@@ -1,0 +1,47 @@
+I, [2021-02-22T08:49:03.082180 #762]  INFO -- : Refreshing Gem list
+I, [2021-02-22T08:49:14.698171 #762]  INFO -- : listening on addr=127.0.0.1:8080 fd=17
+I, [2021-02-22T08:49:14.698313 #762]  INFO -- : listening on addr=/var/opt/gitlab/gitlab-rails/sockets/gitlab.socket fd=18
+I, [2021-02-22T08:49:14.705749 #833]  INFO -- : worker=0 ready
+I, [2021-02-22T08:49:14.712223 #836]  INFO -- : worker=1 ready
+I, [2021-02-22T08:49:14.718754 #839]  INFO -- : worker=2 ready
+I, [2021-02-22T08:49:14.734848 #842]  INFO -- : worker=3 ready
+I, [2021-02-22T08:49:14.753185 #845]  INFO -- : worker=4 ready
+I, [2021-02-22T08:49:14.763101 #848]  INFO -- : worker=5 ready
+I, [2021-02-22T08:49:14.770983 #851]  INFO -- : worker=6 ready
+I, [2021-02-22T08:49:14.778280 #854]  INFO -- : worker=7 ready
+I, [2021-02-22T08:49:14.784383 #762]  INFO -- : master process ready
+I, [2021-02-22T08:49:14.785536 #857]  INFO -- : worker=8 ready
+I, [2021-02-22T08:51:09.939036 #762]  INFO -- : reaped #<Process::Status: pid 833 exit 0> worker=0
+I, [2021-02-22T08:51:09.939180 #762]  INFO -- : reaped #<Process::Status: pid 836 exit 0> worker=1
+I, [2021-02-22T08:51:09.939255 #762]  INFO -- : reaped #<Process::Status: pid 839 exit 0> worker=2
+I, [2021-02-22T08:51:09.939322 #762]  INFO -- : reaped #<Process::Status: pid 842 exit 0> worker=3
+I, [2021-02-22T08:51:09.939391 #762]  INFO -- : reaped #<Process::Status: pid 845 exit 0> worker=4
+I, [2021-02-22T08:51:09.939458 #762]  INFO -- : reaped #<Process::Status: pid 848 exit 0> worker=5
+I, [2021-02-22T08:51:09.939536 #762]  INFO -- : reaped #<Process::Status: pid 851 exit 0> worker=6
+I, [2021-02-22T08:51:09.939623 #762]  INFO -- : reaped #<Process::Status: pid 854 exit 0> worker=7
+I, [2021-02-22T08:51:09.939700 #762]  INFO -- : reaped #<Process::Status: pid 857 exit 0> worker=8
+I, [2021-02-22T08:51:09.939816 #762]  INFO -- : master complete
+I, [2021-02-22T08:51:46.340855 #421]  INFO -- : Refreshing Gem list
+I, [2021-02-22T08:51:57.732575 #421]  INFO -- : listening on addr=127.0.0.1:8080 fd=17
+I, [2021-02-22T08:51:57.732748 #421]  INFO -- : unlinking existing socket=/var/opt/gitlab/gitlab-rails/sockets/gitlab.socket
+I, [2021-02-22T08:51:57.732858 #421]  INFO -- : listening on addr=/var/opt/gitlab/gitlab-rails/sockets/gitlab.socket fd=18
+I, [2021-02-22T08:51:57.740913 #484]  INFO -- : worker=0 ready
+I, [2021-02-22T08:51:57.748233 #487]  INFO -- : worker=1 ready
+I, [2021-02-22T08:51:57.755670 #490]  INFO -- : worker=2 ready
+I, [2021-02-22T08:51:57.763759 #493]  INFO -- : worker=3 ready
+I, [2021-02-22T08:51:57.772225 #496]  INFO -- : worker=4 ready
+I, [2021-02-22T08:51:57.779758 #499]  INFO -- : worker=5 ready
+I, [2021-02-22T08:51:57.787179 #502]  INFO -- : worker=6 ready
+I, [2021-02-22T08:51:57.794559 #505]  INFO -- : worker=7 ready
+I, [2021-02-22T08:51:57.800788 #421]  INFO -- : master process ready
+I, [2021-02-22T08:51:57.802021 #508]  INFO -- : worker=8 ready
+I, [2021-02-22T08:55:26.072283 #421]  INFO -- : reaped #<Process::Status: pid 484 exit 0> worker=0
+I, [2021-02-22T08:55:26.072505 #421]  INFO -- : reaped #<Process::Status: pid 487 exit 0> worker=1
+I, [2021-02-22T08:55:26.072640 #421]  INFO -- : reaped #<Process::Status: pid 490 exit 0> worker=2
+I, [2021-02-22T08:55:26.072793 #421]  INFO -- : reaped #<Process::Status: pid 493 exit 0> worker=3
+I, [2021-02-22T08:55:26.072956 #421]  INFO -- : reaped #<Process::Status: pid 496 exit 0> worker=4
+I, [2021-02-22T08:55:26.073106 #421]  INFO -- : reaped #<Process::Status: pid 499 exit 0> worker=5
+I, [2021-02-22T08:55:26.073272 #421]  INFO -- : reaped #<Process::Status: pid 502 exit 0> worker=6
+I, [2021-02-22T08:55:26.073418 #421]  INFO -- : reaped #<Process::Status: pid 505 exit 0> worker=7
+I, [2021-02-22T08:55:26.073541 #421]  INFO -- : reaped #<Process::Status: pid 508 exit 0> worker=8
+I, [2021-02-22T08:55:26.073725 #421]  INFO -- : master complete

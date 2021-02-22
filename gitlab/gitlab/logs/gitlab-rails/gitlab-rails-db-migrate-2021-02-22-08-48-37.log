@@ -1,0 +1,615 @@
+-- enable_extension("plpgsql")
+   -> 0.0079s
+-- enable_extension("pg_trgm")
+   -> 0.0017s
+-- create_table("abuse_reports", {:force=>:cascade})
+   -> 0.0197s
+-- create_table("appearances", {:force=>:cascade})
+   -> 0.0216s
+-- create_table("application_settings", {:force=>:cascade})
+   -> 0.0441s
+-- create_table("audit_events", {:force=>:cascade})
+   -> 0.0095s
+-- add_index("audit_events", ["entity_id", "entity_type"], {:name=>"index_audit_events_on_entity_id_and_entity_type", :using=>:btree})
+   -> 0.0066s
+-- create_table("award_emoji", {:force=>:cascade})
+   -> 0.0091s
+-- add_index("award_emoji", ["awardable_type", "awardable_id"], {:name=>"index_award_emoji_on_awardable_type_and_awardable_id", :using=>:btree})
+   -> 0.0060s
+-- add_index("award_emoji", ["user_id", "name"], {:name=>"index_award_emoji_on_user_id_and_name", :using=>:btree})
+   -> 0.0061s
+-- create_table("boards", {:force=>:cascade})
+   -> 0.0066s
+-- add_index("boards", ["project_id"], {:name=>"index_boards_on_project_id", :using=>:btree})
+   -> 0.0060s
+-- create_table("broadcast_messages", {:force=>:cascade})
+   -> 0.0092s
+-- create_table("chat_names", {:force=>:cascade})
+   -> 0.0105s
+-- add_index("chat_names", ["service_id", "team_id", "chat_id"], {:name=>"index_chat_names_on_service_id_and_team_id_and_chat_id", :unique=>true, :using=>:btree})
+   -> 0.0067s
+-- add_index("chat_names", ["user_id", "service_id"], {:name=>"index_chat_names_on_user_id_and_service_id", :unique=>true, :using=>:btree})
+   -> 0.0062s
+-- create_table("ci_application_settings", {:force=>:cascade})
+   -> 0.0063s
+-- create_table("ci_builds", {:force=>:cascade})
+   -> 0.0124s
+-- add_index("ci_builds", ["commit_id", "stage_idx", "created_at"], {:name=>"index_ci_builds_on_commit_id_and_stage_idx_and_created_at", :using=>:btree})
+   -> 0.0065s
+-- add_index("ci_builds", ["commit_id", "status", "type"], {:name=>"index_ci_builds_on_commit_id_and_status_and_type", :using=>:btree})
+   -> 0.0061s
+-- add_index("ci_builds", ["commit_id", "type", "name", "ref"], {:name=>"index_ci_builds_on_commit_id_and_type_and_name_and_ref", :using=>:btree})
+   -> 0.0062s
+-- add_index("ci_builds", ["commit_id", "type", "ref"], {:name=>"index_ci_builds_on_commit_id_and_type_and_ref", :using=>:btree})
+   -> 0.0058s
+-- add_index("ci_builds", ["gl_project_id"], {:name=>"index_ci_builds_on_gl_project_id", :using=>:btree})
+   -> 0.0058s
+-- add_index("ci_builds", ["project_id"], {:name=>"index_ci_builds_on_project_id", :using=>:btree})
+   -> 0.0060s
+-- add_index("ci_builds", ["runner_id"], {:name=>"index_ci_builds_on_runner_id", :using=>:btree})
+   -> 0.0055s
+-- add_index("ci_builds", ["status", "type", "runner_id"], {:name=>"index_ci_builds_on_status_and_type_and_runner_id", :using=>:btree})
+   -> 0.0058s
+-- add_index("ci_builds", ["status"], {:name=>"index_ci_builds_on_status", :using=>:btree})
+   -> 0.0058s
+-- add_index("ci_builds", ["token"], {:name=>"index_ci_builds_on_token", :unique=>true, :using=>:btree})
+   -> 0.0052s
+-- create_table("ci_commits", {:force=>:cascade})
+   -> 0.0089s
+-- add_index("ci_commits", ["gl_project_id", "sha"], {:name=>"index_ci_commits_on_gl_project_id_and_sha", :using=>:btree})
+   -> 0.0051s
+-- add_index("ci_commits", ["gl_project_id", "status"], {:name=>"index_ci_commits_on_gl_project_id_and_status", :using=>:btree})
+   -> 0.0052s
+-- add_index("ci_commits", ["gl_project_id"], {:name=>"index_ci_commits_on_gl_project_id", :using=>:btree})
+   -> 0.0047s
+-- add_index("ci_commits", ["status"], {:name=>"index_ci_commits_on_status", :using=>:btree})
+   -> 0.0047s
+-- add_index("ci_commits", ["user_id"], {:name=>"index_ci_commits_on_user_id", :using=>:btree})
+   -> 0.0049s
+-- create_table("ci_events", {:force=>:cascade})
+   -> 0.0078s
+-- create_table("ci_jobs", {:force=>:cascade})
+   -> 0.0099s
+-- create_table("ci_projects", {:force=>:cascade})
+   -> 0.0122s
+-- create_table("ci_runner_projects", {:force=>:cascade})
+   -> 0.0053s
+-- add_index("ci_runner_projects", ["gl_project_id"], {:name=>"index_ci_runner_projects_on_gl_project_id", :using=>:btree})
+   -> 0.0049s
+-- add_index("ci_runner_projects", ["runner_id"], {:name=>"index_ci_runner_projects_on_runner_id", :using=>:btree})
+   -> 0.0049s
+-- create_table("ci_runners", {:force=>:cascade})
+   -> 0.0099s
+-- add_index("ci_runners", ["is_shared"], {:name=>"index_ci_runners_on_is_shared", :using=>:btree})
+   -> 0.0053s
+-- add_index("ci_runners", ["locked"], {:name=>"index_ci_runners_on_locked", :using=>:btree})
+   -> 0.0050s
+-- add_index("ci_runners", ["token"], {:name=>"index_ci_runners_on_token", :using=>:btree})
+   -> 0.0049s
+-- create_table("ci_sessions", {:force=>:cascade})
+   -> 0.0081s
+-- create_table("ci_taggings", {:force=>:cascade})
+   -> 0.0083s
+-- add_index("ci_taggings", ["taggable_id", "taggable_type", "context"], {:name=>"index_ci_taggings_on_taggable_id_and_taggable_type_and_context", :using=>:btree})
+   -> 0.0055s
+-- create_table("ci_tags", {:force=>:cascade})
+   -> 0.0080s
+-- create_table("ci_trigger_requests", {:force=>:cascade})
+   -> 0.0082s
+-- add_index("ci_trigger_requests", ["commit_id"], {:name=>"index_ci_trigger_requests_on_commit_id", :using=>:btree})
+   -> 0.0051s
+-- create_table("ci_triggers", {:force=>:cascade})
+   -> 0.0078s
+-- add_index("ci_triggers", ["gl_project_id"], {:name=>"index_ci_triggers_on_gl_project_id", :using=>:btree})
+   -> 0.0051s
+-- create_table("ci_variables", {:force=>:cascade})
+   -> 0.0078s
+-- add_index("ci_variables", ["gl_project_id"], {:name=>"index_ci_variables_on_gl_project_id", :using=>:btree})
+   -> 0.0050s
+-- create_table("deploy_keys_projects", {:force=>:cascade})
+   -> 0.0056s
+-- add_index("deploy_keys_projects", ["project_id"], {:name=>"index_deploy_keys_projects_on_project_id", :using=>:btree})
+   -> 0.0065s
+-- create_table("deployments", {:force=>:cascade})
+   -> 0.0126s
+-- add_index("deployments", ["project_id", "environment_id", "iid"], {:name=>"index_deployments_on_project_id_and_environment_id_and_iid", :using=>:btree})
+   -> 0.0078s
+-- add_index("deployments", ["project_id", "iid"], {:name=>"index_deployments_on_project_id_and_iid", :unique=>true, :using=>:btree})
+   -> 0.0078s
+-- create_table("emails", {:force=>:cascade})
+   -> 0.0112s
+-- add_index("emails", ["email"], {:name=>"index_emails_on_email", :unique=>true, :using=>:btree})
+   -> 0.0072s
+-- add_index("emails", ["user_id"], {:name=>"index_emails_on_user_id", :using=>:btree})
+   -> 0.0082s
+-- create_table("environments", {:force=>:cascade})
+   -> 0.0100s
+-- add_index("environments", ["project_id", "name"], {:name=>"index_environments_on_project_id_and_name", :unique=>true, :using=>:btree})
+   -> 0.0055s
+-- add_index("environments", ["project_id", "slug"], {:name=>"index_environments_on_project_id_and_slug", :unique=>true, :using=>:btree})
+   -> 0.0050s
+-- create_table("events", {:force=>:cascade})
+   -> 0.0080s
+-- add_index("events", ["action"], {:name=>"index_events_on_action", :using=>:btree})
+   -> 0.0052s
+-- add_index("events", ["author_id"], {:name=>"index_events_on_author_id", :using=>:btree})
+   -> 0.0055s
+-- add_index("events", ["created_at"], {:name=>"index_events_on_created_at", :using=>:btree})
+   -> 0.0051s
+-- add_index("events", ["project_id"], {:name=>"index_events_on_project_id", :using=>:btree})
+   -> 0.0051s
+-- add_index("events", ["target_id"], {:name=>"index_events_on_target_id", :using=>:btree})
+   -> 0.0052s
+-- add_index("events", ["target_type"], {:name=>"index_events_on_target_type", :using=>:btree})
+   -> 0.0052s
+-- create_table("forked_project_links", {:force=>:cascade})
+   -> 0.0056s
+-- add_index("forked_project_links", ["forked_to_project_id"], {:name=>"index_forked_project_links_on_forked_to_project_id", :unique=>true, :using=>:btree})
+   -> 0.0051s
+-- create_table("identities", {:force=>:cascade})
+   -> 0.0079s
+-- add_index("identities", ["user_id"], {:name=>"index_identities_on_user_id", :using=>:btree})
+   -> 0.0053s
+-- create_table("issue_metrics", {:force=>:cascade})
+   -> 0.0058s
+-- add_index("issue_metrics", ["issue_id"], {:name=>"index_issue_metrics", :using=>:btree})
+   -> 0.0052s
+-- create_table("issues", {:force=>:cascade})
+   -> 0.0097s
+-- add_index("issues", ["assignee_id"], {:name=>"index_issues_on_assignee_id", :using=>:btree})
+   -> 0.0054s
+-- add_index("issues", ["author_id"], {:name=>"index_issues_on_author_id", :using=>:btree})
+   -> 0.0050s
+-- add_index("issues", ["confidential"], {:name=>"index_issues_on_confidential", :using=>:btree})
+   -> 0.0050s
+-- add_index("issues", ["created_at"], {:name=>"index_issues_on_created_at", :using=>:btree})
+   -> 0.0051s
+-- add_index("issues", ["deleted_at"], {:name=>"index_issues_on_deleted_at", :using=>:btree})
+   -> 0.0057s
+-- add_index("issues", ["description"], {:name=>"index_issues_on_description_trigram", :using=>:gin, :opclasses=>{"description"=>"gin_trgm_ops"}})
+   -> 0.0046s
+-- add_index("issues", ["due_date"], {:name=>"index_issues_on_due_date", :using=>:btree})
+   -> 0.0058s
+-- add_index("issues", ["milestone_id"], {:name=>"index_issues_on_milestone_id", :using=>:btree})
+   -> 0.0056s
+-- add_index("issues", ["project_id", "iid"], {:name=>"index_issues_on_project_id_and_iid", :unique=>true, :using=>:btree})
+   -> 0.0059s
+-- add_index("issues", ["state"], {:name=>"index_issues_on_state", :using=>:btree})
+   -> 0.0056s
+-- add_index("issues", ["title"], {:name=>"index_issues_on_title_trigram", :using=>:gin, :opclasses=>{"title"=>"gin_trgm_ops"}})
+   -> 0.0042s
+-- create_table("keys", {:force=>:cascade})
+   -> 0.0104s
+-- add_index("keys", ["fingerprint"], {:name=>"index_keys_on_fingerprint", :unique=>true, :using=>:btree})
+   -> 0.0057s
+-- add_index("keys", ["user_id"], {:name=>"index_keys_on_user_id", :using=>:btree})
+   -> 0.0057s
+-- create_table("label_links", {:force=>:cascade})
+   -> 0.0090s
+-- add_index("label_links", ["label_id"], {:name=>"index_label_links_on_label_id", :using=>:btree})
+   -> 0.0063s
+-- add_index("label_links", ["target_id", "target_type"], {:name=>"index_label_links_on_target_id_and_target_type", :using=>:btree})
+   -> 0.0062s
+-- create_table("label_priorities", {:force=>:cascade})
+   -> 0.0074s
+-- add_index("label_priorities", ["priority"], {:name=>"index_label_priorities_on_priority", :using=>:btree})
+   -> 0.0066s
+-- add_index("label_priorities", ["project_id", "label_id"], {:name=>"index_label_priorities_on_project_id_and_label_id", :unique=>true, :using=>:btree})
+   -> 0.0064s
+-- create_table("labels", {:force=>:cascade})
+   -> 0.0108s
+-- add_index("labels", ["group_id", "project_id", "title"], {:name=>"index_labels_on_group_id_and_project_id_and_title", :unique=>true, :using=>:btree})
+   -> 0.0066s
+-- add_index("labels", ["type", "project_id"], {:name=>"index_labels_on_type_and_project_id", :using=>:btree})
+   -> 0.0063s
+-- add_index("labels", ["project_id"], {:name=>"index_labels_on_project_id", :using=>:btree})
+   -> 0.0062s
+-- add_index("labels", ["title"], {:name=>"index_labels_on_title", :using=>:btree})
+   -> 0.0062s
+-- create_table("lfs_objects", {:force=>:cascade})
+   -> 0.0098s
+-- add_index("lfs_objects", ["oid"], {:name=>"index_lfs_objects_on_oid", :unique=>true, :using=>:btree})
+   -> 0.0064s
+-- create_table("lfs_objects_projects", {:force=>:cascade})
+   -> 0.0066s
+-- add_index("lfs_objects_projects", ["project_id"], {:name=>"index_lfs_objects_projects_on_project_id", :using=>:btree})
+   -> 0.0062s
+-- create_table("lists", {:force=>:cascade})
+   -> 0.0075s
+-- add_index("lists", ["board_id", "label_id"], {:name=>"index_lists_on_board_id_and_label_id", :unique=>true, :using=>:btree})
+   -> 0.0065s
+-- add_index("lists", ["label_id"], {:name=>"index_lists_on_label_id", :using=>:btree})
+   -> 0.0066s
+-- create_table("members", {:force=>:cascade})
+   -> 0.0111s
+-- add_index("members", ["access_level"], {:name=>"index_members_on_access_level", :using=>:btree})
+   -> 0.0067s
+-- add_index("members", ["invite_token"], {:name=>"index_members_on_invite_token", :unique=>true, :using=>:btree})
+   -> 0.0065s
+-- add_index("members", ["requested_at"], {:name=>"index_members_on_requested_at", :using=>:btree})
+   -> 0.0066s
+-- add_index("members", ["source_id", "source_type"], {:name=>"index_members_on_source_id_and_source_type", :using=>:btree})
+   -> 0.0067s
+-- add_index("members", ["user_id"], {:name=>"index_members_on_user_id", :using=>:btree})
+   -> 0.0069s
+-- create_table("merge_request_diffs", {:force=>:cascade})
+   -> 0.0109s
+-- add_index("merge_request_diffs", ["merge_request_id"], {:name=>"index_merge_request_diffs_on_merge_request_id", :using=>:btree})
+   -> 0.0068s
+-- create_table("merge_request_metrics", {:force=>:cascade})
+   -> 0.0077s
+-- add_index("merge_request_metrics", ["first_deployed_to_production_at"], {:name=>"index_merge_request_metrics_on_first_deployed_to_production_at", :using=>:btree})
+   -> 0.0067s
+-- add_index("merge_request_metrics", ["merge_request_id"], {:name=>"index_merge_request_metrics", :using=>:btree})
+   -> 0.0065s
+-- add_index("merge_request_metrics", ["pipeline_id"], {:name=>"index_merge_request_metrics_on_pipeline_id", :using=>:btree})
+   -> 0.0066s
+-- create_table("merge_requests", {:force=>:cascade})
+   -> 0.0137s
+-- add_index("merge_requests", ["assignee_id"], {:name=>"index_merge_requests_on_assignee_id", :using=>:btree})
+   -> 0.0067s
+-- add_index("merge_requests", ["author_id"], {:name=>"index_merge_requests_on_author_id", :using=>:btree})
+   -> 0.0068s
+-- add_index("merge_requests", ["created_at"], {:name=>"index_merge_requests_on_created_at", :using=>:btree})
+   -> 0.0066s
+-- add_index("merge_requests", ["deleted_at"], {:name=>"index_merge_requests_on_deleted_at", :using=>:btree})
+   -> 0.0067s
+-- add_index("merge_requests", ["description"], {:name=>"index_merge_requests_on_description_trigram", :using=>:gin, :opclasses=>{"description"=>"gin_trgm_ops"}})
+   -> 0.0051s
+-- add_index("merge_requests", ["milestone_id"], {:name=>"index_merge_requests_on_milestone_id", :using=>:btree})
+   -> 0.0067s
+-- add_index("merge_requests", ["source_branch"], {:name=>"index_merge_requests_on_source_branch", :using=>:btree})
+   -> 0.0066s
+-- add_index("merge_requests", ["source_project_id"], {:name=>"index_merge_requests_on_source_project_id", :using=>:btree})
+   -> 0.0069s
+-- add_index("merge_requests", ["target_branch"], {:name=>"index_merge_requests_on_target_branch", :using=>:btree})
+   -> 0.0065s
+-- add_index("merge_requests", ["target_project_id", "iid"], {:name=>"index_merge_requests_on_target_project_id_and_iid", :unique=>true, :using=>:btree})
+   -> 0.0073s
+-- add_index("merge_requests", ["title"], {:name=>"index_merge_requests_on_title", :using=>:btree})
+   -> 0.0060s
+-- add_index("merge_requests", ["title"], {:name=>"index_merge_requests_on_title_trigram", :using=>:gin, :opclasses=>{"title"=>"gin_trgm_ops"}})
+   -> 0.0031s
+-- create_table("merge_requests_closing_issues", {:force=>:cascade})
+   -> 0.0050s
+-- add_index("merge_requests_closing_issues", ["issue_id"], {:name=>"index_merge_requests_closing_issues_on_issue_id", :using=>:btree})
+   -> 0.0045s
+-- add_index("merge_requests_closing_issues", ["merge_request_id"], {:name=>"index_merge_requests_closing_issues_on_merge_request_id", :using=>:btree})
+   -> 0.0048s
+-- create_table("milestones", {:force=>:cascade})
+   -> 0.0073s
+-- add_index("milestones", ["description"], {:name=>"index_milestones_on_description_trigram", :using=>:gin, :opclasses=>{"description"=>"gin_trgm_ops"}})
+   -> 0.0030s
+-- add_index("milestones", ["due_date"], {:name=>"index_milestones_on_due_date", :using=>:btree})
+   -> 0.0049s
+-- add_index("milestones", ["project_id", "iid"], {:name=>"index_milestones_on_project_id_and_iid", :unique=>true, :using=>:btree})
+   -> 0.0057s
+-- add_index("milestones", ["title"], {:name=>"index_milestones_on_title", :using=>:btree})
+   -> 0.0056s
+-- add_index("milestones", ["title"], {:name=>"index_milestones_on_title_trigram", :using=>:gin, :opclasses=>{"title"=>"gin_trgm_ops"}})
+   -> 0.0034s
+-- create_table("namespaces", {:force=>:cascade})
+   -> 0.0107s
+-- add_index("namespaces", ["created_at"], {:name=>"index_namespaces_on_created_at", :using=>:btree})
+   -> 0.0058s
+-- add_index("namespaces", ["deleted_at"], {:name=>"index_namespaces_on_deleted_at", :using=>:btree})
+   -> 0.0056s
+-- add_index("namespaces", ["name", "parent_id"], {:name=>"index_namespaces_on_name_and_parent_id", :unique=>true, :using=>:btree})
+   -> 0.0054s
+-- add_index("namespaces", ["name"], {:name=>"index_namespaces_on_name_trigram", :using=>:gin, :opclasses=>{"name"=>"gin_trgm_ops"}})
+   -> 0.0034s
+-- add_index("namespaces", ["owner_id"], {:name=>"index_namespaces_on_owner_id", :using=>:btree})
+   -> 0.0048s
+-- add_index("namespaces", ["parent_id", "id"], {:name=>"index_namespaces_on_parent_id_and_id", :unique=>true, :using=>:btree})
+   -> 0.0049s
+-- add_index("namespaces", ["path"], {:name=>"index_namespaces_on_path", :using=>:btree})
+   -> 0.0046s
+-- add_index("namespaces", ["path"], {:name=>"index_namespaces_on_path_trigram", :using=>:gin, :opclasses=>{"path"=>"gin_trgm_ops"}})
+   -> 0.0030s
+-- add_index("namespaces", ["type"], {:name=>"index_namespaces_on_type", :using=>:btree})
+   -> 0.0044s
+-- create_table("notes", {:force=>:cascade})
+   -> 0.0079s
+-- add_index("notes", ["author_id"], {:name=>"index_notes_on_author_id", :using=>:btree})
+   -> 0.0047s
+-- add_index("notes", ["commit_id"], {:name=>"index_notes_on_commit_id", :using=>:btree})
+   -> 0.0045s
+-- add_index("notes", ["created_at"], {:name=>"index_notes_on_created_at", :using=>:btree})
+   -> 0.0047s
+-- add_index("notes", ["discussion_id"], {:name=>"index_notes_on_discussion_id", :using=>:btree})
+   -> 0.0044s
+-- add_index("notes", ["line_code"], {:name=>"index_notes_on_line_code", :using=>:btree})
+   -> 0.0046s
+-- add_index("notes", ["note"], {:name=>"index_notes_on_note_trigram", :using=>:gin, :opclasses=>{"note"=>"gin_trgm_ops"}})
+   -> 0.0030s
+-- add_index("notes", ["noteable_id", "noteable_type"], {:name=>"index_notes_on_noteable_id_and_noteable_type", :using=>:btree})
+   -> 0.0047s
+-- add_index("notes", ["noteable_type"], {:name=>"index_notes_on_noteable_type", :using=>:btree})
+   -> 0.0048s
+-- add_index("notes", ["project_id", "noteable_type"], {:name=>"index_notes_on_project_id_and_noteable_type", :using=>:btree})
+   -> 0.0048s
+-- add_index("notes", ["updated_at"], {:name=>"index_notes_on_updated_at", :using=>:btree})
+   -> 0.0048s
+-- create_table("notification_settings", {:force=>:cascade})
+   -> 0.0084s
+-- add_index("notification_settings", ["source_id", "source_type"], {:name=>"index_notification_settings_on_source_id_and_source_type", :using=>:btree})
+   -> 0.0046s
+-- add_index("notification_settings", ["user_id", "source_id", "source_type"], {:name=>"index_notifications_on_user_id_and_source_id_and_source_type", :unique=>true, :using=>:btree})
+   -> 0.0049s
+-- add_index("notification_settings", ["user_id"], {:name=>"index_notification_settings_on_user_id", :using=>:btree})
+   -> 0.0045s
+-- create_table("oauth_access_grants", {:force=>:cascade})
+   -> 0.0073s
+-- add_index("oauth_access_grants", ["token"], {:name=>"index_oauth_access_grants_on_token", :unique=>true, :using=>:btree})
+   -> 0.0047s
+-- create_table("oauth_access_tokens", {:force=>:cascade})
+   -> 0.0074s
+-- add_index("oauth_access_tokens", ["refresh_token"], {:name=>"index_oauth_access_tokens_on_refresh_token", :unique=>true, :using=>:btree})
+   -> 0.0047s
+-- add_index("oauth_access_tokens", ["resource_owner_id"], {:name=>"index_oauth_access_tokens_on_resource_owner_id", :using=>:btree})
+   -> 0.0046s
+-- add_index("oauth_access_tokens", ["token"], {:name=>"index_oauth_access_tokens_on_token", :unique=>true, :using=>:btree})
+   -> 0.0045s
+-- create_table("oauth_applications", {:force=>:cascade})
+   -> 0.0078s
+-- add_index("oauth_applications", ["owner_id", "owner_type"], {:name=>"index_oauth_applications_on_owner_id_and_owner_type", :using=>:btree})
+   -> 0.0056s
+-- add_index("oauth_applications", ["uid"], {:name=>"index_oauth_applications_on_uid", :unique=>true, :using=>:btree})
+   -> 0.0062s
+-- create_table("pages_domains", {:force=>:cascade})
+   -> 0.0101s
+-- add_index("pages_domains", ["domain"], {:name=>"index_pages_domains_on_domain", :unique=>true, :using=>:btree})
+   -> 0.0067s
+-- create_table("personal_access_tokens", {:force=>:cascade})
+   -> 0.0117s
+-- add_index("personal_access_tokens", ["token"], {:name=>"index_personal_access_tokens_on_token", :unique=>true, :using=>:btree})
+   -> 0.0069s
+-- add_index("personal_access_tokens", ["user_id"], {:name=>"index_personal_access_tokens_on_user_id", :using=>:btree})
+   -> 0.0066s
+-- create_table("project_authorizations", {:id=>false, :force=>:cascade})
+   -> 0.0033s
+-- add_index("project_authorizations", ["project_id"], {:name=>"index_project_authorizations_on_project_id", :using=>:btree})
+   -> 0.0066s
+-- add_index("project_authorizations", ["user_id", "project_id", "access_level"], {:name=>"index_project_authorizations_on_user_id_project_id_access_level", :unique=>true, :using=>:btree})
+   -> 0.0066s
+-- create_table("project_features", {:force=>:cascade})
+   -> 0.0084s
+-- add_index("project_features", ["project_id"], {:name=>"index_project_features_on_project_id", :using=>:btree})
+   -> 0.0066s
+-- create_table("project_group_links", {:force=>:cascade})
+   -> 0.0083s
+-- create_table("project_import_data", {:force=>:cascade})
+   -> 0.0100s
+-- add_index("project_import_data", ["project_id"], {:name=>"index_project_import_data_on_project_id", :using=>:btree})
+   -> 0.0063s
+-- create_table("project_statistics", {:force=>:cascade})
+   -> 0.0120s
+-- add_index("project_statistics", ["namespace_id"], {:name=>"index_project_statistics_on_namespace_id", :using=>:btree})
+   -> 0.0072s
+-- add_index("project_statistics", ["project_id"], {:name=>"index_project_statistics_on_project_id", :unique=>true, :using=>:btree})
+   -> 0.0049s
+-- create_table("projects", {:force=>:cascade})
+   -> 0.0107s
+-- add_index("projects", ["ci_id"], {:name=>"index_projects_on_ci_id", :using=>:btree})
+   -> 0.0040s
+-- add_index("projects", ["created_at"], {:name=>"index_projects_on_created_at", :using=>:btree})
+   -> 0.0039s
+-- add_index("projects", ["creator_id"], {:name=>"index_projects_on_creator_id", :using=>:btree})
+   -> 0.0042s
+-- add_index("projects", ["description"], {:name=>"index_projects_on_description_trigram", :using=>:gin, :opclasses=>{"description"=>"gin_trgm_ops"}})
+   -> 0.0021s
+-- add_index("projects", ["last_activity_at"], {:name=>"index_projects_on_last_activity_at", :using=>:btree})
+   -> 0.0038s
+-- add_index("projects", ["last_repository_check_failed"], {:name=>"index_projects_on_last_repository_check_failed", :using=>:btree})
+   -> 0.0037s
+-- add_index("projects", ["name"], {:name=>"index_projects_on_name_trigram", :using=>:gin, :opclasses=>{"name"=>"gin_trgm_ops"}})
+   -> 0.0023s
+-- add_index("projects", ["namespace_id"], {:name=>"index_projects_on_namespace_id", :using=>:btree})
+   -> 0.0038s
+-- add_index("projects", ["path"], {:name=>"index_projects_on_path", :using=>:btree})
+   -> 0.0035s
+-- add_index("projects", ["path"], {:name=>"index_projects_on_path_trigram", :using=>:gin, :opclasses=>{"path"=>"gin_trgm_ops"}})
+   -> 0.0022s
+-- add_index("projects", ["pending_delete"], {:name=>"index_projects_on_pending_delete", :using=>:btree})
+   -> 0.0036s
+-- add_index("projects", ["runners_token"], {:name=>"index_projects_on_runners_token", :using=>:btree})
+   -> 0.0041s
+-- add_index("projects", ["star_count"], {:name=>"index_projects_on_star_count", :using=>:btree})
+   -> 0.0037s
+-- add_index("projects", ["visibility_level"], {:name=>"index_projects_on_visibility_level", :using=>:btree})
+   -> 0.0039s
+-- create_table("protected_branch_merge_access_levels", {:force=>:cascade})
+   -> 0.0048s
+-- add_index("protected_branch_merge_access_levels", ["protected_branch_id"], {:name=>"index_protected_branch_merge_access", :using=>:btree})
+   -> 0.0036s
+-- create_table("protected_branch_push_access_levels", {:force=>:cascade})
+   -> 0.0049s
+-- add_index("protected_branch_push_access_levels", ["protected_branch_id"], {:name=>"index_protected_branch_push_access", :using=>:btree})
+   -> 0.0068s
+-- create_table("protected_branches", {:force=>:cascade})
+   -> 0.0106s
+-- add_index("protected_branches", ["project_id"], {:name=>"index_protected_branches_on_project_id", :using=>:btree})
+   -> 0.0072s
+-- create_table("releases", {:force=>:cascade})
+   -> 0.0112s
+-- add_index("releases", ["project_id", "tag"], {:name=>"index_releases_on_project_id_and_tag", :using=>:btree})
+   -> 0.0074s
+-- add_index("releases", ["project_id"], {:name=>"index_releases_on_project_id", :using=>:btree})
+   -> 0.0070s
+-- create_table("routes", {:force=>:cascade})
+   -> 0.0104s
+-- add_index("routes", ["path"], {:name=>"index_routes_on_path", :unique=>true, :using=>:btree})
+   -> 0.0049s
+-- add_index("routes", ["source_type", "source_id"], {:name=>"index_routes_on_source_type_and_source_id", :unique=>true, :using=>:btree})
+   -> 0.0040s
+-- create_table("sent_notifications", {:force=>:cascade})
+   -> 0.0067s
+-- add_index("sent_notifications", ["reply_key"], {:name=>"index_sent_notifications_on_reply_key", :unique=>true, :using=>:btree})
+   -> 0.0039s
+-- create_table("services", {:force=>:cascade})
+   -> 0.0110s
+-- add_index("services", ["project_id"], {:name=>"index_services_on_project_id", :using=>:btree})
+   -> 0.0042s
+-- add_index("services", ["template"], {:name=>"index_services_on_template", :using=>:btree})
+   -> 0.0043s
+-- create_table("snippets", {:force=>:cascade})
+   -> 0.0088s
+-- add_index("snippets", ["author_id"], {:name=>"index_snippets_on_author_id", :using=>:btree})
+   -> 0.0054s
+-- add_index("snippets", ["file_name"], {:name=>"index_snippets_on_file_name_trigram", :using=>:gin, :opclasses=>{"file_name"=>"gin_trgm_ops"}})
+   -> 0.0058s
+-- add_index("snippets", ["project_id"], {:name=>"index_snippets_on_project_id", :using=>:btree})
+   -> 0.0082s
+-- add_index("snippets", ["title"], {:name=>"index_snippets_on_title_trigram", :using=>:gin, :opclasses=>{"title"=>"gin_trgm_ops"}})
+   -> 0.0059s
+-- add_index("snippets", ["updated_at"], {:name=>"index_snippets_on_updated_at", :using=>:btree})
+   -> 0.0083s
+-- add_index("snippets", ["visibility_level"], {:name=>"index_snippets_on_visibility_level", :using=>:btree})
+   -> 0.0082s
+-- create_table("spam_logs", {:force=>:cascade})
+   -> 0.0157s
+-- create_table("subscriptions", {:force=>:cascade})
+   -> 0.0119s
+-- add_index("subscriptions", ["subscribable_id", "subscribable_type", "user_id", "project_id"], {:name=>"index_subscriptions_on_subscribable_and_user_id_and_project_id", :unique=>true, :using=>:btree})
+   -> 0.0080s
+-- create_table("taggings", {:force=>:cascade})
+   -> 0.0114s
+-- add_index("taggings", ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], {:name=>"taggings_idx", :unique=>true, :using=>:btree})
+   -> 0.0079s
+-- add_index("taggings", ["taggable_id", "taggable_type", "context"], {:name=>"index_taggings_on_taggable_id_and_taggable_type_and_context", :using=>:btree})
+   -> 0.0075s
+-- create_table("tags", {:force=>:cascade})
+   -> 0.0116s
+-- add_index("tags", ["name"], {:name=>"index_tags_on_name", :unique=>true, :using=>:btree})
+   -> 0.0074s
+-- create_table("timelogs", {:force=>:cascade})
+   -> 0.0079s
+-- add_index("timelogs", ["issue_id"], {:name=>"index_timelogs_on_issue_id", :using=>:btree})
+   -> 0.0072s
+-- add_index("timelogs", ["merge_request_id"], {:name=>"index_timelogs_on_merge_request_id", :using=>:btree})
+   -> 0.0073s
+-- add_index("timelogs", ["user_id"], {:name=>"index_timelogs_on_user_id", :using=>:btree})
+   -> 0.0072s
+-- create_table("todos", {:force=>:cascade})
+   -> 0.0120s
+-- add_index("todos", ["author_id"], {:name=>"index_todos_on_author_id", :using=>:btree})
+   -> 0.0079s
+-- add_index("todos", ["commit_id"], {:name=>"index_todos_on_commit_id", :using=>:btree})
+   -> 0.0070s
+-- add_index("todos", ["note_id"], {:name=>"index_todos_on_note_id", :using=>:btree})
+   -> 0.0070s
+-- add_index("todos", ["project_id"], {:name=>"index_todos_on_project_id", :using=>:btree})
+   -> 0.0071s
+-- add_index("todos", ["target_type", "target_id"], {:name=>"index_todos_on_target_type_and_target_id", :using=>:btree})
+   -> 0.0077s
+-- add_index("todos", ["user_id"], {:name=>"index_todos_on_user_id", :using=>:btree})
+   -> 0.0071s
+-- create_table("trending_projects", {:force=>:cascade})
+   -> 0.0078s
+-- add_index("trending_projects", ["project_id"], {:name=>"index_trending_projects_on_project_id", :using=>:btree})
+   -> 0.0072s
+-- create_table("u2f_registrations", {:force=>:cascade})
+   -> 0.0120s
+-- add_index("u2f_registrations", ["key_handle"], {:name=>"index_u2f_registrations_on_key_handle", :using=>:btree})
+   -> 0.0072s
+-- add_index("u2f_registrations", ["user_id"], {:name=>"index_u2f_registrations_on_user_id", :using=>:btree})
+   -> 0.0075s
+-- create_table("user_agent_details", {:force=>:cascade})
+   -> 0.0117s
+-- add_index("user_agent_details", ["subject_id", "subject_type"], {:name=>"index_user_agent_details_on_subject_id_and_subject_type", :using=>:btree})
+   -> 0.0074s
+-- create_table("users", {:force=>:cascade})
+   -> 0.0346s
+-- add_index("users", ["admin"], {:name=>"index_users_on_admin", :using=>:btree})
+   -> 0.0081s
+-- add_index("users", ["authentication_token"], {:name=>"index_users_on_authentication_token", :unique=>true, :using=>:btree})
+   -> 0.0077s
+-- add_index("users", ["confirmation_token"], {:name=>"index_users_on_confirmation_token", :unique=>true, :using=>:btree})
+   -> 0.0073s
+-- add_index("users", ["created_at"], {:name=>"index_users_on_created_at", :using=>:btree})
+   -> 0.0072s
+-- add_index("users", ["current_sign_in_at"], {:name=>"index_users_on_current_sign_in_at", :using=>:btree})
+   -> 0.0072s
+-- add_index("users", ["email"], {:name=>"index_users_on_email", :unique=>true, :using=>:btree})
+   -> 0.0072s
+-- add_index("users", ["email"], {:name=>"index_users_on_email_trigram", :using=>:gin, :opclasses=>{"email"=>"gin_trgm_ops"}})
+   -> 0.0055s
+-- add_index("users", ["incoming_email_token"], {:name=>"index_users_on_incoming_email_token", :using=>:btree})
+   -> 0.0072s
+-- add_index("users", ["name"], {:name=>"index_users_on_name", :using=>:btree})
+   -> 0.0073s
+-- add_index("users", ["name"], {:name=>"index_users_on_name_trigram", :using=>:gin, :opclasses=>{"name"=>"gin_trgm_ops"}})
+   -> 0.0055s
+-- add_index("users", ["reset_password_token"], {:name=>"index_users_on_reset_password_token", :unique=>true, :using=>:btree})
+   -> 0.0072s
+-- add_index("users", ["state"], {:name=>"index_users_on_state", :using=>:btree})
+   -> 0.0073s
+-- add_index("users", ["username"], {:name=>"index_users_on_username", :using=>:btree})
+   -> 0.0073s
+-- add_index("users", ["username"], {:name=>"index_users_on_username_trigram", :using=>:gin, :opclasses=>{"username"=>"gin_trgm_ops"}})
+   -> 0.0058s
+-- create_table("users_star_projects", {:force=>:cascade})
+   -> 0.0078s
+-- add_index("users_star_projects", ["project_id"], {:name=>"index_users_star_projects_on_project_id", :using=>:btree})
+   -> 0.0072s
+-- add_index("users_star_projects", ["user_id", "project_id"], {:name=>"index_users_star_projects_on_user_id_and_project_id", :unique=>true, :using=>:btree})
+   -> 0.0072s
+-- create_table("web_hooks", {:force=>:cascade})
+   -> 0.0192s
+-- add_index("web_hooks", ["project_id"], {:name=>"index_web_hooks_on_project_id", :using=>:btree})
+   -> 0.0075s
+-- add_foreign_key("boards", "projects")
+   -> 0.0092s
+-- add_foreign_key("issue_metrics", "issues", {:on_delete=>:cascade})
+   -> 0.0052s
+-- add_foreign_key("label_priorities", "labels", {:on_delete=>:cascade})
+   -> 0.0038s
+-- add_foreign_key("label_priorities", "projects", {:on_delete=>:cascade})
+   -> 0.0028s
+-- add_foreign_key("labels", "namespaces", {:column=>"group_id", :on_delete=>:cascade})
+   -> 0.0029s
+-- add_foreign_key("lists", "boards")
+   -> 0.0022s
+-- add_foreign_key("lists", "labels")
+   -> 0.0021s
+-- add_foreign_key("merge_request_metrics", "ci_commits", {:column=>"pipeline_id", :on_delete=>:cascade})
+   -> 0.0024s
+-- add_foreign_key("merge_request_metrics", "merge_requests", {:on_delete=>:cascade})
+   -> 0.0027s
+-- add_foreign_key("merge_requests_closing_issues", "issues", {:on_delete=>:cascade})
+   -> 0.0023s
+-- add_foreign_key("merge_requests_closing_issues", "merge_requests", {:on_delete=>:cascade})
+   -> 0.0020s
+-- add_foreign_key("personal_access_tokens", "users")
+   -> 0.0033s
+-- add_foreign_key("project_authorizations", "projects", {:on_delete=>:cascade})
+   -> 0.0023s
+-- add_foreign_key("project_authorizations", "users", {:on_delete=>:cascade})
+   -> 0.0023s
+-- add_foreign_key("project_statistics", "projects", {:on_delete=>:cascade})
+   -> 0.0024s
+-- add_foreign_key("protected_branch_merge_access_levels", "protected_branches")
+   -> 0.0023s
+-- add_foreign_key("protected_branch_push_access_levels", "protected_branches")
+   -> 0.0021s
+-- add_foreign_key("subscriptions", "projects", {:on_delete=>:cascade})
+   -> 0.0023s
+-- add_foreign_key("timelogs", "issues", {:name=>"fk_timelogs_issues_issue_id", :on_delete=>:cascade})
+   -> 0.0023s
+-- add_foreign_key("timelogs", "merge_requests", {:name=>"fk_timelogs_merge_requests_merge_request_id", :on_delete=>:cascade})
+   -> 0.0022s
+-- add_foreign_key("trending_projects", "projects", {:on_delete=>:cascade})
+   -> 0.0021s
+-- add_foreign_key("u2f_registrations", "users")
+   -> 0.0026s
+-- initialize_schema_migrations_table()
+   -> 0.0145s
+
+== Seed from /opt/gitlab/embedded/service/gitlab-rails/db/fixtures/production/001_admin.rb
+Administrator account created:
+
+login:    root
+password: You'll be prompted to create one on your first visit.
+
+
+== Seed from /opt/gitlab/embedded/service/gitlab-rails/db/fixtures/production/010_settings.rb

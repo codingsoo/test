@@ -1,0 +1,73 @@
+** [Raven] Raven 2.0.2 configured not to capture errors.
+** [Raven] Raven 2.0.2 configured not to capture errors.
+** [Raven] Raven 2.0.2 configured not to capture errors.
+Started GET "/help" for 127.0.0.1 at 2021-02-22 08:49:20 +0000
+Processing by HelpController#index as */*
+Completed 200 OK in 185ms (Views: 163.1ms | ActiveRecord: 5.9ms)
+** [Raven] Raven 2.0.2 configured not to capture errors.
+Started GET "/" for 172.17.0.1 at 2021-02-22 08:49:24 +0000
+Processing by RootController#index as HTML
+Redirected to http://localhost:3000/users/sign_in
+Filter chain halted as :redirect_unlogged_user rendered or redirected
+Completed 302 Found in 17ms (ActiveRecord: 1.5ms)
+Started GET "/users/sign_in" for 172.17.0.1 at 2021-02-22 08:49:24 +0000
+Processing by SessionsController#new as HTML
+Redirected to http://localhost:3000/users/password/edit?reset_password_token=VjfVzHbzHP23C7WBzZy3
+Filter chain halted as :check_initial_setup rendered or redirected
+Completed 302 Found in 249ms (ActiveRecord: 14.6ms)
+Started GET "/users/password/edit?reset_password_token=[FILTERED]" for 172.17.0.1 at 2021-02-22 08:49:25 +0000
+Processing by PasswordsController#edit as HTML
+  Parameters: {"reset_password_token"=>"[FILTERED]"}
+Completed 200 OK in 262ms (Views: 73.9ms | ActiveRecord: 6.6ms)
+** [Raven] Raven 2.0.2 configured not to capture errors.
+Started PUT "/users/password" for 172.17.0.1 at 2021-02-22 08:49:35 +0000
+Processing by PasswordsController#update as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"ED1iklOeQQ8FscQAYHB+NVx2iUeZpeXSwc1mLwef0bsw6lhLa2RwgXe2deF8hYYw1d0KL50+E9AaIisCQELY6A==", "user"=>{"reset_password_token"=>"[FILTERED]", "password"=>"[FILTERED]", "password_confirmation"=>"[FILTERED]"}}
+[ActiveJob] Enqueued ActionMailer::DeliveryJob (Job ID: 90095cf7-4fd0-4edd-a46e-5e5bd234324e) to Sidekiq(mailers) with arguments: "DeviseMailer", "password_change", "deliver_now", gid://gitlab/User/1
+[ActiveJob] [ActionMailer::DeliveryJob] [90095cf7-4fd0-4edd-a46e-5e5bd234324e] Performing ActionMailer::DeliveryJob from Sidekiq(mailers) with arguments: "DeviseMailer", "password_change", "deliver_now", gid://gitlab/User/1
+Redirected to http://localhost:3000/users/sign_in
+Completed 302 Found in 519ms (ActiveRecord: 99.9ms)
+Started GET "/users/sign_in" for 172.17.0.1 at 2021-02-22 08:49:35 +0000
+Processing by SessionsController#new as HTML
+Completed 200 OK in 204ms (Views: 143.7ms | ActiveRecord: 4.0ms)
+[ActiveJob] [ActionMailer::DeliveryJob] [90095cf7-4fd0-4edd-a46e-5e5bd234324e] 
+Sent mail to admin@example.com (4.1ms)
+[ActiveJob] [ActionMailer::DeliveryJob] [90095cf7-4fd0-4edd-a46e-5e5bd234324e] Performed ActionMailer::DeliveryJob from Sidekiq(mailers) in 434.65ms
+Started POST "/users/sign_in" for 172.17.0.1 at 2021-02-22 08:49:39 +0000
+Processing by SessionsController#create as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"J3pEIsfQpV5L0YAQMA7YwCEgXDCdR0rl/shxEH8ZcfUHrX77/yqU0DnWMfEs+yDFqIvfWJncvOclJzw9OMR4pg==", "user"=>{"login"=>"root", "password"=>"[FILTERED]", "remember_me"=>"0"}}
+Redirected to http://localhost:3000/
+Completed 302 Found in 424ms (ActiveRecord: 154.9ms)
+Started GET "/" for 172.17.0.1 at 2021-02-22 08:49:39 +0000
+Processing by RootController#index as HTML
+Completed 200 OK in 446ms (Views: 175.1ms | ActiveRecord: 95.1ms)
+Started GET "/profile" for 172.17.0.1 at 2021-02-22 08:49:50 +0000
+Processing by ProfilesController#show as HTML
+Completed 200 OK in 163ms (Views: 138.9ms | ActiveRecord: 4.6ms)
+Started GET "/profile/account" for 172.17.0.1 at 2021-02-22 08:49:52 +0000
+Processing by Profiles::AccountsController#show as HTML
+Completed 200 OK in 310ms (Views: 247.8ms | ActiveRecord: 12.5ms)
+Scheduling removal of build artifacts
+Started GET "/help" for 127.0.0.1 at 2021-02-22 08:50:20 +0000
+Processing by HelpController#index as */*
+Completed 200 OK in 169ms (Views: 150.0ms | ActiveRecord: 2.8ms)
+** [Raven] Raven 2.0.2 configured not to capture errors.
+** [Raven] Raven 2.0.2 configured not to capture errors.
+Started GET "/help" for 127.0.0.1 at 2021-02-22 08:52:27 +0000
+Processing by HelpController#index as */*
+Completed 200 OK in 174ms (Views: 153.7ms | ActiveRecord: 5.2ms)
+Started GET "/" for 172.17.0.1 at 2021-02-22 08:53:23 +0000
+Processing by RootController#index as HTML
+Completed 200 OK in 293ms (Views: 156.5ms | ActiveRecord: 19.8ms)
+Started GET "/help" for 127.0.0.1 at 2021-02-22 08:53:28 +0000
+Processing by HelpController#index as */*
+Completed 200 OK in 153ms (Views: 135.0ms | ActiveRecord: 2.5ms)
+Started GET "/profile" for 172.17.0.1 at 2021-02-22 08:53:30 +0000
+Processing by ProfilesController#show as HTML
+Completed 200 OK in 220ms (Views: 164.6ms | ActiveRecord: 5.5ms)
+Started GET "/profile/account" for 172.17.0.1 at 2021-02-22 08:53:33 +0000
+Processing by Profiles::AccountsController#show as HTML
+Completed 200 OK in 308ms (Views: 245.4ms | ActiveRecord: 12.1ms)
+Started GET "/help" for 127.0.0.1 at 2021-02-22 08:54:28 +0000
+Processing by HelpController#index as */*
+Completed 200 OK in 217ms (Views: 196.7ms | ActiveRecord: 5.4ms)

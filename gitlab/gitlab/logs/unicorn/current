@@ -1,0 +1,7 @@
+2021-02-22_08:51:45.87032 starting new unicorn master
+2021-02-22_08:51:58.81611 adopted new unicorn master 421
+2021-02-22_08:55:25.97070 Received TERM from runit, sending to process group (-PID)
+2021-02-22_08:55:25.97137 Terminated
+2021-02-22_08:55:25.97142 forwarding TERM to unicorn master 421
+2021-02-22_08:55:25.97149 forwarding CONT to unicorn master 421
+2021-02-22_08:55:25.97160 wrapper for unicorn master 421 exiting

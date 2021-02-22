@@ -1,0 +1,2 @@
+# Logfile created on 2021-02-22 05:57:16 +0000 by logger.rb/v1.4.2
+{"severity":"INFO","time":"2021-02-22T05:57:16.846Z","correlation_id":"01EZ450E4GMT4KW79CNKJRJMGW","author_id":1,"author_name":"Administrator","entity_id":1,"entity_type":"User","with":"standard","target_id":1,"target_type":"User","target_details":"Administrator"}

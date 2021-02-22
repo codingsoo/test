@@ -1,0 +1,7 @@
+2021-02-22_08:49:02.60114 starting new unicorn master
+2021-02-22_08:49:15.79954 adopted new unicorn master 762
+2021-02-22_08:51:09.83509 Received TERM from runit, sending to process group (-PID)
+2021-02-22_08:51:09.83746 Terminated
+2021-02-22_08:51:09.83766 forwarding TERM to unicorn master 762
+2021-02-22_08:51:09.83794 forwarding CONT to unicorn master 762
+2021-02-22_08:51:09.83816 wrapper for unicorn master 762 exiting

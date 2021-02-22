@@ -1,0 +1,7 @@
+=== puma startup: 2021-02-22 05:56:29 +0000 ===
+WARNING: Active Record does not support composite primary key.
+
+user_interacted_projects has composite primary key. Composite primary key is ignored.
+WARNING: Active Record does not support composite primary key.
+
+project_authorizations has composite primary key. Composite primary key is ignored.

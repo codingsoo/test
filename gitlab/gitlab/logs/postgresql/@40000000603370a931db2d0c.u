@@ -1,0 +1,18 @@
+2021-02-22_08:48:36.47298 LOG:  database system was shut down at 2021-02-22 08:48:32 GMT
+2021-02-22_08:48:36.47849 LOG:  database system is ready to accept connections
+2021-02-22_08:48:36.47862 LOG:  autovacuum launcher started
+2021-02-22_08:51:07.72039 received TERM from runit, sending INT instead to force quit connections
+2021-02-22_08:51:07.72274 LOG:  received fast shutdown request
+2021-02-22_08:51:07.72280 LOG:  aborting any active transactions
+2021-02-22_08:51:07.72286 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72288 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72289 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72294 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72295 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72657 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72661 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72663 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72664 FATAL:  terminating connection due to administrator command
+2021-02-22_08:51:07.72666 LOG:  autovacuum launcher shutting down
+2021-02-22_08:51:07.72826 LOG:  shutting down
+2021-02-22_08:51:07.75590 LOG:  database system is shut down

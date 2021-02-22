@@ -1,0 +1,43 @@
+# Logfile created on 2021-02-22 05:55:16 +0000 by logger.rb/v1.4.2
+2021-02-22T05:55:16.355Z: ActiveRecord connection established
+2021-02-22T05:55:16.848Z: Checking state of dynamic postgres partitions
+2021-02-22T05:55:30.004Z: Checking state of dynamic postgres partitions
+2021-02-22T05:55:30.076Z: {:method=>"with_lock_retries", :class=>"Gitlab::Database::Partitioning::PartitionCreator", :message=>"Lock timeout is set", :current_iteration=>1, :lock_timeout_in_ms=>100}
+2021-02-22T05:55:30.108Z: Created partition audit_events_000000 for table audit_events
+2021-02-22T05:55:30.130Z: Created partition audit_events_202102 for table audit_events
+2021-02-22T05:55:30.152Z: Created partition audit_events_202103 for table audit_events
+2021-02-22T05:55:30.173Z: Created partition audit_events_202104 for table audit_events
+2021-02-22T05:55:30.196Z: Created partition audit_events_202105 for table audit_events
+2021-02-22T05:55:30.219Z: Created partition audit_events_202106 for table audit_events
+2021-02-22T05:55:30.241Z: Created partition audit_events_202107 for table audit_events
+2021-02-22T05:55:30.254Z: Created partition audit_events_202108 for table audit_events
+2021-02-22T05:55:30.254Z: {:method=>"with_lock_retries", :class=>"Gitlab::Database::Partitioning::PartitionCreator", :message=>"Migration finished", :current_iteration=>1, :lock_timeout_in_ms=>100}
+2021-02-22T05:55:31.292Z: User "Administrator" (admin@example.com) was created
+2021-02-22T05:55:31.602Z: Group "GitLab Instance" was created
+2021-02-22T05:55:32.756Z: GitLab Instance created a new project "GitLab Instance / Monitoring"
+2021-02-22T05:55:33.594Z: Cannot obtain an exclusive lease. There must be another instance already in execution.
+2021-02-22T05:55:44.973Z: ActiveRecord connection established
+2021-02-22T05:55:45.909Z: Checking state of dynamic postgres partitions
+2021-02-22T05:56:05.214Z: Checking state of dynamic postgres partitions
+2021-02-22T05:56:12.660Z: Checking state of dynamic postgres partitions
+2021-02-22T05:56:30.203Z: ActiveRecord connection disconnected
+2021-02-22T05:56:30.455Z: ActiveRecord connection established
+2021-02-22T05:56:30.473Z: ActiveRecord connection established
+2021-02-22T05:56:30.498Z: ActiveRecord connection established
+2021-02-22T05:56:30.521Z: ActiveRecord connection established
+2021-02-22T05:56:30.527Z: ActiveRecord connection established
+2021-02-22T05:56:30.548Z: ActiveRecord connection established
+2021-02-22T05:56:30.563Z: ActiveRecord connection established
+2021-02-22T05:56:30.588Z: ActiveRecord connection established
+2021-02-22T05:57:02.200Z: ActiveRecord connection established
+2021-02-22T05:57:03.031Z: Checking state of dynamic postgres partitions
+2021-02-22T05:57:16.845Z: Successful Login: username=root ip=172.17.0.1 method=standard admin=true
+2021-02-22T05:57:38.391Z: ActiveRecord connection established
+2021-02-22T05:57:39.377Z: Checking state of dynamic postgres partitions
+2021-02-22T05:57:44.133Z: User "sooding" (project1_bot@example.com) was created
+2021-02-22T05:57:44.382Z: Cannot obtain an exclusive lease. There must be another instance already in execution.
+2021-02-22T05:57:44.426Z: PAT CREATION: created_by: 'project_1_bot', created_for: 'project_1_bot', token_id: '1'
+2021-02-22T06:00:18.736Z: StuckCiJobsWorker: Cleaning stuck builds
+2021-02-22T06:21:13.486Z: Checking state of dynamic postgres partitions
+2021-02-22T07:00:01.328Z: StuckCiJobsWorker: Cleaning stuck builds
+2021-02-22T08:00:16.229Z: StuckCiJobsWorker: Cleaning stuck builds
