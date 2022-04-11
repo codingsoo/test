@@ -101,7 +101,6 @@ paths:
           type: boolean
           default: false
           description: If true, only the rules and categories whose IDs are specified with `enabledRules` or `enabledCategories` are enabled.
-  /check:
     post:
       summary: Check a text
       description: The main feature - check a text with LanguageTool for possible style and grammar issues.
@@ -173,7 +172,6 @@ paths:
           type: boolean
           default: false
           description: If true, only the rules and categories whose IDs are specified with `enabledRules` or `enabledCategories` are enabled.
-  /check:
     post:
       summary: Check a text
       description: The main feature - check a text with LanguageTool for possible style and grammar issues.
