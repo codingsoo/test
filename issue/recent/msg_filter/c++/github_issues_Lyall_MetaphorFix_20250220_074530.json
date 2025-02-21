@@ -1,0 +1,119 @@
+[
+  {
+    "number": 78,
+    "title": "0.8.2 broken on Windows (ASI fails to load and then auto-deletes itself)",
+    "created_at": "2024-10-17T00:22:45Z",
+    "closed_at": "2024-10-17T09:04:50Z",
+    "labels": [],
+    "url": "https://github.com/Lyall/MetaphorFix/issues/78",
+    "body": "See title, release 0.8.2 is broken on Windows.\r\n\r\n0.8.1 works fine.",
+    "comments_url": "https://api.github.com/repos/Lyall/MetaphorFix/issues/78/comments",
+    "author": "zandm7",
+    "comments": [
+      {
+        "user": "MYSTICALMUSICAL",
+        "created_at": "2024-10-17T00:53:24Z",
+        "body": "If you're using an antivirus, it could be flagging the asi file as a false positive and moving it to quarantine."
+      },
+      {
+        "user": "Lyall",
+        "created_at": "2024-10-17T08:26:24Z",
+        "body": "As @MYSTICALMUSICAL said, it's likely being flagged and deleted by Defender. See #68. You'll need to add it as an exception in Defender to stop it from being deleted."
+      },
+      {
+        "user": "zandm7",
+        "created_at": "2024-10-17T09:04:50Z",
+        "body": "Thanks, adding an exception in Windows Defender fixed it!\r\n\r\nI didn't think that was the issue, as normally Defender tells me when it removes a suspicious file, but this time it did not..."
+      }
+    ]
+  },
+  {
+    "number": 73,
+    "title": "[Game Window] issue when set to true",
+    "created_at": "2024-10-15T20:53:49Z",
+    "closed_at": "2024-10-15T22:09:26Z",
+    "labels": [],
+    "url": "https://github.com/Lyall/MetaphorFix/issues/73",
+    "body": "Hi Lyall.\r\n\r\nI have an issue on my side whenever I set the Game Window to true.\r\nWhenever I close the game it seems that a process keeps on running and I have to manually shut it down with task manager.\r\nEven though the game is closed, music keeps on playing.\r\n\r\nI don't know how much more I can provide here to help but anything I can do to help solve this issue feel free to ask back.\r\n\r\nEdit: On a sidenote I noticed this because for some reason setting this to true allowed me to be able to enter the characters name at the start while it being false did not.\r\nAlso I am using specialK because of not having true borderless fullscreen (and wanted the game running the audio when tabbed out)\r\n\r\nThanks in advance and also thanks for the other amazing features coming from this fix.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/Lyall/MetaphorFix/issues/73/comments",
+    "author": "PedSantiago",
+    "comments": [
+      {
+        "user": "Lyall",
+        "created_at": "2024-10-15T21:29:51Z",
+        "body": "> Hi Lyall.\r\n> \r\n> I have an issue on my side whenever I set the Game Window to true. Whenever I close the game it seems that a process keeps on running and I have to manually shut it down with task manager. Even though the game is closed, music keeps on playing.\r\n> \r\n> I don't know how much more I can provide here to help but anything I can do to help solve this issue feel free to ask back.\r\n> \r\n> Edit: On a sidenote I noticed this because for some reason setting this to true allowed me to be able to enter the characters name at the start while it being false did not. Also I am using specialK because of not having true borderless fullscreen (and wanted the game running the audio when tabbed out)\r\n> \r\n> Thanks in advance and also thanks for the other amazing features coming from this fix.\r\n\r\nYou should set the  \"[Game Window]\" option to false if you are using SpecialK. You don't want both MetaphorFix and SpecialK setting a new WndProc. This is why I added the option, specifically for those using SpecialK."
+      },
+      {
+        "user": "PedSantiago",
+        "created_at": "2024-10-15T21:54:21Z",
+        "body": "One more question then which is any idea (even if remote) as to why I couldnt type anything during any of the forced keyboard parts?\r\n\r\nIf nothing at all ill close the issue."
+      },
+      {
+        "user": "Lyall",
+        "created_at": "2024-10-15T22:05:01Z",
+        "body": "> One more question then which is any idea (even if remote) as to why I couldnt type anything during any of the forced keyboard parts?\r\n> \r\n> If nothing at all ill close the issue.\r\n\r\nNot sure why that would be. I know that SpecialK has a ton of input related settings you can tweak that might have caused that? It could also just have been some bugginess on the game side. I'd just be speculating as to what would have caused that issue for you."
+      }
+    ]
+  },
+  {
+    "number": 38,
+    "title": "Models dissapearing and everthing black when in combat (Kreigant Castle)",
+    "created_at": "2024-10-11T23:03:39Z",
+    "closed_at": "2024-10-12T09:07:15Z",
+    "labels": [],
+    "url": "https://github.com/Lyall/MetaphorFix/issues/38",
+    "body": "Entire scene is black when you get into battle in Kriegante Castle. Removing the fix, fixed the problem. didnt change any options in the .ini except for remove dash blur. Thanks for what you do!",
+    "comments_url": "https://api.github.com/repos/Lyall/MetaphorFix/issues/38/comments",
+    "author": "Abanthi",
+    "comments": [
+      {
+        "user": "Lyall",
+        "created_at": "2024-10-12T00:14:21Z",
+        "body": "Should be fixed in v0.7.9 if you want to give it a try."
+      }
+    ]
+  },
+  {
+    "number": 6,
+    "title": "Breaks alt+f4 handler entirely",
+    "created_at": "2024-09-30T18:09:43Z",
+    "closed_at": "2024-10-04T21:38:20Z",
+    "labels": [],
+    "url": "https://github.com/Lyall/MetaphorFix/issues/6",
+    "body": "With `CatchAltF4 = true`, you can't alt+f4 (or end game via menu) at all with this mod",
+    "comments_url": "https://api.github.com/repos/Lyall/MetaphorFix/issues/6/comments",
+    "author": "SandeMC",
+    "comments": [
+      {
+        "user": "Lyall",
+        "created_at": "2024-09-30T20:14:40Z",
+        "body": "With it set to true, that restores the vanilla game's behaviour of catching WM_CLOSE messages. I just removed MetaphorFix to test the vanilla game and now the ALT+F4 handler window thing doesn't even show for me despite pausing the game and showing the mouse cursor, bizarre. I wonder if it changed in the recent update or if my game is just being dodgy."
+      },
+      {
+        "user": "Lyall",
+        "created_at": "2024-09-30T20:20:54Z",
+        "body": "Well I just restarted my PC, and launching the game without any plugins/mods still doesn't show the exit handler window anymore. It used to show a window asking if you were sure you wanted to exit. Are you able to confirm if this happens on your end @SandeMC? If it does then it's for sure something they broke in the update.\r\n\r\nIf that is the case, I'll change `CatchAltF4` to `false` by default in the ini to kill the prompt/window."
+      },
+      {
+        "user": "SandeMC",
+        "created_at": "2024-10-01T21:19:26Z",
+        "body": "> Well I just restarted my PC, and launching the game without any plugins/mods still doesn't show the exit handler window anymore. It used to show a window asking if you were sure you wanted to exit. Are you able to confirm if this happens on your end @SandeMC? If it does then it's for sure something they broke in the update.\r\n> \r\n> If that is the case, I'll change `CatchAltF4` to `false` by default in the ini to kill the prompt/window.\r\n\r\nI've deleted the game already as I was only going to play the demo and remove it but, yeah, that was the case for me too - I had the prompt before installing the mod. Weird shit."
+      },
+      {
+        "user": "SandeMC",
+        "created_at": "2024-10-03T10:21:28Z",
+        "body": "Wait @Lyall can you test something? Could it be related to the ASI loader?"
+      },
+      {
+        "user": "Lyall",
+        "created_at": "2024-10-04T19:15:19Z",
+        "body": "> Wait @Lyall can you test something? Could it be related to the ASI loader?\r\n\r\nI doubt it. I just tested again with no ASI loader in the vanilla game and the exit prompt is still invisible."
+      },
+      {
+        "user": "Lyall",
+        "created_at": "2024-10-04T21:38:20Z",
+        "body": "That's the option changed to false by default now as of v0.7.3. Perhaps whatever they did in the update for demo broke their exit handler but regardless, it'll be disabled by default now."
+      }
+    ]
+  }
+]

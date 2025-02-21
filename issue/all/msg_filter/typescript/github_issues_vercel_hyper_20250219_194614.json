@@ -1,0 +1,48 @@
+[
+  {
+    "number": 897,
+    "title": "Cannot paste unless window is focused via mouseclick",
+    "created_at": "2016-10-18T14:58:53Z",
+    "closed_at": "2016-12-02T23:35:48Z",
+    "labels": [
+      "\ud83d\udc1b Type: Bug",
+      "help wanted"
+    ],
+    "url": "https://github.com/vercel/hyper/issues/897",
+    "body": "#### Info\n\nHyper.app version: **0.8.2**\nOS: **OSX 10.11.5** _(El Capitan)_\n#### Steps to reproduce\n1. Blur focus to the Hyper.app window\n2. Copy something to your clipboard\n3. Tab into Hyper.app\n4. Paste\n\n_Additionally:_\nClick into Hyper.app after these steps and then try pasting again and it works.\n",
+    "comments_url": "https://api.github.com/repos/vercel/hyper/issues/897/comments",
+    "author": "timothyis",
+    "comments": [
+      {
+        "user": "jacksonSingleton",
+        "created_at": "2016-10-26T05:39:26Z",
+        "body": "I'm on Hyper 0.8.1 on El Capitan 10.11.3 and this works perfectly fine for me\n"
+      },
+      {
+        "user": "WillsB3",
+        "created_at": "2016-10-26T09:55:49Z",
+        "body": "I have this issue on Hyper 0.83 on OS X 10.11.6\n"
+      },
+      {
+        "user": "deanputney",
+        "created_at": "2016-10-30T00:58:42Z",
+        "body": "I see this issue as well. It will actually start again if I type anything in between clicking on the window and paste. For example: `click on window, paste` works, but `click on window, type 'x', paste` fails. Also Mac OS Sierra.\n"
+      },
+      {
+        "user": "ppot",
+        "created_at": "2016-11-03T03:26:25Z",
+        "body": "Since PR #892 This should be working since we are not using blur and focus anymore\n"
+      },
+      {
+        "user": "pablomolnar",
+        "created_at": "2016-11-03T03:48:22Z",
+        "body": "@ppot Still happening in master (6d91ab48d63e30d94c7d43434440772fdb976a7c / 1.4.5). \n"
+      },
+      {
+        "user": "matheuss",
+        "created_at": "2016-11-16T18:46:48Z",
+        "body": "Yo y'all, could you test on latest master? I might have introduced a fix via #1006 \ud83d\udc4c \n"
+      }
+    ]
+  }
+]

@@ -1,0 +1,63 @@
+[
+  {
+    "number": 26,
+    "title": "[Locally Hosted] Timeout Issue with Local LLMs",
+    "created_at": "2025-02-08T05:02:32Z",
+    "closed_at": "2025-02-09T17:38:28Z",
+    "labels": [],
+    "url": "https://github.com/dzhng/deep-research/issues/26",
+    "body": "### **Issue:** \n\nRunning deep-research using firecrawl API and LM studio endpoint using the deepseek-r1-distill-llama-8b model. Timeout happens at about 30 seconds. \n\n```Ran What is the current state of lunar regolith composition and its implications for future space exploration, found 5 contents\nError running query: What is the current state of lunar regolith composition and its implications for future space exploration:  \n\nDOMException [TimeoutError]: The operation was aborted due to timeout  \n    at node:internal/deps/undici/undici:12625:11  \n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)  \n    at postToApi (/app/node_modules/@ai-sdk/provider-utils/src/post-to-api.ts:65:22)  \n    at OpenAIChatLanguageModel.doGenerate (/app/node_modules/@ai-sdk/openai/src/openai-chat-language-model.ts:367:50)  \n    at fn (/app/node_modules/ai/core/generate-object/generate-object.ts:489:32)  \n    at <anonymous> (/app/node_modules/ai/core/telemetry/record-span.ts:18:22)  \n    at _retryWithExponentialBackoff (/app/node_modules/ai/util/retry-with-exponential-backoff.ts:36:12)  \n    at fn (/app/node_modules/ai/core/generate-object/generate-object.ts:457:34)  \n    at <anonymous> (/app/node_modules/ai/core/telemetry/record-span.ts:18:22)  \n    at processSerpResult (/app/src/deep-research.ts:86:15)\n```\nLM Studio log\n```\n2025-02-08 13:55:46 [DEBUG] PromptProcessing: 22.7597\n2025-02-08 13:55:50 [DEBUG] PromptProcessing: 23.7942\n2025-02-08 13:55:52  [INFO] [LM STUDIO SERVER] Client disconnected. Stopping generation... (If the model is busy processing the prompt, it will finish first.)\n```\n### **Steps Taken to Fix:**\nI'm not a TS dev so I did what I could. I removed the timeouts and abort signal code in deep-research.ts, but that did nothing. Extended timeouts and abort signals, also nothing.  \n\n### **Potential Reason:**\n\nIt obviously is expecting an openai response which is much faster than a local LLM can provide. I assume the fetch in postToApi has a default timeout also, which is why removing timeouts in deep-research.ts didn't work. \n\nUnfortunately, I don't have the skills/expertise in this area to troubleshoot further. I already spent 125 credits trying. ",
+    "comments_url": "https://api.github.com/repos/dzhng/deep-research/issues/26/comments",
+    "author": "Explosivedoor",
+    "comments": [
+      {
+        "user": "FeindorT",
+        "created_at": "2025-02-08T17:56:19Z",
+        "body": "Had the same Issue when running the model with deepseek-r1:32b. For me setting\n```javascript\nabortSignal: AbortSignal.timeout(6_000_000),\n````\nin deep-research.ts fixed it"
+      },
+      {
+        "user": "Explosivedoor",
+        "created_at": "2025-02-08T18:32:09Z",
+        "body": "> Had the same Issue when running the model with deepseek-r1:32b. For me setting\n> \n> abortSignal: AbortSignal.timeout(6_000_000),\n> in deep-research.ts fixed it\n\nUnfortunately, this still didn't work. It did however get further along before failing. I also tried to set the timeout to be much longer, still didn't work. This might work for those with faster computers. The outputs don't take longer than a minute or 2 so, theoretically that timeout should work but doesn't. \n\nLM Studio log\n```2025-02-09 03:16:07 [DEBUG] PromptProcessing: 100\nFinishedProcessingPrompt. Progress: 100\n2025-02-09 03:16:07  [INFO] [LM STUDIO SERVER] Accumulating tokens ... (stream = false)\n2025-02-09 03:16:07 [DEBUG] [deepseek-r1-distill-llama-8b] Accumulated 1 tokens {\\n\n...\n2025-02-09 03:16:16  [INFO] [LM STUDIO SERVER] Client disconnected. Stopping generation... (If the model is busy processing the prompt, it will finish first.)\n```\n\nSame error as in original post. \n"
+      },
+      {
+        "user": "Explosivedoor",
+        "created_at": "2025-02-09T17:38:28Z",
+        "body": "This does in fact work. I am just an idiot and forgot to rebuild the docker image when I made my changes originally. \n\n```docker compose run --build --rm deep-research```\n\nClosing."
+      }
+    ]
+  },
+  {
+    "number": 6,
+    "title": "Not starting",
+    "created_at": "2025-02-06T12:41:06Z",
+    "closed_at": "2025-02-07T16:46:24Z",
+    "labels": [],
+    "url": "https://github.com/dzhng/deep-research/issues/6",
+    "body": "Hi, I get \n`> open-deep-research@0.0.1 start\n> tsx --env-file=.env.local src/run.ts` on start and it exits (on Windows)",
+    "comments_url": "https://api.github.com/repos/dzhng/deep-research/issues/6/comments",
+    "author": "korzen",
+    "comments": [
+      {
+        "user": "dzhng",
+        "created_at": "2025-02-06T17:37:57Z",
+        "body": "what environment are you running this in?"
+      },
+      {
+        "user": "UOW37",
+        "created_at": "2025-02-07T14:30:40Z",
+        "body": "You may want to upgrade your Node.js to the latest version or to a version that supports dotenv out of the box."
+      },
+      {
+        "user": "dzhng",
+        "created_at": "2025-02-07T16:46:38Z",
+        "body": "yea check you're running >node 22 pls"
+      },
+      {
+        "user": "korzen",
+        "created_at": "2025-02-07T20:12:08Z",
+        "body": "OK, it worked! However I see that the code is hardcoded to o3-mini and, for some reason, I don't have access to it in  OpenAI's API."
+      }
+    ]
+  }
+]

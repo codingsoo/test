@@ -1,0 +1,20 @@
+[
+  {
+    "number": 76,
+    "title": "running lora B on saved quantized model with lora A on disk",
+    "created_at": "2024-10-11T05:55:00Z",
+    "closed_at": "2024-10-12T06:16:47Z",
+    "labels": [],
+    "url": "https://github.com/filipstrand/mflux/issues/76",
+    "body": "\u201cHi, I was wondering if it\u2019s possible to add a LoRA to a model that has already been saved with another LoRA using mflux-save? I tried, but I encountered an error. I\u2019m not sure if it might be due to the limitation \u2018LoRA weights are only supported for the transformer part of the network.\u2019 Any guidance or explanation  would be greatly appreciated!\u201d\r\n\r\n\r\n\r\n```\r\n  File \"/Users/xxxx/miniconda3/envs/diffusionkit/bin/mflux-generate\", line 8, in <module>\r\n    sys.exit(main())\r\n             ^^^^^^\r\n  File \"/Volumes/NewHome/mflux/src/mflux/generate.py\", line 36, in main\r\n    flux = Flux1(\r\n           ^^^^^^\r\n  File \"/Volumes/NewHome/mflux/src/mflux/flux/flux.py\", line 51, in __init__\r\n    weights = WeightHandler(\r\n              ^^^^^^^^^^^^^^\r\n  File \"/Volumes/NewHome/mflux/src/mflux/weights/weight_handler.py\", line 28, in __init__\r\n    LoraUtil.apply_loras(self.transformer, lora_paths, lora_scales)\r\n  File \"/Volumes/NewHome/mflux/src/mflux/weights/lora_util.py\", line 18, in apply_loras\r\n    LoraUtil._apply_lora(transformer, lora_file, lora_scale)\r\n  File \"/Volumes/NewHome/mflux/src/mflux/weights/lora_util.py\", line 37, in _apply_lora\r\n    LoraUtil._apply_transformer(transformer, lora_transformer, lora_scale)\r\n  File \"/Volumes/NewHome/mflux/src/mflux/weights/lora_util.py\", line 87, in _apply_transformer\r\n    weight = transWeight + lora_scale * (lora_b @ lora_a)\r\n             ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\nValueError: Shapes (3072,768) and (3072,3072) cannot be broadcast.\r\n\r\n```\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/filipstrand/mflux/issues/76/comments",
+    "author": "azrahello",
+    "comments": [
+      {
+        "user": "YAY-3M-TA3",
+        "created_at": "2024-10-12T00:56:28Z",
+        "body": "> \u201cHi, I was wondering if it\u2019s possible to add a LoRA to a model that has already been saved with another LoRA using mflux-save? I tried, but I encountered an error. I\u2019m not sure if it might be due to the limitation \u2018LoRA weights are only supported for the transformer part of the network.\u2019 Any guidance or explanation would be greatly appreciated!\u201d\r\n> \r\n> ```\r\n>   File \"/Users/xxxx/miniconda3/envs/diffusionkit/bin/mflux-generate\", line 8, in <module>\r\n>     sys.exit(main())\r\n>              ^^^^^^\r\n>   File \"/Volumes/NewHome/mflux/src/mflux/generate.py\", line 36, in main\r\n>     flux = Flux1(\r\n>            ^^^^^^\r\n>   File \"/Volumes/NewHome/mflux/src/mflux/flux/flux.py\", line 51, in __init__\r\n>     weights = WeightHandler(\r\n>               ^^^^^^^^^^^^^^\r\n>   File \"/Volumes/NewHome/mflux/src/mflux/weights/weight_handler.py\", line 28, in __init__\r\n>     LoraUtil.apply_loras(self.transformer, lora_paths, lora_scales)\r\n>   File \"/Volumes/NewHome/mflux/src/mflux/weights/lora_util.py\", line 18, in apply_loras\r\n>     LoraUtil._apply_lora(transformer, lora_file, lora_scale)\r\n>   File \"/Volumes/NewHome/mflux/src/mflux/weights/lora_util.py\", line 37, in _apply_lora\r\n>     LoraUtil._apply_transformer(transformer, lora_transformer, lora_scale)\r\n>   File \"/Volumes/NewHome/mflux/src/mflux/weights/lora_util.py\", line 87, in _apply_transformer\r\n>     weight = transWeight + lora_scale * (lora_b @ lora_a)\r\n>              ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n> ValueError: Shapes (3072,768) and (3072,3072) cannot be broadcast.\r\n> ```\r\n\r\nShapes error: Currently when you quantize a model + LoRA, you can't mix this with an unquantized LoRA.  You'll need to be all quantized(re-quantize your model with both LoRAs or keep everything unquantized)"
+      }
+    ]
+  }
+]

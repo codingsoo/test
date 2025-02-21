@@ -1,0 +1,43 @@
+[
+  {
+    "number": 83,
+    "title": "construction problem",
+    "created_at": "2024-10-21T12:42:15Z",
+    "closed_at": "2024-10-22T14:36:31Z",
+    "labels": [],
+    "url": "https://github.com/gusye1234/nano-graphrag/issues/83",
+    "body": "when i input the construction \"pip install -e .\", there is a error hint\"ERROR: file:///Users/liuxiang/Desktop/nano-graphrag-main/nano_graphrag does not appear to be a Python project: neither 'setup.py' nor 'pyproject.toml' found.\" I can't find such files in that directory.",
+    "comments_url": "https://api.github.com/repos/gusye1234/nano-graphrag/issues/83/comments",
+    "author": "qhlx",
+    "comments": [
+      {
+        "user": "gusye1234",
+        "created_at": "2024-10-21T14:59:00Z",
+        "body": "You maybe in the wrong dir. Make sure you're running the command in the root dir of this project, where `setup.py` is located"
+      }
+    ]
+  },
+  {
+    "number": 7,
+    "title": "_remove_dups_flatten\u51fa\u73b0TypeError: unhashable type: 'list'",
+    "created_at": "2024-08-19T09:20:51Z",
+    "closed_at": "2024-08-19T10:52:22Z",
+    "labels": [],
+    "url": "https://github.com/gusye1234/nano-graphrag/issues/7",
+    "body": "\u5728\u6267\u884c\u5230await self._clustering_algorithms[algorithm]()\u7684\u65f6\u5019\u51fa\u73b0\u62a5\u9519\uff1a\r\n\r\nfrom graspologic.partition import hierarchical_leiden\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/graspologic/__init__.py\", line 6, in <module>\r\n    import graspologic.datasets\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/graspologic/datasets/__init__.py\", line 4, in <module>\r\n    from .base import load_drosophila_left, load_drosophila_right, load_mice\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/graspologic/datasets/base.py\", line 14, in <module>\r\n    from ..utils import import_edgelist\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/graspologic/utils/__init__.py\", line 4, in <module>\r\n    from .ptr import pass_to_ranks\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/graspologic/utils/ptr.py\", line 8, in <module>\r\n    from .utils import import_graph, is_loopless, is_symmetric, is_unweighted, symmetrize\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/graspologic/utils/utils.py\", line 13, in <module>\r\n    from beartype import beartype\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/beartype/__init__.py\", line 58, in <module>\r\n    from beartype._decor.decormain import (\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/beartype/_decor/decormain.py\", line 26, in <module>\r\n    from beartype._conf.confcls import (\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/beartype/_conf/confcls.py\", line 46, in <module>\r\n    from beartype._conf.confoverrides import (\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/beartype/_conf/confoverrides.py\", line 15, in <module>\r\n    from beartype._data.hint.datahinttyping import (\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/site-packages/beartype/_data/hint/datahinttyping.py\", line 290, in <module>\r\n    BeartypeReturn = Union[BeartypeableT, BeartypeConfedDecorator]\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/typing.py\", line 244, in inner\r\n    return func(*args, **kwds)\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/typing.py\", line 317, in __getitem__\r\n    return self._getitem(self, parameters)\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/typing.py\", line 422, in Union\r\n    parameters = _remove_dups_flatten(parameters)\r\n  File \"/data/newssd/anaconda3/envs/graphrag/lib/python3.9/typing.py\", line 216, in _remove_dups_flatten\r\n    all_params = set(params)\r\nTypeError: unhashable type: 'list'\r\n\r\n\u5f53\u524dparams\u4e3a\uff1a[~BeartypeableT, collections.abc.Callable[[~BeartypeableT], ~BeartypeableT]]\r\n\r\nparams\u4e00\u5171\u5728\u4e0b\u9762\u51e0\u79cd\u573a\u666f\u4e0b\u4f1a\u51fa\u73b0\u9519\u8bef\uff1a\r\nwrong!!!!!\r\n[~BeartypeableT, collections.abc.Callable[[~BeartypeableT], ~BeartypeableT]]\r\nunhashable type: 'list'\r\n\r\nwrong!!!!!\r\n[<class 'type'>, collections.abc.Callable[[], object]]\r\nunhashable type: 'list'\r\n\r\nwrong!!!!!\r\n[collections.abc.Callable[[<class 'int'>], typing.Optional[frame]], <class 'NoneType'>]\r\n\r\n\u5bf9\u5e94\u4ee3\u7801\uff1a\r\ndef _remove_dups_flatten(parameters):\r\n    \"\"\"An internal helper for Union creation and substitution: flatten Unions\r\n    among parameters, then remove duplicates.\r\n    \"\"\"\r\n    # Flatten out Union[Union[...], ...].\r\n    \r\n    params = []\r\n    for p in parameters:\r\n        if isinstance(p, _UnionGenericAlias):\r\n            params.extend(p.__args__)\r\n        elif isinstance(p, tuple) and len(p) > 0 and p[0] is Union:\r\n            params.extend(p[1:])\r\n        else:\r\n            params.append(p)\r\n    # Weed out strict duplicates, preserving the first of each occurrence.\r\n    all_params = set(params)  # \u5e94\u8be5\u662f\u8fd9\u4e00\u53e5\uff1f\r\n    if len(all_params) < len(params):\r\n        new_params = []\r\n        for t in params:\r\n            if t in all_params:\r\n                new_params.append(t)\r\n                all_params.remove(t)\r\n        params = new_params\r\n        assert not all_params, all_params\r\n    return tuple(params)\r\n\r\n\u62a5\u9519\u5ffd\u7565\u76f4\u63a5\u8fd4\u56detuple(params)\u4f3c\u4e4e\u4e5f\u80fd\u7ee7\u7eed\u8dd1\u4e0b\u53bb",
+    "comments_url": "https://api.github.com/repos/gusye1234/nano-graphrag/issues/7/comments",
+    "author": "Zack14159",
+    "comments": [
+      {
+        "user": "gusye1234",
+        "created_at": "2024-08-19T09:35:07Z",
+        "body": "\u770b\u8d77\u6765\u662fpython\u7248\u672c\u548c`graspologic`\u5e93\u7684\u95ee\u9898 \u4f60\u7684python\u7248\u672c\u662f\u4ec0\u4e48\uff1f"
+      },
+      {
+        "user": "Zack14159",
+        "created_at": "2024-08-19T10:01:49Z",
+        "body": "\u6211\u7684\u7684python\u7248\u672c\u662f Python 3.9.0"
+      }
+    ]
+  }
+]

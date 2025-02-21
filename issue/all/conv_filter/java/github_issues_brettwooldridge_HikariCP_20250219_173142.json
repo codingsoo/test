@@ -1,0 +1,543 @@
+[
+  {
+    "number": 1385,
+    "title": "Does the getIdleConnections() method under HikariPoolMXBean class brings the idle connections that are still valid connections?",
+    "created_at": "2019-05-30T13:21:14Z",
+    "closed_at": "2019-05-30T15:08:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/1385",
+    "body": "#### Environment\r\n```\r\nHikariCP version: 3.2.0\r\nJDK version     : 1.8.0_102\r\nDatabase        : AS400\r\nDriver version  : jt400-jdk8 v9.8\r\n```\r\nI am trying to switch the datasources from a primary AS400 to a secondary AS400 in case the primary AS400 is not online. To do this I am looking at the idle connections in the pool. Idle connections are still valid connections to the DB, correct?",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/1385/comments",
+    "author": "amitbhanot",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2019-05-30T15:08:49Z",
+        "body": "@amitbhanot The idle count available through the MXBean may include connections that are not valid.  Connections are tested upon borrow, and therefore connections \"sitting\" in the pool may or may not be valid.\r\n\r\nIf, however, you have an ``idleTImeout`` configured, and a ``minimumIdle`` setting that is less than ``maximumPoolSize ``, you can be reasonable sure that the connections are alive.\r\n\r\nIf you are trying to detect that the primary AS400 has gone down, I suggest looking primarily at the total pool size.  When a database fails, the pool will quickly exhaust all of the connections.  When a new connection is requested, one will be selected, then tested, and upon failing, evicted from the pool -- and the process repeated very quickly for the remaining connections in the pool.\r\n"
+      },
+      {
+        "user": "amitbhanot",
+        "created_at": "2019-05-30T17:40:19Z",
+        "body": "@brettwooldridge That is in fact what I am doing. I am querying the DB which uses an available invalid connection from the pool. Since the connection is invalid, the query fails and I switch it to the secondary AS400 datasource. Thank you for that explanation."
+      }
+    ]
+  },
+  {
+    "number": 1080,
+    "title": "BoneCP also tested???",
+    "created_at": "2018-02-08T15:52:28Z",
+    "closed_at": "2018-02-08T17:46:17Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/1080",
+    "body": "I wonder who is responsible for the output of:\r\n`04:49:427 [Timer-3] INFO DbDownTest - BoneCPDataSource got a connection.`\r\n?\r\n\r\nI thought you only tested C3P0, Tomcat DBCP2, Vibur and Hikari.\r\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/1080/comments",
+    "author": "du-it",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2018-02-08T17:46:17Z",
+        "body": "Bone was removed from the final evaluation because the author stopped development of the pool, and I wanted to focus on active projects.\r\n"
+      },
+      {
+        "user": "du-it",
+        "created_at": "2018-02-09T08:27:22Z",
+        "body": "I see. Thank you. So maybe it would be a good hint to remove the line in the log or to annotate it in the article what you told me."
+      }
+    ]
+  },
+  {
+    "number": 1052,
+    "title": "Java 9 status",
+    "created_at": "2017-12-30T23:11:27Z",
+    "closed_at": "2018-01-10T13:39:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/1052",
+    "body": "Hi\r\n\r\nCurrently there are two versions of HikariCP displayed on the site main page:\r\n\r\n1) Java 8 maven artifact:\r\n2) Java 9 Early Access maven artifact:\r\n\r\nHowever it is not clear the difference between them? Java 9 Early Access version was last released on April, 2017. So now when JDK 9 is released what version should we use? Is it safe to use Java 8 artifact or Java 9 is preferred?\r\n\r\nPlease, give more detail. Thanks.",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/1052/comments",
+    "author": "sergey-morenets",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2018-01-10T13:39:49Z",
+        "body": "@sergey-morenets I just released v2.7.5, which contains a fix for Java 9 compatibility with respect to the Java 8 library.\r\n\r\nThe Java 8 artifact would be the preferred artifact at this point.\r\n"
+      },
+      {
+        "user": "sergey-morenets",
+        "created_at": "2018-01-10T14:41:47Z",
+        "body": "@brettwooldridge Thank you. So you propose using version 2.7.5 if I have JDK 9.0.1 ?"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2018-01-11T23:53:59Z",
+        "body": "Correct."
+      }
+    ]
+  },
+  {
+    "number": 1028,
+    "title": "Decreasing of pool size in runtime",
+    "created_at": "2017-11-27T18:01:21Z",
+    "closed_at": "2017-11-28T13:41:10Z",
+    "labels": [
+      "question",
+      "not-a-bug"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/1028",
+    "body": "#### Environment\r\n```\r\nHikariCP version: 2.2.5\r\nJDK version       : 1.8.0_144\r\nDatabase           : MySQL\r\nDriver version    : 5.1.43\r\nHibernate           : 4.3.6\r\n```\r\n-----------------------------------------------------------------------------------------\r\nI'm trying to investigate problem:\r\n\r\n`org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction; nested exception is javax.persistence.PersistenceException: org.hibernate.exception.GenericJDBCException: Could not open connection \r\n    at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:431) \r\n    at org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:373) \r\n    at org.springframework.transaction.interceptor.TransactionAspectSupport.createTransactionIfNecessary(TransactionAspectSupport.java:427) \r\n    at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:276) \r\n    at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96) \r\n    at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) \r\n    at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:655) \r\n    at de.bcg.xchange.requests.rest.RequestResource$$EnhancerBySpringCGLIB$$3bf285f1.fetchConversationByRequest(<generated>) \r\n    at sun.reflect.GeneratedMethodAccessor554.invoke(Unknown Source) \r\n    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) \r\n    at java.lang.reflect.Method.invoke(Method.java:498) \r\n    at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:221) \r\n    at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:136) \r\n    at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:110) \r\n    at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:817) \r\n    at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:731) \r\n    at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85) \r\n    at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:959) \r\n    at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:893) \r\n    at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:968) \r\n    at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:859) \r\n    at javax.servlet.http.HttpServlet.service(HttpServlet.java:624) \r\n    at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:844) \r\n    at javax.servlet.http.HttpServlet.service(HttpServlet.java:731) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.gzip.GZipServletFilter.doFilter(GZipServletFilter.java:46) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.MDCUserInfoServletFilter.doFilter(MDCUserInfoServletFilter.java:52) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:346) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:262) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at ch.qos.logback.classic.helpers.MDCInsertingServletFilter.doFilter(MDCInsertingServletFilter.java:51) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.MDCInvocationFilter.doFilter(MDCInvocationFilter.java:25) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at com.codahale.metrics.servlet.AbstractInstrumentedFilter.doFilter(AbstractInstrumentedFilter.java:104) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration$ApplicationContextHeaderFilter.doFilterInternal(EndpointWebMvcAutoConfiguration.java:237) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.MDCUserInfoServletFilter.doFilter(MDCUserInfoServletFilter.java:52) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.boot.actuate.trace.WebRequestTraceFilter.doFilterInternal(WebRequestTraceFilter.java:112) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:316) \r\n    at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:126) \r\n    at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:90) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:114) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:122) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:169) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:48) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at de.bcg.xchange.platform.filters.AcceptedTermsOfUseFilter.doFilterInternal(AcceptedTermsOfUseFilter.java:45) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at de.bcg.xchange.platform.filters.AgentLoginFilter.doFilterInternal(AgentLoginFilter.java:94) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at de.bcg.xchange.platform.filters.ImpersonateUserFilter.doFilterInternal(ImpersonateUserFilter.java:78) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter.doFilter(OAuth2AuthenticationProcessingFilter.java:140) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:120) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:64) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:91) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:53) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:213) \r\n    at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:176) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:346) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:262) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.HttpPutFormContentFilter.doFilterInternal(HttpPutFormContentFilter.java:87) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:77) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:121) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:218) \r\n    at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:110) \r\n    at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:506) \r\n    at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:169) \r\n    at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:103) \r\n    at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:962) \r\n    at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116) \r\n    at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:445) \r\n    at org.apache.coyote.ajp.AjpProcessor.process(AjpProcessor.java:190) \r\n    at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:637) \r\n    at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:316) \r\n    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) \r\n    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) \r\n    at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) \r\n    at java.lang.Thread.run(Thread.java:748) \r\nCaused by: javax.persistence.PersistenceException: org.hibernate.exception.GenericJDBCException: Could not open connection \r\n    at org.hibernate.jpa.spi.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1763) \r\n    at org.hibernate.jpa.spi.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1677) \r\n    at org.hibernate.jpa.spi.AbstractEntityManagerImpl.throwPersistenceException(AbstractEntityManagerImpl.java:1771) \r\n    at org.hibernate.jpa.internal.TransactionImpl.begin(TransactionImpl.java:64) \r\n    at org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(HibernateJpaDialect.java:170) \r\n    at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:380) \r\n     ... 126 common frames omitted \r\nCaused by: org.hibernate.exception.GenericJDBCException: Could not open connection \r\n    at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:54) \r\n    at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:126) \r\n    at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:112) \r\n    at org.hibernate.engine.jdbc.internal.LogicalConnectionImpl.obtainConnection(LogicalConnectionImpl.java:235) \r\n    at org.hibernate.engine.jdbc.internal.LogicalConnectionImpl.getConnection(LogicalConnectionImpl.java:171) \r\n    at org.hibernate.engine.transaction.internal.jdbc.JdbcTransaction.doBegin(JdbcTransaction.java:67) \r\n    at org.hibernate.engine.transaction.spi.AbstractTransactionImpl.begin(AbstractTransactionImpl.java:162) \r\n    at org.hibernate.internal.SessionImpl.beginTransaction(SessionImpl.java:1435) \r\n    at org.hibernate.jpa.internal.TransactionImpl.begin(TransactionImpl.java:61) \r\n     ... 128 common frames omitted \r\nCaused by: java.sql.SQLException: Timeout after 34877ms of waiting for a connection. \r\n    at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:205) \r\n    at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:91) \r\n    at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:139) \r\n    at org.hibernate.internal.AbstractSessionImpl$NonContextualJdbcConnectionAccess.obtainConnection(AbstractSessionImpl.java:380) \r\n    at org.hibernate.engine.jdbc.internal.LogicalConnectionImpl.obtainConnection(LogicalConnectionImpl.java:228) \r\n     ... 133 common frames omitted`\r\n\r\nI've enabled logging and found out one strange thing, could you please help to understand that:\r\nI'm using default maxPoolSize and minimumIdle and typical state of connections is:\r\n\r\n2017-11-27 15:27:00,352 [DEBUG] com.zaxxer.hikari.pool.HikariPool - Before cleanup pool stats HikariPool-0 (**total=10**, inUse=3, avail=7, waiting=0)\r\n2017-11-27 15:27:00,353 [DEBUG] com.zaxxer.hikari.pool.HikariPool - After cleanup pool stats HikariPool-0 (**total=10**, inUse=3, avail=7, waiting=0)\r\n\r\nAs I get from the documentation for minimumIdle \"we recommend not setting this value and instead allowing HikariCP to act as a **fixed size connection pool**\", so I expect that total connections should always be equal to maxPoolSize.\r\nBut I see sometimes such cases:\r\n\r\n2017-11-27 15:35:30,351 [DEBUG] com.zaxxer.hikari.pool.HikariPool - Before cleanup pool stats HikariPool-0 (total=10, inUse=4, avail=6, waiting=0)\r\n2017-11-27 15:35:30,353 [DEBUG] com.zaxxer.hikari.pool.HikariPool - After cleanup pool stats HikariPool-0 (**total=5**, inUse=4, avail=1, waiting=0)\r\n\r\n2017-11-27 16:11:07,255 [DEBUG] com.zaxxer.hikari.pool.HikariPool - Before cleanup pool stats HikariPool-0 (total=10, inUse=3, avail=7, waiting=0)\r\n2017-11-27 16:11:07,259 [DEBUG] com.zaxxer.hikari.pool.HikariPool - After cleanup pool stats HikariPool-0 (**total=3**, inUse=3, avail=0, waiting=0)\r\n\r\nAnd thinking why it's changing and could it be a reason for the problem with java.sql.SQLException: Timeout after 34877ms of waiting for a connection that time-to-time there's fewer connections in the pool that is needed (this error appears pretty rarely)? Can minimumIdle help with the problem?",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/1028/comments",
+    "author": "OksanaMykhalets",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2017-11-28T11:51:31Z",
+        "body": "Before trying to diagnose what is happening, I strongly recommend updating HikariCP to v2.7.4.  Version 2.2.5 is *extremely* old and many bugs have been fixed since then, including bugs related to connection retirement and pool repopulation.\r\n\r\nIf you still encounter these errors on the latest version, let us know (and provide v2.7.4 logs).\r\n"
+      },
+      {
+        "user": "OksanaMykhalets",
+        "created_at": "2017-11-28T12:15:24Z",
+        "body": "Thanks a lot for a fast response. I'll try to upgrade."
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2017-11-28T13:42:26Z",
+        "body": "@OksanaMykhalets I assume it worked?  If so, great! \ud83c\udf89 \r\n"
+      },
+      {
+        "user": "OksanaMykhalets",
+        "created_at": "2017-11-28T13:49:45Z",
+        "body": "@brettwooldridge I don't see anymore those decreasing of pool size after upgrade, so I think this issue can be closed. \r\n\r\nCan't say if it also will help with:\r\n`java.sql.SQLException: Timeout after 34877ms of waiting for a connection. at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:205)`\r\ncause I'm facing this issue once in a week or so, but I've also enabled leakDetectionThreshold, so it should be easy to find the cause of the problem if it'll appear again.\r\n\r\nThanks a lot for your help and incredibly cool library!"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2017-11-28T14:08:22Z",
+        "body": "@OksanaMykhalets You're very welcome.  My guess is that the pool exhaustion issue in v2.2.5 was the cause of the timeout that you observed, so hopefully it will not appear again.\r\n"
+      }
+    ]
+  },
+  {
+    "number": 859,
+    "title": "Will the pool offer invalid connection to users and will it automatically reconnect?",
+    "created_at": "2017-04-06T01:39:25Z",
+    "closed_at": "2017-04-06T05:54:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/859",
+    "body": "In my project I always receive a \"Connection is not available, request timed out after\" error,I'm not sure if it is because the pool offered me a invalid connection even after the check. And I am also not sure what the pool will do with an invalid connection",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/859/comments",
+    "author": "gggllm",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2017-04-06T05:54:36Z",
+        "body": "@gggllm The *\"Connection is not available, request timed out after...\"* error indicates that the pool is at maximum capacity, and all connections are in-use, at the time that a thread called ``getConnection()``.  Not only that, it indicates that the thread waited in ``getConnection()`` for the ``connectionTimeout`` period, hoping that a connection would be returned to the pool, but no connection became available.\r\n\r\n It does not indicate that HikariCP offered you an invalid connection; that should be nearly impossible for HikariCP to do.\r\n\r\nThere are two common conditions that are responsible for that error:\r\n\r\nOne is a connection leak.  In that case, connections are being borrowed but never returned.  Eventually the pool will run out of connections and your application will be stuck forever.  I recommend enabling the ``leakDetectionThreshold`` and setting it to 2x the value of ``connectionTimeout``.  If you see leak warnings in your log, it should provide a stacktrace pointing to the source of the leak.\r\n\r\nThe other common cause of that error is simply long-running queries -- queries that execute for longer than the ``connectionTimeout`` period.  In that case, it is possible to have all connections occupied with such queries, preventing a new thread from acquiring a connection from the pool before ``connectionTimeout`` is reached.\r\n"
+      },
+      {
+        "user": "gggllm",
+        "created_at": "2017-04-06T05:56:21Z",
+        "body": "Thank you very much\uff01"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2017-04-06T05:58:30Z",
+        "body": "@gggllm You're welcome."
+      }
+    ]
+  },
+  {
+    "number": 645,
+    "title": "MariaDB setConnectionTimeout not working",
+    "created_at": "2016-06-11T07:58:22Z",
+    "closed_at": "2016-06-11T14:01:53Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/645",
+    "body": "DB : 5.5.5-10.1.13-MariaDB-1~trusty\nOS  : Ubuntu\nDriver : mariadb-java-client-1.4.5\n\nI try to configure when application attempt to connect database wait 1.5 sec stop if server is not found.\nI try follow\nconfig = new HikariConfig();\nconfig.setConnectionTimeout(1500);\nis not working so switch to\nconfig.addDataSourceProperty(\"connectionTimeout\", \"1500\");\nstill not working then do follow\nconfig.addDataSourceProperty(\"connectTimeout\", \"1500\");\nAnd now working perfect. But still \"config.setConnectionTimeout(1500);\" look better way to do it.\nGuess is need support for different variable name.\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/645/comments",
+    "author": "ghost",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2016-06-11T14:01:53Z",
+        "body": "`config.setConnectionTimeout(1500)` will set how long you _application_ will wait for a connection _from the pool_.\n\n`config.addDataSourceProperty(\"connectTimeout\", \"1500\")` will set how long the _pool_ will wait for a connection _to the database_ before the MariaDB driver throw an exception.\n\nBoth are valid for different purposes.\n"
+      },
+      {
+        "user": "ghost",
+        "created_at": "2016-06-11T21:23:47Z",
+        "body": "Thx for clear it out. Can you add it on wiki configuration page?\n"
+      }
+    ]
+  },
+  {
+    "number": 561,
+    "title": "2 Questions Only",
+    "created_at": "2016-01-27T08:22:21Z",
+    "closed_at": "2016-01-28T03:35:29Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/561",
+    "body": "1. Does hikari takes care of the connections {in the connection pool} when cpu {About machine} max out to 100% ?\n2. In-relation to question 1, If no then will it issue a log that there is a connection leak?\n\nthanks,\nDave\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/561/comments",
+    "author": "DavidMont",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2016-01-27T10:43:22Z",
+        "body": "I don't understand question #1.  If a connection is out of the pool for longer than the leak detection threshold it will be logged, regardless of _why_ it was out of the pool.  If the CPU is pegged at 100% the timer thread that logs the leak might itself be starved, and therefore be delayed from reporting the leak.\n"
+      },
+      {
+        "user": "DavidMont",
+        "created_at": "2016-01-28T03:35:29Z",
+        "body": "Ah i see, thanks for your time.\n"
+      }
+    ]
+  },
+  {
+    "number": 474,
+    "title": "com.zaxxer.hikari.pool.PoolInitializationException: Exception during pool initialization: Communications link failure",
+    "created_at": "2015-10-28T07:25:12Z",
+    "closed_at": "2015-10-28T07:37:22Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/474",
+    "body": "Hi brettwooldridge, I'm using HikariCP as MySQL'dataSource with Spring Boot recently, but found some problems.\nThis is my hikari config in application.yml:\n\n```\nhikari:\n    poolName: HikariCP\n    minimumIdle: 5\n    maximumPoolSize: 25\n    connectionTimeout: 30000\n    idleTimeout: 30000\n    connectionTestQuery: SELECT 1\n    dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource\n    dataSourceProperties:\n        url: jdbc:mysql://127.0.0.1:13206/reactive?characterEncoding=UTF-8\n        user: test\n        password: test1234\n        ## Only for mysql\n        cachePrepStmts: true\n        prepStmtCacheSize: 300\n        prepStmtCacheSqlLimit: 2048\n```\n\nAnd the corresponding Java Bean is:\n\n```\n/**\n * provide url, user, password by calling addDataSourceProperty method\n */\n@Bean\n    public DataSource dataSource() {\n        HikariConfig configuration = new HikariConfig();\n        configuration.setPoolName(poolName);\n        configuration.setMinimumIdle(minimumIdle);\n        configuration.setMaximumPoolSize(maximumPoolSize);\n        configuration.setConnectionTimeout(connectionTimeout);\n        configuration.setIdleTimeout(idleTimeout);\n        configuration.setConnectionTestQuery(connectionTestQuery);\n        configuration.setDataSourceClassName(dataSourceClassName);\n\n        configuration.addDataSourceProperty(\"url\", url);\n        configuration.addDataSourceProperty(\"user\", user);\n        configuration.addDataSourceProperty(\"password\", password);\n        configuration.addDataSourceProperty(\"cachePrepStmts\", cachePrepStmts);\n        configuration.addDataSourceProperty(\"prepStmtCacheSize\", prepStmtCacheSize);\n        configuration.addDataSourceProperty(\"prepStmtCacheSqlLimit\", prepStmtCacheSqlLimit);\n\n        return new HikariDataSource(configuration);\n    }\n```\n\nIn this case, the connection pool works fine. When I use other configuration, exception occurred, as following:\n\n```\nhikari:\n    poolName: HikariCP\n    jdbcUrl: jdbc:mysql://127.0.0.1:13206/reactive?characterEncoding=UTF-8\n    username: test\n    password: test1234\n    minimumIdle: 5\n    maximumPoolSize: 25\n    connectionTimeout: 30000\n    idleTimeout: 30000\n    connectionTestQuery: SELECT 1\n    dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource\n    dataSourceProperties:\n        ## Only for mysql\n        cachePrepStmts: true\n        prepStmtCacheSize: 300\n        prepStmtCacheSqlLimit: 2048\n\n/**\n * provide jdbcUrl, username, password instead of calling addDataSourceProperty method\n */\n@Bean\n    public DataSource dataSource() {\n        HikariConfig configuration = new HikariConfig();\n        configuration.setPoolName(poolName);\n        configuration.setJdbcUrl(jdbcUrl);\n        configuration.setUsername(username);\n        configuration.setPassword(password);\n        configuration.setMinimumIdle(minimumIdle);\n        configuration.setMaximumPoolSize(maximumPoolSize);\n        configuration.setConnectionTimeout(connectionTimeout);\n        configuration.setIdleTimeout(idleTimeout);\n        configuration.setConnectionTestQuery(connectionTestQuery);\n        configuration.setDataSourceClassName(dataSourceClassName);\n\n        configuration.addDataSourceProperty(\"cachePrepStmts\", cachePrepStmts);\n        configuration.addDataSourceProperty(\"prepStmtCacheSize\", prepStmtCacheSize);\n        configuration.addDataSourceProperty(\"prepStmtCacheSqlLimit\", prepStmtCacheSqlLimit);\n\n        return new HikariDataSource(configuration);\n    }\n```\n\nThe **exception** information is:\n\n```\nThe last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.\n    at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:571)\n    at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88)\n    at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:331)\n    ... 30 more\nCaused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSource' defined in class path resource [com/github/dolphineor/springboot/configure/JpaConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is com.zaxxer.hikari.pool.PoolInitializationException: Exception during pool initialization: Communications link failure\n\nThe last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.\n    at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:599)\n    at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1123)\n    at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1018)\n    at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:510)\n    at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:482)\n    at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:305)\n    at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230)\n    at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:301)\n    at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196)\n    at org.springframework.beans.factory.support.DefaultListableBeanFactory.findAutowireCandidates(DefaultListableBeanFactory.java:1192)\n    at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1116)\n    at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1014)\n    at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:543)\n    ... 32 more\nCaused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'dataSource' threw exception; nested exception is com.zaxxer.hikari.pool.PoolInitializationException: Exception during pool initialization: Communications link failure\n\nThe last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.\n    at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:189)\n    at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:588)\n    ... 44 more\nCaused by: com.zaxxer.hikari.pool.PoolInitializationException: Exception during pool initialization: Communications link failure\n\nThe last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.\n    at com.zaxxer.hikari.pool.HikariPool.initializeConnections(HikariPool.java:581)\n    at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:152)\n    at com.zaxxer.hikari.HikariDataSource.<init>(HikariDataSource.java:73)\n    at com.github.dolphineor.springboot.configure.JpaConfig.dataSource(JpaConfig.java:80)\n    at com.github.dolphineor.springboot.configure.JpaConfig$$EnhancerBySpringCGLIB$$20918aa0.CGLIB$dataSource$1(<generated>)\n    at com.github.dolphineor.springboot.configure.JpaConfig$$EnhancerBySpringCGLIB$$20918aa0$$FastClassBySpringCGLIB$$cf46bcfb.invoke(<generated>)\n    at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:228)\n    at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:318)\n    at com.github.dolphineor.springboot.configure.JpaConfig$$EnhancerBySpringCGLIB$$20918aa0.dataSource(<generated>)\n    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n    at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)\n    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n    at java.lang.reflect.Method.invoke(Method.java:497)\n    at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:162)\n    ... 45 more\nCaused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure\n\nThe last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.\n    at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)\n    at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)\n    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)\n    at java.lang.reflect.Constructor.newInstance(Constructor.java:422)\n    at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)\n    at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:983)\n    at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:339)\n    at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2252)\n    at com.mysql.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:2285)\n    at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2084)\n    at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:795)\n    at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:44)\n    at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)\n    at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)\n    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)\n    at java.lang.reflect.Constructor.newInstance(Constructor.java:422)\n    at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)\n    at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:400)\n    at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:327)\n    at com.mysql.jdbc.jdbc2.optional.MysqlDataSource.getConnection(MysqlDataSource.java:422)\n    at com.mysql.jdbc.jdbc2.optional.MysqlDataSource.getConnection(MysqlDataSource.java:134)\n    at com.zaxxer.hikari.pool.HikariPool.addConnection(HikariPool.java:496)\n    at com.zaxxer.hikari.pool.HikariPool.initializeConnections(HikariPool.java:565)\n    ... 58 more\nCaused by: java.net.ConnectException: connection refused\n    at java.net.PlainSocketImpl.socketConnect(Native Method)\n    at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)\n    at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)\n    at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)\n    at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)\n    at java.net.Socket.connect(Socket.java:589)\n    at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:214)\n    at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:298)\n    ... 74 more\n```\n\nThe network's solution is setting MySQL's wait_timeout and interactive_timeout, but it doesn't work.\n\ndolphineor.\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/474/comments",
+    "author": "conchz",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-10-28T07:30:21Z",
+        "body": "@dolphineor In the second case, you don't need:\n\n```\ndataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource\n```\n\nThe `jdbcUrl` entry alone is sufficient.  If you get a driver not found error, you can add `driverClassName`, but it shouldn't be necessary.\n\nNOTE: you can still use `dataSourceProperties` even without a `dataSourceClassName`.\n"
+      },
+      {
+        "user": "conchz",
+        "created_at": "2015-10-28T07:37:22Z",
+        "body": "^_^Thanks a lot, it works.\n"
+      }
+    ]
+  },
+  {
+    "number": 447,
+    "title": "Why does Hikari depend on hibernate-core?",
+    "created_at": "2015-10-07T20:20:28Z",
+    "closed_at": "2015-10-08T13:02:56Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/447",
+    "body": "That's a heavy dependency to pull in when a project just wants to use JDBC with a pooling impl. I'm curious why it is necessary. If it's only there to aid Hibernate projects, couldn't it be split into a separate library?\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/447/comments",
+    "author": "donaldquixote",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-10-08T13:02:56Z",
+        "body": "I just built a project that depends on HikariCP and it did not pull in Hibernate as a dependency.  The dependency in the HikariCP _pom.xml_ is declared as:\n\n``` xml\n      <dependency>\n         <groupId>org.hibernate</groupId>\n         <artifactId>hibernate-core</artifactId>\n         <version>${hibernate.version}</version>\n         <scope>provided</scope>\n         <optional>true</optional>\n      </dependency>\n```\n\nWhich should not result in it being pulled in, unless you are building HikariCP itself.\n"
+      },
+      {
+        "user": "donaldquixote",
+        "created_at": "2015-10-08T14:49:47Z",
+        "body": "Apologies for the noise, missed the scope piece. Thanks for your reply.\n"
+      }
+    ]
+  },
+  {
+    "number": 434,
+    "title": "Pooled connection couldn't be reused.",
+    "created_at": "2015-09-28T14:51:14Z",
+    "closed_at": "2015-09-28T15:59:44Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/434",
+    "body": "Failed to test reusing the pooled connection on `HikariCP 2.4.1` below,\n\n``` java\n\nimport java.sql.Connection;\nimport com.zaxxer.hikari.HikariDataSource;\n\npublic class Main {\n\n    public static void main(String[] args) throws Exception {\n\n        HikariDataSource ds = new HikariDataSource();\n        ds.setJdbcUrl(\"jdbc:mysql:///test\");\n        ds.setAutoCommit(false);\n        ds.setMaximumPoolSize(1);\n\n        Connection conn = ds.getConnection();\n        conn.createStatement().executeQuery(\"select 1\");\n\n        new Thread(() -> {\n            try {\n/*   \n  The following line caused java.sql.SQLTransientConnectionException: \n  HikariPool-0 - Connection is not available, request timed out after 30000ms.\n*/\n                Connection conn2 = ds.getConnection(); \n                conn2.createStatement().executeQuery(\"select 2\");\n                conn2.commit();\n            } catch (Exception e) {\n                e.printStackTrace();\n            }\n        }).start();\n\n        conn.commit();\n    }\n}\n\n```\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/434/comments",
+    "author": "fansgit",
+    "comments": [
+      {
+        "user": "chrisvest",
+        "created_at": "2015-09-28T15:09:48Z",
+        "body": "You never close the first connection you grab, so it never returns to the pool.\n"
+      },
+      {
+        "user": "fansgit",
+        "created_at": "2015-09-28T15:22:54Z",
+        "body": "@chrisvest How to check if the connection returns to the pool after it's closed?\n"
+      },
+      {
+        "user": "chrisvest",
+        "created_at": "2015-09-28T15:31:16Z",
+        "body": "It returns to the pool if you can `ds.getConnection()` again. But first, you have to `conn.close()` it.\n"
+      },
+      {
+        "user": "fansgit",
+        "created_at": "2015-09-28T15:35:03Z",
+        "body": "Connection conn = ds.getConnection();\nconn.close();\nassertEqual(conn, ds.getConnection()); // Why does it fail if the connection returns to the pool?\n"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-09-28T15:59:42Z",
+        "body": "@fansgit That assert fails because the proxy object returned by each call to `getConnection()` is unique.\n\nThis would work:\n\n``` java\nConnection connection = ds.getConnection();\nConnection unwrap = connection.unwrap(Connection.class);\nAssert.assertNotNull(connection);\n\nconnection.close();\nconnection =  ds.getConnection();\nConnection unwrap2 = connection.unwrap(Connection.class);\n\nassertEqual(unwrap, unwrap2);\n```\n\nThe `unwrap()` call gets the underlying actual Connection object to the DB which the proxy (delegator) class returned by `getConnection()` is wrapping.\n"
+      },
+      {
+        "user": "fansgit",
+        "created_at": "2015-09-28T16:15:21Z",
+        "body": "@brettwooldridge thanks. I overlooked `unwrap`. Proxy makes perfect sense here. The `close` only destroys the connection wrapper but releases the underlying connection to the pool. How is this related to `active` or `idle` connection status?\n"
+      }
+    ]
+  },
+  {
+    "number": 391,
+    "title": "Impossible to pass connection specific properties",
+    "created_at": "2015-08-20T16:38:01Z",
+    "closed_at": "2015-08-20T21:28:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/391",
+    "body": "On my particular Oracle CP on HikariCP (ds) theres no way to pass specific Connection parameters:\n\n```\n    HikariConfig conf = new HikariConfig(\"testCpConnection.properties\");\n    HikariDataSource ds = new HikariDataSource(conf);\n    Properties pp = new Properties();\n    pp.put(\"connectionProperties.defaultRowPrefetch\", \"10000\");\n    ds.setDataSourceProperties(pp);\n```\n\nwith Orcle DataSource is possible to do this:\n\n```\n    OracleDataSource ds = new OracleDataSource();\n    ds.setURL(\"jdbc:oracle:thin:@xxxxxxxxx\");\n    ds.setUser(\"user\");\n    ds.setPassword(\"password\");\n\n    Properties pp = new Properties();\n    pp.put(\"defaultRowPrefetch\", \"10000\");\n\n    ds.setConnectionProperties(pp);\n```\n\nperhaps I'm wrong also because in some previous version was possible to implement an IConnectionCustomizer that isn't supported anymore.\n\nRegards\n    Antonio\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/391/comments",
+    "author": "aconte76",
+    "comments": [
+      {
+        "user": "jnehlmeier",
+        "created_at": "2015-08-20T19:20:22Z",
+        "body": "I guess you can use \n\n``` java\nOracleDataSource oracleDs = new OracleDataSource();\nProperties pp = new Properties();\npp.put(\"defaultRowPrefetch\", \"10000\");\noracleDs.setConnectionProperties(pp);\n\nHikariConfig conf = new HikariConfig(\"testCpConnection.properties\");\nconf.setDatasource(oracleDs);\nHikariDataSource ds = new HikariDataSource(conf);\n```\n\nThen HikariCP should use the OracleDataSource for creating connections to fill the Hikari pool.\n"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-08-20T21:28:41Z",
+        "body": "@jnehlmeier That is correct.\n"
+      },
+      {
+        "user": "aconte76",
+        "created_at": "2015-08-21T09:20:14Z",
+        "body": "Right, it works correctly, sorry for my mistake.\n\nThx a lot\n   Antonio\n"
+      }
+    ]
+  },
+  {
+    "number": 351,
+    "title": "How do I import the source to IntelliJ IDEA?",
+    "created_at": "2015-07-22T04:53:57Z",
+    "closed_at": "2015-07-22T05:30:05Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/351",
+    "body": "I import the source to IntelliJ IDEA as maven project. But,  **`hikaricp-java6` module can not refer to the sources of  `hikaricp-common`.**\n\nHow do I import the source to IntelliJ IDEA and compile the source?\n\nThanks a lot.\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/351/comments",
+    "author": "diguage",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-07-22T05:30:05Z",
+        "body": "It's a huge pain in the ass.  I recommend using the `dev` branch, it's much cleaner -- a single module.\n"
+      },
+      {
+        "user": "diguage",
+        "created_at": "2015-07-22T06:19:07Z",
+        "body": "@brettwooldridge Thanks again.\n"
+      }
+    ]
+  },
+  {
+    "number": 327,
+    "title": "I configurate the `poolName`, but throw Exception",
+    "created_at": "2015-06-17T06:46:43Z",
+    "closed_at": "2015-06-17T06:50:55Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/327",
+    "body": "I first use HikariCP. And my configuration file is as follows:\n\n```\ndataSourceClassName=com.mysql.jdbc.jdbc2.optional.MysqlDataSource\ndataSource.url=${dataSource.url}\ndataSource.user=${dataSource.user}\ndataSource.password=${dataSource.password}\ndataSource.poolName=${dataSource.poolName}\ndataSource.cachePrepStmts=${dataSource.cachePrepStmts}\ndataSource.prepStmtCacheSize=${dataSource.prepStmtCacheSize}\ndataSource.prepStmtCacheSqlLimit=${dataSource.prepStmtCacheSqlLimit}\n```\n\nBut the code throws exception as follows:\n\n```\nException in thread \"main\" java.lang.RuntimeException: java.beans.IntrospectionException: Method not found: setPoolName\n    at com.zaxxer.hikari.util.PropertyBeanSetter.setProperty(PropertyBeanSetter.java:134)\n    at com.zaxxer.hikari.util.PropertyBeanSetter.setTargetFromProperties(PropertyBeanSetter.java:63)\n    at com.zaxxer.hikari.pool.PoolUtilities.initializeDataSource(PoolUtilities.java:103)\n    at com.zaxxer.hikari.pool.BaseHikariPool.<init>(BaseHikariPool.java:156)\n    at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:60)\n    at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:48)\n    at com.zaxxer.hikari.HikariDataSource.<init>(HikariDataSource.java:80)\n    at com.abc.main(DataAddressServer.java:40)\nCaused by: java.beans.IntrospectionException: Method not found: setPoolName\n    at java.beans.PropertyDescriptor.<init>(PropertyDescriptor.java:110)\n    at com.zaxxer.hikari.util.PropertyBeanSetter.setProperty(PropertyBeanSetter.java:125)\n    ... 7 more\n\n```\n\nThen I configurate it in the code as follows:\n\n``` java\nHikariConfig hikariConfig = new HikariConfig(\"/database.properties\");\nhikariConfig.setMetricRegistry(MetricUtils.METRICS);\nHikariDataSource dataSource = new HikariDataSource(hikariConfig);\ndataSource.setPoolName(\"MyPool\");\n\n```\n\nBad luck. It do not work.\n\nThe option `maxLifetime` is as the `poolName`.\n\nHow do I configurate it ?\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/327/comments",
+    "author": "diguage",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-06-17T06:50:55Z",
+        "body": "`poolName` and `maxLifetime` are not DataSource properties, they are HikariCP properties.  So this:\n\n``` ini\ndataSourceClassName=com.mysql.jdbc.jdbc2.optional.MysqlDataSource\npoolName=${dataSource.poolName}\nmaxLifetime=900000\ndataSource.url=${dataSource.url}\ndataSource.user=${dataSource.user}\ndataSource.password=${dataSource.password}\n...\n```\n"
+      },
+      {
+        "user": "diguage",
+        "created_at": "2015-06-17T09:43:20Z",
+        "body": "Thanks.\n"
+      }
+    ]
+  },
+  {
+    "number": 303,
+    "title": "Setting MetricRegistry at runtime",
+    "created_at": "2015-04-10T14:28:11Z",
+    "closed_at": "2015-04-10T19:59:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/303",
+    "body": "Hi @brettwooldridge, \n\nFirst of all thanks for the great library. \n\nI would like to set CodaHale MetricRegistry at runtime. This is required because I am not configuring datasource. But it seems that I am little bid late for setting it. Is it possible to propagate a change in HikariDataSource to track metrics?\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/303/comments",
+    "author": "cemo",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-04-10T16:22:14Z",
+        "body": "You should be able to set it once, on the HikariDataSource, after the pool is started.  You'll need HikariCP 2.3.6.\n"
+      },
+      {
+        "user": "cemo",
+        "created_at": "2015-04-10T19:56:39Z",
+        "body": "Thanks for answer. It seems that I have taken some connections from pool and then setting MetricRegistry. In this case some of connections in pool don't have a MetricsContext with MetricRegistry. Do you think that setting a MetricRegistry should update existing connections as well?\n"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-04-10T19:59:33Z",
+        "body": "Metrics will not be recorded for connections already taken from the pool, but very quickly whatever stats those connections would have provided will become statistical noise.  As soon as they are returned to the pool, they will start participating in metrics.\n"
+      },
+      {
+        "user": "cemo",
+        "created_at": "2015-04-10T20:37:41Z",
+        "body": "I am sorry @brettwooldridge. I somehow used an old dependency before and after your comment regarding 2.3.6 I have mischecked my configuration. It is working as expected.\n"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-04-10T20:38:55Z",
+        "body": "Great.\n"
+      }
+    ]
+  },
+  {
+    "number": 283,
+    "title": "Why is setConnectionInitSql deprecated?",
+    "created_at": "2015-03-13T10:11:35Z",
+    "closed_at": "2015-03-13T10:20:26Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/283",
+    "body": "We are using this setting to change Oracle's default sorting behavior for a certain application:\n\nALTER SESSION SET NLS_SORT = XGERMAN_DIN\n\nShouldn't such use cases be supported in future, too?\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/283/comments",
+    "author": "fdummert",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-03-13T10:20:26Z",
+        "body": "The _connectionInit_ property will be un-@deprecated in the next release.  You can read the thread in the Google Group if you want to.\n"
+      },
+      {
+        "user": "fdummert",
+        "created_at": "2015-03-13T10:30:48Z",
+        "body": "Thanks for the info and sorry, I should have checked the discussion before...\n"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2015-03-13T12:19:35Z",
+        "body": "@fdummert No problem, I don't expect such a deep search.  Perfectly valid issue to open (and close :smile: )\n"
+      }
+    ]
+  },
+  {
+    "number": 210,
+    "title": "Is it essential to call `shutdown()` on HikariDataSource?",
+    "created_at": "2014-11-28T11:53:48Z",
+    "closed_at": "2014-11-28T13:55:04Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/210",
+    "body": "",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/210/comments",
+    "author": "timmolter",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2014-11-28T13:55:04Z",
+        "body": "`shutdown()` or `close()` is essential at application termination, otherwise you will leave database resources in use.  Most IoC containers (Spring, JBoss, Hibernate, Tomcat) have a way to invoke a \"destroy\" method.\n\nSomewhat riskier, but still workable, is to set `minimumIdle` connections to 0, set the actual database to timeout connections after, for example, 5 minutes, and set the `idleTimeout` and `maxLifetime` in HikariCP to 4 minutes.  This way, if the application aborts \"uncleanly\", the database itself will terminate and cleanup the connections after 5 minutes.\n\nActually, even when `minimumIdle` is non-zero, is it not a bad idea to configure the native database timeouts to between 5-20 minutes, and the HikariCP `maxLifetime` about two minutes shorter than that.  There will be little discernable impact on performance for your application, but you can actually avoid some memory leaks present in databases due to long-held connections.\n"
+      },
+      {
+        "user": "timmolter",
+        "created_at": "2014-11-28T14:03:40Z",
+        "body": "Thanks for the explanation. Very helpful.\n\nWhat if I have `DataSource ds = new HikariDataSource();`. How would you recommend closing `ds` since `DataSource` does not have a `close()` method? I noticed `HikariDataSource` implements `Closable`, but I'm not sure if that helps in my case.\n"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2014-11-28T14:16:39Z",
+        "body": "`Closeable` will help if you have raw `DataSource` and you are sure it is a `HikariDataSource`, you can simply cast to `Closeable` and call close (and possibly have to suppress a casting warning in your IDE).\n\nIssue #208 just before this one, when fixed, will allow you to call `ds.unwrap(HikariDataSource.class).close()`.\n"
+      },
+      {
+        "user": "timmolter",
+        "created_at": "2014-11-28T14:37:29Z",
+        "body": "Is it just me or is it odd that `DataSource` does not have a `cleanup` method? It seems like every `DataSource` impl needs to implement some clean up. My particular problem is that I don't know if the `Datasource` is a `HikariDataSource` or something else.\n"
+      },
+      {
+        "user": "brettwooldridge",
+        "created_at": "2014-11-28T14:40:25Z",
+        "body": "I agree, it is odd.  It is even stranger that (at a minimum) the `DataSource` (or at least `PooledDataSource`), in Java 8 still does not implement `Closeable`.  Would have been nice.\n"
+      },
+      {
+        "user": "sundhr",
+        "created_at": "2018-11-05T23:40:26Z",
+        "body": "When the OS takes care of cleaning up the resources when the process exits, why should I take care of closing it during termination of the program?"
+      }
+    ]
+  },
+  {
+    "number": 155,
+    "title": "Passing useLegacyDatetimeCode without using jdbcUrl",
+    "created_at": "2014-10-04T12:19:40Z",
+    "closed_at": "2014-10-04T13:28:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/155",
+    "body": "When using bonecp I passed with jdbc url ...:3306/DBNAME?useLegacyDatetimeCode=false\n\nHow can I pass it using the new HikariCP DataSource?\n\nIs this ok?\nconfig.addDataSourceProperty(\"useLegacyDatetimeCode\", \"false\");\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/155/comments",
+    "author": "chook",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2014-10-04T13:28:49Z",
+        "body": "Set Hikari's initializationFailFast=true, If it doesn't throw an Exception, it's working.  The best way to check what is available is to look at the JavaDoc for the MySQL DataSource.  If there is a setter like setUseLegacyDatetimeCode() then that will work fine.\n"
+      },
+      {
+        "user": "chook",
+        "created_at": "2014-10-05T07:06:16Z",
+        "body": "Thanks!\n"
+      }
+    ]
+  },
+  {
+    "number": 151,
+    "title": "HikariConfig username property?",
+    "created_at": "2014-09-29T16:48:10Z",
+    "closed_at": "2014-10-03T09:23:59Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/brettwooldridge/HikariCP/issues/151",
+    "body": "HikariConfig has a property which represents  the default authentication username.\nHowever, what's the property name: username or user?\nThe home page's introduction is conflict.\nI'm from China. Sorry for my terrible English.\n",
+    "comments_url": "https://api.github.com/repos/brettwooldridge/HikariCP/issues/151/comments",
+    "author": "CodePlayer",
+    "comments": [
+      {
+        "user": "brettwooldridge",
+        "created_at": "2014-09-30T13:35:28Z",
+        "body": "If you use a DataSource-class, HikariCP will call dataSource.getConnection(username, password).  If you use a Driver-class and JDBC URL, HikariCP will set a `user` property from the HikariConfig username, like this:\n\n``` java\nif (username != null) {\n   driverProperties.put(\"user\", driverProperties.getProperty(\"user\", username));\n}\n...\nreturn DriverManager.getConnection(jdbcUrl, driverProperties);\n```\n\nIf your driver expects a `username` property instead of `user`, then ignore the `HikariConfig.setUsername()` method and call `HikariCP.addDataSourceProperty(\"username\", ...)` instead.  Or put the username in the JDBC URL (eg. `jdbc:mysql://localhost/db?username=...`).\n"
+      },
+      {
+        "user": "CodePlayer",
+        "created_at": "2014-10-03T09:23:57Z",
+        "body": "Oh, I see! It's pretty clear. Many thanks!\n"
+      }
+    ]
+  }
+]

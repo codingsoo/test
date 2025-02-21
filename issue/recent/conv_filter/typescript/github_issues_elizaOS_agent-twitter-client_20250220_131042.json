@@ -1,0 +1,35 @@
+[
+  {
+    "number": 12,
+    "title": "Tweets without the image when using sendTweet",
+    "created_at": "2024-11-29T07:07:22Z",
+    "closed_at": "2024-12-30T15:20:00Z",
+    "labels": [],
+    "url": "https://github.com/elizaOS/agent-twitter-client/issues/12",
+    "body": "Saw there is update in the code and sendTweetWithMedia is removed and image can be sent using sendTweet, I tried but it posted without the image.\r\nhere's the part of code - \r\n```   const img = await fetch(imgUrl);\r\n      const arrayBuffer = await img.arrayBuffer();\r\n      const imgBuffer = Buffer.from(arrayBuffer);\r\n      const response = await scraper.sendTweet(replyText, tweetId, {data:imgBuffer,mediaType: 'image/jpeg'} );\r\n```\r\nIt works with sendTweetWithMedia(), just putting the imgBuffer in array, as it needs Buffer[]",
+    "comments_url": "https://api.github.com/repos/elizaOS/agent-twitter-client/issues/12/comments",
+    "author": "Shrey00",
+    "comments": [
+      {
+        "user": "denizekiz",
+        "created_at": "2024-12-01T14:36:11Z",
+        "body": "I'm having same issue"
+      },
+      {
+        "user": "denizekiz",
+        "created_at": "2024-12-01T15:03:51Z",
+        "body": "I realised I wasnt use latest version, in eliza repo. Update package to latest 0.0.16 not 0.0.14"
+      },
+      {
+        "user": "Shrey00",
+        "created_at": "2024-12-03T05:50:01Z",
+        "body": "> I realised I wasnt use latest version, in eliza repo. Update package to latest 0.0.16 not 0.0.14\r\nOkay, thanks.\r\n"
+      },
+      {
+        "user": "denizekiz",
+        "created_at": "2024-12-30T14:38:46Z",
+        "body": "This issue can be closed. @lalalune \r\n\r\n> > I realised I wasnt use latest version, in eliza repo. Update package to latest 0.0.16 not 0.0.14\r\n> > Okay, thanks.\r\n\r\n"
+      }
+    ]
+  }
+]

@@ -1,0 +1,222 @@
+[
+  {
+    "number": 766,
+    "title": "Different image size for showImageForEmptyUri",
+    "created_at": "2014-09-29T09:39:59Z",
+    "closed_at": "2014-09-29T17:31:14Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/766",
+    "body": "How can I set Different image size for showImageForEmptyUri ?\n",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/766/comments",
+    "author": "aser58",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2014-09-29T13:24:34Z",
+        "body": "You can pass Drawable int o this method. So you can define a size.\n"
+      },
+      {
+        "user": "aser58",
+        "created_at": "2014-09-29T14:02:55Z",
+        "body": "I indeed pass drawable to this method :\".showImageForEmptyUri(R.drawable.globe2)\"\n\nThe size of glob2 is 24x24 , but when it shown in the listview is strched to full all the frame of the imageView.\n\nHow I can define that when there is no Uri the image will not sreched ?\n\nThanks\n"
+      },
+      {
+        "user": "nostra13",
+        "created_at": "2014-09-29T14:51:33Z",
+        "body": "I think `android:scaleType` parameter is responsible for that.\n"
+      }
+    ]
+  },
+  {
+    "number": 678,
+    "title": "image for notifycation ",
+    "created_at": "2014-07-09T07:59:57Z",
+    "closed_at": "2014-07-15T17:23:54Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/678",
+    "body": "please.\nHow can the ImageLoader be used to load images on an notification?\nBecause the displayImage method takes an ImageView as parameter and in a widget we have to use RemoteViews.\nThanks.\n",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/678/comments",
+    "author": "kekedaine",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2014-07-13T13:54:37Z",
+        "body": "You can wrap RemoteViews into `ImageAware` interface and pass it into `displayImage(...)` method.\nOr you can use `loadImage(...)` method with callback.\n"
+      }
+    ]
+  },
+  {
+    "number": 575,
+    "title": "Thumbnail Image for large Image",
+    "created_at": "2014-03-30T15:47:57Z",
+    "closed_at": "2014-06-04T22:05:20Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/575",
+    "body": "I have a gridview that will load huge images. When loading to grid I can load small Image s by setting up \n.cacheOnDisc(true)\nand \n.discCacheExtraOptions(408, 306, CompressFormat.JPEG, 75, null)\n\nThis will create an image of 408x306 in disk cache. But when I select an image in the view and open the image in a viewpager the cache image will be used, But what if I want to load the image that fit the display size?\n(// default = device screen dimensions)\n\nIs there any way to achieve this?\n",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/575/comments",
+    "author": "hrandika",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2014-03-30T21:07:27Z",
+        "body": "I think the only way is to delete\n`.discCacheExtraOptions(408, 306, CompressFormat.JPEG, 75, null)`\nSo images of original size will be cached in disc.\n"
+      },
+      {
+        "user": "hrandika",
+        "created_at": "2014-03-31T01:06:55Z",
+        "body": "That is true but I want to keep the 408x306 image for grid view and full image to the view pager.\nWhat I have done is I have not used UIL in the view pager. Instead I use bitmap loader to load the large image. Is this the only way to achieve this?\n"
+      },
+      {
+        "user": "nostra13",
+        "created_at": "2014-03-31T20:02:17Z",
+        "body": "I think the only way to do it is to have 2 instances of ImageLoader. Create the second singleton by extending ImageLoader. The first ImageLoader will have `.discCacheExtraOptions(408, 306, CompressFormat.JPEG, 75, null)` options and the second won't. So you can use each ImageLoader in appropriate case.\n\nThese ImageLoaders will have different disk caches and different memory caches but you can make they use common memory cache if you want.\n"
+      }
+    ]
+  },
+  {
+    "number": 569,
+    "title": "one uncertainty on single inheritance in Universal-Image-Loader",
+    "created_at": "2014-03-19T06:46:49Z",
+    "closed_at": "2014-03-19T12:50:16Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/569",
+    "body": "Recently, I was reading the source codes of Universal-Image-Loader, And I found an interesting question on inheritance in Java. We know that the multiple inheritance is not allowed in Java. Java designers replaced the concept of multiple inheritance by that of interface. In the release 1.9.1 of Universal-Image-Loader, the interface called BlockingDeque in the package of com.nostra13.universalimageloader.core.assist.deque extends two parent class, BlockingQueue and Deque, but Eclipse does't show any wrong information about it. So I am confused about it. Does someone else ever notice this??\n",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/569/comments",
+    "author": "bytebeats",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2014-03-19T07:47:49Z",
+        "body": "`BlockingQueue` and `BlockingQueue` are interfaces. Java allow \"multiple inheritance\" of interfaces, i.e. class can implement multiple interfaces and interface can extend multiple interfaces.\n"
+      }
+    ]
+  },
+  {
+    "number": 499,
+    "title": "Is it possible to pause/resume image loading..?",
+    "created_at": "2014-01-07T11:00:25Z",
+    "closed_at": "2014-01-07T11:36:12Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/499",
+    "body": "",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/499/comments",
+    "author": "bhaumiknsoni",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2014-01-07T11:12:26Z",
+        "body": "`ImageLoader.pause()` and `ImageLoader.resume()`. But it pauses/resumes all loadings.\n"
+      },
+      {
+        "user": "SagarPanwala",
+        "created_at": "2016-12-12T03:49:32Z",
+        "body": "How to pause and resume loading for current listview or view items/ children ?"
+      }
+    ]
+  },
+  {
+    "number": 455,
+    "title": "delete the specified cache",
+    "created_at": "2013-11-20T03:34:17Z",
+    "closed_at": "2013-11-21T22:34:33Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/455",
+    "body": "When I want to delete the specified cache, I wrote this code:\n\n``` java\n    public void clearCache(String uri, ImageView imageView) {\n        ImageSize targetSize = ImageSizeUtils.defineTargetSizeForView(\n                new ImageViewAware(imageView), getMaxImageSize());\n        String memoryCacheKey = MemoryCacheUtil.generateKey(uri, targetSize);\n\n        imageLoader.getMemoryCache().remove(memoryCacheKey);\n\n        File file = imageLoader.getDiscCache().get(uri);\n        if (file != null) {\n            file.delete();\n        }\n    }\n\n    ImageSize getMaxImageSize() {\n        DisplayMetrics displayMetrics = context.getResources()\n                .getDisplayMetrics();\n\n        int width = maxImageWidthForMemoryCache;\n        if (width <= 0) {\n            width = displayMetrics.widthPixels;\n        }\n        int height = maxImageHeightForMemoryCache;\n        if (height <= 0) {\n            height = displayMetrics.heightPixels;\n        }\n        return new ImageSize(width, height);\n    }\n```\n\nCould you provide a similar interface in \"ImageLoader.java\"??\n",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/455/comments",
+    "author": "nbtstatx",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2013-11-20T22:30:23Z",
+        "body": "`MemoryCacheUtil.removeFromCache(imageUri, ImageLoader.getInstance().getMemoryCache())`?\n`DiscCacheUtil.removeFromCache(imageUri, ImageLoader.getInstance().getDiscCache())`?\n"
+      },
+      {
+        "user": "nbtstatx",
+        "created_at": "2013-11-21T02:11:27Z",
+        "body": "But imageUri is not a key in \"MemoryCache\".So I have to get the key by this code:\n\nImageSize targetSize = ImageSizeUtils.defineTargetSizeForView(\n                new ImageViewAware(imageView), getMaxImageSize());\nString memoryCacheKey = MemoryCacheUtil.generateKey(uri, targetSize);\n\nThen :\n\nMemoryCacheUtil.removeFromCache(imageUri, ImageLoader.getInstance().getMemoryCache())\n"
+      },
+      {
+        "user": "nostra13",
+        "created_at": "2013-11-21T06:49:22Z",
+        "body": "`MemoryCacheUtil.removeFromCache()` removes all bitmaps in memory which keys are relates to incoming image Uri.\n"
+      }
+    ]
+  },
+  {
+    "number": 339,
+    "title": "Why use WeakReference?",
+    "created_at": "2013-07-22T06:54:20Z",
+    "closed_at": "2013-07-23T02:58:44Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/339",
+    "body": "in the ImageLoadingInfo\n\nWhether it will lead to frequent GC?  use softReference?\n",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/339/comments",
+    "author": "zondaOf2012",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2013-07-22T20:37:22Z",
+        "body": "I need the weakest reference for ImageView. So `WeakReference` is the most appropriate type.\nSoft reference is collected by GC only when free memory is low.\n"
+      }
+    ]
+  },
+  {
+    "number": 123,
+    "title": "Does Android-Universal-Image-Loader support Asset folder?",
+    "created_at": "2012-12-17T18:14:47Z",
+    "closed_at": "2012-12-18T03:46:57Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/123",
+    "body": "Hi nostra13,\n\nI was going to use this lib in my project, but after some searches, I couldn't figure out how to use this lib to load images from assets folder, even when I used \"file:///android_asset/... , it didn't work.\n\n``` java\n        mImageLoader.displayImage(\"file:///android_asset/\" + path, \n                iv, Const.displayImageOptions, \n                new SimpleImageLoadingListener()\n        {\n            @Override\n            public void onLoadingComplete(Bitmap loadedImage) {\n                Animation anim = AnimationUtils\n                        .loadAnimation(mContext, R.anim.fade_in);\n                iv.setAnimation(anim);\n                anim.start();\n            }\n        }); \n```\n\nIf it's possible, could you provide me some code? or even if I have to customized some code myself, please let me know how to do it.\n\nThanks in advance and sorry for my bad English :)\n",
+    "comments_url": "https://api.github.com/repos/nostra13/Android-Universal-Image-Loader/issues/123/comments",
+    "author": "mrleolink",
+    "comments": [
+      {
+        "user": "nostra13",
+        "created_at": "2012-12-17T18:42:33Z",
+        "body": "Hi, \nLook into example project. I implemented example of using images from assets and drawables. Use `ExtendedImageDownloader` and **\"assets://\"** prefix.\n"
+      },
+      {
+        "user": "ManojMM026",
+        "created_at": "2012-12-31T08:19:12Z",
+        "body": "hey @nostra13 @mrleolink  please help me with getting images from drawable folder using this library. can you paste snippet which will guide me to use this library with drawable folder.\nwhen i try to use ExtendedImageDownloader it gives me error ExtendedImageDownloader cannot be resolve to a type.\n\nI tried setting config from Example\n\nImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())\n            .threadPriority(Thread.NORM_PRIORITY - 2)\n            .memoryCacheSize(2 \\* 1024 \\* 1024) // 2 Mb\n            .denyCacheImageMultipleSizesInMemory()\n            .discCacheFileNameGenerator(new Md5FileNameGenerator())\n            .imageDownloader(new ExtendedImageDownloader(getApplicationContext()))\n            .tasksProcessingOrder(QueueProcessingType.LIFO)\n            .enableLogging() // Not necessary in common\n            .build();\n        // Initialize ImageLoader with configuration.\n        ImageLoader.getInstance().init(config);\n"
+      },
+      {
+        "user": "nostra13",
+        "created_at": "2012-12-31T10:01:20Z",
+        "body": "@ManojMM026 `ExtendedImageDownloader` is not a part of the library yet. You should copy-paste it from example to your project..\n"
+      },
+      {
+        "user": "YuvPrime",
+        "created_at": "2015-02-25T17:27:59Z",
+        "body": "@nostra13 Where is `ExtendedImageDownloader`? I couldn't find in your project. Can you pl give me the link?\n"
+      },
+      {
+        "user": "nostra13",
+        "created_at": "2015-02-26T18:52:32Z",
+        "body": "`assets://...` scheme is supported out of box now\n"
+      },
+      {
+        "user": "zdd",
+        "created_at": "2015-08-17T02:48:53Z",
+        "body": "Can I use subfolders in assets folder?\nlike this assets://images/test.png\n"
+      }
+    ]
+  }
+]

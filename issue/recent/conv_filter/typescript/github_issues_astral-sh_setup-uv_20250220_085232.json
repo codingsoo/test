@@ -1,0 +1,32 @@
+[
+  {
+    "number": 194,
+    "title": "Auto activate venv when python-version is set",
+    "created_at": "2024-12-13T20:15:55Z",
+    "closed_at": "2024-12-20T07:24:43Z",
+    "labels": [
+      "enhancement"
+    ],
+    "url": "https://github.com/astral-sh/setup-uv/pull/194",
+    "body": "Closes: #124",
+    "comments_url": "https://api.github.com/repos/astral-sh/setup-uv/issues/194/comments",
+    "author": "eifinger",
+    "comments": [
+      {
+        "user": "eifinger",
+        "created_at": "2024-12-19T17:31:16Z",
+        "body": "@agriyakhetarpal I think the following should work:\r\n\r\n```yaml\r\ntest-python-version:\r\n  runs-on: ubuntu-latest\r\n    strategy:\r\n      matrix:\r\n        python-version: [\"3.12\", \"3.13\"]\r\n    steps:\r\n      - uses: actions/checkout@v4\r\n      - uses: actions/setup-python\r\n        with:\r\n          python-version: ${{ matrix.python-version }}\r\n      - name: Install latest version\r\n        uses: astral-sh/setup-uv@auto-environment\r\n        with:\r\n          python-version: ${{ matrix.python-version }}\r\n```\r\n\r\nuv should then pickup the already configured system python by GHA and use it"
+      },
+      {
+        "user": "agriyakhetarpal",
+        "created_at": "2024-12-19T17:40:21Z",
+        "body": "Ah, good idea \u2013 I will try that after this PR makes it to a release, so that I don't need to pass `--system` to the install command. Thanks!"
+      },
+      {
+        "user": "ngoldbaum",
+        "created_at": "2024-12-20T15:05:46Z",
+        "body": "I should probably say that the weird floating point exception issues I saw with the python-build-standalone python I ultimately was able to reproduce with the python.org Python, so it probably has something to do with the system I was testing on.\n\nThe issues with INCLUDEPY should be resolved in uv.\n\nI'm hoping to try converting some of the numpy and pyo3 CI jobs to use uv's python-build-standalone python soon and will follow up with any issues.\n\nThanks so much for working to improve Python packaging and distribution!"
+      }
+    ]
+  }
+]

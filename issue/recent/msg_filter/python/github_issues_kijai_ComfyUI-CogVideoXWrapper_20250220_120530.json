@@ -1,0 +1,321 @@
+[
+  {
+    "number": 245,
+    "title": "1.5test branch AssertionError('First input (fp16) and second input (bf16) must have the same dtype!')",
+    "created_at": "2024-11-18T08:00:10Z",
+    "closed_at": "2024-11-18T08:13:45Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/245",
+    "body": "   noise_pred = self.transformer(\r\n                 ^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 685, in forward\r\n    hidden_states, encoder_hidden_states = block(\r\n                                           ^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 282, in forward\r\n    attn_hidden_states, attn_encoder_hidden_states = self.attn1(\r\n                                                     ^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/diffusers/models/attention_processor.py\", line 495, in forward\r\n    return self.processor(\r\n           ^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 129, in __call__\r\n    hidden_states = sageattn_func(query, key, value, attn_mask=attention_mask, dropout_p=0.0,is_causal=False)\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py\", line 451, in _fn\r\n    return fn(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 50, in sageattn_func\r\n    return sageattn(query, key, value, attn_mask=attn_mask, dropout_p=dropout_p,is_causal=is_causal)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/sageattention/core.py\", line 106, in sageattn\r\n    o = attn_true(q_int8, k_int8, v, q_scale, k_scale, tensor_layout=tensor_layout, output_dtype=dtype)\r\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/sageattention/attn_qk_int8_per_block.py\", line 113, in forward\r\n    _attn_fwd[grid](\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/runtime/jit.py\", line 167, in <lambda>\r\n    return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)\r\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/runtime/jit.py\", line 416, in run\r\n    self.cache[device][key] = compile(\r\n                              ^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/compiler/compiler.py\", line 191, in compile\r\n    module = src.make_ir(options)\r\n             ^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/compiler/compiler.py\", line 117, in make_ir\r\n    return ast_to_ttir(self.fn, self, options=options)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/compiler/code_generator.py\", line 1231, in ast_to_ttir\r\n    raise CompilationError(fn.src, node, repr(e)) from e\r\ntriton.compiler.errors.CompilationError: at 39:55:    O_block_ptr = Out + (off_z * stride_oz + off_h * stride_oh) + offs_m[:, None] * stride_on + offs_k[None, :]\r\n\r\n    m_i = tl.zeros([BLOCK_M], dtype=tl.float32) - float(\"inf\")\r\n    l_i = tl.zeros([BLOCK_M], dtype=tl.float32) + 1.0\r\n    acc = tl.zeros([BLOCK_M, HEAD_DIM], dtype=tl.float32)\r\n\r\n    q = tl.load(Q_ptrs, mask = offs_m[:, None] < qo_len)\r\n    q_scale = tl.load(Q_scale_ptr)\r\n    acc, l_i = _attn_fwd_inner(acc, l_i, m_i, q, q_scale, kv_len, K_ptrs, K_scale_ptr, V_ptrs, stride_kn, stride_vn,\r\n                                    start_m,\r\n                                    BLOCK_M, HEAD_DIM, BLOCK_N,\r\n                                    4 - STAGE, offs_m, offs_n\r\n                                                       ^\r\nAssertionError('First input (fp16) and second input (bf16) must have the same dtype!')\r\n\r\ncommit 6f9e4ff6477d51ef29e2f7eea9ff2bbd6986b007 (HEAD -> 1.5_test, origin/1.5_test)\r\nAuthor: kijai <40791699+kijai@users.noreply.github.com>\r\nDate:   Sun Nov 17 22:23:40 2024 +0200\r\n\r\n    Update custom_cogvideox_transformer_3d.py\r\n\r\ncommit e70da23ac2b4724624537e503b0cdaf93d24a74e\r\nAuthor: kijai <40791699+kijai@users.noreply.",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/245/comments",
+    "author": "magicwang1111",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-11-18T08:09:53Z",
+        "body": "I think I had this too with sageattention 1.0.5, reverting back to 1.0.3 made it work again. "
+      }
+    ]
+  },
+  {
+    "number": 136,
+    "title": "Error when running fastmode",
+    "created_at": "2024-10-07T12:06:11Z",
+    "closed_at": "2024-10-07T18:06:43Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/136",
+    "body": "When I try activating fastmode, I get the error CUDA error: \r\n\r\nCUBLAS_STATUS_NOT_SUPPORTED when calling `cublasLtMatmulAlgoGetHeuristic( ltHandle, computeDesc.descriptor(), Adesc.descriptor(), Bdesc.descriptor(), Cdesc.descriptor(), Ddesc.descriptor(), preference.descriptor(), 1, &heuristicResult, &returnedResult)`.\r\n\r\nI suspect my CUDA version is not correct, I have v11.8. Which one do I need?\r\n\r\nRTX 4090, Windows 11.",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/136/comments",
+    "author": "jpgallegoar",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-10-07T12:41:03Z",
+        "body": "You need torch that's compiled for cuda 124."
+      }
+    ]
+  },
+  {
+    "number": 122,
+    "title": "cuda error: an illegal memory access was encountered",
+    "created_at": "2024-10-02T14:55:13Z",
+    "closed_at": "2024-10-03T03:35:05Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/122",
+    "body": "I updated the CogVideoXWrapper about 10 hours ago. after this update it keep showing this error when the workflow comes to Cogvideo Decode. I tried i2v and the Pose workflow, they both showed the same error. the error is only shown on the cmd window, and the Cogvideo Decode node is stuck since then.  the  full log is as follows:\r\ngot prompt\r\nTemporal tiling disabled\r\nException in thread Thread-22 (prompt_worker):\r\nTraceback (most recent call last):\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 317, in execute\r\n    output_data, output_ui, has_subgraph = get_output_data(obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 192, in get_output_data\r\n    return_values = _map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 169, in _map_node_over_list\r\n    process_inputs(input_dict, i)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 158, in process_inputs\r\n    results.append(getattr(obj, func)(**inputs))\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\custom_nodes\\ComfyUI-CogVideoXWrapper\\nodes.py\", line 926, in decode\r\n    frames = vae.decode(latents).sample\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\utils\\accelerate_utils.py\", line 46, in wrapper\r\n    return method(self, *args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 1184, in decode\r\n    decoded = self._decode(z).sample\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 1142, in _decode\r\n    return self.tiled_decode(z, return_dict=return_dict)\r\n\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 1332, in tiled_decode\r\n    tile = self.decoder(tile)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1511, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1520, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 877, in forward\r\n    hidden_states = up_block(hidden_states, temb, sample)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1511, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1520, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 602, in forward\r\n    hidden_states = resnet(hidden_states, temb, zq)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1511, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1520, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 303, in forward\r\n    hidden_states = self.conv2(hidden_states)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1511, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1520, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 144, in forward\r\n    output = self.conv(inputs)\r\n\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1511, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1520, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\diffusers\\models\\autoencoders\\autoencoder_kl_cogvideox.py\", line 64, in forward\r\n    return super().forward(input)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\conv.py\", line 610, in forward\r\n    return self._conv_forward(input, self.weight, self.bias)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\nn\\modules\\conv.py\", line 605, in _conv_forward\r\n    return F.conv3d(\r\nRuntimeError: CUDA error: an illegal memory access was encountered\r\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\r\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1.\r\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\threading.py\", line 1016, in _bootstrap_inner\r\n    self.run()\r\n  File \"<enhanced_experience vendors.sentry_sdk.integrations.threading>\", line 99, in run\r\n  File \"<enhanced_experience vendors.sentry_sdk.integrations.threading>\", line 94, in _run_old_run_func\r\n  File \"<enhanced_experience vendors.sentry_sdk.utils>\", line 1649, in reraise\r\n  File \"<enhanced_experience vendors.sentry_sdk.integrations.threading>\", line 92, in _run_old_run_func\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\threading.py\", line 953, in run\r\n    self._target(*self._args, **self._kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\main.py\", line 125, in prompt_worker\r\n    e.execute(item[2], prompt_id, item[3], item[4])\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\custom_nodes\\rgthree-comfy\\__init__.py\", line 211, in rgthree_execute\r\n    return self.rgthree_old_execute(*args, **kwargs)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 494, in execute\r\n    result, error, ex = execute(self.server, dynamic_prompt, self.caches, node_id, extra_data, executed, prompt_id, execution_list, pending_subgraph_results)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 384, in execute\r\n    input_data_formatted[name] = [format_value(x) for x in inputs]\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 384, in <listcomp>\r\n    input_data_formatted[name] = [format_value(x) for x in inputs]\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\execution.py\", line 236, in format_value\r\n    return str(x)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\_tensor.py\", line 461, in __repr__\r\n    return torch._tensor_str._str(self, tensor_contents=tensor_contents)\r\n  File \"I:\\stable_diffusion\\ComfyUI-aki-v1.2\\ComfyUI-aki-v1.2\\python\\lib\\site-packages\\torch\\_tensor_str.py\", line 677, in _str\r\n------------------------\r\nFault Traceback: \r\nNot Available",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/122/comments",
+    "author": "tdrminglin",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-10-02T15:43:11Z",
+        "body": "Is this with vae_tiling enabled or not?"
+      },
+      {
+        "user": "tdrminglin",
+        "created_at": "2024-10-02T17:45:03Z",
+        "body": "> Is this with vae_tiling enabled or not?\r\n\r\nThanks for replying. vae_tiling is enabled."
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-10-02T18:01:37Z",
+        "body": "> > Is this with vae_tiling enabled or not?\n> \n> Thanks for replying. vae_tiling is enabled.\n\nI don't really know the cause for that error, but if it worked before then try disabling the auto_tile_size as that's what I changed."
+      },
+      {
+        "user": "tdrminglin",
+        "created_at": "2024-10-03T03:11:28Z",
+        "body": "1.I deleted \"vae._clear_fake_context_parallel_cache()\" \r\n2. replaced the vae_tiling  codes by those from the last version \r\n3. changed tiling settings to last version\r\nI don't know which step worked, but  the error is gone. Thanks again."
+      }
+    ]
+  },
+  {
+    "number": 119,
+    "title": "CogVideoX-Fun-V1.1",
+    "created_at": "2024-10-01T21:00:40Z",
+    "closed_at": "2024-10-03T18:05:59Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/119",
+    "body": "is the CogVideoX-Fun-V1.1 not compatible with I2V like the first one? it completely distorts and warps images, no matter the noise strength \"wich i have no idea how it works\" or cfg, i had a poor cat turn into a strange matter akin to a demon from the depths of hell so many times that i had to delete the poor thing, i downloaded the model directly from HF, could that be the reason tho? i might re-download it from the loader tomorrow maybe.",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/119/comments",
+    "author": "hassakajin",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-10-01T21:08:41Z",
+        "body": "It's a lot stronger because of that noise, less noise would make it more stable. Generally the issue with the 1.0 was that it most of the time just generated no motion at all, just slow zooms, and their 1.1 was mostly to address this. I can't say I've seen anything like you describe yet though, but there's been some results with pretty much garbled motion.\r\n\r\nThat said, if you can run the model then it's working as intended, if there was any issue with download etc. it would simply error out."
+      },
+      {
+        "user": "hassakajin",
+        "created_at": "2024-10-01T21:38:00Z",
+        "body": "> It's a lot stronger because of that noise, less noise would make it more stable. \r\n\r\nyeah really cranking the noise down + lowering cfg made it way more stable, thanks! i had the idea that normal noise would be like 0.4, but around 0.010 it started getting better!\r\n\r\n> Generally the issue with the 1.0 was that it most of the time just generated no motion at all, just slow zooms, and their 1.1 was mostly to address this.\r\n\r\nyeah that was truly an issue, though i think 1.1 was a bit overtuned in that aspect, maybe that's just me... 2b works wonders though strangely, time to get testing everything that works again i guess."
+      },
+      {
+        "user": "cheezecrisp",
+        "created_at": "2024-10-02T08:15:16Z",
+        "body": "The v1.1 model does produce more significant human dynamics, but is unable to maintain proper human body structure. Attempted to reduce the 'noise_aug_strength' were not effective in improving this, and perhaps the v1.1 model needs further training."
+      },
+      {
+        "user": "hassakajin",
+        "created_at": "2024-10-03T06:35:30Z",
+        "body": "Before anything else... what is the default \"noise_aug_strength\"? I've been trying to figure this out for the first fun5b model release, is it 0.7 or straight up 0? for me so far the previous model were giving me nice motion, so there is a little trick to it. Perhaps when i'm done setting up my workflow i can share with you, to use it however you like it.\r\n\r\nAlso in regards to the v1.1 version, it works well in pair with caption models like florence, it gives the image motion enough to no be still, but inputting any type of human motion like jumping or walking warps everything,"
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-10-03T09:01:26Z",
+        "body": "> Before anything else... what is the default \"noise_aug_strength\"? I've been trying to figure this out for the first fun5b model release, is it 0.7 or straight up 0? for me so far the previous model were giving me nice motion, so there is a little trick to it. Perhaps when i'm done setting up my workflow i can share with you, to use it however you like it.\r\n> \r\n> Also in regards to the v1.1 version, it works well in pair with caption models like florence, it gives the image motion enough to no be still, but inputting any type of human motion like jumping or walking warps everything,\r\n\r\nThe default is the default when you create the node, so 0.056. The value is from the original code."
+      }
+    ]
+  },
+  {
+    "number": 100,
+    "title": "Base model and the GGUF model differences?",
+    "created_at": "2024-09-27T22:23:00Z",
+    "closed_at": "2024-10-01T01:57:34Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/100",
+    "body": "What's the difference between a 5bFun model and the 5bfun-GGUF model? i get images more vivid and darker with GGUF versions, is that the only thing it's for? i am so confused about these model versions, is there a description for each somewhere?",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/100/comments",
+    "author": "hassakajin",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-09-27T23:22:10Z",
+        "body": "GGUF is just different way to optimize the model by quantization, results are a bit different, but main thing is that it uses less VRAM, and is slightly slower."
+      }
+    ]
+  },
+  {
+    "number": 97,
+    "title": "1Torch was not compiled with flash attention",
+    "created_at": "2024-09-25T06:30:07Z",
+    "closed_at": "2024-10-01T02:07:44Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/97",
+    "body": "I know this most likely has nothing to do with Cog, but I'm getting the following:\r\n```ComfyUI\\comfy\\ldm\\modules\\attention.py:407: UserWarning: 1Torch was not compiled with flash attention.```\r\nIt still runs okay, I'm just wondering if this is compromising my quality or speed or anything.\r\n\r\nThanks in advance for any help.",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/97/comments",
+    "author": "Vektor369",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-09-25T06:35:05Z",
+        "body": "It's normal for Windows currently as flash_attn isn't supported by the prebuilt torch installs. CogVideoX itself doesn't benefit from it either, as far as I know."
+      }
+    ]
+  },
+  {
+    "number": 95,
+    "title": "OneDiff Support",
+    "created_at": "2024-09-24T17:03:29Z",
+    "closed_at": "2024-09-30T22:39:48Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/95",
+    "body": "Hello! \r\nI was running all sample workflows on my system (Linux, PyTorch 2.4, onediff, RTX 4090). \r\nThey all work, but onediff is not being used. \r\n\r\nWhat do I need to trigger it? \r\n\r\nThank you! ",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/95/comments",
+    "author": "sandor-lisn",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-09-24T17:06:27Z",
+        "body": "You have enabled onediff as the compile option in the model loader node? Note that onediff doesn't work with GGUF so it's only available in the normal model loader node."
+      },
+      {
+        "user": "sandor-lisn",
+        "created_at": "2024-09-25T04:21:09Z",
+        "body": "Hello, \r\nthank you very much for your lightning fast answer! \r\nMy bad, I should have seen this option myself...\r\n\r\nWhen I enable it, I get a python error. The stacktrace is at the botton of this message. \r\n\r\nI followed the instructions on your main project page. My conda environment contains: \r\n- torch 2.4.0.dev20240324+cu121\r\n- nexfort 0.1.dev271\r\n- onediff 1.2.1.dev24\r\n- onediffx 1.2.1.dev24\r\n\r\nDo you have a suggestion? Thank you!\r\n\r\n========\r\nUnable to load nexfort.{extension} module. Is it compatible with your PyTorch installation?\r\n!!! Exception during processing !!! /home/sandor/anaconda3/envs/comfy-flux/lib/python3.10/site-packages/nexfort/_C.cpython-310-x86_64-linux-gnu.so: undefined symbol: _ZNK3c105Error4whatEv\r\nTraceback (most recent call last):\r\n  File \"/home/sandor/workspace/ComfyUI-flux/execution.py\", line 323, in execute\r\n    output_data, output_ui, has_subgraph = get_output_data(obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n  File \"/home/sandor/workspace/ComfyUI-flux/execution.py\", line 198, in get_output_data\r\n    return_values = _map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n  File \"/home/sandor/workspace/ComfyUI-flux/execution.py\", line 169, in _map_node_over_list\r\n    process_inputs(input_dict, i)\r\n  File \"/home/sandor/workspace/ComfyUI-flux/execution.py\", line 158, in process_inputs\r\n    results.append(getattr(obj, func)(**inputs))\r\n  File \"/home/sandor/workspace/ComfyUI-flux/custom_nodes/ComfyUI-CogVideoXWrapper/nodes.py\", line 176, in loadmodel\r\n    pipe = compile_pipe(\r\n  File \"/home/sandor/anaconda3/envs/comfy-flux/lib/python3.10/site-packages/onediffx/compilers/diffusion_pipeline_compiler.py\", line 75, in compile_pipe\r\n    pipe = convert_pipe_to_memory_format(\r\n  File \"/home/sandor/anaconda3/envs/comfy-flux/lib/python3.10/site-packages/onediffx/compilers/diffusion_pipeline_compiler.py\", line 120, in convert_pipe_to_memory_format\r\n    from nexfort.utils.attributes import multi_recursive_apply\r\n  File \"/home/sandor/anaconda3/envs/comfy-flux/lib/python3.10/site-packages/nexfort/__init__.py\", line 22, in <module>\r\n    exec(f\"import nexfort.{extension} as {extension}\")\r\n  File \"<string>\", line 1, in <module>\r\nImportError: /home/sandor/anaconda3/envs/comfy-flux/lib/python3.10/site-packages/nexfort/_C.cpython-310-x86_64-linux-gnu.so: undefined symbol: _ZNK3c105Error4whatEv\r\n"
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-09-25T11:02:20Z",
+        "body": "Some issue with nexfort install, not seen that one before. Torch 2.4.1 is on stable release now so I'd suggest installing that, as it works for me using it."
+      }
+    ]
+  },
+  {
+    "number": 85,
+    "title": "Question about decoder",
+    "created_at": "2024-09-21T21:39:28Z",
+    "closed_at": "2024-09-22T09:47:04Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/85",
+    "body": "Apologies if this is a stupid question, I have pretty much zero knowledge about how video models work compared to image models.\r\n\r\nIs the way the sampler and decoder currently work somehow similar to generating images in batches with SA or Flux? If so, would it be theoretically possible to unbatch the latents or specify which frame(s) to send to the decoder by index?\r\n\r\nOr am I totally off the mark and the decoder already handles this already, and doesn't decode all frames at once.\r\n\r\nThe reason I got curious about this is because with Fun-xB models (I assume probably caused by the models themselves, not the wrapper) I noticed that it will output extra/duplicated frames at the beginning of image sequence (ie: it outputs 16 frames when selecting 13 frames as length), so I was wondering if it was possible to remove those before sending to the decoder, thus somehow saving on a bit of resources along the way when decoding.\r\n\r\nI tried a few different nodes to separate latents from batch/select by index but obviously it doesn't work ;)",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/85/comments",
+    "author": "thelemuet",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-09-21T21:54:28Z",
+        "body": "CogVideoX uses a 3D VAE, meaning it also compresses the images temporally: 4 images into one latent. This causes the disparancies you noticed with the frame counts. The decoding is done 2 \"frames\" at the time by design, it can't be less. If memory for decoding is a concern, the VAE tiling works pretty well with the tile size set to half of the dimensions."
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-09-21T23:23:00Z",
+        "body": "> Ah, makes completes sense, thank you for the explanation.\n> \n> Funnily enough, another reason I was messing with the latents is because yesterday I had issues with the VAE tiling resulting in very obvious seams. As an alternative I was splitting the latents with some padding using the core \"crop latent\" node before sending to the decoder, then stitching the images back after that myself. Clearly the latent shape was wrong, cropping the Width was cropping the Height and cropping the Height did nothing, but it did actually work even if not as intended hehe,\n> \n> But looks like there are no more visible seams with VAE tiling after updating today, so thank you, definitely much more convenient ;)\n\nYes they defaults were just awful before, I got the values from the initial code before these new models and as I never really used it myself, I didn't realise they should be completely different. 96x96 tiles made no sense in pixel space especially, half of the image dimension seems fine now and no seams with 0.2 overlap."
+      }
+    ]
+  },
+  {
+    "number": 77,
+    "title": "Error occurred when executing DownloadAndLoadCogVideoModel",
+    "created_at": "2024-09-20T16:59:48Z",
+    "closed_at": "2024-09-20T17:45:45Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/77",
+    "body": "When I tried CogVideoX-5b-I2V, I encountered this problem. Does anyone know how to solve it\uff1f\r\n![Uploading PixPin_2024-09-21_00-55-09.jpg\u2026]()\r\n",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/77/comments",
+    "author": "TryingToDoBetter25",
+    "comments": [
+      {
+        "user": "TryingToDoBetter25",
+        "created_at": "2024-09-20T17:01:37Z",
+        "body": "Traceback (most recent call last):\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\execution.py\", line 152, in recursive_execute\r\n    output_data, output_ui = get_output_data(obj, input_data_all)\r\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\execution.py\", line 82, in get_output_data\r\n    return_values = map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True)\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\execution.py\", line 75, in map_node_over_list\r\n    results.append(getattr(obj, func)(**slice_dict(input_data_all, i)))\r\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\custom_nodes\\ComfyUI-CogVideoXWrapper\\nodes.py\", line 98, in loadmodel\r\n    transformer = CogVideoXTransformer3DModel.from_pretrained(base_path, subfolder=\"transformer\")\r\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\huggingface_hub\\utils\\_validators.py\", line 114, in _inner_fn\r\n    return fn(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\diffusers\\models\\modeling_utils.py\", line 774, in from_pretrained\r\n    accelerate.load_checkpoint_and_dispatch(\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\accelerate\\big_modeling.py\", line 613, in load_checkpoint_and_dispatch\r\n    load_checkpoint_in_model(\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 1821, in load_checkpoint_in_model\r\n    set_module_tensor_to_device(\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 341, in set_module_tensor_to_device\r\n    raise ValueError(f\"{module} does not have a parameter or a buffer named {tensor_name}.\")\r\nValueError: CogVideoXPatchEmbed(\r\n  (proj): Conv2d(32, 3072, kernel_size=(2, 2), stride=(2, 2))\r\n  (text_proj): Linear(in_features=4096, out_features=3072, bias=True)\r\n) does not have a parameter or a buffer named pos_embedding.\r\n"
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-09-20T17:25:44Z",
+        "body": "Did you update diffusers to 0.30.3?"
+      }
+    ]
+  },
+  {
+    "number": 62,
+    "title": "Error occurred when executing DownloadAndLoadCogVideoModel:  CogVideoXPatchEmbed( (proj): Conv2d(32, 3072, kernel_size=(2, 2), stride=(2, 2)) (text_proj): Linear(in_features=4096, out_features=3072, bias=True) ) does not have a parameter or a buffer named pos_embedding.",
+    "created_at": "2024-09-18T21:05:16Z",
+    "closed_at": "2024-09-18T21:15:36Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/62",
+    "body": "Error occurred when executing DownloadAndLoadCogVideoModel:\r\n\r\nCogVideoXPatchEmbed(\r\n(proj): Conv2d(32, 3072, kernel_size=(2, 2), stride=(2, 2))\r\n(text_proj): Linear(in_features=4096, out_features=3072, bias=True)\r\n) does not have a parameter or a buffer named pos_embedding.\r\n\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 317, in execute\r\noutput_data, output_ui, has_subgraph = get_output_data(obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 192, in get_output_data\r\nreturn_values = _map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 169, in _map_node_over_list\r\nprocess_inputs(input_dict, i)\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 158, in process_inputs\r\nresults.append(getattr(obj, func)(**inputs))\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\custom_nodes\\ComfyUI-CogVideoXWrapper\\nodes.py\", line 92, in loadmodel\r\ntransformer = CogVideoXTransformer3DModel.from_pretrained(base_path, subfolder=\"transformer\")\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\huggingface_hub\\utils\\_validators.py\", line 114, in _inner_fn\r\nreturn fn(*args, **kwargs)\r\n^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\diffusers\\models\\modeling_utils.py\", line 774, in from_pretrained\r\naccelerate.load_checkpoint_and_dispatch(\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\accelerate\\big_modeling.py\", line 613, in load_checkpoint_and_dispatch\r\nload_checkpoint_in_model(\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 1821, in load_checkpoint_in_model\r\nset_module_tensor_to_device(\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 341, in set_module_tensor_to_device\r\nraise ValueError(f\"{module} does not have a parameter or a buffer named {tensor_name}.\")",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/62/comments",
+    "author": "brad12d3",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-09-18T21:07:50Z",
+        "body": "I2V model requires diffusers version 0.30.3 which came out yesterday."
+      }
+    ]
+  },
+  {
+    "number": 32,
+    "title": "`prompt_embeds` and `negative_prompt_embeds` must have the same shape when passed directly, but got: `prompt_embeds` torch.Size([1, 452, 4096]) != `negative_prompt_embeds` torch.Size([1, 226, 4096]).",
+    "created_at": "2024-08-30T09:52:27Z",
+    "closed_at": "2024-08-30T15:28:32Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/32",
+    "body": "Error occurred when executing CogVideoSampler:\r\n\r\n`prompt_embeds` and `negative_prompt_embeds` must have the same shape when passed directly, but got: `prompt_embeds` torch.Size([1, 452, 4096]) != `negative_prompt_embeds` torch.Size([1, 226, 4096]).\r\n\r\nFile \"/data/ComfyUI/execution.py\", line 317, in execute\r\noutput_data, output_ui, has_subgraph = get_output_data(obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\nFile \"/data/ComfyUI/execution.py\", line 192, in get_output_data\r\nreturn_values = _map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\nFile \"/data/ComfyUI/execution.py\", line 169, in _map_node_over_list\r\nprocess_inputs(input_dict, i)\r\nFile \"/data/ComfyUI/execution.py\", line 158, in process_inputs\r\nresults.append(getattr(obj, func)(**inputs))\r\nFile \"/data/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/nodes.py\", line 289, in process\r\nlatents = pipeline[\"pipe\"](\r\nFile \"/etc/anaconda3/envs/comfyui/lib/python3.10/site-packages/torch/utils/_contextlib.py\", line 115, in decorate_context\r\nreturn func(*args, **kwargs)\r\nFile \"/data/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/pipeline_cogvideox.py\", line 391, in __call__\r\nself.check_inputs(\r\nFile \"/data/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/pipeline_cogvideox.py\", line 225, in check_inputs",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/32/comments",
+    "author": "vanche1212",
+    "comments": [
+      {
+        "user": "vanche1212",
+        "created_at": "2024-08-30T09:52:47Z",
+        "body": " diffusers==0.30.1"
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-08-30T09:54:13Z",
+        "body": "The prompt is probably just too long."
+      },
+      {
+        "user": "vanche1212",
+        "created_at": "2024-08-30T09:57:13Z",
+        "body": "> The prompt is probably just too long.\r\n\r\ntks, It is really too long. Is there any way to use long prompt words?"
+      },
+      {
+        "user": "vanche1212",
+        "created_at": "2024-08-30T09:59:39Z",
+        "body": "Here are my hint words\uff0c1047 characters only\r\n\r\nIn the blue underwater world, an elegant turtle leisurely shuttles between coral reefs. The turtle's shell is covered with exquisite textures, and the sun shines through the water with mottled light and shadow, making its shell shine with a mysterious luster. The turtle swings its flippers slowly, light and graceful, as if soaring through the water. The underwater world around is colorful, and corals of different shapes are like sculptures of nature, decorating this peaceful ocean paradise. Colorful tropical fish swam in groups among the corals. Some fish stopped beside the turtle as if to say hello to it. The whole scene was full of vigor and vitality. In the distance, the dark blue water gradually became dark and mysterious, as if hiding countless undiscovered secrets. And the turtle is so calm and comfortable in this vast underwater world, as if it is the guardian of this ocean. The whole picture shows a quiet and harmonious natural beauty with soft colors and smooth lines, showing the fantastic world in the depths of the ocean."
+      },
+      {
+        "user": "vanche1212",
+        "created_at": "2024-08-30T10:14:34Z",
+        "body": "226 tokens \uff0cI found"
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-08-30T10:22:09Z",
+        "body": "> 226 tokens \uff0cI found\r\n\r\nYes, I think it's best to stay within that limit. I did modify the code a bit to allow it to run with the longer prompt too, but the results seem worse, if you update you can test it yourself."
+      }
+    ]
+  },
+  {
+    "number": 21,
+    "title": "\"Prompt outputs failed validation: Value not in list\"",
+    "created_at": "2024-08-28T07:19:18Z",
+    "closed_at": "2024-08-28T15:51:50Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/21",
+    "body": "I've updated ComfyUI, and I installed the latest CogVideoXWrapper through ComfyUI manager via this Git's URL. I've loaded the \"cogvideox_5b_example_01.json\" workflow, and pointed the Load Clip node to my existing model (t5xxl_fp8_e4m3fn.safetensors).\r\n\r\nAfter hitting queue prompt, I get this error:\r\n\r\nPrompt outputs failed validation: Value not in list: format: 'video/nvenc_h264-mp4' not in ['image/gif', 'image/webp', 'video/ProRes', 'video/av1-webm', 'video/h264-mp4', 'video/h265-mp4', 'video/webm']\r\nVHS_VideoCombine:\r\n    - Value not in list: format: 'video/nvenc_h264-mp4' not in ['image/gif', 'image/webp', 'video/ProRes', 'video/av1-webm', 'video/h264-mp4', 'video/h265-mp4', 'video/webm']",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/21/comments",
+    "author": "Gyramuur",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-08-28T12:49:51Z",
+        "body": "This is because I forgot the nvenc format selected on the video combine node, it's not supported by all platforms. Just change to some other encode format or recreate the video combine node to get past that."
+      }
+    ]
+  },
+  {
+    "number": 9,
+    "title": "Results from this are different to official CogVideoX demo and I can't figure out how to match it.",
+    "created_at": "2024-08-10T07:37:18Z",
+    "closed_at": "2024-08-11T06:55:11Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/9",
+    "body": "Using the default settings provided with the example workflow, with 16 frames at 8 fps, it only renders a two second video (as expected). But by default, CogVideoX does 6 second clips. However, upping the amount of frames to 48 does not have the intended effect and instead generates three disjointed clips, like three 2 second clips stuck together. \r\n\r\nHow do I get a single 6 second video like it's supposed to do?",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/9/comments",
+    "author": "Gyramuur",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-08-10T14:12:41Z",
+        "body": "Which workflow exactly? I added the feature to use temporal tiling (t_tile) as context windows, if the value is lower than your frame count it creates the video in what you call \"disjointed clips\", so you'd want to put that to 48 to get the max clips. The point of the t_tile is that you can also go above the 48, though the clips are usually not joined too well together, sometimes it works nicely."
+      },
+      {
+        "user": "Gyramuur",
+        "created_at": "2024-08-11T06:55:11Z",
+        "body": "> Which workflow exactly? I added the feature to use temporal tiling (t_tile) as context windows, if the value is lower than your frame count it creates the video in what you call \"disjointed clips\", so you'd want to put that to 48 to get the max clips. The point of the t_tile is that you can also go above the 48, though the clips are usually not joined too well together, sometimes it works nicely.\r\n\r\nI'm using the default example_01.json provided in the examples folder. Also increasing t_tile_length along with num_frames fixes it, thank you. :) I wasn't sure what the t_tile_length parameter did.\r\n\r\nAlso it's unrelated to this issue, so I'll close it out anyway, but when you load the aforementioned workflow, it throws an error saying the t_tile_overlap of 2 is less than the minimum of 8."
+      }
+    ]
+  }
+]

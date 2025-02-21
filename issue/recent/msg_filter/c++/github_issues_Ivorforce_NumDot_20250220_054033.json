@@ -1,0 +1,45 @@
+[
+  {
+    "number": 51,
+    "title": "Adding rounding functions",
+    "created_at": "2024-09-12T19:37:41Z",
+    "closed_at": "2024-09-12T20:25:37Z",
+    "labels": [],
+    "url": "https://github.com/Ivorforce/NumDot/pull/51",
+    "body": null,
+    "comments_url": "https://api.github.com/repos/Ivorforce/NumDot/issues/51/comments",
+    "author": "Krishn1412",
+    "comments": [
+      {
+        "user": "Krishn1412",
+        "created_at": "2024-09-12T19:39:36Z",
+        "body": "hey @Ivorforce,\r\nwhile building the project I was running into this issue\r\n`In file included from src/ndarray.cpp:1:\r\nIn file included from src/ndarray.h:23:\r\nsrc/vatensor/varray.h:14:10: fatal error: 'xtensor/xarray.hpp' file not found\r\n#include \"xtensor/xarray.hpp\"           // for xarray_adaptor\r\n         ^~~~~~~~~~~~~~~~~~~~\r\n1 error generated.\r\nscons: *** [src/ndarray.os] Error 1\r\nscons: building terminated because of errors.`\r\n\r\nI have written a basic structure for the rounding functions but can't test because of this failure. Can you help me out with this?\r\nTIA "
+      },
+      {
+        "user": "Krishn1412",
+        "created_at": "2024-09-12T19:57:27Z",
+        "body": "still getting the same error, I see this is a recent change"
+      },
+      {
+        "user": "Ivorforce",
+        "created_at": "2024-09-12T20:11:42Z",
+        "body": "I think the includes may fail on any (random) xtensor include. Due to #23, it does not reliably set up the 3 dependencies (xtl, xtensor, xsimd).\r\n\r\nTry the following in your command line manually:\r\n\r\n```\r\n# in numdot folder\r\ncd xtl/build && cmake ../ && cmake --install . --prefix .\r\n# back to numbot folder\r\ncd xsimd/build && cmake ../ -DENABLE_XTL_COMPLEX=1 -Dxtl_DIR='../xtl/build/ && cmake --install . --prefix .\r\n# back to numdot folder\r\ncd xtensor/build && cmake ../ -DXTENSOR_USE_XSIMD=1 -Dxtl_DIR='../xtl/build/' -Dxsimd_DIR='../xsimd/build/' && cmake --install . --prefix .\r\n```\r\n\r\nThis basically replicates what SConstruct is supposed to do."
+      },
+      {
+        "user": "Ivorforce",
+        "created_at": "2024-09-12T20:30:28Z",
+        "body": "Reading up on the differences between rint and nearbyint, i'm deleting nearbyint and using nearbyint for the rint implementation. As i understand, rint raises when it actually had to perform rounding, which is not really useful in vectorized cases."
+      },
+      {
+        "user": "20akshay00",
+        "created_at": "2024-09-12T21:05:13Z",
+        "body": "@Krishn1412 I was attempting to build this on Windows 10 w/ mingw and faced the same issue. I ended up resolving it by manually building the three dependencies as mentioned above, and then removed those subcommands from the SConstruct file before running it again.\r\n\r\nedit: we traced the issue to the fact that powershell doesn't recognize `&&` and deletes the tmp file (xtl.hpp for example) when that command fails."
+      },
+      {
+        "user": "Ivorforce",
+        "created_at": "2024-09-12T21:31:48Z",
+        "body": "I just removed the cmake steps from SConstruct and just added the include dirs to the project. Found no difference so far. Hopefully this eliminates these issues for good."
+      }
+    ]
+  }
+]

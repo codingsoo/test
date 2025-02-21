@@ -1,0 +1,25 @@
+[
+  {
+    "number": 16,
+    "title": "In example replace .UseSyncfusionToolkit() with .ConfigureSyncfusionToolkit() in mauiprogram.cs",
+    "created_at": "2024-10-25T17:16:57Z",
+    "closed_at": "2024-10-28T03:41:05Z",
+    "labels": [],
+    "url": "https://github.com/syncfusion/maui-toolkit/issues/16",
+    "body": "In the example, use .ConfigureSyncfusionToolkit() in mauiprogram.cs instead of  .UseSyncfusionToolkit().\r\nUpdate the MainPage.xaml with:\r\n`        <chart:SfCartesianChart.Series>\r\n            <chart:SplineSeries Label=\"High\" EnableTooltip=\"True\" EnableAnimation=\"True\" ItemsSource=\"{Binding Data}\" XBindingPath=\"Name\" YBindingPath=\"Height\" StrokeWidth=\"1\" ShowMarkers=\"True\" LegendIcon=\"SeriesType\" >\r\n                <chart:SplineSeries.MarkerSettings>\r\n                    <chart:ChartMarkerSettings Width=\"8\" Height=\"8\" StrokeWidth=\"1\"/>\r\n                </chart:SplineSeries.MarkerSettings>\r\n            </chart:SplineSeries>\r\n        </chart:SfCartesianChart.Series>\r\n`\r\nIn Xaml, the namespace that worked for me was:\r\nxmlns:chart=\"clr-namespace:Syncfusion.Maui.Toolkit.Charts;assembly=Syncfusion.Maui.Toolkit\"\r\n\r\nThen the example will display the intended data. How do I get the code displayed above to appear properly as seperated lines?",
+    "comments_url": "https://api.github.com/repos/syncfusion/maui-toolkit/issues/16/comments",
+    "author": "davefxy",
+    "comments": [
+      {
+        "user": "PaulAndersonS",
+        "created_at": "2024-10-26T05:59:49Z",
+        "body": "Hi @davefxy,\r\nThanks for the code suggestions. We have now updated the complete code example to the readme file\r\n"
+      },
+      {
+        "user": "davefxy",
+        "created_at": "2024-10-26T23:21:13Z",
+        "body": "Awesome library. Replaced MicroCharts.with yout library charts. Your library is just in time. MicroCharts was past end of life.\r\n\r\nYahoo Mail: Search, Organize, Conquer \r\n \r\n  On Sat, Oct 26, 2024 at 12:00 AM, Paul ***@***.***> wrote:   \r\n\r\n\r\nHi @davefxy,\r\nThanks for the code suggestions. We have now updated the complete code example to the readme file\r\n\r\n\u2014\r\nReply to this email directly, view it on GitHub, or unsubscribe.\r\nYou are receiving this because you were mentioned.Message ID: ***@***.***>\r\n  \r\n"
+      }
+    ]
+  }
+]

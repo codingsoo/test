@@ -1,0 +1,27 @@
+[
+  {
+    "number": 6,
+    "title": "missing sat.model",
+    "created_at": "2025-02-11T05:19:28Z",
+    "closed_at": "2025-02-11T07:47:57Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/FoundationVision/FlashVideo/issues/6",
+    "body": "Hello, thank you for open-sourcing such an excellent work !\n\nBut when I run `sat/demo.ipynb`, an error will be reported at the line from `sat.model.base_model import get_model`, prompting that `sat.model cannot be found`. \nI see that there is indeed no model folder in the sat, and there is no `get_model` function in the `base_model` file. Is it because a file was uploaded missing?",
+    "comments_url": "https://api.github.com/repos/FoundationVision/FlashVideo/issues/6/comments",
+    "author": "frozoul",
+    "comments": [
+      {
+        "user": "jshilong",
+        "created_at": "2025-02-11T06:17:50Z",
+        "body": "Indeed, there seems to be a confusion over the `sat` reference. Here, `sat` points to the module in the environment, corresponding to `SwissArmyTransformer>=0.4.12` in the requirements. Have you executed `pip install -r requirements`? Feel free to comment here if you continue to face issues.\n\nTo avoid this confusion for more people, I may consider renaming the folder to `flashvideo`. Thanks for your feedback"
+      },
+      {
+        "user": "frozoul",
+        "created_at": "2025-02-11T06:34:54Z",
+        "body": "Thank you for your reply. I installed the dependencies according to the requirements, but I moved the `demo` file out of the `sat` folder and executed it, which caused the problem. If it is in the sat folder, it will be normal."
+      }
+    ]
+  }
+]

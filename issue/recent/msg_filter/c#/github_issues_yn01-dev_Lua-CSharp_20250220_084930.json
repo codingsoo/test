@@ -1,0 +1,43 @@
+[
+  {
+    "number": 90,
+    "title": "Error: 'LuaAsset' could not be found after installing via NuGet to Unity 6",
+    "created_at": "2025-01-12T15:22:20Z",
+    "closed_at": "2025-01-12T15:36:21Z",
+    "labels": [],
+    "url": "https://github.com/yn01-dev/Lua-CSharp/issues/90",
+    "body": "I created a new Unity 6000.0.33f1 project, installed NuGet via git URL, and installed LuaCSharp through NuGet and afterwards installed the LuaCSharp package via Package Manager from git URL.\r\n\r\nAfter that I created a simple test script in the Assets root folder:\r\n\r\n```\r\nusing UnityEngine;\r\n\r\nnamespace DefaultNamespace\r\n{\r\n\tpublic class MonoBehaviour1 : MonoBehaviour\r\n\t{\r\n\t\tpublic LuaAsset script;\r\n\t}\r\n}\r\n```\r\n\r\nThis says LuaAsset could not be found:\r\n\r\n```\r\nAssets\\MonoBehaviour1.cs(10,10): error CS0246: The type or namespace name 'LuaAsset' could not be found (are you missing a using directive or an assembly reference?)\r\n```\r\n\r\nI repeated this by creating an `Editor` folder with another script thinking LuaAsset may be editor-only but this results in the same error.\u00a0\r\n\r\nThen I added Assembly Definitions, one for the runtime script and another for the editor script, referencing Lua.Unity for both and Lua.Unity.Editor for the editor assembly. But no matter what, the error sticks.\r\n\r\nAlso added a test.lua file under Assets and selected it. Inspector reads \"Test (Lua Asset)\" indicating that the Lua importer is active.\r\n\r\nI tried about everything I could think of but the LuaAsset type just isn't available.",
+    "comments_url": "https://api.github.com/repos/yn01-dev/Lua-CSharp/issues/90/comments",
+    "author": "CodeSmile-0000011110110111",
+    "comments": [
+      {
+        "user": "yn01-dev",
+        "created_at": "2025-01-12T15:25:25Z",
+        "body": "~~Do you have both the core package and the Unity extension installed?~~\r\nAnd have you simply forgotten to `using Lua.Unity`?"
+      }
+    ]
+  },
+  {
+    "number": 89,
+    "title": "Use of C# 10 makes this package incompatible with Unity",
+    "created_at": "2025-01-12T14:30:30Z",
+    "closed_at": "2025-01-12T14:43:05Z",
+    "labels": [],
+    "url": "https://github.com/yn01-dev/Lua-CSharp/issues/89",
+    "body": "When I drop the Lua folder due to missing ILuaModuleLoader into a Unity project I am greeted with plenty of these errors:\r\n\r\n```\r\nAssets\\Packages\\Lua.Unity\\Runtime\\Lua\\Attributes.cs(1,1): error CS8773: Feature 'file-scoped namespace' is not available in C# 9.0. Please use language version 10.0 or greater.\r\nAssets\\Packages\\Lua.Unity\\Runtime\\Lua\\CodeAnalysis\\Compilation\\Descriptions.cs(6,28): error CS8773: Feature 'record structs' is not available in C# 9.0. Please use language version 10.0 or greater.\r\n```\r\n\r\nI'm on Unity 6.1 beta which is still using C# 9. Unity isn't scheduled to support C# 10 or higher until Unity 7 which is expected to surface in 2026 at the earliest.\r\n\r\nMakes me wonder, does Nuget add some special sauce to make this work or has the code not been tested with Unity?",
+    "comments_url": "https://api.github.com/repos/yn01-dev/Lua-CSharp/issues/89/comments",
+    "author": "CodeSmile-0000011110110111",
+    "comments": [
+      {
+        "user": "yn01-dev",
+        "created_at": "2025-01-12T14:33:32Z",
+        "body": "Please install using NugetForUnity. For dll, the language version does not matter."
+      },
+      {
+        "user": "yn01-dev",
+        "created_at": "2025-01-12T14:43:49Z",
+        "body": "In any case, I don't have plans to create a dedicated repository for Unity. Please use the dll."
+      }
+    ]
+  }
+]

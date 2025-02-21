@@ -1,0 +1,387 @@
+[
+  {
+    "number": 170,
+    "title": "Ranking function",
+    "created_at": "2025-02-12T15:25:22Z",
+    "closed_at": "2025-02-12T16:35:44Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/170",
+    "body": "Hi, thank you for your great package! It has been incredibly useful and has made my research/task much more efficient!\n\nI'm using BindCraft and have generated 300 binders. However, they are all running at different times, which forces me to stop the pipeline before it reaches 100. Is there a way to run the ranking function individually?\n\nAny guidance or suggestions would be greatly appreciated!\n\n",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/170/comments",
+    "author": "JH-42",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2025-02-12T15:31:14Z",
+        "body": "Yeah, I just set the number of designs to 1 and run it again"
+      },
+      {
+        "user": "JH-42",
+        "created_at": "2025-02-12T16:35:44Z",
+        "body": "Thank you for your quick reply!"
+      }
+    ]
+  },
+  {
+    "number": 169,
+    "title": "Missing subunit in output model",
+    "created_at": "2025-02-11T13:10:52Z",
+    "closed_at": "2025-02-13T15:24:43Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/169",
+    "body": "Hello,\n\nIm currently trying to design binders for a complex composed of 3 subunits. To accelerate processing I delete one subunit and trim away parts of the structure of the remaining 2 subunits that are far away from the hotspot and do not interfere with binding of the binder. I successfully managed to design binders for one complex (4ic0) but for a homologous complex (6qgt) I can't get it to work. For some reason one subunit gets skipped during the process. So the output structure only contains subunit G (where the hotspot is on) but subunit B is missing, which probably causes binder design to the interface where subunit B should sit.\nSo far I tried using different trimmed structures as input and also the not trimmed structure (apart from deleting the 3rd subunit) and renaming the chains (don't now if the name of the chain even effects anything).\u00a0\n\nI am using these settings:\u00a0\nadvanved filters =default_4stage_multimer_hardtarget.json\nfilters = slightly adjusted version of the peptide_filters.json\nHowever all these settings worked fine on the first complex.\n\nDo you have an idea what causes this issue?\nKind regards",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/169/comments",
+    "author": "da-schaefer",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2025-02-13T11:24:13Z",
+        "body": "So if a subunit is missing, it probably was not specified in the 'chains = \"A,B,C\"' of the target_settings file. The chain names there correspond to what chains are taken into account during design so it does matter. Can you double check that it matches to what is in your pdb file?"
+      },
+      {
+        "user": "da-schaefer",
+        "created_at": "2025-02-13T15:24:43Z",
+        "body": "Thanks, its working fine now!"
+      }
+    ]
+  },
+  {
+    "number": 156,
+    "title": "Just PyRosetta or also RosettaDL/Rosetta Licenses Needed",
+    "created_at": "2025-01-27T23:09:44Z",
+    "closed_at": "2025-01-28T10:35:32Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/156",
+    "body": "Thanks for creating this amazing software.\nI can\u2019t find any exact guidance on which  modules are used precisely by BindCraft for commercial use - is it just PyRosetta, PyRosetta + Rosetta, or even PyRosetta + Rosetta + RosettaDL? They all seem to be licensed separately by UW and any guidance on which are actually needed is much appreciated.",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/156/comments",
+    "author": "LRParser",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2025-01-28T07:26:26Z",
+        "body": "PyRosetta is only licensed to Rosetta license holders so you would need both. RosettaDL is not used."
+      },
+      {
+        "user": "LRParser",
+        "created_at": "2025-01-28T10:35:32Z",
+        "body": "Thank you!"
+      }
+    ]
+  },
+  {
+    "number": 121,
+    "title": "Design two binders simultaneously",
+    "created_at": "2024-12-05T20:40:39Z",
+    "closed_at": "2024-12-06T12:07:33Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/121",
+    "body": "Using the BindCraft, is it possible to simultaneously generate two binders binding to different interfaces on one target protein? I am thinking of running the pipeline twice, where you used the output complex from the first round as your target in the second round. Are there other ways?",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/121/comments",
+    "author": "riiichardh",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-12-05T22:09:19Z",
+        "body": "not two at a time, but you can use target+binder1 as input into a second round"
+      },
+      {
+        "user": "riiichardh",
+        "created_at": "2024-12-06T18:44:27Z",
+        "body": "Thanks so much, @martinpacesa! I will try this method anyway.\r\n\r\nNow I have another issue. After binder hallucination and optimization, I can get satisfying trajectories with low i_pae (~0.2). But after passing through MPNNsol, the i_pae usually becomes quite large (~0.8+). I know that the binder sequence has been changed a little bit by MPNNsol, but why has the i_pae significantly deteriorated? Do you have some suggestions in this case?"
+      }
+    ]
+  },
+  {
+    "number": 116,
+    "title": "RMSD weight",
+    "created_at": "2024-12-02T06:08:26Z",
+    "closed_at": "2024-12-02T08:19:49Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/116",
+    "body": "First of all, thank you for your excellent work. The community thrives because of you. When I was looking at your code, I was very interested in your filtering strategy, because we can't always find a suitable standard to filter the structures generated by AFD or RF+MPNN, so I carefully checked your weight file. I found that your weights for hotspot_RMSDhe Binder_RMSD are positive and usually large. Generally speaking, if the RMSD of the target structure in a trajectory is large, doesn't it mean that the prediction is not very reliable? The weight treatment in the code is a simple addition, so if the RMSD is large, will this cause the ranking of unreliable trajectories to rise?",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/116/comments",
+    "author": "astomer2",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-12-02T06:23:57Z",
+        "body": "Thank you for the kind works! I think you were looking at the filter json file, those are not weights but hard cutoffs of the value to filter against. In the case of RMSD it is the Calpha RMSD in Angstrom. \"higher\": false flag indicates that the value for the passing design should NOT be higher than that. In the case of Binder_RMSD it is to make sure that the binder in bound and unbound form does not have a radically different structure"
+      },
+      {
+        "user": "astomer2",
+        "created_at": "2024-12-02T08:12:11Z",
+        "body": "Thanks for your quick reply, this means we are just doing a cutoffs of an attribute, right? Different binders apply different cutoffs ."
+      },
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-12-02T08:15:16Z",
+        "body": "You can apply different cutoffs if you wish, but these have been pretty generalisable so far for a variety of different targets"
+      },
+      {
+        "user": "astomer2",
+        "created_at": "2024-12-02T08:19:47Z",
+        "body": "Ok, thanks for your reply, I will close this issue"
+      }
+    ]
+  },
+  {
+    "number": 95,
+    "title": "Difference between peptide_filters.json and filters_peptides.json",
+    "created_at": "2024-11-10T01:58:34Z",
+    "closed_at": "2024-11-10T10:21:26Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/95",
+    "body": "Hi, there are two files with a similar name in the settings_filters directory called `peptide_filters.json` (the last commit was \"v1.2.0\") and `filters_peptides.json` (the last commit was Add files via upload\") where the only difference between them is the `peptide_filters.json` has `null` values for `Average_PackStat`, `1_PackStat`, and `2_PackStat` threshold values and `filters_peptides.json` has `0.35`. ",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/95/comments",
+    "author": "ahmedselim2017",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-11-10T09:22:12Z",
+        "body": "Whoops, that's a leftover from previous version, will be removed"
+      },
+      {
+        "user": "ahmedselim2017",
+        "created_at": "2024-11-11T19:16:55Z",
+        "body": "Thanks!"
+      }
+    ]
+  },
+  {
+    "number": 87,
+    "title": "Using the same output folder for multiple parallel runs",
+    "created_at": "2024-11-04T07:59:33Z",
+    "closed_at": "2024-11-04T08:11:50Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/87",
+    "body": "Hi, does BindCraft support using the same output folder for multiple parallel runs?",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/87/comments",
+    "author": "ahmedselim2017",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-11-04T08:03:14Z",
+        "body": "Yes it does"
+      },
+      {
+        "user": "ahmedselim2017",
+        "created_at": "2024-11-04T08:11:50Z",
+        "body": "Thanks!"
+      }
+    ]
+  },
+  {
+    "number": 78,
+    "title": "shutil.copy(best_model_pdb, design_paths[\"Rejected\"])",
+    "created_at": "2024-10-27T03:24:26Z",
+    "closed_at": "2024-10-30T16:48:15Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/78",
+    "body": "\r\n\r\n I got this error message after running my program. What could be causing it, and how should I fix it? Really looking forward to your help!\r\n\r\n\r\n\r\n\r\nFixing interface residues: B43,B63,B66,B69,B70,B73,B74,B77,B78,B80,B81,B82,B85\r\nBase AF2 filters not passed for /home/BindCraft/example/PDL1_l91_s345674_mpnn1, skipping interface scoring\r\nUnmet filter conditions for /home/BindCraft/example/PDL1_l91_s345674_mpnn2\r\nTraceback (most recent call last):\r\n  File \"/home/BindCraft/./bindcraft.py\", line 411, in <module>\r\n    shutil.copy(best_model_pdb, design_paths[\"Rejected\"])\r\n  File \"/home/anaconda3/envs/BindCraft/lib/python3.10/shutil.py\", line 417, in copy\r\n    copyfile(src, dst, follow_symlinks=follow_symlinks)\r\n  File \"/home/anaconda3/envs/BindCraft/lib/python3.10/shutil.py\", line 254, in copyfile\r\n    with open(src, 'rb') as fsrc:\r\nFileNotFoundError: [Errno 2] No such file or directory: '/home/BindCraft/example/PDL1_l91_s345674_mpnn2_model2.pdb'\r\n",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/78/comments",
+    "author": "EHHDD2024",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-27T17:45:38Z",
+        "body": "Try updating the bindcraft.py file from the latest repo now."
+      },
+      {
+        "user": "EHHDD2024",
+        "created_at": "2024-11-01T01:44:06Z",
+        "body": "> Try updating the bindcraft.py file from the latest repo now.\r\n\r\nThank you so much! After updating bindcraft.py, it's now running smoothly. But I'm facing another issue now: why does bindcraft.py utilize all the GPUs when I run it? Is there a way to specify and use only a few GPUs?"
+      },
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-11-01T05:55:32Z",
+        "body": "It shouldn't. What if you add this line to bindcraft.py:\n\nos.environ['CUDA_VISIBLE_DEVICES'] = '0'"
+      }
+    ]
+  },
+  {
+    "number": 77,
+    "title": "Reading PDB residue numbers vs appearance order in PDB file?",
+    "created_at": "2024-10-25T15:02:39Z",
+    "closed_at": "2024-10-28T19:09:31Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/77",
+    "body": "Hi,\r\n  While picking hotspots for an uploaded pdb file, I came across an error that my picked hotspot residue actually doesn't exist.  I was using a PDB file where I pruned a large number of residues out of the system in order to make Bindcraft run faster.  The original pdb had ~400AA, and the new one had only 124, but those 124 still have the residue numbers from the original PDB file.  \r\n\r\nMy expected and desired behavior would be to use hotspot choices that are based on residue number in the pdb file rather than their appearance inside the uploaded PDB file.  I'm also not sure if the PDB fetching function has the same issue.\r\n\r\nHere's part of the contents of my PDB file used:\r\n\r\n> ATOM    598  N   ASP A 115     152.516 115.360  99.807  1.00 85.56           N  \r\nATOM    599  CA  ASP A 115     151.122 115.004 100.139  1.00 85.56           C  \r\nATOM    600  C   ASP A 115     150.714 115.453 101.556  1.00 85.56           C  \r\nATOM    601  O   ASP A 115     149.599 115.925 101.773  1.00 85.56           O  \r\nATOM    602  CB  ASP A 115     150.927 113.481 100.043  1.00 85.56           C  \r\nATOM    603  CG  ASP A 115     151.019 112.907  98.624  1.00 85.56           C  \r\nATOM    604  OD1 ASP A 115     150.553 113.580  97.679  1.00 85.56           O  \r\nATOM    605  OD2 ASP A 115     151.529 111.774  98.515  1.00 85.56           O1-\r\nATOM    606  H   ASP A 115     153.049 114.680  99.284  1.00 85.56           H  \r\nATOM    607  HA  ASP A 115     150.453 115.486  99.425  1.00 85.56           H  \r\nATOM    608  HB2 ASP A 115     149.939 113.237 100.431  1.00 85.56           H  \r\nATOM    609  HB3 ASP A 115     151.662 112.991 100.682  1.00 85.56           H  \r\n\r\nHere is the hotspot from my JSON file:\r\n> \"hotspot\":\"A115,A185,A186,A187,A188,A189,A190,A349\"\r\n\r\nAnd here is the error when I run Bindcraft:\r\n>[2024-10-24, 12:18:23 EDT] {EPI_bindcraft.py:127} INFO - AssertionError: ERROR: positions 115 and chain A not found\r\n\r\nIs it possible to somehow change the pdb handling to match the PDB numbering more seamlessly?",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/77/comments",
+    "author": "TimCraigCGPS",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-27T15:28:45Z",
+        "body": "It should match the PDB numbering, so this is a bit strange. How did you do the trimming? Could you try to trim it again, for example in PyMOL or ChimeraX, save and try again?"
+      },
+      {
+        "user": "TimCraigCGPS",
+        "created_at": "2024-10-28T14:16:30Z",
+        "body": "I did it using pymol and \"remove atoms\" - I wonder if a partial AA would cause this..."
+      },
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-28T14:17:32Z",
+        "body": "most likely! I usually remove either in ChimeraX or manually via editing the .pdb file"
+      },
+      {
+        "user": "TimCraigCGPS",
+        "created_at": "2024-10-28T19:09:31Z",
+        "body": "I removed the partial residues, which seems to fix the problem.  Thanks!"
+      }
+    ]
+  },
+  {
+    "number": 72,
+    "title": "Is there a way to restart where a previous run left off?",
+    "created_at": "2024-10-23T16:56:48Z",
+    "closed_at": "2024-10-25T12:50:15Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/72",
+    "body": "Let's say I ran the program and asked for 10 binders, and Bindcraft ended after 10.  Is there a way to go back and then ask for 100, but to start from where the previous one left off?  ",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/72/comments",
+    "author": "TimCraigCGPS",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-23T16:59:20Z",
+        "body": "Yes, you can just keep outputting to the same folder"
+      },
+      {
+        "user": "TimCraigCGPS",
+        "created_at": "2024-10-25T12:50:16Z",
+        "body": "Awesome, thanks!"
+      }
+    ]
+  },
+  {
+    "number": 41,
+    "title": "Is that OK to use AlphaFold generated PDB as a template",
+    "created_at": "2024-10-10T23:59:01Z",
+    "closed_at": "2024-10-11T13:38:24Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/41",
+    "body": "My target does not have a published PDB. Thus I used AlphaFold to generate a PDB as the template.\r\n\r\nHowever, after I ran the software, I continued to see the buffer error messages:\r\nBuffer 9:\r\n\t\tSize: 1.22GiB\r\n\t\tXLA Label: fusion\r\n\t\tShape: bf16[4,1130,1130,128]\r\n\t\t==========================\r\n\r\n\tBuffer 10:\r\n\t\tSize: 623.49MiB\r\n\t\tOperator: op_name=\"jit(_model)/jit(main)/transpose(jvp(jit(apply)))/jit(apply_fn)/alphafold/alphafold_iteration/evoformer/__layer_stack_no_state/while/body/checkpoint/rematted_computation/extra_msa_stack/triangle_multiplication_outgoing/projection/...a, ah->...h/dot_general[dimension_numbers=(((2,), (0,)), ((), ())) precision=None preferred_element_type=bfloat16]\" source_file=\"/content/colabdesign/af/alphafold/model/common_modules.py\" source_line=118\r\n\t\tXLA Label: custom-call\r\n\t\tShape: bf16[1276900,256]\r\n\t\t==========================\r\n\r\n\tBuffer 11:\r\n\t\tSize: 623.49MiB\r\n\t\tOperator: op_name=\"jit(_model)/jit(main)/transpose(jvp(jit(apply)))/jit(apply_fn)/alphafold/alphafold_iteration/evoformer/__layer_stack_no_state/while/body/checkpoint/rematted_computation/extra_msa_stack/triangle_multiplication_outgoing/div\" source_file=\"/content/colabdesign/af/alphafold/model/modules.py\" source_line=1038 deduplicated_name=\"input_transpose_fusion.31\"\r\n\t\tXLA Label: fusion\r\n\t\tShape: bf16[256,1130,1130]\r\n\t\t==========================\r\n\r\n\tBuffer 12:\r\n\t\tSize: 623.49MiB\r\n\t\tXLA Label: fusion\r\n\t\tShape: f32[1130,1130,128]\r\n\t\t==========================\r\n\r\n\tBuffer 13:\r\n\t\tSize: 623.49MiB\r\n\t\tOperator: op_name=\"jit(_model)/jit(main)/transpose(jvp(jit(apply)))/jit(apply_fn)/alphafold/alphafold_iteration/evoformer/__layer_stack_no_state/while/body/checkpoint/rematted_computation/extra_msa_stack/add\" source_file=\"/content/colabdesign/af/alphafold/model/modules.py\" source_line=73\r\n\t\tXLA Label: fusion\r\n\t\tShape: f32[1130,1130,128]\r\n\t\t==========================\r\n\r\n\tBuffer 14:\r\n\t\tSize: 623.49MiB\r\n\t\tOperator: op_name=\"jit(_model)/jit(main)/transpose(jvp(jit(apply)))/jit(apply_fn)/alphafold/alphafold_iteration/evoformer/__layer_stack_no_state_1/while/body/checkpoint/rematted_computation/evoformer_iteration/msa_row_attention_with_pair_bias/feat_2d_norm/feat_2d_norm/jit(_var)/sub\" source_file=\"/usr/local/lib/python3.10/dist-packages/haiku/_src/layer_norm.py\" source_line=166\r\n\t\tXLA Label: fusion\r\n\t\tShape: f32[1130,1130,128]\r\n\t\t==========================\r\n\r\n\tBuffer 15:\r\n\t\tSize: 623.49MiB\r\n\t\tEntry Parameter Subshape: f32[1130,1130,128]\r\n\t\t==========================",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/41/comments",
+    "author": "finexzhi",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-11T10:31:10Z",
+        "body": "How big is the pdb you are inputting in amino acids? It is probably too big for your GPU memory, you may have to try it"
+      },
+      {
+        "user": "finexzhi",
+        "created_at": "2024-10-11T11:54:34Z",
+        "body": "Thanks, Martin. You are giving the right direction to solve this problem.\r\nThe protein is about 1000 amino acids. But I have defined the hot spot residues to be the first 100 amino acids.\r\nI thought the software will only take it as a 100-aa-long target. But I could be wrong.\r\n"
+      },
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-11T12:05:12Z",
+        "body": "It takes the whole pdb you provide as input"
+      },
+      {
+        "user": "finexzhi",
+        "created_at": "2024-10-11T12:27:02Z",
+        "body": "Thanks, Martin. That is very important information to me. :)\r\nI have used the notepad to modify the original PDB to a new one containing a smaller part of before.\r\nNow it is working. Thank you. "
+      }
+    ]
+  },
+  {
+    "number": 40,
+    "title": "How to resume the computation in the colab?",
+    "created_at": "2024-10-10T13:10:09Z",
+    "closed_at": "2024-10-11T13:38:37Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/40",
+    "body": "I ran the computation to the 4th stage of \"run BindCraft\" . However, it was stopped because my computer went to sleep.\r\n\r\nAs such, I could not run the next step \"consolidate and rank designs\".\r\n\r\nIs that anyway to resume the computation from where I left? Or I have to start over.\r\n\r\nThanks!\r\n\r\nI am using colab pro+.",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/40/comments",
+    "author": "finexzhi",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-10T16:08:52Z",
+        "body": "Since the data is saved on your google drive, you can just start it again and as long as it points to the same output folder it will continue doing the designs. Note, the cosolidate and rank designs part will only start automatically once sufficient number of designs have passed the filters (100 by defualt). This can take a long time depending on your target size, generally you need to generate like 500-3000 trajectories to get 100 that pass the filters. However, if less is okay for you, then you can stop the design loop cell and just run consolidate and rank designs. You can also continue any time and consolidate again, the pipeline is designed in a way that you can always generate more designs and it does not \"break\" anything."
+      },
+      {
+        "user": "finexzhi",
+        "created_at": "2024-10-10T16:30:44Z",
+        "body": "Thanks for the clarification. It is very clear now that the newly found hits were stored under the project folder. We can always run the software to search the sequence universe to find potentially better hits. I know this could be a random process. But when I start a new round of run, how can the software know which space it has already searched?"
+      },
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-10T16:32:50Z",
+        "body": "Based on the filename, that's why we include the binder length and seed number which is what in an oversimplified manner \"roughly\" determines the search space."
+      }
+    ]
+  },
+  {
+    "number": 31,
+    "title": "multiple target chains",
+    "created_at": "2024-10-08T17:15:58Z",
+    "closed_at": "2024-10-08T18:46:13Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/31",
+    "body": "Hi\r\n\r\nfor the target_settings json. How can we specifiy multiple chains?\r\n\r\nIn PDL1 its only 1 chain:\r\n\r\n> {\r\n>     \"design_path\": \"/content/drive/My Drive/BindCraft/PDL1/\",\r\n>     \"binder_name\": \"PDL1\",\r\n>     \"starting_pdb\": \"/content/bindcraft/example/PDL1.pdb\",\r\n>     **\"chains\": \"A\",**\r\n>     \"target_hotspot_residues\": \"56\",\r\n>     \"lengths\": [65, 150],\r\n>     \"number_of_final_designs\": 100\r\n> }\r\n\r\nIf my pdb is a complex, how can I specifiy that my target is chain B, C and D in json file?\r\n\r\nThank you in advance for your help,\r\nJF\r\n",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/31/comments",
+    "author": "jflucier",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2024-10-08T17:18:57Z",
+        "body": "\"chains\": \"A,B,C,D\","
+      },
+      {
+        "user": "jflucier",
+        "created_at": "2024-10-08T18:46:13Z",
+        "body": "thank you very much for quick response!"
+      }
+    ]
+  },
+  {
+    "number": 4,
+    "title": "ValueError: RGBA values should be within 0-1 range",
+    "created_at": "2024-10-02T22:13:42Z",
+    "closed_at": "2024-10-03T06:36:50Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/4",
+    "body": "Hey, \r\nsorry, but I ran into another issue when running the provided example. Stage 4 finishes, but then I get the following: \r\n\r\nTrajectory successful, final pLDDT: 0.74\r\nTraceback (most recent call last):\r\n  File \"/home/joe/Software/BindCraft/bindcraft.py\", line 108, in <module>\r\n    trajectory = binder_hallucination(design_name, target_settings[\"starting_pdb\"], target_settings[\"chains\"],\r\n  File \"/home/joe/Software/BindCraft/functions/colabdesign_utils.py\", line 227, in binder_hallucination\r\n    plots = af_model.animate(dpi=150)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/colabdesign/af/utils.py\", line 118, in animate\r\n    return make_animation(**sub_traj, pos_ref=pos_ref, length=self._lengths,\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/colabdesign/shared/plot.py\", line 303, in make_animation\r\n    ims[-1].append(plot_pseudo_3D(pos[k], c=plddt[k], Ls=Ls, cmin=0.5, cmax=0.9, **flags))\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/colabdesign/shared/plot.py\", line 177, in plot_pseudo_3D\r\n    lines = mcoll.LineCollection(seg_xy[order], colors=colors[order], linewidths=linewidths,\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 1393, in __init__\r\n    super().__init__(\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 206, in __init__\r\n    self._internal_update(kwargs)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/artist.py\", line 1216, in _internal_update\r\n    return self._update_props(\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/artist.py\", line 1192, in _update_props\r\n    ret.append(func(v))\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 1463, in set_color\r\n    self.set_edgecolor(c)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 834, in set_edgecolor\r\n    self._set_edgecolor(c)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 813, in _set_edgecolor\r\n    self._edgecolors = mcolors.to_rgba_array(c, self._alpha)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/colors.py\", line 476, in to_rgba_array\r\n    raise ValueError(\"RGBA values should be within 0-1 range\")\r\nValueError: RGBA values should be within 0-1 range\r\n\r\nDid anyone else encounter this?",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/4/comments",
+    "author": "joerloeffler",
+    "comments": [
+      {
+        "user": "sokrypton",
+        "created_at": "2024-10-03T04:30:42Z",
+        "body": "Can you try downgrade matplotlib?\r\n```pip install matplotlib==3.7.1```"
+      },
+      {
+        "user": "joerloeffler",
+        "created_at": "2024-10-03T06:04:03Z",
+        "body": "Thank you for pointing this out! with the downgrade the code runs! Thank you @sokrypton "
+      }
+    ]
+  },
+  {
+    "number": 3,
+    "title": "TypeError: Cannot convert numpy.ndarray to numpy.ndarray",
+    "created_at": "2024-10-02T19:47:29Z",
+    "closed_at": "2024-10-03T06:37:12Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/3",
+    "body": "hey, \r\nafter following the steps of reinstalling pyrosetta, I ended up with the following error message when trying to rerun the example locally.\r\n\r\nTraceback (most recent call last):\r\n  File \"/home/joe/Software/BindCraft/./bindcraft.py\", line 52, in <module>\r\n    create_dataframe(trajectory_csv, trajectory_labels)\r\n  File \"/home/joe/Software/BindCraft/functions/generic_utils.py\", line 262, in create_dataframe\r\n    df = pd.DataFrame(columns=columns)\r\n  File \"/home/mojoe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/frame.py\", line 876, in __init__\r\n    mgr = dict_to_mgr(\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/internals/construction.py\", line 443, in dict_to_mgr\r\n    arrays = Series(data, index=columns, dtype=object)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/series.py\", line 490, in __init__\r\n    index = ensure_index(index)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/indexes/base.py\", line 7647, in ensure_index\r\n    return Index(index_like, copy=copy, tupleize_cols=False)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/indexes/base.py\", line 565, in __new__\r\n    arr = sanitize_array(data, None, dtype=dtype, copy=copy)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/construction.py\", line 654, in sanitize_array\r\n    subarr = maybe_convert_platform(data)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/dtypes/cast.py\", line 138, in maybe_convert_platform\r\n    arr = lib.maybe_convert_objects(arr)\r\n  File \"lib.pyx\", line 2538, in pandas._libs.lib.maybe_convert_objects\r\nTypeError: Cannot convert numpy.ndarray to numpy.ndarray\r\n\r\nThank you for your support! ",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/3/comments",
+    "author": "joerloeffler",
+    "comments": [
+      {
+        "user": "LandonGetz",
+        "created_at": "2024-10-02T21:29:54Z",
+        "body": "I also hit this error after following the solutions in #2, but I managed to get around this by reinstalling jax (guided by some suggestions also in #2). \r\n`pip install --force-reinstall jax`"
+      },
+      {
+        "user": "joerloeffler",
+        "created_at": "2024-10-02T21:32:26Z",
+        "body": "@LandonGetz this seems to do the trick! Thank you for the suggestion!!! "
+      }
+    ]
+  }
+]

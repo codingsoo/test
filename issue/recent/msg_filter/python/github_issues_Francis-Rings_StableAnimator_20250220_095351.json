@@ -1,0 +1,81 @@
+[
+  {
+    "number": 64,
+    "title": "\u5173\u4e8e\u5fae\u8c03",
+    "created_at": "2025-01-02T02:28:01Z",
+    "closed_at": "2025-01-02T07:26:50Z",
+    "labels": [],
+    "url": "https://github.com/Francis-Rings/StableAnimator/issues/64",
+    "body": "\u8bf7\u95ee\u5927\u4f6c\r\n\u4f7f\u7528\u5fae\u8c03\u540e\u7684 pose_net.pth\u3001face_encoder.pth\u3001unet.pth \u53bb\u505a\u63a8\u7406\uff0c\u63a8\u7406\u65f6\u53c2\u8003\u56fe\u7247\u968f\u4fbf\u9009\u62e9\u4e00\u5f20\u4eba\u7269\u56fe\uff0c\u4e3a\u5565\u63a8\u7406\u51fa\u6765\u751f\u6210\u7684\u52a8\u753b/\u89c6\u9891\u90fd\u8fd8\u662f\u5fae\u8c03\u65f6\u5019\u7684\u4eba\u7269\uff0c\u4f3c\u4e4e\u53c2\u8003\u56fe\u7247\u7684\u4eba\u7269\u56fe\u5e76\u6ca1\u6709\u751f\u6548\r\n\u8bf7\u95ee\u8fd9\u662f\u4e3a\u5565\u5462\uff1f",
+    "comments_url": "https://api.github.com/repos/Francis-Rings/StableAnimator/issues/64/comments",
+    "author": "Jeremy-J-J",
+    "comments": [
+      {
+        "user": "Francis-Rings",
+        "created_at": "2025-01-02T03:34:38Z",
+        "body": "Hi, the plausible reason is the limited quality and diversity of your training dataset, as well as the potential for overfitting. You can use SVD to initialize StableAnimator and train it on your dataset to check whether the issue is related to dataset quality or overfitting."
+      },
+      {
+        "user": "Jeremy-J-J",
+        "created_at": "2025-01-02T06:05:33Z",
+        "body": "> Hi, the plausible reason is the limited quality and diversity of your training dataset, as well as the potential for overfitting. You can use SVD to initialize StableAnimator and train it on your dataset to check whether the issue is related to dataset quality or overfitting.\r\n\r\nHow can I implement the initialization of StableAnimator using SVD?"
+      },
+      {
+        "user": "Francis-Rings",
+        "created_at": "2025-01-02T06:32:25Z",
+        "body": "Please refer to the training tutorial in the README file.\r\n```\r\nbash command_train.sh\r\n```"
+      },
+      {
+        "user": "Jeremy-J-J",
+        "created_at": "2025-01-02T06:41:54Z",
+        "body": "> Please refer to the training tutorial in the README file.\r\n> \r\n> ```\r\n> bash command_train.sh\r\n> ```\r\n\r\nI compared `command_finetune.sh` and `command_train.sh`, the difference in using SVD initialization is only that the parameters `--posenet_model_finetune_path`, `--face_encoder_finetune_path`, `--unet_model_finetune_path`, and `--finetune_mode` are not passed. Is that all there is to it?\r\n"
+      }
+    ]
+  },
+  {
+    "number": 45,
+    "title": "the file \"inference\" cannot be opened",
+    "created_at": "2024-12-17T02:33:53Z",
+    "closed_at": "2024-12-17T03:17:36Z",
+    "labels": [],
+    "url": "https://github.com/Francis-Rings/StableAnimator/issues/45",
+    "body": null,
+    "comments_url": "https://api.github.com/repos/Francis-Rings/StableAnimator/issues/45/comments",
+    "author": "sunjing1123",
+    "comments": [
+      {
+        "user": "Francis-Rings",
+        "created_at": "2024-12-17T02:48:33Z",
+        "body": "Hi, I just downloaded the `inference.zip` file from the Hugging Face model and unzipped it locally. I was able to open the unzipped files successfully and have checked all the contents to ensure that no files are corrupted."
+      },
+      {
+        "user": "Francis-Rings",
+        "created_at": "2024-12-17T02:51:36Z",
+        "body": "Please check you have successfully downloaded the entire `inference.zip` file from the Hugging Face model."
+      }
+    ]
+  },
+  {
+    "number": 16,
+    "title": "How much VRAM does it need",
+    "created_at": "2024-12-10T18:36:50Z",
+    "closed_at": "2024-12-11T09:10:09Z",
+    "labels": [],
+    "url": "https://github.com/Francis-Rings/StableAnimator/issues/16",
+    "body": null,
+    "comments_url": "https://api.github.com/repos/Francis-Rings/StableAnimator/issues/16/comments",
+    "author": "nitinmukesh",
+    "comments": [
+      {
+        "user": "Francis-Rings",
+        "created_at": "2024-12-11T01:20:36Z",
+        "body": "Hi, StableAnimator currently supports animating reference images in two resolutions: 512x512 and 576x1024. For a 15-second demo video (512x512 resolution at 30 fps), the 16-frame basic model requires 8GB of VRAM and takes approximately 5 minutes to complete on a 4090 GPU. When the reference image resolution is 576x1024, the same model requires around 10GB of VRAM to animate."
+      },
+      {
+        "user": "nitinmukesh",
+        "created_at": "2024-12-11T09:10:09Z",
+        "body": "You are awesome.\r\n\r\nTested 512 x 512, only need ~6 GB. 576 x 1024 need ~8+ GB.\r\nIf some sort of quantization is applied 576x1024 will work on 8 GB. "
+      }
+    ]
+  }
+]

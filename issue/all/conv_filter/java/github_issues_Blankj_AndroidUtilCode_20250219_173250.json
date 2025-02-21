@@ -1,0 +1,332 @@
+[
+  {
+    "number": 1280,
+    "title": "\u53ef\u5426\u964d\u4f4e\u4e0b\u8026\u5408\u6027",
+    "created_at": "2020-07-16T07:29:06Z",
+    "closed_at": "2020-07-16T07:44:31Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/1280",
+    "body": "\r\n\u80fd\u5426\u4e0d\u628a\u4e00\u4e2a\u5de5\u5177\u7c7b\u4f9d\u8d56\u4e00\u5806",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/1280/comments",
+    "author": "Reginer",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2020-07-16T07:35:09Z",
+        "body": "\u80fd\u5426\u4e0d\u8981\u5355\u72ec\u62f7\u4e00\u4e2a\u7c7b\u51fa\u53bb\u7528\uff1f"
+      },
+      {
+        "user": "Reginer",
+        "created_at": "2020-07-16T07:38:19Z",
+        "body": "@Blankj   \u662f\u7684\u5440\u3002\r\n\u4ee5\u524d\u7ecf\u5e38\u5728\u8fd9\u91cc\u62f7\u8d1d\u5de5\u5177\u7c7b(ToastUtils   FileUtils .. )\uff0c\u653e\u5230\u5de5\u7a0b\u91cc\u57fa\u672c\u90fd\u80fd\u7528\u3002\r\n\r\n\u521a\u770b\u6709\u4e9b\u4ee3\u7801\u66f4\u65b0\u4e86\uff0c\u518d\u4e00\u62f7\u8d1d\u5c31\u5f88\u591a\u9519\u3002\r\n\r\n\u4e4b\u524d\u90a3\u6837\u662f\u6709\u54ea\u4e0d\u597d\u4e48\r\n"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2020-07-16T07:42:08Z",
+        "body": "\u6362\u4e86\u8bbe\u8ba1\u65b9\u6848\uff0c\u901a\u8fc7 UtilsBridge \u6765\u505a\u6865\u63a5\uff0c\u4ee5\u524d\u90a3\u6837\u56e0\u4e3a\u5b58\u5728\u4ee3\u7801\u7684\u5197\u4f59\uff0c\u4e00\u4e2a\u5730\u65b9\u4fee\u590d\u4e86\uff0c\u6709\u7684\u5730\u65b9\u5c31\u6f0f\u4e86\uff0c\u4e0d\u63a8\u8350\u62f7\u8d1d\uff0c\u6709\u7684\u62f7\u8d1d\u5c31\u4f1a\u9690\u6027\u5b58\u5728\u95ee\u9898\u3002"
+      },
+      {
+        "user": "Reginer",
+        "created_at": "2020-07-16T07:44:26Z",
+        "body": "\u4ee3\u7801\u6709\u91cd\u590d\uff0c\u6f0f\u6539\u786e\u5b9e\u662f\u4e2a\u95ee\u9898\u3002\r\n\r\n\u4e00\u4e2a\u4f9d\u8d56\u5168\u90e8\u653e\u8fdb\u53bb\u611f\u89c9\u53c8\u592a\u591a\u4e86 \u3002"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2020-07-16T07:49:02Z",
+        "body": "\u9879\u76ee\u90fd\u5f00\u542f\u6df7\u6dc6\u7684\u4e48\uff1f\u5f00\u4e86\u6df7\u6dc6\u5c31\u4e0d\u7528\u987e\u8651\u4e86\u5440"
+      }
+    ]
+  },
+  {
+    "number": 1218,
+    "title": "PermissionConstants\u589e\u52a0\u6743\u9650",
+    "created_at": "2020-04-09T03:29:42Z",
+    "closed_at": "2020-04-09T06:46:49Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/1218",
+    "body": "PermissionConstants \u91cc\u9762\u7684\u6743\u9650\u4e0d\u591f\uff0c\u6211\u60f3\u589e\u52a0\u6709\u4ec0\u4e48\u65b9\u6cd5\u561b\uff1f\u5fc5\u987b\u5f97lib\u8fd9\u4e2a\u7c7b\u91cd\u5199\u5417",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/1218/comments",
+    "author": "neabea",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2020-04-09T04:08:10Z",
+        "body": "\u76f4\u63a5\u5f80 permission \u540e\u52a0\u6743\u9650\u5c31\u884c\u4e86"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2020-04-09T05:33:56Z",
+        "body": "\u518d\u8bf4\u4e3a\u5565\u4f1a\u6709\u4e0d\u591f\uff1fandroid \u65b0\u52a0\u6743\u9650\u4e86\u5417\uff1f"
+      },
+      {
+        "user": "neabea",
+        "created_at": "2020-04-09T05:45:20Z",
+        "body": "\u6bd4\u5982\u5224\u65ad\u4f4d\u7f6e\u670d\u52a1\uff0c\u53ef\u80fd\u662f\u4e0d\u662f\u6743\u9650\uff0c\u8fd9\u4e2a\u76f8\u5173\u7684\u6709\u652f\u6301\u561b"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2020-04-09T05:50:19Z",
+        "body": "\u5c5e\u4e8e\u52a8\u6001\u6743\u9650\u624d\u9700\u8981\u8bf7\u6c42\u7684\uff0c\u4e0d\u662f\u52a8\u6001\u6743\u9650\u4e3a\u4f55\u9700\u8981\u8bf7\u6c42\uff1f\u5b9a\u4f4d\u7684\u8bf7\u6c42\u6743\u9650\u4e0d\u662f\u5df2\u7ecf\u6709\u4e86\u4e48\u3002"
+      },
+      {
+        "user": "neabea",
+        "created_at": "2020-04-09T06:03:33Z",
+        "body": "\u7533\u8bf7\u4e86\u52a8\u6001\u4f4d\u7f6e\u6743\u9650\uff0c\u5982\u679c\u6ca1\u5f00\u4f4d\u7f6e\u670d\u52a1\u4e5f\u662f\u5b9a\u4f4d\u4e0d\u4e86\u7684\uff0c\u6240\u4ee5\u6211\u8fd8\u8981\u5224\u65ad\u4f4d\u7f6e\u670d\u52a1\u5f00\u6ca1\u5f00\uff0c\u6211\u662f\u60f3\u52a0\u8fd9\u4e2a"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2020-04-09T06:06:20Z",
+        "body": "\u8fd9\u53c8\u4e0d\u5c5e\u4e8e\u52a8\u6001\u6743\u9650\u4e86\uff0c\u4e3a\u4f55\u8981\u52a0\u5230\u8fd9\u91cc\u6765\uff1f"
+      },
+      {
+        "user": "neabea",
+        "created_at": "2020-04-09T06:23:21Z",
+        "body": "\u6211\u5f00\u59cb\u4ee5\u4e3a\u4f4d\u7f6e\u670d\u52a1\u4e5f\u662f\u52a8\u6001\u6743\u9650\uff0c\u67e5\u4e86\u4e0b\u901a\u8fc7setting\u53ef\u4ee5\u67e5\u8be2"
+      }
+    ]
+  },
+  {
+    "number": 916,
+    "title": "LogUtils\u7684LogBorderSwitch\u5206\u884c\u673a\u5236\u5bf9\u4e2d\u6587\u652f\u6301\u4e0d\u597d",
+    "created_at": "2019-05-14T02:15:33Z",
+    "closed_at": "2019-06-03T09:29:22Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/916",
+    "body": "## Describe the bug\r\n\r\nA clear and concise description of what the bug is.\r\n\r\n- The version of utilcode: 1.23.0\r\n- The device: \r\n- The version of device: API 27 \r\n\r\n## The code of bug\r\n\r\n     StringBuilder sb = new StringBuilder();\r\n        for (int i = 0; i < 1024; i++) {\r\n            sb.append(\"{\u6d4b\u8bd5\u5185\u5bb9 = \").append(i).append(\"}\");\r\n        }\r\n        LogUtils.d(sb.toString());\r\n\r\n## Screenshots\r\n\u5e93\u4e2d\u7684\u6838\u5fc3\u5224\u65ad\u4ee3\u7801\u5982\u4e0b\uff1a\r\n\r\n    int len = msg.length();\r\n    int countOfSub = len / MAX_LEN;\r\n\r\n\r\n\u5efa\u8bae\u6539\u6210\uff1a \r\n\r\n    int len = msg.getBytes().length();\r\n    int countOfSub = len / MAX_LEN;",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/916/comments",
+    "author": "fly904021125",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2019-05-17T14:30:13Z",
+        "body": "\u8fd9\u4e0d\u884c\u7684\uff0c\u540e\u9762 substring \u4e0d\u662f\u6839\u636e\u8fd9\u4e2a len \u6765\u4f1a\u51fa\u95ee\u9898\u7684\uff0c\u6211\u628a MAX_LEN \u503c\u6539\u5c0f\u70b9\u5427\uff0c\u4e00\u822c logcat \u8f93\u51fa\u90fd\u662f\u6bd4\u8f83\u77ed\u7684"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2019-06-03T08:32:39Z",
+        "body": "1.24.0 \u5df2\u4fee\u590d"
+      },
+      {
+        "user": "fly904021125",
+        "created_at": "2019-06-03T09:26:47Z",
+        "body": "\u4fee\u6539MAX_LEN\u4e0d\u5931\u4e3a\u4e00\u79cd\u6709\u6548\u7387\u7684\u65b9\u6cd5\r\n\r\n    public static List<String> splitLog(String msg) {\r\n        List<String> list = new ArrayList<>();\r\n        int index = 0;\r\n        int step = 1;\r\n        while (index < msg.length()) {\r\n            int stepTotal = step * 500;\r\n            boolean isEnd = false;\r\n            if (stepTotal + index > msg.length()) {\r\n                stepTotal = msg.length() - index;\r\n                isEnd = true;\r\n            }\r\n            if (msg.substring(index, index + stepTotal).getBytes().length > MAX_LEN || isEnd && step == 1) {\r\n                if (isEnd && step == 1) {\r\n                    list.add(msg.substring(index, index + stepTotal));\r\n                    index = index + stepTotal;\r\n                } else {\r\n                    step--;\r\n                    list.add(msg.substring(index, index + step * 500));\r\n                    index = index + step * 500;\r\n                }\r\n\r\n                step = 1;\r\n            } else {\r\n                step++;\r\n            }\r\n\r\n        }\r\n        return list;\r\n    }\r\n\r\n\u8fd9\u662f\u4e2a\u4eba\u6240\u5199\u7684\u5c06\u4e00\u4e2a\u957f\u5b57\u7b26\u4e32\u5206\u5272\u6210\u5c0f\u4e8eMAX_LEN\u5b57\u8282\u957f\u5ea6\u7684\u5b57\u7b26\u4e32List\u7684\u65b9\u6cd5\uff0c\u53ef\u80fd\u5bf9\u60a8\u540e\u7eed\u4f18\u5316\u4f1a\u6709\u5e2e\u52a9"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2019-06-03T09:28:20Z",
+        "body": "\u5df2\u7ecf\u4fee\u590d\u4e86\u54c8\uff0c\u4ee5\u524d\u672c\u6765\u5c31\u5206\u5272\u7684\uff0c\u53ea\u662f\u6c49\u5b57\u5b57\u8282\u5360\u4e86\u4e24\u4e2a\uff0c\u6240\u4ee5\u540c\u7b49\u957f\u5ea6\u7684 logcat \u5c31\u8f93\u51fa\u4e0d\u5b8c"
+      }
+    ]
+  },
+  {
+    "number": 458,
+    "title": "\u5173\u4e8e\u65b0\u7248SPUtils",
+    "created_at": "2018-04-18T02:59:39Z",
+    "closed_at": "2018-04-18T08:09:29Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/458",
+    "body": "\u4f60\u597d\uff0c\u76ee\u524d\u65b0\u7248\u7684spuitls\u662f\u4e0d\u662fput\u7684value\u4e0d\u80fd\u4e3anull\u4e86  \r\n\u540c\u6837\u7684\u4ee3\u7801 \u6211\u53bb\u5e74\u4f9d\u8d56\u7684UtilCode\u9879\u76eeput\u7684value\u662fnull\u4e0d\u62a5\u7a7a\u6307\u9488\r\n\u6628\u5929\u4f9d\u8d56\u4e86\u65b0\u7248\u7684utilCode\u7136\u540e\u7528\u4e4b\u524d\u7684\u4ee3\u7801 put\u7684value\u4e3anull\u5c31\u62a5\u7a7a\u6307\u9488\r\n Caused by: java.lang.NullPointerException: Argument 'value' of type String (#1 out of 2, zero-based) is marked by @android.support.annotation.NonNull but got null for it\r\n  at com.blankj.utilcode.util.SPUtils.put(SPUtils.java:62)",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/458/comments",
+    "author": "zhuzhao404",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2018-04-18T03:08:15Z",
+        "body": "\u56e0\u4e3a\u4f9d\u8d56\u4e86 apply plugin: \"tech.harmonysoft.oss.traute\"\uff0c\u5bfc\u81f4\u6709 @NonNull \u6ce8\u89e3\u7684\u5982\u679c\u4f20\u5165 null \u4f1a\u62a5\u9519\uff0c\u6211\u6539\u4e00\u4e0b\u6ce8\u89e3\u5427"
+      },
+      {
+        "user": "zhuzhao404",
+        "created_at": "2018-04-18T03:10:57Z",
+        "body": "\u54e6 \u8fd9\u6837\u554a  \u6211\u6682\u65f6\u5224\u65ad\u4e86\u4e0b\u662fnull\u5c31return\u4e86  \u9632\u6b62\u62a5\u9519  "
+      },
+      {
+        "user": "zhuzhao404",
+        "created_at": "2018-04-18T03:11:04Z",
+        "body": "\u8c22\u8c22"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2018-04-18T08:09:20Z",
+        "body": "\u4f60\u7528\u6700\u65b0\u7248\u672c\u5427 1.13.13"
+      }
+    ]
+  },
+  {
+    "number": 435,
+    "title": "PermissionUtils.request() \u65b9\u6cd5\u8de8\u8fdb\u7a0b\u8c03\u7528\u95ee\u9898",
+    "created_at": "2018-03-20T07:01:02Z",
+    "closed_at": "2018-03-21T02:58:50Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/435",
+    "body": "\u5728\u5b50\u8fdb\u7a0b\u4e2d\u4f7f\u7528 PermissionUtils.request() \u4e0d\u751f\u6548\uff1b\r\n\u4ece\u4ee3\u7801\u5224\u65ad\uff0cPermissionActivity \u662f\u9ed8\u8ba4\u5728\u4e3b\u8fdb\u7a0b\u8fd0\u884c\uff1b\r\nPermissionUtils.sInstance \u6bcf\u4e2a\u8fdb\u7a0b\u4e2d\u90fd\u6709\u4e00\u4e2a\uff0c\u56e0\u6b64\u8de8\u8fdb\u7a0b\u8c03\u7528\u65f6\u65e0\u6cd5\u83b7\u53d6\u5230\uff1b\r\n\u5efa\u8bae\u628a\u6743\u9650\u53c2\u6570\u901a\u8fc7 Intent \u6765\u4f20\u9012\uff1b\r\n        @Override\r\n        protected void onCreate(@Nullable Bundle savedInstanceState) {\r\n            if (sInstance.mThemeCallback != null) {\r\n                sInstance.mThemeCallback.onActivityCreate(this);\r\n            }\r\n            super.onCreate(savedInstanceState);\r\n\r\n            if (sInstance.rationale(this)) {\r\n                finish();\r\n                return;\r\n            }\r\n            if (sInstance.mPermissionsRequest != null) {\r\n                int size = sInstance.mPermissionsRequest.size();\r\n                if (size <= 0) return;\r\n                requestPermissions(sInstance.mPermissionsRequest.toArray(new String[size]), 1);\r\n            }\r\n        }",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/435/comments",
+    "author": "JasonPiao",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2018-03-20T07:54:43Z",
+        "body": "\u90a3\u4f60\u5728\u5b50\u8fdb\u7a0b\u521d\u59cb\u5316\u5de5\u5177\u7c7b\u4e86\u5417\uff1f\u8fd9\u8c03\u7528\u548c\u8fdb\u7a0b\u6ca1\u5173\u7cfb\u7684\u5427\uff0c\u4f60\u4e00\u4e2a\u8fdb\u7a0b\u53ef\u4ee5\uff0c\u90a3\u53e6\u4e00\u4e2a\u8fdb\u7a0b\u80af\u5b9a\u4e5f\u662f\u53ef\u4ee5\u7684\u3002"
+      },
+      {
+        "user": "JasonPiao",
+        "created_at": "2018-03-20T08:17:01Z",
+        "body": "\u4e24\u4e2a\u8fdb\u7a0b\u90fd\u521d\u59cb\u5316\u8fc7\u5de5\u5177\u7c7b\uff0c\u5728\u4e3b\u8fdb\u7a0b\u8c03\u7528 request() \u6210\u529f\uff0c\u5728\u5b50\u8fdb\u7a0b\u8c03\u7528 request() \u5931\u8d25\uff1b\r\n\u95ee\u9898\u6240\u5728\u5df2\u7ecf\u8d34\u51fa\u6765\u4e86\uff1b\r\n\u5728\u5b50\u8fdb\u7a0b\u8c03\u7528 request() \u65f6\uff0c\u7531\u4e8e PermissionActivity \u8fd0\u884c\u5728\u4e3b\u8fdb\u7a0b\uff0c\u56e0\u6b64 onCreate \u65b9\u6cd5\u91cc\u83b7\u53d6\u5230\u7684 PermissionUtils.sInstance \u662f\u4e3b\u8fdb\u7a0b\u7684\uff0cmPermissionsRequest \u59cb\u7ec8\u4e3a\u7a7a\uff1b\r\n\u4e0d\u5982\u4f60\u52a8\u624b\u8bd5\u8bd5\uff1b"
+      },
+      {
+        "user": "JasonPiao",
+        "created_at": "2018-03-20T08:34:13Z",
+        "body": "        <activity\r\n            android:name=\"com.blankj.utilcode.util.PermissionUtils$PermissionActivity\"\r\n            android:configChanges=\"orientation|keyboardHidden|screenSize\"\r\n            android:process=\":pbx\"\r\n            android:theme=\"@style/ActivityTranslucent\"\r\n            android:windowSoftInputMode=\"stateHidden|stateAlwaysHidden\"/>\r\n\u9a8c\u8bc1\u8fc7\u624b\u52a8\u6307\u5b9a PermissionActivity \u6240\u5728\u8fdb\u7a0b\u540e\uff0c\u5728\u5b50\u8fdb\u7a0b\u4e2d\u7533\u8bf7\u6743\u9650\u662f\u6210\u529f\u7684\uff1b\r\n\u76f8\u5bf9\u5730\uff0c\u5728\u4e3b\u8fdb\u7a0b\u4e2d\u7533\u8bf7\u6743\u9650\u5c31\u65e0\u6548\u4e86\uff1b\r\n\u5efa\u8bae\u628a\u6743\u9650\u53c2\u6570\u901a\u8fc7 Intent \u6765\u4f20\u9012\uff1b"
+      },
+      {
+        "user": "JasonPiao",
+        "created_at": "2018-03-20T08:41:14Z",
+        "body": "\u53e6\u5916 1.13.4 \u7248\u672c\u6d4b\u8bd5\u6743\u9650\u4e3a\u7a7a\u65f6\uff0cPermissionActivity \u4f1a\u4ee5\u900f\u660e\u754c\u9762\u7684\u5f62\u5f0f\u663e\u793a\uff1b\r\n\u5efa\u8bae\u6743\u9650\u4e3a\u7a7a\u65f6\u628a PermissionActivity finish() \u6389\uff1b"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2018-03-20T17:00:52Z",
+        "body": "\u6211\u8bf4\u600e\u4e48\u4f1a\u51fa\u73b0 PermissionActivity \u4e2d mPermissionsRequest \u7684 size \u4e3a 0 \u7684\u60c5\u51b5\u3002\u73b0\u5728\u89e3\u51b3\u4e86\u5df2\u7ecf\uff0c\r\n\u7528 1.13.5 \u7248\u672c\u5373\u53ef\uff0cPermissionActivity \u589e\u52a0 `android:multiprocess=\"true\"` \u5c5e\u6027\u5373\u53ef\uff0c\u4f60\u8bf4\u7684\u90a3\u79cd\u65b9\u5f0f\u5bf9\u4e8e\u63a5\u53e3\u662f\u65e0\u6cd5\u5e8f\u5217\u5316\u7684\uff0c\u6240\u4ee5\u5b9e\u73b0\u4e0d\u4e86\u3002"
+      },
+      {
+        "user": "JasonPiao",
+        "created_at": "2018-03-21T00:30:27Z",
+        "body": "ok\uff0cthanks\uff1b\r\nandroid:multiprocess=\"true\"\r\n\u6709\u8fd9\u4e2a\u914d\u7f6e\uff0c\u5b66\u5230\u4e86\uff1b"
+      }
+    ]
+  },
+  {
+    "number": 302,
+    "title": "\u6dfb\u52a0shell\u8fd4\u56de\u6362\u884c",
+    "created_at": "2017-10-31T07:52:33Z",
+    "closed_at": "2017-10-31T08:10:36Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/pull/302",
+    "body": "shell\u7ed3\u679c\u6362\u884c\u3002\r\n\u4e4b\u524d\u7684\u7ed3\u679c\u4f1a\u5c06shell\u8fd4\u56de\u540e\u7684\u5b57\u7b26\u4e32\u62fc\u63a5\u5728\u4e00\u8d77\uff0c\u5982\u679c\u4f7f\u7528ls \u3001ps\u7b49\u8fd9\u6837\u7684\u547d\u4ee4\u5bfc\u81f4\u8f93\u51fa\u7684\u6587\u4ef6\u5939\u90fd\u62fc\u63a5\u5728\u4e00\u8d77\u65e0\u6cd5\u53cb\u597d\u7684\u67e5\u770b\uff0c\u4e5f\u4e0d\u7b26\u5408\u547d\u4ee4\u8f93\u51fa\u7684\u683c\u5f0f\u3002",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/302/comments",
+    "author": "BolexLiu",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2017-10-31T08:02:17Z",
+        "body": "\u597d\u7684\uff0c\u4f7f\u7528 `System.getProperty(\"line.separator\");`\u66f4\u597d\u54e6"
+      },
+      {
+        "user": "BolexLiu",
+        "created_at": "2017-10-31T08:02:28Z",
+        "body": "@Blankj  \u8fd9\u4e2a\u811a\u672c\u68c0\u6d4b\u662f\u54ea\u91cc\u51fa\u9519\u4e86\uff0c\u6ca1\u6709\u770b\u61c2\u3002"
+      },
+      {
+        "user": "BolexLiu",
+        "created_at": "2017-10-31T08:06:15Z",
+        "body": "\u597d\u7684\u3002\u6211\u6539\u4e0b"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2017-10-31T08:08:34Z",
+        "body": "\u6211\u4e5f\u4e0d\u592a\u6e05\u695a\uff0cAn error occurred while generating the build script. \u4e2d\u6587\u95ee\u9898\uff1f"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2017-10-31T08:10:47Z",
+        "body": "\u6211\u628a\u6362\u884c\u7b26\u548c\u6587\u4ef6\u5206\u5272\u7b26\u90fd\u5199\u5728`Utils`\u91cc\u4e86\uff0c\u7136\u540e\u628a\u4ee5\u524d\u7528\u5230\u7684\u90fd\u66ff\u6362\u6389\u3002"
+      }
+    ]
+  },
+  {
+    "number": 278,
+    "title": "ActivityUtils\u4e2d\u7684finishAllActivities()\u65b9\u6cd5\u6709\u9519",
+    "created_at": "2017-09-21T07:38:27Z",
+    "closed_at": "2017-09-26T08:46:59Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/278",
+    "body": "    /**\r\n     * \u7ed3\u675f\u6240\u6709activity\r\n     */\r\n    public static void finishAllActivities() {\r\n        List<Activity> activityList = Utils.sActivityList;\r\n        for (int i = activityList.size() - 1; i >= 0; --i) {\r\n            activityList.get(i).finish();\r\n            **activityList.remove(i);**\r\n        }\r\n    }\r\n\r\n\u96c6\u5408\u5728\u904d\u5386\u65f6\u4e0d\u80fd\u4fee\u6539 \u4f1a\u62a5\u9519\uff1aConcurrentModificationException",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/278/comments",
+    "author": "LJW123",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2017-09-21T08:29:01Z",
+        "body": "\u6211\u628aremove\u53bb\u6389\u5c31\u884c\u4e86\uff0c\u751f\u547d\u5468\u671f\u91cc\u8d70\u4e86remove\u4e86\uff0c\u4e0b\u4e2a\u7248\u672c\u66f4\u65b0"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2017-09-26T08:46:51Z",
+        "body": "1.9.1\u5df2\u89e3\u51b3"
+      }
+    ]
+  },
+  {
+    "number": 210,
+    "title": "\u4e00\u70b9\u5c0f\u5c0f\u7684\u5efa\u8bae",
+    "created_at": "2017-06-24T06:53:59Z",
+    "closed_at": "2017-07-05T04:27:10Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/210",
+    "body": "\u4f5c\u8005\u4f60\u597d\uff0c\u611f\u8c22\u4f60\u5f00\u6e90\u7684\u8fd9\u4e2a\u9879\u76ee\uff0c\u5bf9\u6211\u7684\u5de5\u4f5c\u6548\u7387\u975e\u5e38\u5927\uff0c\u4f46\u6211\u4e5f\u6709\u4e00\u4e9b\u5efa\u8bae\u5e0c\u671b\u91c7\u7eb3\uff1a\r\n\u7531\u4e8e\u5de5\u4f5c\u9700\u8981\u7528\u5230cacheutils \u6211\u4ece\u4e4b\u524d\u7684\u7248\u672c\u5347\u7ea7\u52301.7.1\uff0c\u53d1\u73b0\u5176\u4e2d\u6709\u8bb8\u591a\u53d8\u52a8\u7684\u5730\u65b9\uff1a\r\n1. SpUtils \u83b7\u53d6\u65b9\u5f0f\u53d8\u5316 ,\u5bfc\u81f4\u6211\u6574\u4e2a\u9879\u76ee\u7684SpUtils\u90fd\u9700\u8981\u53d8\u5316\u3002\r\n2. sputils.get(String , String ),\u4ee5\u524d\u6ca1\u6709\u503c\u5219\u662f\u83b7\u53d6\u7684null\uff0c\u73b0\u5728\u5374\u662f\u201c\u201d\u3002\u5bfc\u81f4\u6211\u4ee3\u7801\u8bb8\u591a\u5224\u65ad\u90fd\u5931\u6548\u3002\r\n3.  SpannableStringUtils\u6539\u540d\u4e3aSpanUtils\uff0c\u5e76\u4e14\u5176\u4e2d\u7684\u4e00\u4e9b\u65b9\u6cd5\u540d\u4e5f\u4fee\u6539\r\n\r\n1.3\u70b9\u63d0\u793a\u62a5\u9519\u8fd8\u597d\uff0c\u7b2c2\u70b9\u6ca1\u6709\u4efb\u4f55\u63d0\u793a\uff0c\u770b\u4e86\u6e90\u7801\u624d\u53d1\u73b0\uff0c\u5e0c\u671b\u4f5c\u8005\u5bf9\u4e8e\u7b2c2\u70b9\u8fd9\u6837\u7684\u60c5\u51b5\u8003\u8651\u53d8\u52a8\u7684\u5f71\u54cd\uff0c\u6216\u8005\u5728\u6587\u6863\u4e2d\u63d0\u793a\uff0c\u540c\u65f6\u8003\u8651\u4e00\u4e0b\u65b9\u6cd5\u4fee\u6539\u5f62\u5f0f\u5bf9\u4e8e\u4ee5\u524d\u96c6\u6210\u5f00\u53d1\u8005\u7684\u5f71\u54cd\uff0c\u8c22\u8c22\uff01",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/210/comments",
+    "author": "Fitem",
+    "comments": [
+      {
+        "user": "YunlongYang",
+        "created_at": "2017-06-24T12:19:20Z",
+        "body": "1.\u4f5c\u8005\u628anull\u6539\u6210\"\"\u5c31\u662f\u4e0d\u60f3\u8fd4\u56de\u7a7a\u6307\u9488\u51fa\u5f02\u5e38\r\n2.\u5224\u65ad\u5b57\u7b26\u4e32\u4e3a\u7a7a\u6700\u597d\u7528TextUtils.isEmpty\u6765\u5224\u65ad\r\n3.\u5f53\u4f60\u7684\u4ee3\u7801\u6709\u5f88\u591a\u5730\u65b9\u5728\u5224\u65ad\u540c\u4e00\u4e2a\u503c\uff0c\u600e\u4e48\u4e0d\u7edf\u4e00\u6210\u4e00\u4e2a\u65b9\u6cd5\u5462"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2017-06-24T14:56:43Z",
+        "body": "\u4e0d\u597d\u610f\u601d\u54c8\uff0c\u7ed9\u4f60\u5e26\u6765\u4e86\u4e0d\u4fbf\uff0c\u6709\u4e9b\u4e1c\u897f\u90fd\u662f\u5728\u4e0d\u65ad\u4f18\u5316\u7684\uff0c\u5f53\u4f60\u4fee\u6539\u7248\u672c\u53f7\u4e86\uff0c\u6216\u591a\u6216\u5c11\u662f\u4f1a\u51fa\u73b0\u8fd9\u79cd\u9519\u8bef\uff0c\u800c\u4e14\u6211\u7528\u65b0\u51fd\u6570\u66ff\u4ee3\u4e86\u8001\u51fd\u6570\u4e00\u822c\u90fd\u4e0d\u52a0\u8fc7\u65f6\u6ce8\u89e3\uff0c\u4e0d\u8fc7\u4e00\u822c\u90fd\u662f\u671d\u597d\u7684\u65b9\u9762\u53d1\u5c55\u7684\uff0c\u800c\u4e14\u6539\u52a8\u4e00\u822c\u4e5f\u4e0d\u662f\u5f88\u5927\u3002\r\n\r\n\u6839\u636e\u4f60\u7684\u95ee\u9898\u6211\u53ef\u4ee5\u7ed9\u4f60\u63d0\u51e0\u4e2a\u4f60\u53ef\u4ee5\u5438\u53d6\u7684\u5efa\u8bae\uff0cSpUtils\u4f60\u7528\u7684\u65f6\u5019\u81ea\u5df1\u53ef\u4ee5\u518d\u5c01\u88c5\u4e00\u5c42\uff0c\u90a3\u6837\u53ea\u9700\u8981\u4fee\u6539\u4f60\u81ea\u5df1\u5c01\u88c5\u7684\u90a3\u4e00\u5c42\u5373\u53ef\uff0c\u800c\u4e14SP\u64cd\u4f5c\u90fd\u5e94\u8be5\u653e\u5728\u540c\u4e00\u4e2a\u5730\u65b9\u4e00\u822c\uff0c\u7b2c\u4e8c\u70b9\u7684\u8bdd @YunlongYang \u5df2\u7ecf\u5e2e\u6211\u56de\u7b54\u4e86\uff0c\u6216\u8005\u4f60\u53ef\u4ee5\u7528\u6211\u7684StringUtils\u89e3\u51b3\uff0c\u7b2c\u4e09\u70b9\u7684\u8bdd\u51fd\u6570\u540d\u6539\u4e86\u7684\u8bdd\u5168\u5267\u66ff\u6362\u4e00\u4e0b\u5427\u53ea\u80fd\u3002\r\n\r\n\u4e0d\u8fc7\uff0c\u4f60\u5347\u7ea7\u7248\u672c\u53ea\u662f\u8981\u7528\u5230CacheUtils\uff0c\u90a3\u4e48\u4e3a\u4f55\u4e0d\u628a\u8fd9\u4e2a\u7c7b\u62f7\u51fa\u6765\u5373\u53ef\u5462\uff0c\u54c8\u54c8\u3002"
+      },
+      {
+        "user": "Fitem",
+        "created_at": "2017-06-25T13:17:16Z",
+        "body": "\u9996\u5148\u611f\u89c9\u697c\u4e0a\u4e24\u4f4d\u5468\u672b\u82b1\u65f6\u95f4\u7684\u89e3\u7b54\uff01\u5728\u6b64\u611f\u8c22\u4e24\u4f4d\uff01\uff01\uff01\r\n\r\n\u60f3\u4e00\u60f3\u786e\u5b9e\u662f\u81ea\u5df1\u7684\u95ee\u9898\uff1a\r\n\u7b2c\u4e00\uff0c\u592a\u4f9d\u8d56\u4e86\u7b2c\u4e09\u65b9\u5e93\uff0c\u6ca1\u6709\u8003\u8651\u5230\u7b2c\u4e09\u65b9\u5e93\u7248\u672c\u66f4\u65b0\u6216\u8005\u66ff\u6362\u7b2c\u4e09\u65b9\u5e93\u7684\u60c5\u51b5\r\n\u7b2c\u4e8c\uff0c\u6ca1\u6709\u5bf9\u53ef\u80fd\u4f1a\u7ecf\u5e38\u51fa\u73b0\u7684\u4ee3\u7801\u8fdb\u884c\u4e00\u4e2a\u7edf\u4e00\u7684\u7ba1\u7406\uff0c\u8fd9\u4e9b\u95ee\u9898\u81ea\u5df1\u4ee5\u540e\u90fd\u8981\u6ce8\u610f\u3002\r\n\r\n\u5bf9\u4e8e\u51fd\u6570\u540d\u7684\u53d8\u66f4\u6211\u4e5f\u662f\u7528\u7684\u5168\u5c40\u66ff\u6362\uff08\u987a\u5e26\u4e00\u63d0AS\u7684\u5168\u5c40\u67e5\u627e\u9884\u89c8\u771f\u7684\u5f88\u8d5e\uff01\uff09\uff0c\u81f3\u4e8eTextUtils\u6211\u8fd8\u662f\u7ecf\u5e38\u7528\u7684(QAQ)\u3002\r\n\r\n\u6700\u540e\uff0c\u795d\u4f5c\u8005\u7684utils\u5e93\u8d8a\u6765\u8d8a\u706b\uff0c\u6211\u662f\u4ece\u7b80\u4e66\u5230Github\uff0c\u4ece\u5f00\u59cb\u76846K\u523011K Star\u7684\u89c1\u8bc1\u8005(ZZZ)"
+      },
+      {
+        "user": "jp1017",
+        "created_at": "2017-06-25T13:23:35Z",
+        "body": ":+1: "
+      }
+    ]
+  },
+  {
+    "number": 135,
+    "title": "\u4e00\u4e9b\u5c0f\u5efa\u8bae\uff0c\u8fd8\u671b\u91c7\u7eb3",
+    "created_at": "2017-02-15T02:46:17Z",
+    "closed_at": "2017-07-07T11:24:44Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/Blankj/AndroidUtilCode/issues/135",
+    "body": "1.`IntentUtils`\u4e2d\u7684`getInstallAppIntent(File file)`\u65b9\u6cd5\uff0c\u5176\u4e2d\"com.your.package.fileProvider\"\u91cc\u9762\u7684package\u662f\u53ef\u4ee5\u62ff\u5230\u7684\u5427\uff0c\u6240\u4ee5\u8fd9\u91cc\u662f\u4e0d\u662f\u8fd8\u6ca1\u6709\u6539\u8fc7\u6765\uff1f\r\n\r\n```java\r\nUri contentUri = FileProvider.getUriForFile(Utils.getContext(), \"com.your.package.fileProvider\", file);\r\n```\r\n\r\n2.`SDCardUtils`\u4e2d\u7684`getSDCardPath`\u65b9\u6cd5\uff0c\u4e2a\u4eba\u611f\u89c9\u5728sd\u5361\u4e0d\u5728\u7684\u65f6\u5019\u8fd4\u56denull\u6bd4\u8fd4\u56de\"sdcard unable!\"\u597d\u4e9b\uff0c\u5426\u5219\u8c03\u7528\u65b9\u62ff\u5230\u4e00\u4e2a\u975enull\u975e\u7a7a\u7684\u5b57\u7b26\u4e32\u53ef\u80fd\u4f1a\u4ee5\u4e3a\u8def\u5f84\u5b58\u5728\uff0c\u540c\u7406\u8fd9\u4e2a\u7c7b\u4e2d\u7684\u5176\u4ed6\u65b9\u6cd5\u4e5f\u5efa\u8bae\u8fd4\u56denull\u3002\r\n\r\n```java\r\npublic static String getSDCardPath() {\r\n        if (!isSDCardEnable()) return null;//\"sdcard unable!\"\r\n        //...\r\n}\r\n```\r\n\r\n3.`PhoneUtils`\u4e2d`getPhoneStatus`\u65b9\u6cd5\u91cc\u9762`PhoneType`\u62fc\u5199\u6709\u7b14\u8bef\uff0c\u6f0f\u4e86`P`\r\n\r\n4.`SizeUtils`\u4e2d`mListener`\u6210\u5458\u53d8\u91cf\u53ef\u4ee5\u4e0d\u7528\u5b9a\u4e49\uff0c\u4e5f\u5c31\u662f\u4e0b\u9762\u51e0\u53e5\u53ef\u4ee5\u4e0d\u7528\uff0c`forceGetViewSize`\u65b9\u6cd5\u8c03\u7528\u7684\u65f6\u5019\u4f1a\u4f20\u5165listener\r\n\r\n```java\r\npublic static void setListener(onGetSizeListener listener) {\r\n  mListener = listener;\r\n}\r\n\r\nprivate static onGetSizeListener mListener;\r\n```\r\n\r\n\u6700\u540e\uff0c\u518d\u6b21\u611f\u8c22\u4f60\u7684\u5206\u4eab\u3002\r\n",
+    "comments_url": "https://api.github.com/repos/Blankj/AndroidUtilCode/issues/135/comments",
+    "author": "javayhu",
+    "comments": [
+      {
+        "user": "Blankj",
+        "created_at": "2017-02-15T14:24:10Z",
+        "body": "\u611f\u8c22\u4f60\u7684\u5efa\u8bae\u54c8\uff0c\u4e0b\u7248\u672c\u4f1a\u66f4\u65b0\u54c8"
+      },
+      {
+        "user": "Blankj",
+        "created_at": "2017-02-16T04:05:49Z",
+        "body": "@wrightakencom  welcome"
+      }
+    ]
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "number": 4280,
+    "title": "Tesseract hangs when you run 2 or more instances of them at the same time.",
+    "created_at": "2024-07-09T02:06:31Z",
+    "closed_at": "2024-07-09T06:44:02Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/tesseract-ocr/tesseract/issues/4280",
+    "body": "### Current Behavior\r\n\r\nIn Ubuntu 22.04.6 LTS it supports Tesseract 4.1.1 and my code executing multiple instances of Tesseract on that machine worked. But when I tried it on a newer release (Ubuntu 24.04 with Tesseract 5.3.4) this problem started occurring. To test this I opened to bash terminals and ran the command directly manually one after the other (around the same time) and it does indeed hang. Only after I ctrl+c one of them does the other finish.\r\n\r\n### Expected Behavior\r\n\r\nShould be able to run multiple instances of Tesseract at the same time. At least 2.\r\n\r\n### Suggested Fix\r\n\r\nSeems to be a new bug that go introduced at one point?\r\n\r\n### tesseract -v\r\n\r\n**New version with the issue:**\r\ntesseract 5.3.4\r\n leptonica-1.82.0\r\n  libgif 5.2.1 : libjpeg 8d (libjpeg-turbo 2.1.5) : libpng 1.6.43 : libtiff 4.5.1 : zlib 1.3 : libwebp 1.3.2 : libopenjp2 2.5.0\r\n Found AVX2\r\n Found AVX\r\n Found FMA\r\n Found SSE4.1\r\n Found OpenMP 201511\r\n Found libarchive 3.7.2 zlib/1.3 liblzma/5.4.5 bz2lib/1.0.8 liblz4/1.9.4 libzstd/1.5.5\r\n Found libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3 brotli/1.1.0 zstd/1.5.5 libidn2/2.3.7 libpsl/0.21.2 (+libidn2/2.3.7) libssh/0.10.6/openssl/zlib nghttp2/1.59.0 librtmp/2.3 OpenLDAP/2.6.7\r\n \r\n**Old version last known working:**\r\ntesseract 4.1.1\r\n leptonica-1.79.0\r\n  libgif 5.1.4 : libjpeg 8d (libjpeg-turbo 2.0.3) : libpng 1.6.37 : libtiff 4.1.0 : zlib 1.2.11 : libwebp 0.6.1 : libopenjp2 2.3.1\r\n Found AVX2\r\n Found AVX\r\n Found FMA\r\n Found SSE\r\n Found libarchive 3.4.0 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.8 liblz4/1.9.2 libzstd/1.4.4\r\n\r\n### Operating System\r\n\r\nUbuntu 24.04 Noble\r\n\r\n### Other Operating System\r\n\r\n_No response_\r\n\r\n### uname -a\r\n\r\nLinux ip-172-31-13-132 6.8.0-1009-aws #9-Ubuntu SMP Fri May 17 14:39:23 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux\r\n\r\n### Compiler\r\n\r\n_No response_\r\n\r\n### CPU\r\n\r\n_No response_\r\n\r\n### Virtualization / Containers\r\n\r\n_No response_\r\n\r\n### Other Information\r\n\r\n_No response_",
+    "comments_url": "https://api.github.com/repos/tesseract-ocr/tesseract/issues/4280/comments",
+    "author": "anesuc",
+    "comments": [
+      {
+        "user": "zdenop",
+        "created_at": "2024-07-09T05:26:35Z",
+        "body": "please provide minimal example  for reproducing problem"
+      },
+      {
+        "user": "stweil",
+        "created_at": "2024-07-09T05:26:43Z",
+        "body": "Do both instances hang \"forever\", or do they terminate after a longer time? And do they use CPU time while they are hanging?"
+      },
+      {
+        "user": "stweil",
+        "created_at": "2024-07-09T05:28:33Z",
+        "body": "I run up to 64 instances of the latest Tesseract at the same time without any problem, but I have Debian bookworm and compiled Tesseract myself."
+      },
+      {
+        "user": "anesuc",
+        "created_at": "2024-07-09T05:42:14Z",
+        "body": "> I run up to 64 instances of the latest Tesseract at the same time without any problem, but I have Debian bookworm and compiled Tesseract myself.\r\n\r\nI ran it and waited and they did eventually finish in 4 mins (when running 2 of them. I have waited longer before but i was running more than 2). If you run one of them they finish in like 4 seconds. This is on a \"t2.xlarge\" AWS instance which has \"4 vCPUs\".  The previous one I had did have an AMD with 16 cores so maybe that is why it was fine.\r\n\r\nSo this does not scale very well with multiple instances it seems? Or AWS just has weak CPUs?"
+      },
+      {
+        "user": "stweil",
+        "created_at": "2024-07-09T05:54:37Z",
+        "body": "Try `export OMP_THREAD_LIMIT=1` before starting both processes. This will disable the default multithreading and should allow up to four instances on your AWS instance. Two Tesseract processes with multithreading are definitely too much for a host which can only run four threads."
+      },
+      {
+        "user": "anesuc",
+        "created_at": "2024-07-09T06:44:02Z",
+        "body": "> Try `export OMP_THREAD_LIMIT=1` before starting both processes. This will disable the default multithreading and should allow up to four instances on your AWS instance. Two Tesseract processes with multithreading are definitely too much for a host which can only run four threads.\r\n\r\nAlright this seems to have fixed the issue! Thanks for helping resolve this!"
+      }
+    ]
+  },
+  {
+    "number": 2803,
+    "title": "build system: shared library is gone",
+    "created_at": "2019-12-05T02:31:44Z",
+    "closed_at": "2019-12-05T09:20:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/tesseract-ocr/tesseract/issues/2803",
+    "body": "I believe that the recent improvements in the build system brought a major regression: `make install` does not (build and) install libtesseract.so anymore.\r\n\r\nThis is a huge problem for other software that wants to link to Tesseract (like `tesserocr`). Their build will fall back to the static library, but this can fail by not pulling in Tesseract's dependencies (like `-llept`), or by missing things like `-fsanitize=address`.\r\n\r\n@stweil do you want me to give detailed error messages?",
+    "comments_url": "https://api.github.com/repos/tesseract-ocr/tesseract/issues/2803/comments",
+    "author": "bertsky",
+    "comments": [
+      {
+        "user": "stweil",
+        "created_at": "2019-12-05T06:17:07Z",
+        "body": "I cannot confirm this. This is what I just tested:\r\n\r\n    ./autogen.sh clean\r\n    mkdir test\r\n    cd test\r\n    nohup ../configure\r\n    nohup make\r\n    make install prefix=$PWD/usr\r\n    ls -l usr/lib/\r\n    insgesamt 213396\r\n    -rw-r--r-- 1 debian debian 163296074 Dez  5 07:13 libtesseract.a\r\n    -rwxr-xr-x 1 debian debian      1075 Dez  5 07:13 libtesseract.la\r\n    lrwxrwxrwx 1 debian debian        21 Dez  5 07:13 libtesseract.so -> libtesseract.so.5.0.0\r\n    lrwxrwxrwx 1 debian debian        21 Dez  5 07:13 libtesseract.so.5 -> libtesseract.so.5.0.0\r\n    -rwxr-xr-x 1 debian debian  55202672 Dez  5 07:13 libtesseract.so.5.0.0\r\n    drwxr-xr-x 2 debian debian      4096 Dez  5 07:13 pkgconfig"
+      },
+      {
+        "user": "bertsky",
+        "created_at": "2019-12-05T09:20:41Z",
+        "body": "False alert \u2013 sorry!"
+      }
+    ]
+  },
+  {
+    "number": 2436,
+    "title": "Error param ALTO when using tessdata-dir param",
+    "created_at": "2019-05-15T13:00:01Z",
+    "closed_at": "2019-05-15T13:53:28Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/tesseract-ocr/tesseract/issues/2436",
+    "body": "### Environment\r\n\r\n* **Tesseract Version**:  4.1.0-rc2-48-g5320\r\n* **Commit Number**: \r\n* **Platform**: Ubuntu 18.04 LTS\r\n\r\n### Current Behavior:\r\n\r\nCall `tesseract` from Bash with explicite `tessdata-dir` leads to improper processing of last Parameter `alto`:\r\n\r\n```\r\ntesseract --dpi 500 --tessdata-dir <path> <path-to-some-image> <output-name> -l deu_frak alto\r\n\r\n=>\r\n\r\nread_params_file: can't open alto\r\n```\r\nWhereas calling without `tessdata-dir`works fine\r\n\r\n```\r\ntesseract --dpi 500 <path-to-some-image> <output-name> -l deu_frak alto\r\n```\r\nwhich in turn works only if Language-Model-File was moved into `/usr/share/tesseract/4.00/tessdata`\r\n\r\n### Expected Behavior:\r\n\r\nNo difference in order or number of parameters, no side-effect from parameter `tessdata-dir` to any other parameters or their placements.\r\n\r\n### Suggested Fix:\r\n\r\nAdjust Parameter-Processing, introduce explicite output-format parameter, like `--output-format alto`\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/tesseract-ocr/tesseract/issues/2436/comments",
+    "author": "M3ssman",
+    "comments": [
+      {
+        "user": "zdenop",
+        "created_at": "2019-05-15T13:53:28Z",
+        "body": "`tessdata-dir` specified where are tesseract data located (language data & config).\r\nIf you specified to use config alto and it is not presented in tessdata-dir, it fails. It is correct and expected behavior."
+      },
+      {
+        "user": "M3ssman",
+        "created_at": "2019-05-15T19:09:46Z",
+        "body": "Thanks for your explanation. I wasn't aware of this relationship, I didn't expect configurations inside a data Directory, sorry."
+      },
+      {
+        "user": "stweil",
+        "created_at": "2019-05-16T04:54:14Z",
+        "body": "> Adjust Parameter-Processing, introduce explicite output-format parameter, like --output-format alto\r\n\r\n@M3ssman, `-c tessedit_create_alto=1` can be used in your case, so there is already an explicit parameter for the output format."
+      }
+    ]
+  }
+]

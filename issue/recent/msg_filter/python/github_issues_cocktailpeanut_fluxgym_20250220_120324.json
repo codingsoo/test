@@ -1,0 +1,48 @@
+[
+  {
+    "number": 325,
+    "title": "Stuck in loop when trying to build docker container",
+    "created_at": "2025-02-04T08:33:18Z",
+    "closed_at": "2025-02-08T09:55:01Z",
+    "labels": [],
+    "url": "https://github.com/cocktailpeanut/fluxgym/issues/325",
+    "body": "Following the install guide for docker, when I attempt to run `docker compose up -d --build` running `docker ps` showed the container was stuck in a boot loop. Removing the `-d` from the build I received this error\n\n` \u2714 Network fluxgym_default  Created                                                                                                                     0.1s\n \u2714 Container fluxgym        Created                                                                                                                     0.1s\nAttaching to fluxgym\n\nfluxgym  | Traceback (most recent call last):\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/utils/import_utils.py\", line 943, in _get_module\n\nfluxgym  |     return importlib.import_module(\".\" + module_name, self.__name__)\n\nfluxgym  |   File \"/usr/lib/python3.10/importlib/__init__.py\", line 126, in import_module\n\nfluxgym  |     return _bootstrap._gcd_import(name[level:], package, level)\n\nfluxgym  |   File \"<frozen importlib._bootstrap>\", line 1050, in _gcd_import\n\nfluxgym  |   File \"<frozen importlib._bootstrap>\", line 1027, in _find_and_load\n\nfluxgym  |   File \"<frozen importlib._bootstrap>\", line 1006, in _find_and_load_unlocked\n\nfluxgym  |   File \"<frozen importlib._bootstrap>\", line 688, in _load_unlocked\n\nfluxgym  |   File \"<frozen importlib._bootstrap_external>\", line 883, in exec_module\n\nfluxgym  |   File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/loaders/single_file.py\", line 24, in <module>\n\nfluxgym  |     from .single_file_utils import (\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/loaders/single_file_utils.py\", line 28, in <module>\n\nfluxgym  |     from ..models.modeling_utils import load_state_dict\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/models/modeling_utils.py\", line 37, in <module>\n\nfluxgym  |     from ..quantizers import DiffusersAutoQuantizer, DiffusersQuantizer\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/quantizers/__init__.py\", line 15, in <module>\n\nfluxgym  |     from .auto import DiffusersAutoQuantizer\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/quantizers/auto.py\", line 22, in <module>\n\nfluxgym  |     from .bitsandbytes import BnB4BitDiffusersQuantizer, BnB8BitDiffusersQuantizer\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/quantizers/bitsandbytes/__init__.py\", line 2, in <module>\n\nfluxgym  |     from .utils import dequantize_and_replace, dequantize_bnb_weight, replace_with_bnb_linear\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/diffusers/quantizers/bitsandbytes/utils.py\", line 32, in <module>\n\nfluxgym  |     import bitsandbytes as bnb\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/bitsandbytes/__init__.py\", line 15, in <module>\n\nfluxgym  |     from .nn import modules\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/bitsandbytes/nn/__init__.py\", line 21, in <module>\n\nfluxgym  |     from .triton_based_modules import (\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/bitsandbytes/nn/triton_based_modules.py\", line 7, in <module>\n\nfluxgym  |     from bitsandbytes.triton.int8_matmul_mixed_dequantize import (\n\nfluxgym  |   File \"/usr/local/lib/python3.10/dist-packages/bitsandbytes/triton/int8_matmul_mixed_dequantize.py\", line 12, in <module>\n\nfluxgym  |     from triton.ops.matmul_perf_model import early_config_prune, estimate_matmul_time\n\nfluxgym  | ModuleNotFoundError: No module named 'triton.ops'\n`\n\nI inserted `triton` into the list of packages to be installed by `pip` in the Dockerfile. I ran `docker build --no-cache` to rebuild everything, and saw triton being installed in one of the steps. However I still receive the exact same error message, and I can't seem to find any answers on Google how to fix this. Any help would be appreciated.",
+    "comments_url": "https://api.github.com/repos/cocktailpeanut/fluxgym/issues/325/comments",
+    "author": "gavanpang",
+    "comments": [
+      {
+        "user": "namila007",
+        "created_at": "2025-02-07T20:32:17Z",
+        "body": "fixed the issue by adding this after line 32 on DockerFile\n  `RUN pip install --upgrade --force-reinstall triton==2.1.0`"
+      }
+    ]
+  },
+  {
+    "number": 94,
+    "title": "ModuleNotFoundError: No module named 'train_network'",
+    "created_at": "2024-09-16T23:33:48Z",
+    "closed_at": "2024-09-18T10:04:06Z",
+    "labels": [],
+    "url": "https://github.com/cocktailpeanut/fluxgym/issues/94",
+    "body": "When running `python app.py` after completing manual install steps this error shows. No clue how to resolve, any help would be appreciated\r\n\r\n`ModuleNotFoundError: No module named 'train_network'`",
+    "comments_url": "https://api.github.com/repos/cocktailpeanut/fluxgym/issues/94/comments",
+    "author": "keizured",
+    "comments": [
+      {
+        "user": "wuliang19869312",
+        "created_at": "2024-09-17T02:20:12Z",
+        "body": "Traceback (most recent call last):\r\n  File \"D:\\fluxgym\\app.py\", line 17, in <module>\r\n    import train_network\r\nModuleNotFoundError: No module named 'train_network'\r\nwhy???"
+      },
+      {
+        "user": "deepfriedheroin",
+        "created_at": "2024-09-17T04:04:09Z",
+        "body": "I'm sure there's better way to do this, but here. \r\n```\r\nsys.path.append(os.path.abspath('./sd-scripts'))\r\nimport train_network\r\n```"
+      },
+      {
+        "user": "chnisar515",
+        "created_at": "2024-09-17T17:55:17Z",
+        "body": "i am facing the same error\r\n\r\n> (env) E:\\fluxgym>python app.py\r\nTraceback (most recent call last):\r\n  File \"E:\\fluxgym\\app.py\", line 17, in <module>\r\n    import train_network\r\nModuleNotFoundError: No module named 'train_network'\r\n\r\ncan someone tell me how i can fix this?\r\ni replaced these lines in my app.py file\r\nnow my app.py files looks like below\r\n\r\n> import os\r\nimport sys\r\nimport subprocess\r\nimport gradio as gr\r\nfrom PIL import Image\r\nimport torch\r\nimport uuid\r\nimport shutil\r\nimport json\r\nimport yaml\r\nfrom slugify import slugify\r\nfrom transformers import AutoProcessor, AutoModelForCausalLM\r\nfrom gradio_logsview import LogsView, LogsViewRunner\r\nfrom huggingface_hub import hf_hub_download, HfApi\r\nfrom library import flux_train_utils, huggingface_util\r\nfrom argparse import Namespace\r\nimport train_network\r\nimport toml\r\nimport re\r\nos.environ[\"HF_HUB_ENABLE_HF_TRANSFER\"] = \"1\"\r\nos.environ['GRADIO_ANALYTICS_ENABLED'] = '0'\r\nsys.path.insert(0, os.getcwd())\r\nsys.path.append(os.path.abspath('./sd-scripts'))\r\nimport train_network\r\nMAX_IMAGES = 150"
+      }
+    ]
+  }
+]

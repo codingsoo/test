@@ -1,0 +1,213 @@
+[
+  {
+    "number": 3567,
+    "title": "onChange gets fired even no change is made (i.e. if I put it out of focus without any changes made)",
+    "created_at": "2020-03-29T22:45:46Z",
+    "closed_at": "2020-03-30T20:02:22Z",
+    "labels": [
+      "question",
+      "discussion"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/3567",
+    "body": "#### Do you want to request a _feature_ or report a _bug_?\r\n\r\n*Bug*\r\n\r\n#### What's the current behavior?\r\n\r\n`onChange` gets fired even if I don't make any changes on editable text. For example, if I put focus on editable text, make no changes and immediately click out of it,  'onChange' callback is triggered. How can I prevent this behavior? \r\nIt's problem because every `onChange` re-renders my component where editable text is located and I don't want this additional re-render.\r\n\r\n#### What's the expected behavior?\r\n\r\nSlate version (npm packages):\r\n _\"slate\": \"*\",_\r\n_\"slate-history\": \"*\",_\r\n_\"slate-react\": \"*\",_\r\n\r\nBrowser: Chrome / Safari / Firefox / Edge\r\nOS: Mac\r\n",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/3567/comments",
+    "author": "ebasic",
+    "comments": [
+      {
+        "user": "cameracker",
+        "created_at": "2020-03-30T16:39:24Z",
+        "body": "onChange is fired as part of selection change. This is an unavoidable behavior and is required for slate to work. Instead, I'd focus on making your `onChange` loop as tight as possible. The rerender impact, even for a large document, should not be a burden for react."
+      },
+      {
+        "user": "ebasic",
+        "created_at": "2020-03-30T20:00:57Z",
+        "body": "Solved and shared code by **@piyushpatel** on Slack:\r\n\r\n`const handleChange = useCallback(val => {`\r\n    `const ops = editor.operations.filter(o => {`\r\n      `if (o) {`\r\n        `return o.type !== 'set_selection';`\r\n     ` }`\r\n      `return false;`\r\n   ` });`\r\n\r\n   ` if (ops && Array.isArray(ops) && ops.length > 0) {`\r\n      `onChange(val);`\r\n    `}`\r\n  `}, []);`"
+      }
+    ]
+  },
+  {
+    "number": 2049,
+    "title": "Schema normalization doesn't seem to work as outlined in the changelog",
+    "created_at": "2018-08-07T23:22:25Z",
+    "closed_at": "2018-08-07T23:35:58Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/2049",
+    "body": "I'm trying to update my schema, but it seems like the _only_ method for matching that works is to write rules exactly like this:\r\n\r\n```javascript\r\nconst schemaRules = {\r\n  blocks: {\r\n    list_item: {\r\n      nodes: [\r\n        { match: { type: 'paragraph' } },\r\n        { match: { type: 'ol_list' } },\r\n        { match: { type: 'ul_list' } },\r\n      ],\r\n      normalize: (change, error) => {\r\n        //  Some code\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nTrying something like this has no effect:\r\n\r\n```javascript\r\nconst schemaRules = {\r\n  blocks: {\r\n    list_item: {\r\n      nodes: [{ type: 'paragraph' }, { type: 'ol_list' }, { type: 'ul_list' }],\r\n      normalize: (change, error) => {\r\n        //  Some code\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nI tried with the property name `node` and `nodes` but no effect. Am I doing something wrong here? More examples would be great!",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/2049/comments",
+    "author": "Nantris",
+    "comments": [
+      {
+        "user": "ianstormtaylor",
+        "created_at": "2018-08-07T23:35:57Z",
+        "body": "@Slapbox that's correct, the second syntax doesn't work because the objects in the `nodes` array are not match objects, but constraints themselves like `min/max/etc.` They constrain match objects as their `.match` property."
+      },
+      {
+        "user": "ianstormtaylor",
+        "created_at": "2018-08-07T23:37:58Z",
+        "body": "If you're looking to only allow certain types of nodes, it would be:\r\n\r\n```js\r\nconst schemaRules = {\r\n  blocks: {\r\n    list_item: {\r\n      nodes: [\r\n        { \r\n          match: [{ type: 'paragraph' }, { type: 'ol_list' }, { type: 'ul_list' }]\r\n        }\r\n      ],\r\n      normalize: (change, error) => {\r\n        //  Some code\r\n      }\r\n    }\r\n  }\r\n}\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1036,
+    "title": "Horizontal Rules in markup?",
+    "created_at": "2017-08-29T00:26:31Z",
+    "closed_at": "2017-09-04T22:27:58Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/1036",
+    "body": "Should a < hr > tag/dividing line that contains no children be implemented as a mark or as a block with custom behavior?\r\n\r\nNot quite sure how to tackle this, so I would appreciate any input.",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/1036/comments",
+    "author": "anewusr",
+    "comments": [
+      {
+        "user": "dmitrizzle",
+        "created_at": "2017-08-29T05:49:02Z",
+        "body": "Definitely a block. I had it set up in my schema as:\r\n```javascript\r\n    divider: props => {\r\n      const { node, state } = props\r\n      const focus = state.isFocused && state.selection.hasEdgeIn(node)\r\n      const className = focus ? \"focus\" : \"nofocus\"\r\n      return <hr className={className} />\r\n    },\r\n```\r\nAbove adds a class name to your `<hr/>` when it's selected; it will be removed with backspace."
+      },
+      {
+        "user": "YurkaninRyan",
+        "created_at": "2017-08-29T14:01:30Z",
+        "body": "@anewusr `isVoid`, is the property you should look up.  It was an a-ha moment for me.  Basically is just a node without editable content"
+      }
+    ]
+  },
+  {
+    "number": 739,
+    "title": "Use removeNodeByKey on the last node breaks editor's state",
+    "created_at": "2017-04-21T09:18:23Z",
+    "closed_at": "2017-04-21T10:53:42Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/739",
+    "body": "Hello! Not sure if this is intended or not but if you remove the last node in a editor's state with `removeNodeByKey` the editor state became unworkable, the documents nodes became an empty `List` and I got a warning and an error in console every time I try to type something in the editor:\r\n\r\n`Warning: An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was: null`\r\n\r\nand the error:\r\n\r\n`Uncaught Error: Invalid `key` argument! It must be either a block, an inline, a text, or a string. You passed: \"null\".`",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/739/comments",
+    "author": "ingro",
+    "comments": [
+      {
+        "user": "skogsmaskin",
+        "created_at": "2017-04-21T09:23:27Z",
+        "body": "Hi! You should set up a rule in you schema that takes care of this for you, as Slate doesn't have any assumptions of what should happen (like which content should be insterted when empty). This is a good thing really, however I think this should be better documented, as this question comes up often.\r\n\r\nFor example:\r\n\r\n```\r\n    rules: [\r\n      // Rule to insert a default block when document is empty\r\n      {\r\n        match: node => {\r\n          return node.kind === 'document'\r\n        },\r\n        validate: document => {\r\n          return document.nodes.size ? null : true\r\n        },\r\n        normalize: (transform, document) => {\r\n          const block = Block.create({\r\n            type: 'paragraph'\r\n          })\r\n          transform\r\n            .insertNodeByKey(document.key, 0, block)\r\n            .focus()\r\n        }\r\n      }\r\n    ]\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 695,
+    "title": "Selecting actual \"typed content\" when rendered content is selected.",
+    "created_at": "2017-03-30T13:05:14Z",
+    "closed_at": "2017-03-30T14:29:00Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/695",
+    "body": "Let's say I type `(c)` and convert it to \u00a9. Or, maybe I convert `:)` to \ud83d\ude04 .\r\nIs it possible to get actual typed content when I selected rendered content. So, selecting the emoji should give me `:)`. \r\n\r\nEssentially mapping selection/cursor position from rendered content to typed content.\r\n\r\nIs something like that possible?",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/695/comments",
+    "author": "jatins",
+    "comments": [
+      {
+        "user": "ianstormtaylor",
+        "created_at": "2017-03-30T14:28:58Z",
+        "body": "Hey @jatins, I'm not totally sure what you mean, but Slate is only concerned with the actual content, and not any previous representation that happened to be converted. So my guess is the answer is no. Of course, you can keep your own mapping around to do that if you want, but it wouldn't be handled by core. Feel free to ask follow up questions though!"
+      },
+      {
+        "user": "jatins",
+        "created_at": "2017-03-30T15:09:08Z",
+        "body": "What I meant was, let's say I have a plugin which converts `:)` to \ud83d\ude04 .\r\n\r\nSo, in this case, the _typed content_ (the thing that was actually typed) is `:)` and rendered content being the emoji.\r\n\r\nNow when I select the emoji, I want to know what is selected in the _typed content_. However, I guess it wouldn't be possible since, as you mentioned, slate only knows about what's rendered.\r\n\r\n"
+      },
+      {
+        "user": "ianstormtaylor",
+        "created_at": "2017-03-30T16:36:50Z",
+        "body": "Yup, unfortunately not. What's your use case?"
+      },
+      {
+        "user": "jatins",
+        "created_at": "2017-03-30T18:23:07Z",
+        "body": "@ianstormtaylor I have some custom parsing logic for the text. So, `onKeyDown()` I parse the _entire content_ of current block, create a new slate block from parsed content and replace the existing block with new block.\r\n\r\nSo, let's say `-[ ] ` at the start of line becomes a check box. But `abcd -[ ]` should be rendered as plain text.\r\n\r\nConsider this scenario:\r\n1. User types `-[ ] ` -> renders a check box.\r\n2. User goes to the start of this block (that is the places his cursor before the check box) and types `abcd`. So, essentially the user _typed content_ now is `abcd-[ ] ` which should not be rendered as a check list. \r\n\r\nI can save what the user types in separate model. But now I have to map actions in _rendered content_ to actions in _typed content_ but unless I have a mapping between two, I am not sure how that'll work."
+      },
+      {
+        "user": "oyeanuj",
+        "created_at": "2017-04-17T19:12:40Z",
+        "body": "@jatins For things like emojis and checkboxes, if you use inline nodes, then you could use the `data` property of the node to store the original text?"
+      },
+      {
+        "user": "michaelpietrykowski",
+        "created_at": "2017-04-18T16:19:21Z",
+        "body": "@jatins That will work, I am doing basically the same thing.\r\nJust iterate over the nodes and check if `node.type === yourEmojiType`. If true, do `result += node.data.get('originalText')`, otherwise `result += node.text`."
+      }
+    ]
+  },
+  {
+    "number": 641,
+    "title": "Uncaught TypeError: node.getRanges is not a function",
+    "created_at": "2017-03-02T15:31:43Z",
+    "closed_at": "2017-03-02T16:54:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/641",
+    "body": "```\r\nconst firstNode = state.document.nodes.get(0);\r\n\r\nstate.transform().removeTextByKey(firstNode.key, 0, 3);\r\n```\r\n\r\nThrows \"Uncaught TypeError: node.getRanges is not a function\" at \"Object.Transforms.removeTextOperation\" at line 250\r\n\r\nIt seems like the node doesn't have a getRanges function.\r\n",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/641/comments",
+    "author": "santiagopuentep",
+    "comments": [
+      {
+        "user": "ianstormtaylor",
+        "created_at": "2017-03-02T16:54:11Z",
+        "body": "Hey @santiagopuentep, I think this is actually because `removeTextByKey` requires a `kind == 'text'` node, instead of a block or inline. I believe if you do:\r\n\r\n```js\r\nconst firstText = state.document.getFirstText()\r\nstate.transform().removeTextByKey(firstText.key, 0, 3)\r\n```\r\n\r\n...it will work! Let me know if not though."
+      },
+      {
+        "user": "santiagopuentep",
+        "created_at": "2017-03-02T19:20:06Z",
+        "body": "That worked. Thanks!\r\n\r\nShouldn't it have a check for the correct node? Or maybe a more descriptive error?\r\n\r\nAlso, I don't see `Document.getFirstText()` documented. I think it's missing.\r\n\r\nGreat job with the editor by the way, I love it, **much** better than draft.js that was driving me pretty crazy with some things and was hard to understand."
+      }
+    ]
+  },
+  {
+    "number": 266,
+    "title": "Schema rules question: Validation against a node's parents",
+    "created_at": "2016-08-24T07:49:24Z",
+    "closed_at": "2016-08-29T12:10:47Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/266",
+    "body": "Hello again, now with a real question.\n\nI am implementing a validation rule for lists with a classic structure, a parent `list-block` that can contains only a list of `item-block`:\n\n```\nlist-block\n    [\n        item-block\n    ]    \n```\n\nI can easily validate a `list-block` node's children to be `item-blocks`. But I am not sure **how to validate that any `item-blocks` is a descendant of a `list-block`**.\n\nI could make a global rule that looks for orphan `item-block` across the whole document, like this:\n\n``` js\nconst ITEM_BLOCK_RULE = {\n    // Apply rule to all blocks\n    match: function matchAllBlock () ...,\n\n    validate: function (block) {\n        // If the block is not a list-block,\n        // but has an orphan item-block as child,\n        // invalidate.\n    },\n\n    normalize: ... // remove orphan item-blocks\n}\n```\n\nBut I instinctively would like to implement a rule like this:\n\n``` js\nconst ITEM_BLOCK_RULE = {\n    match: function matchItemBlock () ...,\n\n    // Extra <document> parameter\n    validate: function (node, document) {\n        // Use the document reference to check that node's parent\n        // is a list-block\n    },\n\n    normalize: ... // remove the item-block if it is orphan\n}\n```\n\nDo you think it would make sense to pass a reference to the document as parameter to `validate` ? This would help to implement these kind of context sensitive rules.\n\nThanks for the awesome work.\n",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/266/comments",
+    "author": "Soreine",
+    "comments": [
+      {
+        "user": "Soreine",
+        "created_at": "2016-08-24T07:55:05Z",
+        "body": "Thinking about it now, passing the `document` as reference could prevent some cool optimizations like memoizing the `validate` functions (to only execute the validation on nodes that have changed).\n"
+      },
+      {
+        "user": "ianstormtaylor",
+        "created_at": "2016-08-24T22:05:53Z",
+        "body": "Ah yup, the memoization is the reason I opted not to do that. Sadly I think it's something we have to constrain since validation will be called so often that without being able to lock it down a lot for performance things will get slow.\n\nSame goes for the `decorate` method too if I remember correctly.\n\nSo yeah, it would need to be implemented with the \"all blocks\" technique instead. But that'll give us better performance.\n\nLet me know if you have any more questions!\n"
+      }
+    ]
+  },
+  {
+    "number": 222,
+    "title": "Capability to disable console.log statements.",
+    "created_at": "2016-08-04T12:07:29Z",
+    "closed_at": "2016-08-04T17:57:29Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ianstormtaylor/slate/issues/222",
+    "body": "They are useful when debugging slate, but they get in the way when I attempt to debug other parts of my system.  Being able to toggle them would be great.\n",
+    "comments_url": "https://api.github.com/repos/ianstormtaylor/slate/issues/222/comments",
+    "author": "ctrlplusb",
+    "comments": [
+      {
+        "user": "ianstormtaylor",
+        "created_at": "2016-08-04T17:57:28Z",
+        "body": "Hey @ctrlplusb do you mean the `debug` calls? Right now they should be Local Storage based, so that if you have `debug=\"*\"` set they will show up. You can disable all debug calls by removing the `debug` key, or you can disable Slate's only by doing something like `debug=\"*,-slate:*\"` I believe. Let me know if that helps!\n"
+      }
+    ]
+  }
+]

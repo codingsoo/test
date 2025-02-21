@@ -1,0 +1,73 @@
+[
+  {
+    "number": 4621,
+    "title": "[docs]: The \"Edit in StackBlitz\" button opens snippets in wrong format causing many examples to break",
+    "created_at": "2019-03-06T18:20:02Z",
+    "closed_at": "2019-08-12T02:09:33Z",
+    "labels": [
+      "help wanted",
+      "docs"
+    ],
+    "url": "https://github.com/ReactiveX/rxjs/issues/4621",
+    "body": "### Please check those that apply\r\n\r\n- [ ] typo\r\n- [ ] documentation doesn't exist\r\n- [ ] documentation needs clarification\r\n- [X] error(s) in example\r\n- [ ] needs example\r\n\r\n### Description Of The Issue\r\nAs all examples are written in TypeScript and the \"Edit in StackBlitz\" button opens all snippest in JavaScript format many examples do not work.",
+    "comments_url": "https://api.github.com/repos/ReactiveX/rxjs/issues/4621/comments",
+    "author": "BioPhoton",
+    "comments": [
+      {
+        "user": "niklas-wortmann",
+        "created_at": "2019-03-07T06:35:01Z",
+        "body": "Well spotted! Thanks for that. So the issue occurs when the code example is labeled as javascript code,\r\n\r\ne.g. \r\n```markdown\r\n```javascript\r\nimport { Observable } from 'rxjs';\r\n\r\nconst observable = new Observable(subscriber => {\r\n  subscriber.next(1);\r\n  subscriber.next(2);\r\n  subscriber.next(3);\r\n  setTimeout(() => {\r\n    subscriber.next(4);\r\n    subscriber.complete();\r\n  }, 1000);\r\n});\r\n```\r\n\r\nsuch examples will produce a js stackblitz.\r\n\r\nWhat we basically need to do is replace those javascript hightlighting with ts. AFAIK most of the examples uses typescript so it should be quite safe to replace javascript with typescript here, but it might break some of the examples"
+      },
+      {
+        "user": "BioPhoton",
+        "created_at": "2019-03-07T12:22:33Z",
+        "body": "Is there a standard for code snippets in this reop?\r\nI saw some examples using `var` so this would be a thing to replace too if replacing \" \\`\\`\\`javascript\" with \"\\`\\`\\` ts\".\r\n\r\nOr are just all snippets in the src folder in ts? \r\nIf not already you might mention it in some fitting place."
+      },
+      {
+        "user": "BioPhoton",
+        "created_at": "2019-08-12T02:09:32Z",
+        "body": "Hi @JWO719 as the related PR is merged, (and shipped?) we can close it. \r\nAlso #4605 could be closed.\r\n\r\nPlease reopen if I'm wrong "
+      }
+    ]
+  },
+  {
+    "number": 540,
+    "title": "Comprehensive marble tests for concatMap",
+    "created_at": "2015-10-15T14:03:47Z",
+    "closed_at": "2015-10-26T20:27:56Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/ReactiveX/rxjs/issues/540",
+    "body": "(I didn't find tests for concatMap, maybe we should have it)\n",
+    "comments_url": "https://api.github.com/repos/ReactiveX/rxjs/issues/540/comments",
+    "author": "staltz",
+    "comments": [
+      {
+        "user": "benlesh",
+        "created_at": "2015-10-17T00:05:04Z",
+        "body": "Yes we should. I just found that same thing for scan: #555. I think we need to go back to @trxcllnt's original mega-pr and make sure we have all of the operators created at that point tested.\n"
+      },
+      {
+        "user": "staltz",
+        "created_at": "2015-10-19T09:58:57Z",
+        "body": "I'll take this one.\n"
+      },
+      {
+        "user": "staltz",
+        "created_at": "2015-10-19T11:07:20Z",
+        "body": "Found a potential bug.\n\nRxJS 4 does this:\n\n``` js\nvar e1 = hot(    '--a---b---c---|');\nvar inner = cold(  '-1-2-3-4|    ');\nvar expected =   '---1-2#        ';\n\nvar result = e1.concatMap(value => {\n  if (value === 'b') {\n    throw 'error';\n  }\n  return inner;\n});\n```\n\nwhile RxJS Next does this:\n\n``` js\nvar e1 = hot(    '--a---b---c---|');\nvar inner = cold(  '-1-2-3-4|    ');\nvar expected =   '---1-2-3-4#    ';\n\nvar result = e1.concatMap(value => {\n  if (value === 'b') {\n    throw 'error';\n  }\n  return inner;\n});\n```\n\nIf we are to mirror RxJS 4's functionality, then it's a bug. But we might also be redefining how concatMap should work.\n\nFeedback? @blesh ?\n"
+      },
+      {
+        "user": "trxcllnt",
+        "created_at": "2015-10-20T21:31:25Z",
+        "body": "@staltz not a bug, just an artifact of changing the default scheduling model from trampolining to recursive. Try your first example in Rx 4 using the ImmediateScheduler and you'll get the same results as the Rx Next example.\n"
+      },
+      {
+        "user": "staltz",
+        "created_at": "2015-10-21T10:51:31Z",
+        "body": "Good to know\n"
+      }
+    ]
+  }
+]

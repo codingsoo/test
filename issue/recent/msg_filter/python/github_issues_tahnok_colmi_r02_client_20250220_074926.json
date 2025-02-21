@@ -1,0 +1,20 @@
+[
+  {
+    "number": 23,
+    "title": "WSL support?",
+    "created_at": "2024-10-31T15:50:30Z",
+    "closed_at": "2024-10-31T19:23:23Z",
+    "labels": [],
+    "url": "https://github.com/tahnok/colmi_r02_client/issues/23",
+    "body": "I'm running ubuntu from WSL, is this the reason for this error?\r\n```\r\n  File \"/home/myname/.local/pipx/venvs/colmi-r02-client/lib/python3.12/site-packages/bleak/backends/bluezdbus/manager.py\", line 243, in async_init\r\n    bus = MessageBus(bus_type=BusType.SYSTEM, auth=get_dbus_authenticator())\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/myname/.local/pipx/venvs/colmi-r02-client/lib/python3.12/site-packages/dbus_fast/aio/message_bus.py\", line 200, in __init__\r\n    super().__init__(bus_address, bus_type, ProxyObject, negotiate_unix_fd)\r\n  File \"src/dbus_fast/message_bus.py\", line 169, in dbus_fast.message_bus.BaseMessageBus.__init__\r\n  File \"src/dbus_fast/message_bus.py\", line 729, in dbus_fast.message_bus.BaseMessageBus._setup_socket\r\n  File \"src/dbus_fast/message_bus.py\", line 702, in dbus_fast.message_bus.BaseMessageBus._setup_socket\r\nFileNotFoundError: [Errno 2] No such file or directory\r\n```",
+    "comments_url": "https://api.github.com/repos/tahnok/colmi_r02_client/issues/23/comments",
+    "author": "agamm",
+    "comments": [
+      {
+        "user": "tahnok",
+        "created_at": "2024-10-31T15:58:19Z",
+        "body": "I don't think WSL is supported. There's no support for Bluetooth access from within WSL from a quick google and bleak (the Bluetooth library I use) doesn't support WSL either\r\n\r\nAs a workaround, I believe it would work if you installed it on windows directly "
+      }
+    ]
+  }
+]

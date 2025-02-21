@@ -1,0 +1,71 @@
+[
+  {
+    "number": 21,
+    "title": "\u8bad\u7ec3\u5f88\u6162",
+    "created_at": "2024-08-15T09:12:08Z",
+    "closed_at": "2024-08-16T02:58:33Z",
+    "labels": [],
+    "url": "https://github.com/wanghao9610/OV-DINO/issues/21",
+    "body": "finetune\u7684\u65f6\u5019\uff0c\u5f88\u6162\uff0c\u6709\u529e\u6cd5\u63d0\u9ad8\u901f\u5ea6\u5417\uff1f\u6211\u662f\u56fa\u5b9a\u51e0\u4e2a\u76ee\u6807\u7684\u68c0\u6d4b\uff0c\u662f\u4e0d\u662ftext\u7684\u7279\u5f81\u53ef\u4ee5\u9884\u5148\u751f\u6210\u597d\uff1f",
+    "comments_url": "https://api.github.com/repos/wanghao9610/OV-DINO/issues/21/comments",
+    "author": "zuoshaobo",
+    "comments": [
+      {
+        "user": "wanghao9610",
+        "created_at": "2024-08-15T09:24:11Z",
+        "body": "\u8bad\u7ec3\u6162\u4e3b\u8981\u662f\u6240\u6709\u7684\u6a21\u578b\u6743\u91cd\u90fd\u9700\u8981\u66f4\u65b0\uff0c\u4f60\u53ef\u4ee5\u8003\u8651\u5728ovdino/projects/ovdino/configs/ovdino_swin_tiny224_bert_base_ft_custom_24ep.py L37\u4e0b\u9762\u6dfb\u52a0\u4e0b\u9762\u7684\u4ee3\u7801\uff1a\r\n```python\r\nmodel.language_backbone.is_freeze=True\r\n```\r\n\u56fa\u5b9a\u4f4ftext encoder\u7684\u53c2\u6570\u3002"
+      },
+      {
+        "user": "zuoshaobo",
+        "created_at": "2024-08-16T00:29:47Z",
+        "body": "\u597d\u7684\uff0c\u8c22\u8c22"
+      }
+    ]
+  },
+  {
+    "number": 13,
+    "title": "\u5fae\u8c03\u65f6\u7684\u8bad\u7ec3\u8fc7\u7a0b\u56fe",
+    "created_at": "2024-08-08T13:28:47Z",
+    "closed_at": "2024-08-09T07:33:16Z",
+    "labels": [],
+    "url": "https://github.com/wanghao9610/OV-DINO/issues/13",
+    "body": "\u60a8\u597d\uff0c\u60f3\u8bf7\u95ee\u4e00\u4e0b\u5728coco\u6570\u636e\u96c6\u4e0a\u5fae\u8c03\u65f6\uff0c\u6709\u6ca1\u6709\u652f\u6301\u67e5\u770b\u8bad\u7ec3\u8fc7\u7a0b\u7684\u53c2\u6570\uff08tensorboard\u7c7b\u4f3c\u7684\uff09\uff1f",
+    "comments_url": "https://api.github.com/repos/wanghao9610/OV-DINO/issues/13/comments",
+    "author": "Zwh195",
+    "comments": [
+      {
+        "user": "wanghao9610",
+        "created_at": "2024-08-09T02:29:29Z",
+        "body": "\u9ed8\u8ba4\u662f\u652f\u6301tensorboard\u7684\u3002\u4f60\u53ef\u4ee5\u67e5\u770b\u4e00\u4e0b\u4f60\u7684\u8bad\u7ec3\u8f93\u51fa\u8def\u5f84\u4e2d\u662f\u5426\u6709 events.out.tfevents.* \u7684\u6587\u4ef6\uff0c\u5982\u679c\u6709\u5219\u8bf4\u660e\u5df2\u7ecf\u6709tensorboard\u7684\u65e5\u5fd7\u4e86\u3002\u8fdb\u5165\u5230\u8bad\u7ec3\u8f93\u51fa\u8def\u5f84\u4e2d\uff0c\u6267\u884c\u4ee5\u4e0b\u547d\u4ee4\uff1a\r\n```bash\r\ntensorboard --logdir=./\r\n```\r\n\u5728\u8fd9\u4e4b\u524d\uff0c\u4f60\u53ef\u80fd\u9700\u8981\u5148\u5b89\u88c5\u4e00\u4e0btensorboard\u3002\u53c2\u8003\uff1apip install tensorboard \u3002"
+      },
+      {
+        "user": "Zwh195",
+        "created_at": "2024-08-09T07:33:14Z",
+        "body": "\u597d\u7684\u597d\u7684\uff0c\u8c22\u8c22\u60a8\uff01"
+      }
+    ]
+  },
+  {
+    "number": 3,
+    "title": "how to take image feature as prompt ?",
+    "created_at": "2024-08-02T03:23:45Z",
+    "closed_at": "2024-08-02T04:13:51Z",
+    "labels": [],
+    "url": "https://github.com/wanghao9610/OV-DINO/issues/3",
+    "body": "use CLIP image encode is ok ?",
+    "comments_url": "https://api.github.com/repos/wanghao9610/OV-DINO/issues/3/comments",
+    "author": "Apm5",
+    "comments": [
+      {
+        "user": "wanghao9610",
+        "created_at": "2024-08-02T03:47:10Z",
+        "body": "OV-DINO doesn't support taking image feature as prompt, only category name text prompt is available as open-vocabulary setting."
+      },
+      {
+        "user": "Apm5",
+        "created_at": "2024-08-02T04:13:32Z",
+        "body": "ok. thank you"
+      }
+    ]
+  }
+]

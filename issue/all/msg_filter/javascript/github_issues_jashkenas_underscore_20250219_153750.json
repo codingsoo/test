@@ -1,0 +1,478 @@
+[
+  {
+    "number": 2574,
+    "title": "Why using `slice.call(obj)` when `_.isArray(obj)` is true?",
+    "created_at": "2016-07-30T13:31:49Z",
+    "closed_at": "2016-07-30T16:48:59Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/2574",
+    "body": "In `_.toArray`:\n\n```\nif (_.isArray(obj)) return slice.call(obj);\n```\n\nWhy using `slice.call(obj)` when `_.isArray(obj)` is true?\nWhy not just return obj ? I don't understand, please tell me :)\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/2574/comments",
+    "author": "ahonn",
+    "comments": [
+      {
+        "user": "jridgewell",
+        "created_at": "2016-07-30T16:48:59Z",
+        "body": "It's to create a new instance of an array, so modifications do the original do not affect the returned value.\n"
+      }
+    ]
+  },
+  {
+    "number": 2551,
+    "title": "_.isObject for functions is true?",
+    "created_at": "2016-06-22T11:36:25Z",
+    "closed_at": "2016-06-22T15:56:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/2551",
+    "body": "Hey,\n\nwhy the fudge is `_.isObject(function() {}) === true`? This makes no sense. If function is an object, array should be one as well, otherwise it's pretty inconsistent. To check, whether it's a function or not they should use `_.isFunction`.\n\nCan someone explain this to me?\n\nCheers\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/2551/comments",
+    "author": "sateffen",
+    "comments": [
+      {
+        "user": "jridgewell",
+        "created_at": "2016-06-22T15:56:37Z",
+        "body": "It's because you can `fn.prop = 'value'`, making them \"objects\".\n\n> If function is an object, array should be one as well, otherwise it's pretty inconsistent.\n\nThey both are. \ud83d\ude09 \n"
+      },
+      {
+        "user": "sateffen",
+        "created_at": "2016-06-22T16:19:08Z",
+        "body": "Right, `typeof []` is an object, I wasn't there for a moment.\n\nSeeing it from that point of view, you're right. And while driving home, I came across something else: A class (`class foo {}`) should be an object as well, but `typeof foo` is still `function`, because it's a prototype (so basically an \n\nI should have known this :-D Sorry for the unnecessary issue\n\nCheers\n"
+      }
+    ]
+  },
+  {
+    "number": 2378,
+    "title": "Checkmarx Issue - Divide by Zero",
+    "created_at": "2015-12-09T16:11:02Z",
+    "closed_at": "2015-12-09T16:25:58Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/2378",
+    "body": "Hello,\n\nWe are using underscorejs in our application and we ran Checkmarx against it. It returned a security issue with the minified script:\n\n| # | Issue | Code in question |\n| --- | --- | --- |\n| 1 | Divide by zero | var e, u, i = 1 / 0, |\n| 2 | Divide by zero | o = 1 / 0; |\n| 3 | Divide by zero | (o > u |\n| 4 | Divide by zero | var e, u, i = -1 / 0, |\n| 5 | Divide by zero | o = -1 / 0 |\n| 6 | Divide by zero | (u > o |\n| 7 | Divide by zero | return x(n, t, 1 / 0) |\n\nNote that this is in the minified version - the actual source code makes use of Infinity instead of dividing by zero.\n\nWe just wish to check if this is a valid issue or a false positive.\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/2378/comments",
+    "author": "callmekatootie",
+    "comments": [
+      {
+        "user": "jridgewell",
+        "created_at": "2015-12-09T16:25:58Z",
+        "body": "This isn't an issue in JS because it gives `Infinity` (or `-Infinity` for `-1 / 0`) and doesn't throw an error.\n"
+      }
+    ]
+  },
+  {
+    "number": 2304,
+    "title": "_.isNumber( NaN ) == true",
+    "created_at": "2015-09-23T00:44:09Z",
+    "closed_at": "2015-09-23T00:48:56Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/2304",
+    "body": "Why `_.isNumber( NaN ) == true` ?\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/2304/comments",
+    "author": "judsonbsilva",
+    "comments": [
+      {
+        "user": "jdalton",
+        "created_at": "2015-09-23T00:48:56Z",
+        "body": "Hi @judsonbsilva! \n\n`_.isNumber( NaN )` is `true` because `NaN` is classified as a number just as\n`Infinity` and `-Infinity` are.\n\nThe `_.isNumber` method is not intended for numeric validation just as `_.isDate` will not validate whether a date object is a valid date, `new Date(Infinity)`.\n\nIf you're looking for validation there's `_.isFinite` or\nES6 `Number.isFinite`, `Number.isNaN`, `Number.isInteger`, and `Number.isSafeInteger`.\n"
+      }
+    ]
+  },
+  {
+    "number": 2225,
+    "title": "_.has({}, []) should return true",
+    "created_at": "2015-07-01T03:19:20Z",
+    "closed_at": "2015-07-01T05:39:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/2225",
+    "body": "`_.has({}, [])` and `_.has({})` should technically return true, because the object does have nothing?\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/2225/comments",
+    "author": "reggi",
+    "comments": [
+      {
+        "user": "megawac",
+        "created_at": "2015-07-01T05:39:37Z",
+        "body": "`_.has` don't (document) taking an array or undefined as the second argument so returning false seems correct\n"
+      },
+      {
+        "user": "akre54",
+        "created_at": "2015-07-01T13:21:33Z",
+        "body": "I think you're misunderstanding the use of `has`. It's only really used to check if the key (a string) exists in the object. An array isn't an empty value, and neither is `undefined`. \n"
+      },
+      {
+        "user": "reggi",
+        "created_at": "2015-07-01T14:55:02Z",
+        "body": "Thanks all.\n\nI create a `hasOnly` mixin to return true if object has only the provided keys\n\n``` javascript\n_.mixin({\n  hasOnly: function(obj, keys){\n    if(_.difference(_.keys(obj), keys) == 0) return true\n    return false\n  },\n})\n```\n\nSo when you run `console.log(_.hasOnly({}, []))` you are kind of expecting `true` I realize it's not the same for `_.has`. At the time of writing this issue I was using `_.has` for a more complicated version of this mixin. At the time I misread the `_.has` documentation for `_.has(object, key*)` and I thought it accepted an array.\n"
+      }
+    ]
+  },
+  {
+    "number": 2186,
+    "title": "How to sortBy by second level (subkey) of JSON object?",
+    "created_at": "2015-05-23T17:21:05Z",
+    "closed_at": "2015-05-23T18:42:09Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/2186",
+    "body": "I have an example JSON array I would like to sort. However, I would like to sort by attributes.Country (a second level) rather than a first level like label.\n\n``` javascript\n[\n   {\n      \"label\":\"Ha Dae-sung\",\n      \"id\":\"268\",\n      \"attributes\":{\n         \"Country\":\"South Korea\"\n      }\n   },\n   {\n      \"label\":\"Maxi Pereira\",\n      \"id\":\"486\",\n      \"attributes\":{\n         \"Country\":\"Uruguay\"\n      }\n   },\n   {\n      \"label\":\"Manabu Saito\",\n      \"id\":\"441\",\n      \"attributes\":{\n         \"Country\":\"Japan\"\n      }\n   }\n]\n```\n\nI can sort just fine on the first level using _.sortBy. For instance, to sort by just the label.\n\n``` javascript\nsearched = _.sortBy(searched, \"label\"); \n```\n\nHowever, I want to get a sorted array by Country within attributes. How would I set up a second level sort?\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/2186/comments",
+    "author": "blueridgemountains1",
+    "comments": [
+      {
+        "user": "alexZielonko",
+        "created_at": "2015-05-23T18:16:26Z",
+        "body": "Getting an array sorted by country can be achieved by using a function as the iteratee. This should work for you -\n\n```\nsearched = _.sortBy(searched, function(obj) { return obj.attributes.Country; });\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 2040,
+    "title": "not to be bounded to window by default",
+    "created_at": "2015-02-09T12:39:06Z",
+    "closed_at": "2015-02-09T13:09:32Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/2040",
+    "body": "Hi all,\n\nIn my scenario where one of my client has different version of Underscore and my library is using different version of underscore.\n\nWe ended up overriding our window._\n\nIs there a way to source underscore and not to be bounded to window. Instead bind to the reference provided.\n\nKind regards,\nPhani.\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/2040/comments",
+    "author": "pasupulaphani",
+    "comments": [
+      {
+        "user": "megawac",
+        "created_at": "2015-02-09T13:09:31Z",
+        "body": "There are several ways you can address this:\n1. You can build your application using a build tool such as browserify or esperanto, which will respect the version ranges you set per module\n2. you can load the multiple versions of underscore via a script tag and call `_.noConflict()`\n\nAssuming you load 3 underscore versions\n\n``` js\n// The last loaded underscore version\nvar _3 = _.noConflict();\n// The second loaded version\nvar _2 = _.noConflict();\n// The first one\nvar _1 = _;\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 1648,
+    "title": "_.isEqual on \"[object HTMLCanvasElement]\" elements with different content",
+    "created_at": "2014-05-22T09:50:59Z",
+    "closed_at": "2014-05-22T12:30:44Z",
+    "labels": [
+      "question",
+      "duplicate"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/1648",
+    "body": "With two canvas of the same size and same properties, but different contents (and different results from \"toDataURL()\"), _.isEqual returns true.\n\nI'm not sure what should be the expected result in this case. Maybe it's a bug, maybe it should lead to a warning in the documentation.\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/1648/comments",
+    "author": "Volune",
+    "comments": [
+      {
+        "user": "akre54",
+        "created_at": "2014-05-22T12:30:44Z",
+        "body": "`_.isEqual` is undefined for Elements (do a search through the issues for some background). It's much better to write the comparison by hand and `mixin` it into your own Underscore copy if you need it.\n\n``` js\n_.mixin({\n  isCanvasEqual: function(a, b) { return a.toDataUrl() === b.toDataUrl() }\n});\n```\n"
+      },
+      {
+        "user": "michaelficarra",
+        "created_at": "2014-05-22T14:30:42Z",
+        "body": "You could also define `HTMLCanvasElement.prototype.isEqual`.\n\n``` js\nHTMLCanvasElement.prototype.isEqual = function(otherCanvas) {\n  return this.toDataUrl() === otherCavas.toDataUrl();\n};\n```\n"
+      },
+      {
+        "user": "Volune",
+        "created_at": "2014-05-22T14:56:58Z",
+        "body": "A \"isCanvasEqual\" function is not usable for objects that may or may not contain a canvas (as it was in my case)\n\nThe HTMLCanvasElement.prototype.isEqual function is a good solution, thanks.\n"
+      },
+      {
+        "user": "jdalton",
+        "created_at": "2014-05-22T15:53:00Z",
+        "body": "Yap, the current Underscore method of handling DOM elements puts devs in a jam because it either works on some browsers, doesn't, or locks up the browser. That's not a good experience and seems to be common enough to warrant action.\n\nExtending DOM prototypes is a losing game too (see Prototype.js).\n\nUnderscore could detect DOM elements, avoid crawling, and do a strict equality check, `===`. This prevents the inconsistent behavior and browser freezes. Then Underscore could add support for a customizing callback to allow devs to tailor `_.isEqual` to their needs.\n\n``` js\nvar eq = _.partial(_.isEqual, _, _, function(value, other) {\n  if (_.isElement(value) && _.isElement(other) &&\n        value.nodeName.toLowerCase() == 'canvas' &&\n        other.nodeName.toLowerCase() == 'canvas'\n      ){\n    return value.toDataUrl() == other.toDataUrl();\n  }\n});\n```\n"
+      },
+      {
+        "user": "akre54",
+        "created_at": "2014-05-22T17:46:28Z",
+        "body": "Yeah extending prototypes is usually a no-go. @jdalton's solution is the way to go here. Given the number of edge cases and the murkily-defined equality semantics for elements of any type, it's much better to add this yourself to your own app.\n"
+      }
+    ]
+  },
+  {
+    "number": 1129,
+    "title": "Why used \"concat.apply\" in _.pick and _.omit",
+    "created_at": "2013-05-25T09:14:15Z",
+    "closed_at": "2013-05-25T11:01:21Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/1129",
+    "body": " I found following code in _.pick and _.omit when I review the code\n\n``` javascript\n    var keys = concat.apply(ArrayProto, slice.call(arguments, 1));\n```\n\nI don't know why we have to `concat` the `slice.call(arguments, 1)`, since we already got a new array by `slice.call(arguments, 1)`, even there's only empty array, it will no affect on the code below.\n\nseems the code can be shorten as following, any ideas?\n\n``` javascript\n\n  _.pick = function(obj) {\n    var copy = {};\n    each(slice.call(arguments, 1), function(key) {\n      if (key in obj) copy[key] = obj[key];\n    });\n    return copy;\n  };\n\n   // Return a copy of the object without the blacklisted properties.\n  _.omit = function(obj) {\n    var copy = {};\n    var keys = slice.call(arguments, 1);\n    for (var key in obj) {\n      if (!_.contains(keys, key)) copy[key] = obj[key];\n    }\n    return copy;\n  };\n```\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/1129/comments",
+    "author": "qivhou",
+    "comments": [
+      {
+        "user": "braddunbar",
+        "created_at": "2013-05-25T11:01:21Z",
+        "body": "Morning @qivhou!  `concat` is used because it also flattens the array.\n\n``` js\nconcat.apply(ArrayProto, [[1, 2, 3], [4, 5, 6]]); // [1, 2, 3, 4, 5, 6]\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 1009,
+    "title": "_.wrap doesn't support wrapping function with argument",
+    "created_at": "2013-03-09T04:47:02Z",
+    "closed_at": "2013-03-09T11:50:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/1009",
+    "body": "Today while writing code using underscore and backbone i had to wrap some functions. I saw following example on underscorejs.org\n\nvar hello = function(name) { return \"hello: \" + name; };\nhello = _.wrap(hello, function(func) {\n  return \"before, \" + func(\"moe\") + \", after\";\n});\nhello();\n=> 'before, hello: moe, after'\n\non the second last line \nwhat if the function call is like \nhello(\"umar\");\nI means to say that arguments are coming from outside.\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/1009/comments",
+    "author": "umarfarooq125",
+    "comments": [
+      {
+        "user": "knowtheory",
+        "created_at": "2013-03-09T11:50:36Z",
+        "body": "Wrap already takes care of most of this for you.  The source for wrap is pretty short to read through.  That or you can take a gander at the extended example below:\n\n``` Javascript\nvar greet = function(name, language){\n  var response\n  if (language === \"sp\") {\n    response = \"Hola\"\n  } else if (language === \"fr\") {\n    response = \"Bonjour\"\n  } else {\n    response = \"Hello\"\n  }\n  return response + \" \" + name\n}\ngreet(\"Ted\", \"fr\"); // => \"Bonjour Ted\"\ngreet = _.wrap(greet, function(old_greet, lang){ return old_greet(\"Ted\", lang); } );\ngreet(\"sp\"); // => \"Hola Ted\"\n\n```\n"
+      },
+      {
+        "user": "braddunbar",
+        "created_at": "2013-03-10T12:56:34Z",
+        "body": "You'll need to call `_createAlert` with a context like below.  Hope that helps.  :)\n\n``` js\nreturn _createAlert.call(this, _type);\n```\n"
+      },
+      {
+        "user": "zarehb",
+        "created_at": "2015-03-11T00:24:20Z",
+        "body": "it seems underscore _wrap only supports one parameter , use this instead:\n\nfn = (function(fn,before,after, self) {\n                return function() {\n                    if(before) before.apply(self,arguments);\n                    var res = fn.apply(self,arguments);\n                    if(after) after.apply(self,arguments);\n                    return res;\n                }\n            })(fn, before, after, this )\n"
+      },
+      {
+        "user": "megawac",
+        "created_at": "2015-03-11T00:43:01Z",
+        "body": "Wrap is implemented via `_.partial` fyi\n\n``` js\nfn = _.partial(function(fn, before, after, self) {\n    var args = _.rest(arguments, 4);\n    if (before) before.apply(self,args);\n    var res = fn.apply(self,args);\n    if (after) after.apply(self,args);\n    return res;\n})(fn, before, after, this )\n```\n"
+      },
+      {
+        "user": "zarehb",
+        "created_at": "2015-03-11T00:49:25Z",
+        "body": "that's correct and it will work, but in case anyone wants a pure js solution can take mine specially that using underscore doesn't give you any benefit in this case!\n"
+      }
+    ]
+  },
+  {
+    "number": 641,
+    "title": "Why is _._ defined?",
+    "created_at": "2012-06-13T20:30:06Z",
+    "closed_at": "2012-06-13T20:39:50Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/641",
+    "body": "For underscore.1.3.3, why is _._ defined?\n\n```\nif (typeof exports !== 'undefined') {\n    if (typeof module !== 'undefined' && module.exports) {\n        exports = module.exports = _;\n    }\n    exports._ = _;\n} else {\n    root['_'] = _;\n}\n```\n\nShouldn't `exports = module.exports = _;` be `exports = module.exports;`?\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/641/comments",
+    "author": "LarryBattle",
+    "comments": [
+      {
+        "user": "ghost",
+        "created_at": "2012-06-13T20:37:42Z",
+        "body": "Compatibility with CommonJS environments that don't support the non-standard `module.exports` property (in these implementations, Underscore has to be loaded as `var _ = require(\"_\")._`.\n"
+      }
+    ]
+  },
+  {
+    "number": 634,
+    "title": "Strange behavior with _.range function",
+    "created_at": "2012-06-08T14:44:06Z",
+    "closed_at": "2012-06-08T14:52:26Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/634",
+    "body": "Some example:\n_.range(4) or _range(0, 4) or  _.range(\"4\")  produce [0, 1, 2, 3]  - OK\n_.range(\"0\", 4) or _range(\"0\", \"4\") produce [\"0\", \"01\", \"011\", \"0111\"] I was expected [0, 1, 2, 3]\n\nfrom the above examples I've conclude that star parameter is not parse as stop parameter \n\nI tested in  iceweasel 10.0.4 / Debian 6.5 with Underscore.js 1.3.3\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/634/comments",
+    "author": "yoander",
+    "comments": [
+      {
+        "user": "jashkenas",
+        "created_at": "2012-06-08T14:51:31Z",
+        "body": "`_.range` is defined for numbers, not for strings, I'm afraid. If you pass in other objects as well, it similarly won't work.\n"
+      },
+      {
+        "user": "yoander",
+        "created_at": "2012-06-08T14:53:33Z",
+        "body": "Ok, I agree why _.range(\"4\") produce [0, 1, 2, 3] then?\n"
+      },
+      {
+        "user": "jashkenas",
+        "created_at": "2012-06-08T14:56:25Z",
+        "body": "It shouldn't -- ideally it would throw an error. But, this being a dynamic language, we don't hard police the input arguments to every single function. It's entirely possible to pass a function bad values and get strange results. Just don't do it. ;)\n"
+      }
+    ]
+  },
+  {
+    "number": 461,
+    "title": "difference() behaviour change between 1.1.7 and 1.3.1",
+    "created_at": "2012-02-06T05:50:53Z",
+    "closed_at": "2012-04-02T20:55:09Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/461",
+    "body": "In 1.1.7, difference() seems to identify differences between objects:\n\n```\n_.difference({a: \"b\", c: \"d\", e: \"f\"}, {a: \"b\"})\n[\"d\", \"f\"]\n```\n\nIn 1.3.1, difference() fails to identify differences.  Perhaps it's comparing reference equality rather than value equality now?\n\n```\n_.difference({a: \"b\", c: \"d\", e: \"f\"}, {a: \"b\"})\n[\"b\", \"d\", \"f\"]\n```\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/461/comments",
+    "author": "duncan-bayne",
+    "comments": [
+      {
+        "user": "michaelficarra",
+        "created_at": "2012-02-06T17:34:41Z",
+        "body": "I don't know what kind of undocumented behaviour you were relying upon before, but the documentation for `_.difference` pretty clearly states\n\n> // Take the difference between one array and a number of other arrays.\n> // Only the elements present in just the first array will remain.\n\nand\n\n> Similar to `without`, but returns the values from `array` that are not present in the `other` arrays.\n\nYou're not using arrays or even array-like objects as arguments. Though, admittedly, the code does look generic enough to support arbitrary object difference if we wanted.\n\n```\n_.difference = function(array) {\n  var rest = _.flatten(slice.call(arguments, 1), true);\n  return _.filter(array, function(value){ return !_.include(rest, value); });\n};\n```\n\n`_.flatten`, when called on a list of objects like the ones you are giving it just produces the list of `other`s. `_.filter` is filtering based on the values of the first argument (the three strings you see in your result) and testing if the `other` array contains any of those values. Obviously it doesn't because it contains a bunch of objects, not (in your case) strings. We would have to `_.map` `_.values` over `other`s before flattening.\n\n```\n_.difference = function(array) {\n  var rest = _.flatten(_.map(_.tail(arguments), _.values), true);\n  return _.filter(array, function(value){ return !_.include(rest, value); });\n};\n```\n\nThat should genericise `_.difference`.\n"
+      },
+      {
+        "user": "jashkenas",
+        "created_at": "2012-04-02T20:55:08Z",
+        "body": "I think we should stick with the existing \"array-only\" semantics. Diffing objects opens up a whole can of worms about shallow equality versus deep equality, and representing changes to nested arrays and objects, and we probably don't want to go there.\n"
+      }
+    ]
+  },
+  {
+    "number": 297,
+    "title": "each cannot iterate localStorage",
+    "created_at": "2011-09-21T13:27:29Z",
+    "closed_at": "2011-09-21T21:06:50Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/297",
+    "body": "The issue of testing the length property in **each** has been already discussed, but what is the final decision?\n\nJust to mention that localStorage is not an array but has a (numerical) length property, and therefore cannot be iterated with each.\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/297/comments",
+    "author": "bambax",
+    "comments": [
+      {
+        "user": "jashkenas",
+        "created_at": "2011-09-21T21:06:46Z",
+        "body": "The final decision is that you should iterate `localStorage` yourself, and not rely on `_.each`.\n"
+      }
+    ]
+  },
+  {
+    "number": 181,
+    "title": "Alternative to <%= and %>",
+    "created_at": "2011-04-24T16:46:47Z",
+    "closed_at": "2011-04-24T18:07:57Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/181",
+    "body": "I would like to use Underscore.js templates within a JSP, but cannot figure out a way to prevent JSP from processing the <%= and %>.\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/181/comments",
+    "author": "ghost",
+    "comments": [
+      {
+        "user": "samuelclay",
+        "created_at": "2011-04-24T17:35:30Z",
+        "body": "Does this help? From the docs:\n\n_.templateSettings = {\n  interpolate : /{{(.+?)}}/g\n};\n\nvar template = _.template(\"Hello {{ name }}!\");\ntemplate({name : \"Mustache\"});\n=> \"Hello Mustache!\"\n"
+      }
+    ]
+  },
+  {
+    "number": 88,
+    "title": "Extend nested objects?",
+    "created_at": "2010-12-29T22:57:24Z",
+    "closed_at": "2010-12-30T23:14:08Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/88",
+    "body": "say i have:\n    var a = {\"foo\": { \"bar\":\"baz\" }}\n    var b = {\"foo\": { \"alice\":\"bob\" }}\n    var c = _.extend(a, b) // gives me {\"foo\": { \"alice\":\"bob\" }}\n\nWhat's the best way to make:\n    c = {\"foo\": { \"bar\":\"baz\", \"alice\":\"bob\" }}\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/88/comments",
+    "author": "cly",
+    "comments": [
+      {
+        "user": "jashkenas",
+        "created_at": "2010-12-30T15:13:54Z",
+        "body": "Hmm ... you're looking for a \"deep merge\" sort of function. One trick about that is that Objects within the hash will also be merged instead of replaced. For example:\n\n```\nvar a = {person: new Alice()};\nvar b = {person: new Bob()};\nvar c = deepMerge(a, b);\n```\n\n... now, instead of replacing Alice with Bob, you have some sort of funky Alice-Bob hybrid. I believe that's one of the reasons why this sort of function isn't commonly used.\n\nBut, genetic experimentation aside, let's try to write one anyway.\n\n```\ndeepMerge = function(target, source) {\n  for (var key in source) {\n    var original = target[key];\n    var next = source[key];\n    if (original && next && typeof next == \"object\") {\n      deepMerge(original, next);\n    } else {\n      target[key] = next;\n    }\n  }\n  return target;\n};\n```\n"
+      },
+      {
+        "user": "cly",
+        "created_at": "2010-12-30T21:57:23Z",
+        "body": "This is awesome thanks! Any chance this will make it into _? Hmm, or maybe I can try a different approach.\n\nMy use case is overriding a common config file with an environment's config file. Using log4js, I have nested configs and I have to maintain entire logging configs for each of the environments when all I want to do is override a few parameters.\n\nThe alternative I have is to have a config template with parameters for overridable values. Then I can have flat common, prod, dev config files that replaces those overridable parameters as necessary. This will work with arrays as well whereas deepMerge will not. Hey, I can use _.templates! Cool, i think ill try this approach.\n\nCheers!\n"
+      }
+    ]
+  },
+  {
+    "number": 85,
+    "title": "Uniq/unique returns undefined on an empty array in WebKit on OS X",
+    "created_at": "2010-12-22T04:05:59Z",
+    "closed_at": "2010-12-22T23:11:38Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/85",
+    "body": "Since, Underscore is influenced by Ruby, I figured that unique-ing an empty array would just return an empty array.\n\nIn Ruby 1.8.7:\n\n[].uniq\n=> []\n\nOf course the uniq! method does return a nil on an empty array, but it's a destructive method and Underscore doesn't really have those.\n\nRuby 1.8.7:\n\n[].uniq!\n=> nil\n\nIs undefined the correct output when calling uniq on an empty array or should it just return itself or an empty array?\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/85/comments",
+    "author": "eddorre",
+    "comments": [
+      {
+        "user": "ghost",
+        "created_at": "2010-12-22T06:01:46Z",
+        "body": "Nope, it shouldn't return `undefined`...you mentioned that you're using Prototype 1.6.0.1 alongside Underscore; this is why. Older versions of Prototype redefine `Array#reduce()`, which is required for `uniq` to work correctly (see #84 for a more detailed explanation).\n\nTry removing Prototype and then running `_.uniq([])`. The result should be an empty array.\n"
+      }
+    ]
+  },
+  {
+    "number": 84,
+    "title": "uniq/unique doesn't seem to work in Webkit (Chrome/Safari) on OS X",
+    "created_at": "2010-12-22T03:59:27Z",
+    "closed_at": "2010-12-22T12:08:34Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/84",
+    "body": "I'm using version 1.1.3 and here is a sample from the console:\na\n[1, 2, 1, 3, 1, 4]\na[0]\n1\na[2]\n1\na[0] === a[2]\ntrue\n_.uniq(a);\n[1, 2, 1, 3, 1, 4]\n\nYou'll notice that a[0] and a[2] are equal according to the \"threequals\" operator and according to the documentation, there should only be one \"1\" after unique-ing the array \"a\".\n\nIs there something that I'm doing wrong or is this a bug?\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/84/comments",
+    "author": "eddorre",
+    "comments": [
+      {
+        "user": "ghost",
+        "created_at": "2010-12-22T04:05:35Z",
+        "body": "`_.uniq()` returns a new array; it doesn't mutate the original. Try this:\n\n```\nvar a = [1, 2, 1, 3, 1, 4], b = _.uniq(a);\na; // [1, 2, 1, 3, 1, 4]\nb; // [1, 2, 3, 4]\n```\n"
+      },
+      {
+        "user": "eddorre",
+        "created_at": "2010-12-22T04:09:31Z",
+        "body": "kitgoncharov,\n\nThanks for the quick reply. It doesn't seem to work for me:\n\nThis is output from the WebInspector in Safari:\n\nvar a = [1, 2, 1, 3, 1, 4], b = _.uniq(a);\nundefined\nb\n[1, 2, 1, 3, 1, 4]\na\n[1, 2, 1, 3, 1, 4]\n"
+      },
+      {
+        "user": "eddorre",
+        "created_at": "2010-12-22T04:24:33Z",
+        "body": "kitgoncharov,\n\nStarted taking out JavaScript libraries. Seems to be an incompatibility with an older version of Prototype; 1.6.0.1 to be exact.\n"
+      },
+      {
+        "user": "ghost",
+        "created_at": "2010-12-22T04:35:42Z",
+        "body": "Aha...that's why. Older versions of Prototype define an `Array#reduce()` method that returns the first element of an array if it contains only one element, or the original array if it contains multiple elements. ECMAScript 5, however, defines a separate `Array#reduce()` function that behaves completely differently from Prototype's version (this version of `reduce` is similar to Ruby's `inject`).\n\nUnderscore's `uniq` method uses `reduce` internally, which delegates to the native implementation if available. Unfortunately, it can't distinguish between the native ECMAScript 5 version and the Prototype version, which overrides the former without checking for it.\n\nPrototype 1.6.1 and higher fix this problem; I'd recommend updating to the latest version if you can.\n"
+      },
+      {
+        "user": "ghost",
+        "created_at": "2010-12-22T04:44:32Z",
+        "body": "As a side note, however, it's generally considered bad practice to include multiple JavaScript libraries. Prototype's `Enumerable` module provides iteration functions comparable to Underscore's, so I'd suggest using one or the other. Incidentally, this will also avoid conflicts like these, since Prototype augments native prototypes extensively.\n"
+      }
+    ]
+  },
+  {
+    "number": 26,
+    "title": "Install underscore in npm?",
+    "created_at": "2010-06-14T19:39:03Z",
+    "closed_at": "2010-06-15T03:19:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/underscore/issues/26",
+    "body": "I was creating a new npm package that depends on underscore.js and was wondering if I should list underscore as a dependency, in which case it will need to be installed into npm, or if I should include it in my package?  I see there is a package.json in the root so it seems to me that it might be good to publish it to npm, I didn't see it in the npm list yet.  \n\nThanks,\n\nJohn\n\n(Wanted to label this with a question but can't seem to get the label control to work.)\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/underscore/issues/26/comments",
+    "author": "mrjjwright",
+    "comments": [
+      {
+        "user": "documentcloud",
+        "created_at": "2010-06-14T20:19:06Z",
+        "body": "Hi John.\n\nI've pushed the latest Underscore (1.0.3), up to the npm registry. After running `npm install underscore`, you should be able to use it like so:\n\n```\nvar _ = require('underscore')._\n```\n\nBe careful with the Node REPL, as it overrides _ to mean \"the return value of the last command\". You might want to use a different alias if you're REPL-ing around.\n\nLet me know if it doesn't work for you.\n"
+      }
+    ]
+  }
+]

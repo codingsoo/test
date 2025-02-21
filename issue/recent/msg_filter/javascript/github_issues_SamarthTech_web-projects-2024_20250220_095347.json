@@ -1,0 +1,28 @@
+[
+  {
+    "number": 124,
+    "title": "Contribute my project \"CodeAura\" ",
+    "created_at": "2024-10-11T11:58:46Z",
+    "closed_at": "2024-10-23T16:10:10Z",
+    "labels": [
+      "dino-accepted",
+      "open-odyssey"
+    ],
+    "url": "https://github.com/SamarthTech/web-projects-2024/pull/124",
+    "body": "**CodeAura** is a custom IDE code editor built with the MERN stack for HTML, CSS, and JavaScript development. ",
+    "comments_url": "https://api.github.com/repos/SamarthTech/web-projects-2024/issues/124/comments",
+    "author": "noobrehan18",
+    "comments": [
+      {
+        "user": "darkhorse404",
+        "created_at": "2024-10-13T23:42:14Z",
+        "body": "An innovative idea but\r\n\r\n\ud83d\uded1 Remove the `node_modules` folder. \r\n- This folder is only for environment building locally and **NOT to be pushed on Git or GitHub**\r\n- This can be automated by adding a `.gitignore` file in your project with all such ignored folders and files listed\r\n\r\nAlso Recheck the PR for any other problems"
+      },
+      {
+        "user": "darkhorse404",
+        "created_at": "2024-10-18T21:13:15Z",
+        "body": "The `node_modules` folder is still there. It has to be removed."
+      }
+    ]
+  }
+]

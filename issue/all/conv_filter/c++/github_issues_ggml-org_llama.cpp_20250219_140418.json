@@ -1,0 +1,90 @@
+[
+  {
+    "number": 228,
+    "title": "7B/13B: Inability to write certain words/names with smaller models",
+    "created_at": "2023-03-17T07:46:08Z",
+    "closed_at": "2023-03-17T08:31:37Z",
+    "labels": [
+      "question",
+      "model"
+    ],
+    "url": "https://github.com/ggml-org/llama.cpp/issues/228",
+    "body": "Hey!\r\n\r\nWhen I attempted to tell the bot in a chat-like prompt that my name is \"Nils\", I ran into an issue where the bot kept interpreting my name as \"Nil\" instead. I then noticed further issues with the word \"guild\" and some other words too.\r\nIs this a bug or to be expected? It does not happen on 30B, I couldn't give 65B a try.\r\n\r\nThanks\r\nNiansa",
+    "comments_url": "https://api.github.com/repos/ggml-org/llama.cpp/issues/228/comments",
+    "author": "niansa",
+    "comments": [
+      {
+        "user": "gjmulder",
+        "created_at": "2023-03-17T08:17:19Z",
+        "body": "Larger models are going to perform better. They \"understand\" a wider range of concepts such as the difference between \"niL\" and \"nils\"."
+      },
+      {
+        "user": "niansa",
+        "created_at": "2023-03-17T08:31:37Z",
+        "body": "Alright, that explains it. Thanks!"
+      }
+    ]
+  },
+  {
+    "number": 5745,
+    "title": "build(python): Package scripts with pep-0517 compliance",
+    "created_at": "2024-02-27T06:34:38Z",
+    "closed_at": "2024-07-04T15:39:13Z",
+    "labels": [
+      "help wanted",
+      "build",
+      "script",
+      "refactoring",
+      "examples",
+      "Review Complexity : Low",
+      "python",
+      "devops"
+    ],
+    "url": "https://github.com/ggml-org/llama.cpp/pull/5745",
+    "body": "## Gist\n\nPackages the python scripts in this repo in a PEP 517-compliant way.\nOther changes:\n- Script names had to be converted to snake_case so they could be used as modules via\n  entrypoints declared in `pyproject.toml`.\n\nRef: #5664\n",
+    "comments_url": "https://api.github.com/repos/ggml-org/llama.cpp/issues/5745/comments",
+    "author": "ditsuke",
+    "comments": [
+      {
+        "user": "ditsuke",
+        "created_at": "2024-03-10T16:31:10Z",
+        "body": "Would appreciate a review here. I can rebase to resolve conflicts once a review begins."
+      },
+      {
+        "user": "ggerganov",
+        "created_at": "2024-03-10T16:53:22Z",
+        "body": "Update script names in `ci/run.sh` to use underscores and check other places that might need updates too"
+      },
+      {
+        "user": "ditsuke",
+        "created_at": "2024-07-02T10:36:24Z",
+        "body": "Rebased, resolved conflicts and addressed a minor review point. Requesting review again"
+      },
+      {
+        "user": "ditsuke",
+        "created_at": "2024-07-03T20:00:35Z",
+        "body": "There is again a trivial conflict here. I'll resolve it once the PR is otherwise ready to merge, looking forward to an approval."
+      },
+      {
+        "user": "ditsuke",
+        "created_at": "2024-07-04T15:27:17Z",
+        "body": "Rebased"
+      },
+      {
+        "user": "ditsuke",
+        "created_at": "2024-07-04T16:51:31Z",
+        "body": "Thanks for merging"
+      },
+      {
+        "user": "ggerganov",
+        "created_at": "2024-07-05T04:48:21Z",
+        "body": "@SomeoneSerge We prefer to squash-merge all PRs, even when the individual commits are well organized"
+      },
+      {
+        "user": "SomeoneSerge",
+        "created_at": "2024-07-05T04:59:10Z",
+        "body": "@ggerganov Acknowledged. I rushed a bit to sneak in before new conflicts"
+      }
+    ]
+  }
+]

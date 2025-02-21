@@ -1,0 +1,48 @@
+[
+  {
+    "number": 12,
+    "title": "Add state for \"scrolling to bottom\" ",
+    "created_at": "2025-01-14T02:49:40Z",
+    "closed_at": "2025-01-31T16:36:43Z",
+    "labels": [],
+    "url": "https://github.com/stackblitz-labs/use-stick-to-bottom/issues/12",
+    "body": "I am implementing the ability to stop scrolling when a particular div reaches the top of the viewable area. The stopScroll function is perfect for this. However, I'm finding it would be nice to have a variable that indicates that scrollToBottom is currently executing so if my component re-renders while it's scrolling to the bottom, it doesn't see that my div is outside the scrollable area and stop the scroll. Essentially being able to do:\r\n\r\n```\r\nif(!scrollingToBottom){\r\n   //do logic for stopping scroll\r\n}\r\n```\r\n\r\nThis would also be beneficial for skipping certain actions if the component renders and the initial scroll is executing.",
+    "comments_url": "https://api.github.com/repos/stackblitz-labs/use-stick-to-bottom/issues/12/comments",
+    "author": "Greg-Freeman",
+    "comments": [
+      {
+        "user": "samdenty",
+        "created_at": "2025-01-31T16:36:40Z",
+        "body": "I agree, we have this information in the state object but I thought to hide it as an implementation detail.\n\nI've just published 1.0.46 which adds the `state` object to the return of the `useStickToBottom()` hook and the `StickToBottom` context provider.\n\nYou can read `state.animation` to get the current playing animation, or it'll be `undefined` if none is happening"
+      },
+      {
+        "user": "Greg-Freeman",
+        "created_at": "2025-01-31T17:07:10Z",
+        "body": "> I agree, we have this information in the state object but I thought to hide it as an implementation detail.\n> \n> I've just published 1.0.46 which adds the `state` object to the return of the `useStickToBottom()` hook and the `StickToBottom` context provider.\n> \n> You can read `state.animation` to get the current playing animation, or it'll be `undefined` if none is happening\n\nMakes total sense that you'd defer the exposure of that state. Thanks for knocking this out. I'll check it out when I have a chance."
+      }
+    ]
+  },
+  {
+    "number": 11,
+    "title": "Request for use-stick-to-bottom Support for React 19.0.0",
+    "created_at": "2024-12-30T00:34:04Z",
+    "closed_at": "2025-01-02T01:28:41Z",
+    "labels": [],
+    "url": "https://github.com/stackblitz-labs/use-stick-to-bottom/issues/11",
+    "body": "Hi @samdenty,\r\n\r\nCould you please update `use-stick-to-bottom` to support React 19.0.0? The current version 1.0.42 doesn't meet the peer dependency requirement for this React version.\r\n\r\nThanks!",
+    "comments_url": "https://api.github.com/repos/stackblitz-labs/use-stick-to-bottom/issues/11/comments",
+    "author": "RostyslavManko",
+    "comments": [
+      {
+        "user": "samdenty",
+        "created_at": "2025-01-02T01:28:39Z",
+        "body": "19.0.0 added in 1.0.43, thanks for bringing up! have a good new year!"
+      },
+      {
+        "user": "RostyslavManko",
+        "created_at": "2025-01-02T20:55:35Z",
+        "body": "Thanks. You too."
+      }
+    ]
+  }
+]

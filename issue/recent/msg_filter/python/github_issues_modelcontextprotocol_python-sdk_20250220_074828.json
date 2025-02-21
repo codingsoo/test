@@ -1,0 +1,20 @@
+[
+  {
+    "number": 124,
+    "title": "pip install mcp - Unable to find FastMCP",
+    "created_at": "2025-01-03T09:59:32Z",
+    "closed_at": "2025-01-03T14:39:49Z",
+    "labels": [],
+    "url": "https://github.com/modelcontextprotocol/python-sdk/issues/124",
+    "body": "**Describe the bug**\r\nI installed mcp using pip install mcp. But I see it doesnt have FastMCO installed. Is it not yet released?\r\n",
+    "comments_url": "https://api.github.com/repos/modelcontextprotocol/python-sdk/issues/124/comments",
+    "author": "raolak",
+    "comments": [
+      {
+        "user": "dsp-ant",
+        "created_at": "2025-01-03T14:39:43Z",
+        "body": "FastMCP is still RC1 and will be released today. So this will work tomorrow."
+      }
+    ]
+  }
+]

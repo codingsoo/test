@@ -1,0 +1,71 @@
+[
+  {
+    "number": 111,
+    "title": "Running FastKoko: Error generating speech",
+    "created_at": "2025-02-02T05:02:12Z",
+    "closed_at": "2025-02-02T09:44:19Z",
+    "labels": [],
+    "url": "https://github.com/remsky/Kokoro-FastAPI/issues/111",
+    "body": "**Describe the bug**\nA clear and concise description of what the bug is.\n\n**Screenshots or console output**\nIf applicable, add screenshots to help explain your problem. When doing so., please ensure you have the first command that triggered the trace and/or the command that started up your build included, otherwise it is difficult to diagnose. \n\n**Branch / Deployment used**\nLet us know if it's the master branch, or the stable branch indicated in the readme, as well as if you're running it locally, in the cloud, via the docker compose (cpu or gpu), or direct docker run commands. Please include the exact commands used to run in the latter cases.\n\n**Operating System**\nInclude the platform, version numbers of your docker, etc. Whether its GPU (Nvidia or other) or CPU, Mac, Linux, Windows, etc. \n\n**Additional context**\nAdd any other context about the problem here.\nRunning FastKoko (gpu): Error generating speech: MediaSource.addSourceBuffer: Type not supported in MediaSource\n\nMain branch.\n\nLinux, Mint.\n\nLatest Docker on Linux Mint 22",
+    "comments_url": "https://api.github.com/repos/remsky/Kokoro-FastAPI/issues/111/comments",
+    "author": "noorbeast",
+    "comments": [
+      {
+        "user": "remsky",
+        "created_at": "2025-02-02T09:39:10Z",
+        "body": "I've heard this is an issue with FIrefox and can be resolved for some people by switching to Chrome based (though not always), but have a patch shortly which should be more compatible with any browser"
+      },
+      {
+        "user": "remsky",
+        "created_at": "2025-02-02T09:44:19Z",
+        "body": "Most likely the same as #103 "
+      },
+      {
+        "user": "noorbeast",
+        "created_at": "2025-02-02T09:46:15Z",
+        "body": "> I've heard this is an issue with FIrefox and can be resolved for some people by switching to Chrome based (though not always), but have a patch shortly which should be more compatible with any browser\n\nInstalled Brave and indeed it does seem to be a browser related issue, though yesterday Fast Kokoro was working fine on LibreWolf, I am looking forward to a patch for a long term resolution."
+      }
+    ]
+  },
+  {
+    "number": 43,
+    "title": "GPU image does not use GPU",
+    "created_at": "2025-01-13T12:12:31Z",
+    "closed_at": "2025-01-13T12:53:46Z",
+    "labels": [],
+    "url": "https://github.com/remsky/Kokoro-FastAPI/issues/43",
+    "body": "I am using following image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.0.5post1 with unmodified `docker-compose.yml` from repo.\r\n```\r\nkokoro-tts-1     | INFO:     Started server process [1]\r\nkokoro-tts-1     | INFO:     Waiting for application startup.\r\nkokoro-tts-1     | 11:30:33 AM | INFO     | Loading TTS model and voice packs...\r\nkokoro-tts-1     | 11:30:33 AM | INFO     | CUDA available: False\r\nkokoro-tts-1     | 11:30:33 AM | INFO     | Initializing model on cpu\r\n```\r\n\r\nImage runs as `appuser` instead of root and on linux you need to be in proper group to use NVIDIA driver (even when using nvidia-container-toolkit).\r\n```\r\ndevilan@darkstar:~/git/Kokoro-FastAPI (master) $ docker exec -it b5ed10b82d7f /bin/bash\r\nappuser@b5ed10b82d7f:/app$ nvidia-smi \r\nFailed to initialize NVML: Insufficient Permissions\r\n```\r\n\r\nYou should at least point this out clearly in README if this app should not work as root user.\r\nThere are some methods to resolve this problem, but each of them compromises system a bit.\r\nYou can chmod 666 /dev/nvidia* so no access restriction for this device (but not everyone would like to do so).",
+    "comments_url": "https://api.github.com/repos/remsky/Kokoro-FastAPI/issues/43/comments",
+    "author": "DevilaN",
+    "comments": [
+      {
+        "user": "remsky",
+        "created_at": "2025-01-13T12:53:46Z",
+        "body": "Hey @DevilaN. Thanks for the info. I'm not seeing that issue, though as mentioned in the readme, it's only been tested on Windows 11 w/WSL2 and the HuggingFace A100's for CUDA support + a Mac M3 for CPU (also may require a build from source for arm compatibility, though looking to add the multiplatform image shortly)\r\n\r\nAdded a note in the readme for linux users with this issue, feel free to modify it with a PR with any brief specifics I miss, so they can build from source with the config they'd want. \r\n\r\nbfe2dd522f5eef196973c2c95a0416bc314f17e4"
+      },
+      {
+        "user": "DevilaN",
+        "created_at": "2025-01-13T13:21:06Z",
+        "body": "Nice!\r\nThere might be a little catch with `add_group:` for users.\r\nIf numerical group id exists in container it is not added, so for me `video` group is the proper one on Gentoo. But it has id: 27 which is also id of `sudo` group inside image `/etc/groups`. Only when I specify id of group instead of it's name it is working great.\r\n\r\nOf course different systems / distros have different permissions / id's so there is no one proper way of doing this.\r\n\r\nIt might be worth mentioning that instead of tinkering with `docker-compose.yml` file it might be better to create `docker-compose.override.yml` and place changes there, so it will not conflict with further repo pulling.\r\n\r\nThank you for your support!"
+      }
+    ]
+  },
+  {
+    "number": 20,
+    "title": "Failed to run in docker wsl",
+    "created_at": "2025-01-10T17:47:56Z",
+    "closed_at": "2025-01-10T17:52:54Z",
+    "labels": [],
+    "url": "https://github.com/remsky/Kokoro-FastAPI/issues/20",
+    "body": "Trying to run it on docker on wsl and I keep getting this error:\r\n``` bash\r\nkokoro-fastapi-kokoro-tts-1     | ERROR:    Traceback (most recent call last):\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/usr/local/lib/python3.10/dist-packages/starlette/routing.py\", line 693, in lifespan\r\nkokoro-fastapi-kokoro-tts-1     |     async with self.lifespan_context(app) as maybe_state:\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/usr/lib/python3.10/contextlib.py\", line 199, in __aenter__\r\nkokoro-fastapi-kokoro-tts-1     |     return await anext(self.gen)\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/usr/local/lib/python3.10/dist-packages/fastapi/routing.py\", line 133, in merged_lifespan\r\nkokoro-fastapi-kokoro-tts-1     |     async with original_context(app) as maybe_original_state:\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/usr/lib/python3.10/contextlib.py\", line 199, in __aenter__\r\nkokoro-fastapi-kokoro-tts-1     |     return await anext(self.gen)\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/usr/local/lib/python3.10/dist-packages/fastapi/routing.py\", line 133, in merged_lifespan\r\nkokoro-fastapi-kokoro-tts-1     |     async with original_context(app) as maybe_original_state:\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/usr/lib/python3.10/contextlib.py\", line 199, in __aenter__\r\nkokoro-fastapi-kokoro-tts-1     |     return await anext(self.gen)\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/app/api/src/main.py\", line 52, in lifespan\r\nkokoro-fastapi-kokoro-tts-1     |     voicepack_count = await TTSModel.setup()\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/app/api/src/services/tts_base.py\", line 46, in setup\r\nkokoro-fastapi-kokoro-tts-1     |     os.makedirs(cls.VOICES_DIR, exist_ok=True)\r\nkokoro-fastapi-kokoro-tts-1     |   File \"/usr/lib/python3.10/os.py\", line 225, in makedirs\r\nkokoro-fastapi-kokoro-tts-1     |     mkdir(name, mode)\r\nkokoro-fastapi-kokoro-tts-1     | PermissionError: [Errno 13] Permission denied: '/app/api/src/voices'\r\nkokoro-fastapi-kokoro-tts-1     |\r\nkokoro-fastapi-kokoro-tts-1     | ERROR:    Application startup failed. Exiting.\r\nkokoro-fastapi-kokoro-tts-1 exited with code 3\r\n```\r\n\r\nThe model-fetcher and gradio-ui containers seem to be running fine but the kokoro-tts container crashes as soon as it starts.\r\nAlso in gradio, I just see a message saying \"TTS service: Waiting for service...\"",
+    "comments_url": "https://api.github.com/repos/remsky/Kokoro-FastAPI/issues/20/comments",
+    "author": "ronneldavis",
+    "comments": [
+      {
+        "user": "lsnch",
+        "created_at": "2025-01-14T04:41:30Z",
+        "body": "had the same issue on arch.\r\nreconnected ssh, restarted tmux = resolved. \r\nit was probably permissions at some level, even though i was root."
+      }
+    ]
+  }
+]

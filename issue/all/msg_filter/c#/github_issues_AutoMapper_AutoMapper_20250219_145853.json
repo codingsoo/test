@@ -1,0 +1,147 @@
+[
+  {
+    "number": 3545,
+    "title": "Mapping with a constructor doesn't work if a target property is mapped using MapFrom",
+    "created_at": "2020-12-10T17:26:35Z",
+    "closed_at": "2020-12-10T17:47:03Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3545",
+    "body": "### Source/destination types\r\n\r\n```csharp\r\nrecord Foo(int Id, string Name, string Description);\r\n\r\nrecord FooDto(int Id, string Name, string Text);\r\n```\r\n\r\n(I'm using records here, but I don't think it matters)\r\n\r\n### Mapping configuration\r\n\r\n```csharp\r\n    var mapper = new MapperConfiguration(cfg =>\r\n    {\r\n        cfg.CreateMap<Foo, FooDto>()\r\n            .ForMember(dto => dto.Text, o => o.MapFrom(f => f.Description));\r\n    }).CreateMapper();\r\n```\r\n\r\n### Version: 10.1.1\r\n\r\n### Expected behavior\r\n\r\nShould map successfully\r\n\r\n### Actual behavior\r\n\r\n> **ArgumentException**: FooDto needs to have a constructor with 0 args or only optional args. (Parameter 'type')\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\n    var foo = new Foo(123, \"hello\", \"test\");\r\n    var dto = mapper.Map<FooDto>(foo);\r\n```\r\n\r\n### Additional remarks\r\n\r\nIt works fine if `FooDto.Text` is renamed to `Description` and I remove the `ForMember(... MapFrom(...))` configuration, so I'm pretty sure that's what causing the problem.",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3545/comments",
+    "author": "thomaslevesque",
+    "comments": [
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-12-10T17:47:03Z",
+        "body": "You need `ForCtorParam`."
+      }
+    ]
+  },
+  {
+    "number": 3407,
+    "title": "DuplicateTypeMapConfigurationException due to MapperConfigurationExpression.AddMap(IEnumerable<Type>)",
+    "created_at": "2020-05-06T17:12:04Z",
+    "closed_at": "2020-05-06T18:56:50Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3407",
+    "body": "I have multiple assemblies and each has multiple types derived from `AutoMapper.Profile` so that mappings are nicely organized.\r\n\r\nWhen creating the `MapperConfiguration` I used the `AddMaps(IEnumerable<Type>)` overload and passed all those derived types that are available in the current `AppDomain`.\r\n\r\nThen calling `AssertConfigurationIsValid()` throws `DuplicateTypeMapConfigurationException`.\r\n\r\n### Mapping configuration\r\n\r\n```csharp\r\npublic class DependencyModule : Module\r\n{\r\n    protected override void Load(ContainerBuilder builder)\r\n    {\r\n        // Here we collect all types that are\r\n        // - derived from AutoMapper.Profile and\r\n        // - loaded into the current AppDomain.\r\n        IEnumerable<Type> profileTypes = GetAutoMapperProfileTypes();\r\n\r\n        var mapperConfiguration =\r\n            new MapperConfiguration(\r\n                config =>\r\n                {\r\n                    config.AllowNullCollections = true;\r\n                    config.AddMaps(profileTypes);\r\n                }\r\n            );\r\n\r\n        // This throws DuplicateTypeMapConfigurationException.\r\n        mapperConfiguration.AssertConfigurationIsValid();\r\n\r\n        IMapper mapper = mapperConfiguration.CreateMapper();\r\n\r\n        builder.RegisterInstance(mapper);\r\n    }\r\n}\r\n```\r\n\r\n### Version: 8.1.1\r\n\r\n### Expected behavior\r\n\r\nThe expected behavior is `DuplicateTypeMapConfigurationException` not to be thrown.\r\n\r\n### Actual behavior\r\n\r\n`DuplicateTypeMapConfigurationException` was thrown and based on the exception message it seemed that the same assembly is loaded exactly `n` times where `n` is the number of types derived from `AutoMapper.Profile` in that specific assembly.\r\n\r\nIf skipping `mapperConfiguration.AssertConfigurationIsValid();` then no `Exception` is thrown.\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\n    private IEnumerable<Type> GetAutoMapperProfileTypes()\r\n    {\r\n        return new Type[]\r\n        {\r\n            typeof(CustomProfile1),\r\n            typeof(CustomProfile2)\r\n        };\r\n    }\r\n    \r\n    public class Entity1 { }\r\n    \r\n    public class Entity2 { }\r\n    \r\n    public class Model1 { }\r\n    \r\n    public class Model2 { }\r\n    \r\n    public class CustomProfile1 : AutoMapper.Profile\r\n    {\r\n        public CustomProfile1()\r\n        {\r\n            CreateMap<Entity1, Model1>();\r\n        }\r\n    }\r\n    \r\n    public class CustomProfile2 : AutoMapper.Profile\r\n    {\r\n        public CustomProfile2()\r\n        {\r\n            CreateMap<Entity2, Model2>();\r\n        }\r\n    }\r\n\r\n```\r\n\r\n### Suggested change\r\n\r\nChange `MapperConfigurationExpression.cs` as below:\r\n\r\nIn `AddMaps(IEnumerable<Type>)` method call `.Distinct()` after calling `.Select()`.\r\n\r\nSimilarly in `AddMapsCore(IEnumerable<Assembly>)` method call `.Distinct()` in between `.Where()` and `.SelectMany()`.\r\n\r\n### Remarks\r\n\r\nAs for `AddMaps(IEnumerable<Type>)` I might misused/misunderstood it but it might not be 100% obvious that to you should pass *only one type per assembly*. Otherwise, you risk `DuplicateTypeMapConfigurationException` to be thrown.\r\n\r\nAdding the above suggested `.Distinct()` calls help avoid `DuplicateTypeMapConfigurationException` that I think is worth thinking about.\r\n\r\nIf you like this idea then I would happily make this minor change.",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3407/comments",
+    "author": "gcsizmadia",
+    "comments": [
+      {
+        "user": "jbogard",
+        "created_at": "2020-05-06T17:16:26Z",
+        "body": "Why are you adding the same assembly multiple times? It seems that you can call `Distinct` on your side before calling into AutoMapper.\r\n\r\nI don't like our code making those sorts of assumptions."
+      },
+      {
+        "user": "gcsizmadia",
+        "created_at": "2020-05-06T17:24:23Z",
+        "body": "I don't add the same assembly multiple times. \r\n\r\nI add different types derived from `AutoMapper.Profile` that are in the same assembly hence your `AddMaps(IEnumerable<Type>)` overload selects the same assembly multiple times in the 74th line:\r\n`.Select(t => t.GetTypeInfo().Assembly)`"
+      },
+      {
+        "user": "jbogard",
+        "created_at": "2020-05-06T17:28:20Z",
+        "body": "Oh, don't do that. Those types you pass in are types to match assemblies.\r\n\r\n@lbargaoanu I wonder if this is more confusing than helpful, should we only have methods that accept Assembly objects? It'll just force you to do `typeof(MyProfile).Assembly`."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-05-06T17:37:05Z",
+        "body": "A lot of things can be confusing :) I vote to keep them. I'm sure I've seen this in some other library and I would guess it's pretty useful."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-05-06T17:42:07Z",
+        "body": "The name of the parameter seems well chosen to me. But I guess we could rename it if there's a better idea."
+      },
+      {
+        "user": "jbogard",
+        "created_at": "2020-05-06T17:45:30Z",
+        "body": "\"MarkerTypesForAssembliesButOnlyOneMarkerTypePerAssemblyPlease\""
+      },
+      {
+        "user": "gcsizmadia",
+        "created_at": "2020-05-06T17:46:28Z",
+        "body": "I suspected I misunderstood the purpose of that method. :)\r\n\r\nAs for me I now use the `AddMaps(IEnumerable<Assembly>)` overload and it works well.\r\n\r\nRegarding the subject I'd suggest\r\n- either extending the XML comment for that method to make it clear(er) - should pass only one type per assembly!\r\n- or adding that `.Distinct()` call as a guard\r\n\r\nThe parameter name could remain as it is now."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-05-06T18:56:50Z",
+        "body": "About the docs, a PR is welcome."
+      }
+    ]
+  },
+  {
+    "number": 3190,
+    "title": "Breaking change between v8.1.0 and v8.1.1 when mapping to a dictionary",
+    "created_at": "2019-08-12T17:42:02Z",
+    "closed_at": "2019-08-12T17:53:23Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3190",
+    "body": "Hello,\r\n\r\nI meant to post this a while ago when 8.1.1 was released but I got caught up in things at work so I never got a chance. I'm not sure if this was an intentional breaking change or not, but there was a breaking change in 8.1.1 when mapping from a collection of Key/Values to a Dictionary (the Key/Value type is not `KeyValuePair` because it is an EF entity).\r\n\r\n### Expected behavior\r\nIn 8.1.0 of AutoMapper, this mapping worked without any issues. It would map the Key/Values into the Dictionary.\r\n\r\n### Actual behavior\r\nIn 8.1.1, the following error is thrown:\r\n\r\n```\r\nAutoMapperMappingException: Error mapping types.\r\n\r\nMapping types:\r\nOrder -> OrderModel\r\nUserQuery+Order -> UserQuery+OrderModel\r\n\r\nType Map configuration:\r\nOrder -> OrderModel\r\nUserQuery+Order -> UserQuery+OrderModel\r\n\r\nDestination Member:\r\nAttributes\r\n```\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\nvoid Main()\r\n{\r\n    var services = new ServiceCollection();\r\n    services.AddAutoMapper(this.GetType().Assembly);\r\n    \r\n    using var root = services.BuildServiceProvider();\r\n    var mapper = root.GetRequiredService<IMapper>();\r\n    \r\n    var model = mapper.Map<OrderModel>(new Order\r\n    {\r\n        OrderNumber = \"PO1001\",\r\n        Attributes =\r\n        {\r\n            new Order.Attribute { Key = \"Key1\", Value = \"Value1\" },\r\n            new Order.Attribute { Key = \"Key2\", Value = \"Value2\" },\r\n        }\r\n    });\r\n}\r\n\r\npublic class Order\r\n{\r\n    public String OrderNumber { get; set; }\r\n    public ICollection<Attribute> Attributes { get; set; } = new HashSet<Attribute>();\r\n\r\n    public class Attribute\r\n    {\r\n        public String Key { get; set; }\r\n        public String Value { get; set; }\r\n    }\r\n}\r\n\r\npublic class OrderModel\r\n{\r\n    public String OrderNumber { get; set; }\r\n    public IDictionary<String, String> Attributes { get; set; } = new Dictionary<String, String>();\r\n}\r\n\r\npublic class Profile : AutoMapper.Profile\r\n{\r\n    public Profile()\r\n    {\r\n        this.CreateMap<Order, OrderModel>();\r\n    }\r\n}\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3190/comments",
+    "author": "ChristopherHaws",
+    "comments": [
+      {
+        "user": "ChristopherHaws",
+        "created_at": "2019-08-12T18:06:57Z",
+        "body": "@lbargaoanu This issue still occurs in v9."
+      },
+      {
+        "user": "jbogard",
+        "created_at": "2019-08-14T12:46:00Z",
+        "body": "The `Order.Attribute` type is unknown to AutoMapper. Previously, we would create dynamic maps on the fly. We turned that off, then removed dynamic maps, since you could have misspelled or changed the `Order.Attribute` type and your mapping would silently skip those properties.\r\n\r\nYou need to create a map from your custom type to the KeyValuePair type:\r\n\r\n```c#\r\npublic class Profile : AutoMapper.Profile\r\n{\r\n    public Profile()\r\n    {\r\n        this.CreateMap<Order, OrderModel>();\r\n        this.CreateMap<Order.Attribute, KeyValuePair<string, string>>();\r\n    }\r\n}\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 3166,
+    "title": "Mapping fails to recognize existing constructor parameters",
+    "created_at": "2019-07-12T21:41:49Z",
+    "closed_at": "2019-07-12T22:18:20Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3166",
+    "body": "### Source/destination types\r\n\r\n```csharp\r\nSrc: \r\n public class UserClaim : AuditableEntity\r\n    {\r\n        [Key]\r\n        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]\r\n        public int UserClaimId { get; set; }\r\n\r\n        [Required]\r\n        public int UserId { get; set; }\r\n\r\n        [Required]\r\n        [ForeignKey(\"ClaimType\")]\r\n        public ClaimTypeEnum ClaimTypeId { get; set; }\r\n        \r\n        [Required]\r\n        public ClaimType ClaimType { get; set; }\r\n\r\n        [Required]\r\n        [MaxLength(50)]\r\n        public string ClaimValue { get; set; }\r\n    }\r\n}\r\npublic class ClaimType : AuditableEntity\r\n    {\r\n        [Key]\r\n        public ClaimTypeEnum ClaimTypeId { get; set; }\r\n        public string ClaimTypeName { get; set; }\r\n    }\r\nDest: System.Security.Claims.Claim\r\n\r\n\r\npublic class Claim\r\n    {\r\n        ...\r\n        //\r\n        // Summary:\r\n        //     Initializes a new instance of the System.Security.Claims.Claim class with the\r\n        //     specified claim type, and value.\r\n        //\r\n        // Parameters:\r\n        //   type:\r\n        //     The claim type.\r\n        //\r\n        //   value:\r\n        //     The claim value.\r\n        //\r\n        // Exceptions:\r\n        //   T:System.ArgumentNullException:\r\n        //     type or value is null.\r\n        public Claim(string type, string value);\r\n...\r\n\r\n```\r\n\r\n### Mapping configuration\r\n\r\n```csharp\r\nAutoMapper.Mapper.Initialize(config =>\r\n            {\r\n                config.CreateMap<UserClaim, Claim>()\r\n                .ForCtorParam(\"value\", opt => opt.MapFrom(src => src.ClaimValue))\r\n                .ForCtorParam(\"type\", opt => opt.MapFrom(src => src.ClaimType.ClaimTypeName));\r\n            });\r\n```\r\n\r\n### Version: 8.0.0\r\n\r\n### Expected behavior\r\n\r\nsuccessfully map?\r\n\r\n### Actual behavior\r\n\r\n\r\nException has occurred: CLR/AutoMapper.AutoMapperConfigurationException\r\nAn exception of type 'AutoMapper.AutoMapperConfigurationException' occurred in AutoMapper.dll but was not handled in user code: 'Claim does not have a constructor with a parameter named 'value'.\r\nSystem.Security.Claims.Claim'\r\n   at AutoMapper.CtorParamConfigurationExpression`1.Configure(TypeMap typeMap)\r\n   at AutoMapper.Configuration.MappingExpression`2.Configure(TypeMap typeMap)\r\n   at AutoMapper.ProfileMap.BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)\r\n   at AutoMapper.ProfileMap.Register(IConfigurationProvider configurationProvider)\r\n   at AutoMapper.MapperConfiguration.Seal()\r\n   at AutoMapper.MapperConfiguration..ctor(MapperConfigurationExpression configurationExpression)\r\n   at AutoMapper.MapperConfiguration..ctor(Action`1 configure)\r\n   at AutoMapper.Mapper.Initialize(Action`1 config)\r\n   at Wellspring.Eqp.Api.Startup.SetUpAutoMapper() in /home/brian/clients/walsh/eqp-api/src/Wellspring.Eqp.Api/Startup.cs:line 362\r\n   at Wellspring.Eqp.Api.Startup.Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger`1 logger) in /home/brian/clients/walsh/eqp-api/src/Wellspring.Eqp.Api/Startup.cs:line 241\r\n   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)\r\n   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)\r\n   at Microsoft.AspNetCore.Hosting.Internal.ConfigureBuilder.Invoke(Object instance, IApplicationBuilder builder)\r\n   at Microsoft.AspNetCore.Hosting.Internal.ConfigureBuilder.<>c__DisplayClass4_0.<Build>b__0(IApplicationBuilder builder)\r\n   at Microsoft.AspNetCore.Hosting.Internal.GenericWebHostBuilder.<>c__DisplayClass13_0.<UseStartup>b__2(IApplicationBuilder app)\r\n   at Microsoft.AspNetCore.Mvc.Filters.MiddlewareFilterBuilderStartupFilter.<>c__DisplayClass0_0.<Configure>g__MiddlewareFilterBuilder|0(IApplicationBuilder builder)\r\n   at Microsoft.AspNetCore.HostFilteringStartupFilter.<>c__DisplayClass0_0.<Configure>b__0(IApplicationBuilder app)\r\n   at Microsoft.AspNetCore.Hosting.Internal.GenericWebHostService.<StartAsync>d__31.MoveNext()\r\n",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3166/comments",
+    "author": "WellspringCS",
+    "comments": [
+      {
+        "user": "spydacarnage",
+        "created_at": "2019-07-12T21:57:20Z",
+        "body": "Due to the way that constructor mapping currently works, your source object must contain all the properties contained in the destination constructor.\r\n\r\nThere is currently an active PR (#3160) to resolve this issue, but in the meantime, you can create a dummy parameter (`public object Value => null;`) in `UserClaim` and it should work."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2019-07-13T06:35:42Z",
+        "body": "There is no need for that. You can use `ConstructUsing` or optional parameters. Or just take advantage of the naming convention:\r\n\r\n  \tpublic Claim(string claimValue, string claimTypeClaimTypeName)\r\n"
+      }
+    ]
+  },
+  {
+    "number": 3125,
+    "title": "Problem with mapping if the maps are in separate classes",
+    "created_at": "2019-06-17T12:01:03Z",
+    "closed_at": "2019-06-17T12:55:23Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3125",
+    "body": "AutoMapper versions: 8.1.1\r\nThe previous version worked!\r\n\r\nLet's look at the code below:\r\n\r\n```\r\n    public class A\r\n    {\r\n        public int P1 { get; set; }\r\n    }\r\n\r\n    public class B\r\n    {\r\n        public int P1 { get; set; }\r\n    }\r\n\r\n    public class C\r\n    {\r\n        public List<A> List { get; set; }\r\n    }\r\n\r\n    public class D\r\n    {\r\n        public List<B> List { get; set; }\r\n    }\r\n\r\n    public sealed class C_To_D : MapperConfigurationExpression\r\n    {\r\n        public C_To_D()\r\n        {\r\n             // \u2193 it would work \u2193\r\n            //CreateMap<A, B>()\r\n            //    .ForMember(_ => _.P1, _ => _.MapFrom(v => v.P1));\r\n\r\n            CreateMap<C, D>()\r\n                .ForMember(_ => _.List, _ => _.MapFrom(v => v.List));\r\n        }\r\n    }\r\n\r\n    public sealed class A_To_B : MapperConfigurationExpression\r\n    {\r\n        public A_To_B()\r\n        {\r\n             // \u2193 it does not work \u2193\r\n            CreateMap<A, B>()\r\n                .ForMember(_ => _.P1, _ => _.MapFrom(v => v.P1));\r\n        }\r\n    }\r\n```\r\nIf the map from A to B is in a separate class then:\r\n\r\n**Message: AutoMapper.AutoMapperConfigurationException : The following member on ...D cannot be mapped: \r\n\tList \r\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type ...D.\r\nContext:\r\n\tMapping to member List from ...C to ...D\r\nException of type 'AutoMapper.AutoMapperConfigurationException' was thrown.**\r\n\r\nThe project is so large that it is impossible to have maps in this way. Please help.",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3125/comments",
+    "author": "Tomaszczubaszek",
+    "comments": [
+      {
+        "user": "jbogard",
+        "created_at": "2019-06-17T12:33:33Z",
+        "body": "Why are your classes inheriting from `MapperConfigurationExpression`? That's the class that performs configuration once for the entire mapper.\r\n\r\nTypically you use `Profile` classes to segregate configuration."
+      }
+    ]
+  }
+]

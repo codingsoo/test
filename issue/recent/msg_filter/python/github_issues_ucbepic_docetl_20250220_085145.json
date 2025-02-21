@@ -1,0 +1,20 @@
+[
+  {
+    "number": 172,
+    "title": "AttributeError: 'Console' object has no attribute 'post_optimizer_status'",
+    "created_at": "2024-11-13T17:37:21Z",
+    "closed_at": "2024-11-14T05:59:12Z",
+    "labels": [],
+    "url": "https://github.com/ucbepic/docetl/issues/172",
+    "body": "when i use this , pipeline = pipeline.optimize(model=\"gpt-4o-mini\")\r\nit gives me this error",
+    "comments_url": "https://api.github.com/repos/ucbepic/docetl/issues/172/comments",
+    "author": "sarveshshh8",
+    "comments": [
+      {
+        "user": "shreyashankar",
+        "created_at": "2024-11-13T18:38:19Z",
+        "body": "Ah this was a bug we fixed a week ago; any chance you need to rebase your fork?"
+      }
+    ]
+  }
+]

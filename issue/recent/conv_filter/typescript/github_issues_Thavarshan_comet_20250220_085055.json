@@ -1,0 +1,52 @@
+[
+  {
+    "number": 55,
+    "title": "Why doesn't your program show the logo?",
+    "created_at": "2024-11-11T22:31:46Z",
+    "closed_at": "2025-02-17T04:59:08Z",
+    "labels": [],
+    "url": "https://github.com/Thavarshan/comet/issues/55",
+    "body": "Why does your program not show the logo in the program removal application?",
+    "comments_url": "https://api.github.com/repos/Thavarshan/comet/issues/55/comments",
+    "author": "asdefasdf",
+    "comments": [
+      {
+        "user": "AzielCF",
+        "created_at": "2024-12-03T04:26:06Z",
+        "body": "@Thavarshan must modify the iconUrl value of the Squirrel maker for it to work. The current URL is just a GitHub URL that does not show the image. The maintainer should upload the image to Cloudinary, for example, and place the URL, and that would fix it.\r\n"
+      },
+      {
+        "user": "Thavarshan",
+        "created_at": "2024-12-03T06:35:35Z",
+        "body": "Thanks for the tip. Much appreciated!"
+      }
+    ]
+  },
+  {
+    "number": 49,
+    "title": "File is damaged and cant be opened M3 Pro Macos Sonoma",
+    "created_at": "2024-11-02T11:51:06Z",
+    "closed_at": "2024-11-04T14:14:14Z",
+    "labels": [
+      "documentation",
+      "help wanted",
+      "question"
+    ],
+    "url": "https://github.com/Thavarshan/comet/issues/49",
+    "body": "tried the last 3 versions, none of them worked and show as damaged",
+    "comments_url": "https://api.github.com/repos/Thavarshan/comet/issues/49/comments",
+    "author": "DerpcatMusic",
+    "comments": [
+      {
+        "user": "Thavarshan",
+        "created_at": "2024-11-02T18:05:44Z",
+        "body": "Hiya @DerpcatMusic! sorry for the late response. \r\n\r\nYeah this issue happens because Apple has increased restriction with Gatekeeper on the newer versions of MacOS. Luckily, there is a way to still make it work.\r\n\r\n1. **Open Terminal**:\r\n   - You can open Terminal from the Applications > Utilities folder, or press `Cmd + Space`, type \"Terminal,\" and hit Enter.\r\n\r\n2. **Navigate to the App Location**:\r\n   - Use the `cd` command to go to the folder where your app is located. For example, if the app is in the Downloads folder, you would type:\r\n     ```bash\r\n     cd ~/Downloads\r\n     ```\r\n\r\n3. **Remove the Quarantine Attribute**:\r\n   - Run the following command, replacing `Comet.app` with the actual name of your app:\r\n     ```bash\r\n     xattr -d com.apple.quarantine Comet.app\r\n     ```\r\n   - This removes the quarantine flag that macOS automatically sets on downloaded applications, which is what blocks it from opening.\r\n\r\n4. **Open the App**:\r\n   - Now that the quarantine attribute has been removed, you should be able to open the app by double-clicking it in Finder.\r\n\r\n#### Alternative: If You\u2019re Using a Path\r\n\r\nIf your app is in a custom location or has spaces in the name, you may want to use the full path. Here\u2019s an example:\r\n```bash\r\nxattr -d com.apple.quarantine \"~/Downloads/Comet.app\"\r\n```\r\n\r\n### Verification\r\n\r\nYou can check if the quarantine attribute was successfully removed by running:\r\n```bash\r\nxattr Comet.app\r\n```\r\nIf `com.apple.quarantine` no longer appears in the output, the quarantine flag has been successfully removed. \r\n\r\nLet me know if you run into any more issues!"
+      },
+      {
+        "user": "DerpcatMusic",
+        "created_at": "2024-11-03T09:27:28Z",
+        "body": "Thank you I really appreciate it! Would be great to add it in the document of comet incase it's not there :)\r\n\r\nBest,\r\nDaniel Elmaliah.\r\nOn Nov 2, 2024 at 8:06\u202fPM +0200, Jerome Thayananthajothy ***@***.***>, wrote:\r\n> Hiya @DerpcatMusic! sorry for the late response.\r\n> Yeah this issue happens because Apple has increased restriction with Gatekeeper on the enwer versions of MacOS. Luckily, there is a way to still make it work.\r\n>\r\n> 1. > Open Terminal:\r\n>     \u2022 You can open Terminal from the Applications > Utilities folder, or press Cmd + Space, type \"Terminal,\" and hit Enter.\r\n> 2. > Navigate to the App Location:\r\n>     \u2022 Use the cd command to go to the folder where your app is located. For example, if the app is in the Downloads folder, you would type:\r\n> cd ~/Downloads\r\n> 3. > Remove the Quarantine Attribute:\r\n>     \u2022 Run the following command, replacing Comet.app with the actual name of your app:\r\n> xattr -d com.apple.quarantine Comet.app\r\n>     \u2022 This removes the quarantine flag that macOS automatically sets on downloaded applications, which is what blocks it from opening.\r\n> 4. > Open the App:\r\n>     \u2022 Now that the quarantine attribute has been removed, you should be able to open the app by double-clicking it in Finder.\r\n>\r\n> Alternative: If You\u2019re Using a Path\r\n> If your app is in a custom location or has spaces in the name, you may want to use the full path. Here\u2019s an example:\r\n> xattr -d com.apple.quarantine \"~/Downloads/Comet.app\"\r\n> Verification\r\n> You can check if the quarantine attribute was successfully removed by running:\r\n> xattr Comet.app\r\n> If com.apple.quarantine no longer appears in the output, the quarantine flag has been successfully removed.\r\n> Let me know if you run into any more issues!\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub, or unsubscribe.\r\n> You are receiving this because you were mentioned.Message ID: ***@***.***>\r\n"
+      }
+    ]
+  }
+]

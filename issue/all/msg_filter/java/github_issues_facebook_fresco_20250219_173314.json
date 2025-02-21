@@ -1,0 +1,119 @@
+[
+  {
+    "number": 2422,
+    "title": "animated-gif package breaks downloadable gifs with rounding",
+    "created_at": "2019-10-18T16:19:03Z",
+    "closed_at": "2019-11-12T11:55:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/facebook/fresco/issues/2422",
+    "body": "### Description\r\n\r\nI'm using **com.facebook.fresco:fresco** and **com.facebook.fresco:animated-gif** for show animated gif.\r\nI load a gif image (non animated) from the Internet and apply **RoundingParams**.  \r\nI expect to see round image, but I get square.\r\nGifs from app resources work fine.\r\nI need **animated-gif** package for animation, but how to disable it for non animated gifs?\r\n\r\n### Reproduction\r\n\r\nIf enable **animated-gif** package then **RoundingParams** will broken but animation will worked fine.\r\n\r\n### Solution\r\n\r\nDisabling **animated-gif** package resolve problem, but all animated gifs break.\r\n\r\n### Additional Information\r\n\r\n* Fresco version: 2.0.0\r\n* animated-gif: 2.0.0\r\n* Platform version: any device\r\n",
+    "comments_url": "https://api.github.com/repos/facebook/fresco/issues/2422/comments",
+    "author": "ilyamuromets",
+    "comments": [
+      {
+        "user": "oprisnik",
+        "created_at": "2019-11-12T11:19:09Z",
+        "body": "Hey! How can we reproduce the issue? Can you give us some sample code? Rounding for GIFs is currently not supported."
+      },
+      {
+        "user": "ilyamuromets",
+        "created_at": "2019-11-12T11:44:34Z",
+        "body": "@oprisnik The problem is in use **fresco**'s and **animated-gif**'s dependencies at the same time.\r\nI use fresco for show user photo which is one-frame gif without animation and round it in user list. And I use fresco for show animated gifs. Both (user photo and funny gifs) are loading from the Internet. But with **animated-gif** fresco doesn't round user photo gif.\r\nI can create demo project for you during several days."
+      },
+      {
+        "user": "oprisnik",
+        "created_at": "2019-11-12T11:55:41Z",
+        "body": "Oh, that explains the issue.\r\nWhen you include animated-gif, we'll use the animated GIF decoder for the image, which does not support rounding. For a single frame GIF, the system can decode a static image (which is happening when you don't have animated-gif).\r\n\r\nThe solution to this problem is to supply this method:\r\n\r\n```java\r\nImageDecodeOptions options = ImageDecodeOptions.newBuilder().setForceStaticImage(true).build();\r\n// Pass the options to the Drawee view via a DraweeController\r\ndraweeControllerBuilder.setImageRequest(\r\n          ImageRequestBuilder.newBuilderWithSource(uri)\r\n              .setImageDecodeOptions(options)\r\n              .build());\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1863,
+    "title": "How to set loopcount for AnimatedImage after v1.4.0?",
+    "created_at": "2017-08-11T03:04:18Z",
+    "closed_at": "2017-08-16T10:17:04Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/facebook/fresco/issues/1863",
+    "body": "Now I aim to play a gif image 5 time.\r\nAnd I found there is  a method getLoopCount for get the number of loops for a  animatedImage, \r\nbut the question is I don't know how to dynamic set loopCount.\r\nWaiting for your help.",
+    "comments_url": "https://api.github.com/repos/facebook/fresco/issues/1863/comments",
+    "author": "zewenwang",
+    "comments": [
+      {
+        "user": "oprisnik",
+        "created_at": "2017-08-16T10:17:04Z",
+        "body": "Ideally, your GIF would be properly formatted and have the loop count set to N.\r\n\r\nOtherwise, you can create a modifying backend, something like this:\r\n```java\r\npublic class LoopCountModifyingBackend extends AnimationBackendDelegate {\r\n\r\n  private int mLoopCount;\r\n\r\n  public LoopCountModifyingBackend(\r\n      @Nullable AnimationBackend animationBackend,\r\n      int loopCount) {\r\n    super(animationBackend);\r\n    mLoopCount = loopCount;\r\n  }\r\n\r\n  @Override\r\n  public int getLoopCount() {\r\n    return mLoopCount;\r\n  }\r\n}\r\n```\r\n\r\nand then set it to your animated drawable:\r\n\r\n```java\r\nfinal DraweeController controller = Fresco.newDraweeControllerBuilder()\r\n    .setAutoPlayAnimations(true)\r\n    .setUri(uri)\r\n    .setControllerListener(new BaseControllerListener<ImageInfo>() {\r\n      @Override\r\n      public void onFinalImageSet(\r\n          String id,\r\n          @Nullable ImageInfo imageInfo,\r\n          @Nullable Animatable animatable) {\r\n        if (animatable instanceof AnimatedDrawable2) {\r\n          AnimatedDrawable2 animatedDrawable = (AnimatedDrawable2) animatable;\r\n          animatedDrawable.setAnimationBackend(new LoopCountModifyingBackend(animatedDrawable.getAnimationBackend(), 3));\r\n        }\r\n      }\r\n    })\r\n    .build();\r\nsimpleDraweeView.setController(controller);\r\n```\r\n\r\nYou can also create a custom DrawableFactory that does this directly and then pass it when the image is rendered via PipelineDraweeController."
+      },
+      {
+        "user": "GrossGhost",
+        "created_at": "2019-12-18T12:47:58Z",
+        "body": "now for fresco 2.0.0+ ,how to do this?"
+      }
+    ]
+  },
+  {
+    "number": 1703,
+    "title": "Loading the GIF causes the project to crash",
+    "created_at": "2017-03-17T11:30:05Z",
+    "closed_at": "2017-03-18T14:10:50Z",
+    "labels": [
+      "duplicate",
+      "build",
+      "question"
+    ],
+    "url": "https://github.com/facebook/fresco/issues/1703",
+    "body": "\r\n\r\n```java\r\n//my code\r\n\r\n Uri uri = Uri.parse(address);\r\n        DraweeController draweeController =\r\n                Fresco.newDraweeControllerBuilder()\r\n                        .setUri(uri)\r\n                        .setAutoPlayAnimations(true) \r\n                        .build();\r\n        nivShowImg.setController(draweeController);\r\n```\r\n\r\n```java\r\n//my version\r\ncompile 'com.facebook.fresco:fresco:1.1.0'\r\ncompile 'com.facebook.fresco:animated-gif:1.1.0'\r\n```\r\n\r\n```java\r\n//my error\r\n java.lang.NoSuchFieldError: com.facebook.imagepipeline.common.ImageDecodeOptions.forceOldAnimationCode\r\n                                                               at com.facebook.imagepipeline.animated.factory.AnimatedImageFactoryImpl.decodeGif(AnimatedImageFactoryImpl.java:84)\r\n                                                               at com.facebook.imagepipeline.decoder.DefaultImageDecoder.decodeGif(DefaultImageDecoder.java:142)\r\n                                                               at com.facebook.imagepipeline.decoder.DefaultImageDecoder$1.decode(DefaultImageDecoder.java:65)\r\n                                                               at com.facebook.imagepipeline.decoder.DefaultImageDecoder.decode(DefaultImageDecoder.java:123)\r\n                                                               at com.facebook.imagepipeline.producers.DecodeProducer$ProgressiveDecoder.doDecode(DecodeProducer.java:239)\r\n                                                               at com.facebook.imagepipeline.producers.DecodeProducer$ProgressiveDecoder.access$200(DecodeProducer.java:111)\r\n                                                               at com.facebook.imagepipeline.producers.DecodeProducer$ProgressiveDecoder$1.run(DecodeProducer.java:144)\r\n                                                               at com.facebook.imagepipeline.producers.JobScheduler.doJob(JobScheduler.java:207)\r\n                                                               at com.facebook.imagepipeline.producers.JobScheduler.access$000(JobScheduler.java:27)\r\n                                                               at com.facebook.imagepipeline.producers.JobScheduler$1.run(JobScheduler.java:78)\r\n                                                               at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1112)\r\n                                                               at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:587)\r\n                                                               at com.facebook.imagepipeline.core.PriorityThreadFactory$1.run(PriorityThreadFactory.java:43)\r\n                                                               at java.lang.Thread.run(Thread.java:841)\r\n\r\n```\r\n#question\r\nWhat is the solution to this problem, or what is the cause of the problem",
+    "comments_url": "https://api.github.com/repos/facebook/fresco/issues/1703/comments",
+    "author": "bxhuhu",
+    "comments": [
+      {
+        "user": "oprisnik",
+        "created_at": "2017-03-17T14:17:04Z",
+        "body": "I guess some of your Gradle dependencies got mixed up. We removed `forceOldAnimationCode`. Try and clean/rebuild your project"
+      },
+      {
+        "user": "oprisnik",
+        "created_at": "2017-03-18T14:10:50Z",
+        "body": "See also #1660"
+      }
+    ]
+  },
+  {
+    "number": 1645,
+    "title": "When trying to fetchImageFromBitmapCache() for GIF image, imageReference is always null",
+    "created_at": "2017-01-30T09:49:57Z",
+    "closed_at": "2017-01-30T16:38:58Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/facebook/fresco/issues/1645",
+    "body": "I want to allow users to save GIF images in our app. I am trying to get GIF image from Fresco cache via `fetchImageFromBitmapCache()` but it always returns NULL for GIF images.\r\nFor JPG and PNG images there is no problem.",
+    "comments_url": "https://api.github.com/repos/facebook/fresco/issues/1645/comments",
+    "author": "rafaelekol",
+    "comments": [
+      {
+        "user": "oprisnik",
+        "created_at": "2017-01-30T11:19:01Z",
+        "body": "Did you add `compile 'com.facebook.fresco:animated-gif:1.0.1'` to your `build.gradle`?"
+      },
+      {
+        "user": "rafaelekol",
+        "created_at": "2017-01-30T11:28:44Z",
+        "body": "Yes I have that line.\r\n```\r\ncompile ('com.facebook.fresco:animated-gif:1.0.1') {\r\n        exclude module: 'bolts-android'\r\n    }\r\n```"
+      },
+      {
+        "user": "oprisnik",
+        "created_at": "2017-01-30T16:38:35Z",
+        "body": "I guess you have to use `fetchDecodedImage` instead since animated images are handled a bit differently than normal static bitmaps (not in the same bitmap cache currently).\r\n\r\nHowever, if you want to allow people to save images, you should get the encoded image instead of the decoded image, i.e. `fetchEncodedImage`."
+      },
+      {
+        "user": "rafaelekol",
+        "created_at": "2017-01-31T05:24:12Z",
+        "body": "Thanks, it worked. I managed to save files with this code:\r\n\r\n```\r\nDataSource<CloseableReference<PooledByteBuffer>>\r\n                dataSource = Fresco.getImagePipeline().fetchEncodedImage(ImageRequest.fromUri(imageUrl), App.getContext());\r\n\r\n        DataSubscriber<CloseableReference<PooledByteBuffer>> dataSubscriber =\r\n                new BaseDataSubscriber<CloseableReference<PooledByteBuffer>>() {\r\n                    @Override\r\n                    protected void onNewResultImpl(\r\n                            DataSource<CloseableReference<PooledByteBuffer>> dataSource) {\r\n                        if (!dataSource.isFinished()) {\r\n                            return;\r\n                        }\r\n                        CloseableReference<PooledByteBuffer> ref = dataSource.getResult();\r\n                        if (ref != null) {\r\n                            try {\r\n                                PooledByteBuffer pooledByteBuffer = ref.get();\r\n                                PooledByteBufferInputStream sourceIs = new PooledByteBufferInputStream(pooledByteBuffer);\r\n                                BufferedInputStream bis = new BufferedInputStream(sourceIs);\r\n                                String newFilePath = getAppFolderPath() + UUID.randomUUID().toString().toLowerCase() + \"_\" + URLUtil.guessFileName(imageUrl, null, null);\r\n                                File targetFile = new File(newFilePath);\r\n                                createDirectories(targetFile.getPath());\r\n                                try {\r\n                                    BufferedOutputStream fout = new BufferedOutputStream(new FileOutputStream(newFilePath));\r\n                                    int i;\r\n                                    do {\r\n                                        i = bis.read();\r\n                                        if (i != -1)\r\n                                            fout.write(i);\r\n                                    } while (i != -1);\r\n                                    bis.close();\r\n                                    fout.close();\r\n                                    registerMediaInDeviceGallery(new File(newFilePath));\r\n                                    showMessage(R.string.saved_to_gallery);\r\n                                } catch (IOException e) {\r\n                                    targetFile.delete();\r\n                                    e.printStackTrace();\r\n                                    showMessage(R.string.failed_to_save_to_gallery);\r\n                                }\r\n\r\n                            } finally {\r\n                                CloseableReference.closeSafely(ref);\r\n                            }\r\n                        }\r\n                    }\r\n\r\n                    @Override\r\n                    protected void onFailureImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {\r\n                        Throwable t = dataSource.getFailureCause();\r\n                        Log.e(TAG, \"onFailureImpl: \", t);\r\n                        showMessage(R.string.failed_to_save_to_gallery);\r\n                    }\r\n                };\r\n\r\n        dataSource.subscribe(dataSubscriber, Runnable::run);\r\n```"
+      }
+    ]
+  }
+]

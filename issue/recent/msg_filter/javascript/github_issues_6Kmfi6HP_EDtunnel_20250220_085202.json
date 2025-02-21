@@ -1,0 +1,20 @@
+[
+  {
+    "number": 36,
+    "title": "About Drivepage and store",
+    "created_at": "2024-11-04T13:17:35Z",
+    "closed_at": "2024-11-07T12:24:10Z",
+    "labels": [],
+    "url": "https://github.com/6Kmfi6HP/EDtunnel/issues/36",
+    "body": "Hi there. I've noticed there is a drivepage when the project uploaded to cf pages. So, is there any ways to edit the files that uploaded to the driver? I'm wondering because there is no button to edit or even remove the files uploaded to it. \r\nCould you please give some ideas about it. Sincerely thank you for your help.",
+    "comments_url": "https://api.github.com/repos/6Kmfi6HP/EDtunnel/issues/36/comments",
+    "author": "FrenTim",
+    "comments": [
+      {
+        "user": "6Kmfi6HP",
+        "created_at": "2024-11-07T11:14:26Z",
+        "body": "Cannot delete or edit. the file list is stored in the browser, but u cannot delete files in ipfs.\r\nThe best way to clear ur file list is to delete the website's cookies."
+      }
+    ]
+  }
+]

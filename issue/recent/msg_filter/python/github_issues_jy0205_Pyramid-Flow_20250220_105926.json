@@ -1,0 +1,158 @@
+[
+  {
+    "number": 206,
+    "title": "2. Inference Code \u592a\u6162\u4e86",
+    "created_at": "2024-12-05T02:32:55Z",
+    "closed_at": "2024-12-06T03:35:08Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/206",
+    "body": "\u4f7f\u7528\u6700\u65b0readme\u91cc\u9762\u7684Inference Code\u548cflux\u6a21\u578b\u3002A800\u663e\u5361\u9700\u89811h\u51fa\u7ed3\u679c\uff0c\u600e\u4e48\u56de\u4e8b\uff0c\u5f88\u6162\u3002\u539f\u59cb\u6a21\u578b\u5728\u54ea\u5462\u3002\u611f\u8c22",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/206/comments",
+    "author": "henbucuoshanghai",
+    "comments": [
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-12-05T02:54:38Z",
+        "body": "There shouldn't be any speed difference between miniflux and sd3 based versions. Could you please check if (sequential) CPU offloading is disabled?"
+      },
+      {
+        "user": "henbucuoshanghai",
+        "created_at": "2024-12-05T03:07:15Z",
+        "body": "(sequential) CPU offloading is disabled\uff0cthen others to cuda,it about 1 mins for a video?"
+      }
+    ]
+  },
+  {
+    "number": 170,
+    "title": "[WARNING]",
+    "created_at": "2024-11-10T21:33:10Z",
+    "closed_at": "2024-11-13T15:17:23Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/170",
+    "body": "[WARNING] Required file 'config.json' missing in 'D:\\Pyramid-Flow-main\\pyramid_flow_model\\diffusion_transformer_768p'.",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/170/comments",
+    "author": "wx331406",
+    "comments": [
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-11-11T00:33:07Z",
+        "body": "The warning of 'config.json' missing is completely normal and does not affect subsequent usage."
+      }
+    ]
+  },
+  {
+    "number": 119,
+    "title": "About training detail",
+    "created_at": "2024-10-18T08:19:35Z",
+    "closed_at": "2024-10-20T16:14:45Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/119",
+    "body": "Hi, thanks for sharing the great project.\r\n\r\nI have found the mmdit in your method can accept different stages as input, and different stage are concatenated in token dimension. This may require the timestep to be same in different stages but different stages have their respective timestep interval. I wonder if the training sampled for each batch only include one stage, or my understanding is wrong in something. Looking forward for your reply, and thanks again for the excellent project!",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/119/comments",
+    "author": "WangFeng18",
+    "comments": [
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-10-18T13:58:19Z",
+        "body": "> Hi, thanks for sharing the great project.\r\n> \r\n> I have found the mmdit in your method can accept different stages as input, and different stage are concatenated in token dimension. This may require the timestep to be same in different stages but different stages have their respective timestep interval. I wonder if the training sampled for each batch only include one stage, or my understanding is wrong in something. Looking forward for your reply, and thanks again for the excellent project!\r\n\r\nIn the original implementation, we composed the training batch so that it contained different stages uniformly. In the newest version (expected to release soon), we have optimized the procedure so that it contains three stages by 25%/50%/25% which shows certain improvement."
+      }
+    ]
+  },
+  {
+    "number": 107,
+    "title": "text encoder network details?",
+    "created_at": "2024-10-16T07:16:21Z",
+    "closed_at": "2024-10-17T08:56:27Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/107",
+    "body": "I noticed that in your code, for the text encoder part, you used the clip and T5 models. Based on this, I have two questions: 1. Will the clip and T5 models update parameters during training? 2. What is the difference between these two clip models?\r\nLooking forward to your answer, thank you",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/107/comments",
+    "author": "xuzukang",
+    "comments": [
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-10-16T07:31:15Z",
+        "body": "We followed SD3 in the text encoder design, where these models are frozen during training. The two CLIP models are used separately for the text branch of MM-DiT and AdaLN."
+      },
+      {
+        "user": "xuzukang",
+        "created_at": "2024-10-16T07:35:53Z",
+        "body": "In training process, only the parameters of MM-DiT and VAE will be updated?"
+      },
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-10-16T07:53:07Z",
+        "body": "> In training process, only the parameters of MM-DiT and VAE will be updated?\r\n\r\nThe VAE is also frozen during training. We used pre-extracted VAE latents to train the MM-DiT."
+      },
+      {
+        "user": "xuzukang",
+        "created_at": "2024-10-16T11:57:53Z",
+        "body": "> > In training process, only the parameters of MM-DiT and VAE will be updated?\r\n> \r\n> The VAE is also frozen during training. We used pre-extracted VAE latents to train the MM-DiT.\r\n>\r\n> Thank you very much for your answer, can I understand it as: The paper states that vae comes from MAGVIT, which means that vae encoder and vae decoder both come from the MAGVIT model and are not need training. only the MM-DiT needs trained?\r\n"
+      },
+      {
+        "user": "xuzukang",
+        "created_at": "2024-10-16T12:07:00Z",
+        "body": "> > > In training process, only the parameters of MM-DiT and VAE will be updated?\r\n> > \r\n> > \r\n> > The VAE is also frozen during training. We used pre-extracted VAE latents to train the MM-DiT.\r\n> > Thank you very much for your answer, can I understand it as: The paper states that vae comes from MAGVIT, which means that vae encoder and vae decoder both come from the MAGVIT model and are not need training. only the MM-DiT needs trained?\r\n\r\n>Thank you for your great work. I really want to figure out the composition of each part of pyramid-flow: I now know that CLIP_1, CLIP_2, T5, MM-DiT come from SD3, of which only MM-DiT needs to be trained in pyramid-flow, VAE-encoder comes from MAGVIT and does not need to be trained. So where does VAE-decoder come from and does it need to be trained?"
+      },
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-10-16T12:31:53Z",
+        "body": "The VAE encoder and decoder were trained from scratch, with some of the key design choices following MAGVIT-v2."
+      }
+    ]
+  },
+  {
+    "number": 87,
+    "title": "NotImplementedError: Cannot copy out of meta tensor; no data!",
+    "created_at": "2024-10-13T20:46:45Z",
+    "closed_at": "2024-10-14T02:12:40Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/87",
+    "body": "```python\r\nimport torch\r\nfrom PIL import Image\r\nfrom pyramid_dit import PyramidDiTForVideoGeneration\r\nfrom diffusers.utils import load_image, export_to_video\r\nfrom accelerate import Accelerator, cpu_offload\r\n\r\ntorch.cuda.set_device(0)\r\nmodel_dtype, torch_dtype = 'bf16', torch.bfloat16   # Use bf16 (not support fp16 yet)\r\n\r\nmodel = PyramidDiTForVideoGeneration(\r\n    'PATH',                                         # The downloaded checkpoint dir\r\n    model_dtype,\r\n    model_variant='diffusion_transformer_768p',     # 'diffusion_transformer_384p'\r\n)\r\n\r\nmodel.vae.enable_tiling()\r\nmodel.enable_sequential_cpu_offload()\r\n\r\nprompt = \"A dog walking on the beach.\"\r\n\r\nwith torch.no_grad(), torch.cuda.amp.autocast(enabled=True, dtype=torch_dtype):\r\n    frames = model.generate(\r\n        prompt=prompt,\r\n        num_inference_steps=[20, 20, 20],\r\n        video_num_inference_steps=[10, 10, 10],\r\n        height=768,     \r\n        width=1280,\r\n        temp=31,                    # temp=16: 5s, temp=31: 10s\r\n        guidance_scale=9.0,         # The guidance for the first frame, set it to 7 for 384p variant\r\n        video_guidance_scale=5.0,   # The guidance for the other video latent\r\n        output_type=\"pil\",\r\n        save_memory=True,           # If you have enough GPU memory, set it to `False` to improve vae decoding speed\r\n    )\r\n\r\nexport_to_video(frames, \"./text_to_video_sample.mp4\", fps=24)\r\n```\r\n\r\nWith this config it says:\r\n\r\n```\r\nTraceback (most recent call last):\r\n  File \"text.py\", line 22, in <module>\r\n    frames = model.generate(\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\utils\\_contextlib.py\", line 115, in decorate_context\r\n    return func(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\pyramid_dit_for_video_gen_pipeline.py\", line 586, in generate\r\n    prompt_embeds, prompt_attention_mask, pooled_prompt_embeds = self.text_encoder(prompt, device)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\hooks.py\", line 166, in new_forward\r\n    output = module._old_forward(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\modeling_text_encoder.py\", line 138, in forward\r\n    prompt_embeds, prompt_attention_mask, pooled_prompt_embeds = self.encode_prompt(input_prompts, 1, clip_skip=None, device=device)\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\modeling_text_encoder.py\", line 113, in encode_prompt\r\n    pooled_prompt_embed = self._get_clip_prompt_embeds(\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\modeling_text_encoder.py\", line 98, in _get_clip_prompt_embeds\r\n    prompt_embeds = text_encoder(text_input_ids.to(device), output_hidden_states=True)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\transformers\\models\\clip\\modeling_clip.py\", line 1216, in forward\r\n    text_outputs = self.text_model(\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\transformers\\models\\clip\\modeling_clip.py\", line 699, in forward\r\n    hidden_states = self.embeddings(input_ids=input_ids, position_ids=position_ids)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\hooks.py\", line 161, in new_forward\r\n    args, kwargs = module._hf_hook.pre_forward(module, *args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\hooks.py\", line 356, in pre_forward\r\n    return send_to_device(args, self.execution_device), send_to_device(\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\utils\\operations.py\", line 186, in send_to_device\r\n    {\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\utils\\operations.py\", line 187, in <dictcomp>\r\n    k: t if k in skip_keys else send_to_device(t, device, non_blocking=non_blocking, skip_keys=skip_keys)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\utils\\operations.py\", line 158, in send_to_device\r\n    return tensor.to(device, non_blocking=non_blocking)\r\nNotImplementedError: Cannot copy out of meta tensor; no data!\r\n```\r\n\r\nWhat is wrong?",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/87/comments",
+    "author": "dillfrescott",
+    "comments": [
+      {
+        "user": "Ednaordinary",
+        "created_at": "2024-10-13T21:29:10Z",
+        "body": "This seems to be a by-product of trying to sequential offload when cpu_offloading is not enabled. Adding `cpu_offloading=True` to the generation call should fix this. I'll make a PR to make it the default when sequential is enabled."
+      }
+    ]
+  },
+  {
+    "number": 18,
+    "title": "Can you fix the demo huggingface please?",
+    "created_at": "2024-10-10T18:45:15Z",
+    "closed_at": "2024-10-11T12:08:38Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/18",
+    "body": "the question is solved thanks for replying! not sure how to delete the issue im sorry",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/18/comments",
+    "author": "ghost",
+    "comments": [
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-10-10T18:51:52Z",
+        "body": "This is due to the GPU quota limit, the demo can only generate 25 frames at a time. We have two options to play it at 1 second & 24 fps or 3 seconds & 8 fps. We could not decide which is better, both are very unfortunate compromises.\r\n\r\nWe initially chose 3 seconds & 8 fps, but now we have added an FPS control slider so you can choose for yourself."
+      }
+    ]
+  },
+  {
+    "number": 14,
+    "title": "Setup instructions ",
+    "created_at": "2024-10-10T13:18:45Z",
+    "closed_at": "2024-10-10T15:57:18Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/14",
+    "body": "I create a new conda env on a Ubuntu 24 linux \r\nconda create --name pyramid python=3.10\r\n\r\nDid a git clone of this project and then ran pip install -r requirements.txt\r\nAnd it throws errors that it can't find a compatible scipy package and tries to build one and fail. \r\n\r\nDo you have alternate setup instructions?\r\n\r\nThanks,\r\nAsh\r\n",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/14/comments",
+    "author": "AshD",
+    "comments": [
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-10-10T13:24:44Z",
+        "body": "Thank you for your interest in our project. We are using a Python version of 3.8.10, perhaps re-running the commands with `conda create --name ENV_NAME python==3.8.10` will solve the problem."
+      }
+    ]
+  }
+]

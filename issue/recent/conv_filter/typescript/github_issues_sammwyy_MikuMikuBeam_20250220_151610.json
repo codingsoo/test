@@ -1,0 +1,55 @@
+[
+  {
+    "number": 2,
+    "title": "The frontend doesn't show",
+    "created_at": "2025-01-20T17:59:24Z",
+    "closed_at": "2025-01-23T21:37:33Z",
+    "labels": [],
+    "url": "https://github.com/sammwyy/MikuMikuBeam/issues/2",
+    "body": "Hi !\nI'm trying to run the frontend with the `npm run dev` but when it get launched I get a white screen. I also get this in my developper console :\n\n`Uncaught (in promise) DOMException: An invalid or illegal string was specified`\n`setupWebSocket client:536`\n`fallback client:509`\n`setupWebSocket client:555`\n`setupWebSocket client:552`\n`<anonymous> client:531`\n`client:536`\n`setupWebSocket client:536`\n`fallback client:509`\n`setupWebSocket client:555`\n`(Asynchrone : EventListener.handleEvent)`\n`setupWebSocket client:552`\n`<anonyme> client:531`\n\nI guess he doesn't really like it \ud83d\ude05 \nIf you know how to sole this problem it would be great, thanks by advance <3",
+    "comments_url": "https://api.github.com/repos/sammwyy/MikuMikuBeam/issues/2/comments",
+    "author": "HappySunnySun",
+    "comments": [
+      {
+        "user": "sammwyy",
+        "created_at": "2025-01-20T18:07:37Z",
+        "body": "Can you send the full error (screenshot)? Also, what version of Node are you using? I did it on v20 so if you have an older version that's probably it."
+      },
+      {
+        "user": "RemiL-Nel",
+        "created_at": "2025-01-20T18:24:16Z",
+        "body": "Hello, I had the same error as you when trying to use the program, just try changing browser and it should work. (Doesn't work on Arc browser but worked on Microsoft Edge)."
+      },
+      {
+        "user": "AshesOfLuxury",
+        "created_at": "2025-01-20T20:36:54Z",
+        "body": "My frontend isnt working either it just shows white, i keep getting this \"(node:18488) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.\" and im using node version 22.13"
+      },
+      {
+        "user": "sammwyy",
+        "created_at": "2025-01-21T00:26:40Z",
+        "body": "Check with the latest commit ^^"
+      },
+      {
+        "user": "HappySunnySun",
+        "created_at": "2025-01-22T09:46:29Z",
+        "body": "Hello !\nSorry for taking time to respond, I updated my Node and installed Edge and it's working, i guess it was just Firefox who wasn't liking this\nFriendly\n\nSun \u2600 "
+      },
+      {
+        "user": "sammwyy",
+        "created_at": "2025-01-22T20:13:26Z",
+        "body": "It's probably your adblocker installed on Firefox. ^^"
+      },
+      {
+        "user": "HappySunnySun",
+        "created_at": "2025-01-23T08:58:21Z",
+        "body": "I have UBlock Origin so yeah maybe :3"
+      },
+      {
+        "user": "HappySunnySun",
+        "created_at": "2025-01-23T21:37:31Z",
+        "body": "It was Unlock Origin :3 \n\nThanks for your help ! Hype to see other projects form your \u2728"
+      }
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "number": 18,
+    "title": "Cannot import since latest version",
+    "created_at": "2024-07-12T01:03:02Z",
+    "closed_at": "2024-07-12T02:06:27Z",
+    "labels": [],
+    "url": "https://github.com/need4swede/Portall/issues/18",
+    "body": "Seems like latest release broke the json import feature. \r\n\r\n```\r\nPOST /import HTTP/1.1\" 500 -\r\nportall  | ERROR:app:Exception on /import [POST]\r\nportall  | Traceback (most recent call last):\r\nportall  |   File \"/app/utils/routes/imports.py\", line 184, in import_json\r\nportall  |     data = json.loads(content)\r\nportall  |   File \"/usr/local/lib/python3.9/json/__init__.py\", line 346, in loads\r\nportall  |     return _default_decoder.decode(s)\r\nportall  |   File \"/usr/local/lib/python3.9/json/decoder.py\", line 337, in decode\r\nportall  |     obj, end = self.raw_decode(s, idx=_w(s, 0).end())\r\nportall  |   File \"/usr/local/lib/python3.9/json/decoder.py\", line 353, in raw_decode\r\nportall  |     obj, end = self.scan_once(s, idx)\r\nportall  | json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 3 (char 2)\r\nportall  | \r\nportall  | During handling of the above exception, another exception occurred:\r\nportall  | \r\nportall  | Traceback (most recent call last):\r\nportall  |   File \"/usr/local/lib/python3.9/site-packages/flask/app.py\", line 1473, in wsgi_app\r\nportall  |     response = self.full_dispatch_request()\r\nportall  |   File \"/usr/local/lib/python3.9/site-packages/flask/app.py\", line 882, in full_dispatch_request\r\nportall  |     rv = self.handle_user_exception(e)\r\nportall  |   File \"/usr/local/lib/python3.9/site-packages/flask/app.py\", line 880, in full_dispatch_request\r\nportall  |     rv = self.dispatch_request()\r\nportall  |   File \"/usr/local/lib/python3.9/site-packages/flask/app.py\", line 865, in dispatch_request\r\nportall  |     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]\r\nportall  |   File \"/app/utils/routes/imports.py\", line 44, in import_data\r\nportall  |     imported_data = import_json(file_content)\r\nportall  |   File \"/app/utils/routes/imports.py\", line 195, in import_json\r\nportall  |     raise ValueError(\"Invalid JSON format\")\r\nportall  | ValueError: Invalid JSON format\r\nportall  | INFO:werkzeug:192.168.1.68 - - [12/Jul/2024 00:57:38] \"POST /import HTTP/1.1\" 500 -\r\n```\r\n\r\nData:\r\n\r\n```\r\n[{'ip_address': '192.168.1.68', 'nickname': 'monitor-server-1', 'port_number': 9020, 'description': 'portall', 'order': 0, 'port_protocol': 'TCP'}]\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/need4swede/Portall/issues/18/comments",
+    "author": "Buco7854",
+    "comments": [
+      {
+        "user": "need4swede",
+        "created_at": "2024-07-12T01:51:28Z",
+        "body": "Is that from an export using Portall?\r\n\r\nProperty values are single quoted in your data. JSON requires double quotes. All Portall exports use double quotes, but let me know if it somehow produced single quotes.\r\n\r\nHere is your data, using double quotes. It should work.\r\n\r\n```\r\n[{\"ip_address\": \"192.168.1.68\", \"nickname\": \"monitor-server-1\", \"port_number\": 9020, \"description\": \"portall\", \"order\": 0, \"port_protocol\": \"TCP\"}]\r\n```"
+      },
+      {
+        "user": "Buco7854",
+        "created_at": "2024-07-12T01:54:32Z",
+        "body": "> Is that from an export using Portall?\r\n> \r\n> Property values are single quoted in your data. JSON requires double quotes. All Portall exports use double quotes, but let me know if it somehow produced single quotes.\r\n> \r\n> Here is your data, using double quotes. It should work.\r\n> \r\n> ```\r\n> [{\"ip_address\": \"192.168.1.68\", \"nickname\": \"monitor-server-1\", \"port_number\": 9020, \"description\": \"portall\", \"order\": 0, \"port_protocol\": \"TCP\"}]\r\n> ```\r\n\r\nNo it wasnt using portal thanks for the pointer sorry."
+      },
+      {
+        "user": "need4swede",
+        "created_at": "2024-07-12T02:06:27Z",
+        "body": "No worries! Let me know if you encounter any more issues.\r\n\r\nThank you!"
+      }
+    ]
+  }
+]

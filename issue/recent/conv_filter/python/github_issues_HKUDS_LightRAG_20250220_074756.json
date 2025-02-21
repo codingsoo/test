@@ -1,0 +1,355 @@
+[
+  {
+    "number": 855,
+    "title": "Run examples/lightrag_zhipu_postgres_demo.py failed:  RuntimeWarning: coroutine 'LightRAG.initialize_storages' was never awaited",
+    "created_at": "2025-02-19T08:49:00Z",
+    "closed_at": "2025-02-19T09:38:18Z",
+    "labels": [
+      "question",
+      "lightrag-server"
+    ],
+    "url": "https://github.com/HKUDS/LightRAG/issues/855",
+    "body": "```\n  File \"/Users/sunny/.local/share/uv/python/cpython-3.13.1-macos-x86_64-none/lib/python3.13/asyncio/runners.py\", line 194, in run\n    return runner.run(main)\n           ~~~~~~~~~~^^^^^^\n  File \"/Users/sunny/.local/share/uv/python/cpython-3.13.1-macos-x86_64-none/lib/python3.13/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/sunny/.local/share/uv/python/cpython-3.13.1-macos-x86_64-none/lib/python3.13/asyncio/base_events.py\", line 720, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/private/var/www/LightRAG/hello2.py\", line 32, in main\n    rag = LightRAG(\n        working_dir=WORKING_DIR,\n    ...<15 lines>...\n        vector_storage=\"PGVectorStorage\",\n    )\n  File \"<string>\", line 34, in __init__\n  File \"/private/var/www/LightRAG/lightrag/lightrag.py\", line 563, in __post_init__\n    loop.run_until_complete(self.initialize_storages())\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/sunny/.local/share/uv/python/cpython-3.13.1-macos-x86_64-none/lib/python3.13/asyncio/base_events.py\", line 696, in run_until_complete\n    self._check_running()\n    ~~~~~~~~~~~~~~~~~~~^^\n  File \"/Users/sunny/.local/share/uv/python/cpython-3.13.1-macos-x86_64-none/lib/python3.13/asyncio/base_events.py\", line 632, in _check_running\n    raise RuntimeError('This event loop is already running')\nRuntimeError: This event loop is already running\nINFO:Creating a new event loop in main thread.\n<sys>:0: RuntimeWarning: coroutine 'LightRAG.initialize_storages' was never awaited\n```",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/855/comments",
+    "author": "tevooli",
+    "comments": [
+      {
+        "user": "YanSte",
+        "created_at": "2025-02-19T09:11:33Z",
+        "body": "Are you using a notebook ?\n\n``\nimport nest_asyncio\nnest_asyncio.apply()\n``\n"
+      },
+      {
+        "user": "tevooli",
+        "created_at": "2025-02-19T09:32:33Z",
+        "body": "@YanSte Thank you. This line of code solved this error."
+      }
+    ]
+  },
+  {
+    "number": 799,
+    "title": "[Bug][Neo4j] get_edge() returns incorrect edge properties due to schema mismatch",
+    "created_at": "2025-02-16T19:21:04Z",
+    "closed_at": "2025-02-17T17:36:17Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/799",
+    "body": "## Description\nWhen using Neo4j as `LIGHTRAG_GRAPH_STORAGE` ~with a non-empty `NAMESPACE_PREFIX`~, the web UI query fails because the edge data is missing the required 'description' field. This issue doesn't occur when:\n- ~`NAMESPACE_PREFIX` is empty, or~ (I can't reproduce this today; maybe I made a mistake yesterday.) \n- Using MongoDB as `LIGHTRAG_GRAPH_STORAGE`\n\n## Error Message\n```\n[ERROR][2025-02-16 19:07:40] Traceback (most recent call last):\n  File \"/app/lightrag/api/lightrag_server.py\", line 1299, in query_text\n    response = await rag.aquery(\n  File \"/app/lightrag/lightrag.py\", line 1022, in aquery\n    response = await kg_query(\n  File \"/app/lightrag/operate.py\", line 659, in kg_query\n    context = await _build_query_context(\n  File \"/app/lightrag/operate.py\", line 1038, in _build_query_context\n    ll_data, hl_data = await asyncio.gather(\n  File \"/app/lightrag/operate.py\", line 1355, in _get_edge_data\n    edge_datas = truncate_list_by_token_size(\n  File \"/app/lightrag/utils.py\", line 228, in truncate_list_by_token_size\n    tokens += len(encode_string_by_tiktoken(key(data)))\n  File \"/app/lightrag/operate.py\", line 1357, in <lambda>\n    key=lambda x: x[\"description\"],\nKeyError: 'description'\n```\n\n## Debug Information\nThe edge data object `x` contains the following in this case:\n```python\n{\n    'src_id': '\"XXXXXX\"', 'tgt_id': '\"XXXXXXX\"', 'rank': 11, 'created_at': None, 'weight': 0.0, 'source_id': None, 'target_id': None\n}\n```\n\n## Environment\n- Storage: Neo4j\n\n## Expected Behavior\nData should include a 'description' field when retrieved from Neo4j.  I also believe that these keys\n```\n'created_at': None, 'weight': 0.0, 'source_id': None, 'target_id': None\n```\nshould contain non-trivial data.\n\n## Current Behavior\nData is missing the 'description' field, causing the query to fail.\n\nPS: Additionally, I'd like to understand if there are any differences in retrieval results when using MongoDB versus Neo4j as the graph storage backend, thanks.",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/799/comments",
+    "author": "atYuguo",
+    "comments": [
+      {
+        "user": "atYuguo",
+        "created_at": "2025-02-17T14:05:45Z",
+        "body": "After investigating the code, I found the issue is related to a mismatch between the `edge_property` formats in different parts of the codebase.\n\n1. In the following part of `neo4j_impl.py`\n```python\n@@ -278,14 +278,16 @@ class Neo4JStorage(BaseGraphStorage):\n\n                result = await session.run(query)\n                record = await result.single()\n                if record and \"edge_properties\" in record:\n                    try:\n                        result = dict(record[\"edge_properties\"])\n\n                        # Ensure required keys exist with defaults\n                        required_keys = {\n                            \"weight\": 0.0,\n                            \"source_id\": None,\n                            \"target_id\": None,\n\n                        }\n                        for key, default_value in required_keys.items():\n                            if key not in result:\n@@ -305,20 +307,20 @@ class Neo4JStorage(BaseGraphStorage):\n                            f\"and {entity_name_label_target}: {str(e)}\"\n                        )\n                        # Return default edge properties on error\n                        return {\"weight\": 0.0, \"source_id\": None, \"target_id\": None}\n\n                logger.debug(\n                    f\"{inspect.currentframe().f_code.co_name}: No edge found between {entity_name_label_source} and {entity_name_label_target}\"\n                )\n                # Return default edge properties when no edge found\n                return {\"weight\": 0.0, \"source_id\": None, \"target_id\": None}\n\n        except Exception as e:\n            logger.error(\n                f\"Error in get_edge between {source_node_id} and {target_node_id}: {str(e)}\"\n            )\n            # Return default edge properties on error\n            return {\"weight\": 0.0, \"source_id\": None, \"target_id\": None}\n\n    async def get_node_edges(self, source_node_id: str) -> list[tuple[str, str]] | None:\n        node_label = source_node_id.strip('\"')\n```\n, there are two issues:\n   - The condition `if record and \"edge_properties\" in record` never evaluates to true\n   - The default edge properties do not match the expected format\n\n2. Current Edge Property Format:\n   ```python\n   # In neo4j_impl.py\n   # Default edge properties\n   {\n       \"weight\": 0.0,\n       \"source_id\": None,\n       \"target_id\": None  # Note this field\n   }\n   ```\nalso\n   ```python\n   return {\"weight\": 0.0, \"source_id\": None, \"target_id\": None}\n   ```\n\n3. Expected Edge Property Format (from `operate.py`):\n   ```python\n   # In operate.py\n   edge_data = {\n       \"weight\": weight,\n       \"description\": description,  # Required field that's missing\n       \"keywords\": keywords,\n       \"source_id\": source_id\n       # No 'target_id' field\n   }\n   ```\n\n## Suggested Fix\n```python\n@@ -278,14 +278,16 @@ class Neo4JStorage(BaseGraphStorage):\n\n                result = await session.run(query)\n                record = await result.single()\n                if record:\n                    try:\n                        result = dict(record[\"edge_properties\"])\n                        logger.info(f\"Result: {result}\")\n                        # Ensure required keys exist with defaults\n                        required_keys = {\n                            \"weight\": 0.0,\n                            \"source_id\": None,\n                            \"description\": None,\n                            \"keywords\": None,\n                        }\n                        for key, default_value in required_keys.items():\n                            if key not in result:\n@@ -305,20 +307,20 @@ class Neo4JStorage(BaseGraphStorage):\n                            f\"and {entity_name_label_target}: {str(e)}\"\n                        )\n                        # Return default edge properties on error\n                        return {\"weight\": 0.0, \"description\": None, \"keywords\": None, \"source_id\": None}\n\n                logger.debug(\n                    f\"{inspect.currentframe().f_code.co_name}: No edge found between {entity_name_label_source} and {entity_name_label_target}\"\n                )\n                # Return default edge properties when no edge found\n                return {\"weight\": 0.0, \"description\": None, \"keywords\": None, \"source_id\": None}\n\n        except Exception as e:\n            logger.error(\n                f\"Error in get_edge between {source_node_id} and {target_node_id}: {str(e)}\"\n            )\n            # Return default edge properties on error\n            return {\"weight\": 0.0, \"description\": None, \"keywords\": None, \"source_id\": None}\n\n    async def get_node_edges(self, source_node_id: str) -> list[tuple[str, str]] | None:\n        node_label = source_node_id.strip('\"')\n```"
+      },
+      {
+        "user": "spo0nman",
+        "created_at": "2025-02-17T17:33:31Z",
+        "body": "With your changes i get a TypeError because `source_id` is None when trying to split it. We have to modify the `get_edge` method to ensure `source_id` is always a string, even when empty.\n\n\n\n`    async def get_edge(\n        self, source_node_id: str, target_node_id: str\n    ) -> dict[str, str] | None:\n        try:\n            entity_name_label_source = source_node_id.strip('\"')\n            entity_name_label_target = target_node_id.strip('\"')\n\n            async with self._driver.session(database=self._DATABASE) as session:\n                query = f\"\"\"\n                MATCH (start:`{entity_name_label_source}`)-[r]->(end:`{entity_name_label_target}`)\n                RETURN properties(r) as edge_properties\n                LIMIT 1\n                \"\"\".format(\n                    entity_name_label_source=entity_name_label_source,\n                    entity_name_label_target=entity_name_label_target,\n                )\n\n                result = await session.run(query)\n                record = await result.single()\n                if record and \"edge_properties\" in record:\n                    try:\n                        result = dict(record[\"edge_properties\"])\n                        logger.info(f\"Result: {result}\")\n                        # Ensure required keys exist with defaults\n                        required_keys = {\n                            \"weight\": 0.0,\n                            \"source_id\": \"\",  # Changed from None to empty string\n                            \"target_id\": \"\",  # Changed from None to empty string\n                            \"description\": \"\",\n                            \"keywords\": \"\",\n                        }\n                        for key, default_value in required_keys.items():\n                            if key not in result or result[key] is None:  # Also check for None values\n                                result[key] = default_value\n                                logger.warning(\n                                    f\"Edge between {entity_name_label_source} and {entity_name_label_target} \"\n                                    f\"missing {key}, using default: {default_value}\"\n                                )\n\n                        logger.debug(\n                            f\"{inspect.currentframe().f_code.co_name}:query:{query}:result:{result}\"\n                        )\n                        return result\n                    except (KeyError, TypeError, ValueError) as e:\n                        logger.error(\n                            f\"Error processing edge properties between {entity_name_label_source} \"\n                            f\"and {entity_name_label_target}: {str(e)}\"\n                        )\n                        # Return default edge properties on error\n                        return {\n                            \"weight\": 0.0,\n                            \"source_id\": \"\",\n                            \"target_id\": \"\",\n                            \"description\": \"\",\n                            \"keywords\": \"\"\n                        }\n\n                logger.debug(\n                    f\"{inspect.currentframe().f_code.co_name}: No edge found between {entity_name_label_source} and {entity_name_label_target}\"\n                )\n                # Return default edge properties when no edge found\n                return {\n                    \"weight\": 0.0,\n                    \"source_id\": \"\",\n                    \"target_id\": \"\",\n                    \"description\": \"\",\n                    \"keywords\": \"\"\n                }\n\n        except Exception as e:\n            logger.error(\n                f\"Error in get_edge between {source_node_id} and {target_node_id}: {str(e)}\"\n            )\n            # Return default edge properties on error\n            return {\n                \"weight\": 0.0,\n                \"source_id\": \"\",\n                \"target_id\": \"\",\n                \"description\": \"\",\n                \"keywords\": \"\"\n            }`"
+      },
+      {
+        "user": "YanSte",
+        "created_at": "2025-02-17T17:36:15Z",
+        "body": "Thanks a lot."
+      }
+    ]
+  },
+  {
+    "number": 715,
+    "title": "Fix: AttributeError in NanoVectorDB Initialization",
+    "created_at": "2025-02-05T08:12:34Z",
+    "closed_at": "2025-02-07T05:12:43Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/pull/715",
+    "body": "Issue\r\nThe following error occurred during the initialization of NanoVectorDB in nano_vector_db_impl.py:\r\n\r\nFile \".../LightRAG/LightRAG/lightrag/kg/nano_vector_db_impl.py\", line 92, in __post_init__\r\n    self.embedding_func.embedding_dim, storage_file=self._client_file_name\r\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nAttributeError: 'function' object has no attribute 'embedding_dim'\r\n\r\nRoot Cause\r\nThe embedding_func variable was declared locally instead of being assigned to self.embedding_func.\r\nAs a result, self.embedding_func was referring to a function instead of an instance of EmbeddingFunc, causing the AttributeError.\r\n\r\nChanges Made\r\n1. Explicitly Initialized self.embedding_func in __post_init__ and query using:\r\n\r\nself.embedding_func = EmbeddingFunc(\r\n    embedding_dim=4096, max_token_size=8192, func=gpt_4o_mini_complete\r\n)\r\n\r\n2. Imported EmbeddingFunc and gpt_4o_mini_complete to avoid reference errors.\r\n\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/715/comments",
+    "author": "Vasundhhara",
+    "comments": [
+      {
+        "user": "LarFii",
+        "created_at": "2025-02-05T12:42:38Z",
+        "body": "Thanks for your contribution!  But there are some linting errors. Please make sure to run `pre-commit run --all-files` before submitting to ensure all linting checks pass."
+      },
+      {
+        "user": "danielaskdd",
+        "created_at": "2025-02-05T15:30:12Z",
+        "body": "@LarFii the embedding function is setup by post_init of LightRAG according to user preference. It can not be set to a fix method in the DB implementation."
+      },
+      {
+        "user": "ArnoChenFx",
+        "created_at": "2025-02-05T15:35:53Z",
+        "body": "It's not a good idea to create the embedding_func in NanoVectorDBStorage. The embedding_func of VectorDB is automatically passed in by LightRAG. You only need to pass the embedding_func as a parameter when creating LightRAG.\r\n\r\n```python\r\nfrom lightrag.llm.openai import gpt_4o_complete, openai_embed\r\n\r\nrag = LightRAG(\r\n    llm_model_func=gpt_4o_complete,\r\n    embedding_func=EmbeddingFunc(\r\n        embedding_dim=1024, \r\n        max_token_size=8192, \r\n        func=lambda texts: openai_embed(\r\n            texts,\r\n            model=\"text-embedding-3-small\"\r\n        )\r\n    )\r\n)\r\n```"
+      },
+      {
+        "user": "LarFii",
+        "created_at": "2025-02-05T18:04:39Z",
+        "body": "> @LarFii the embedding function is setup by post_init of LightRAG according to user preference. It can not be set to a fix method in the DB implementation.\r\n\r\nOh, I got it. Thanks!"
+      },
+      {
+        "user": "Vasundhhara",
+        "created_at": "2025-02-06T08:12:16Z",
+        "body": "@ArnoChenFx This solved the error without having to initialize the embedding_func in NanoVectorDBStorage. Thanks."
+      }
+    ]
+  },
+  {
+    "number": 662,
+    "title": "AttributeError: 'function' object has no attribute 'embedding_dim' in \"lightrag_openai_demo.py\" (PLEASE EXPLAIN THE FIX)",
+    "created_at": "2025-01-27T22:04:01Z",
+    "closed_at": "2025-01-28T14:37:05Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/662",
+    "body": "Hi\n\nI am getting the following error in the lightrag_openai_demo.py. Can someone please help me fix it?\n\nTraceback (most recent call last):\n  File \"C:\\Users\\arpit\\LLM Projects\\RAG\\Tutorial - GraphRAG\\LightRAG\\examples\\lightrag_openai_demo.py\", line 11, in <module>\n    rag = LightRAG(\n          ^^^^^^^^^\n  File \"<string>\", line 32, in __init__\n  File \"C:\\Users\\arpit\\LLM Projects\\RAG\\Tutorial - GraphRAG\\LightRAG\\lightrag\\lightrag.py\", line 254, in __post_init__\n    self.entities_vdb = self.vector_db_storage_cls(\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\arpit\\LLM Projects\\RAG\\Tutorial - GraphRAG\\LightRAG\\lightrag\\lightrag.py\", line 80, in import_class\n    return cls(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"<string>\", line 8, in __init__\n  File \"C:\\Users\\arpit\\LLM Projects\\RAG\\Tutorial - GraphRAG\\LightRAG\\lightrag\\kg\\nano_vector_db_impl.py\", line 84, in __post_init__\n    self.embedding_func.embedding_dim, storage_file=self._client_file_name\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'function' object has no attribute 'embedding_dim'",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/662/comments",
+    "author": "ArpitNarain",
+    "comments": [
+      {
+        "user": "napoleon9000",
+        "created_at": "2025-01-28T01:31:32Z",
+        "body": "Same here"
+      },
+      {
+        "user": "gutama",
+        "created_at": "2025-01-28T03:03:51Z",
+        "body": "```\nimport os\n\nfrom lightrag import LightRAG, QueryParam\nfrom lightrag.llm.openai import gpt_4o_mini_complete\nfrom lightrag.utils import EmbeddingFunc\nfrom lightrag.llm.openai import openai_embed  # or your custom embedding\n\nWORKING_DIR = \"./dickens\"\n\nif not os.path.exists(WORKING_DIR):\n    os.mkdir(WORKING_DIR)\n\nrag = LightRAG(\n    working_dir=WORKING_DIR,\n    llm_model_func=gpt_4o_mini_complete,\n    # llm_model_func=gpt_4o_complete\n    embedding_func=EmbeddingFunc(\n        embedding_dim=1536,\n        max_token_size=8192,\n        func=lambda texts: openai_embed(texts, model=\"text-embedding-3-small\")\n    )\n)\n\n\nwith open(\"./book.txt\", \"r\", encoding=\"utf-8\") as f:\n    rag.insert(f.read())\n\n\n# Perform naive search\n# print(\n#     rag.query(query=\"What are the top themes in this story?\", param=QueryParam(mode=\"naive\", ))\n# )\n\n# Perform local search\nprint(\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"local\"))\n)\n\n# Perform global search\nprint(\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"global\"))\n)\n\n# Perform hybrid search\nprint(\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"hybrid\"))\n)\n\nprint(\n    rag.query(query=\"What are the top themes in this story?\", param=QueryParam(mode=\"naive\"))\n)\n```\n\n\nshould be work\n"
+      },
+      {
+        "user": "ArpitNarain",
+        "created_at": "2025-01-28T14:37:05Z",
+        "body": "Thank you so much, it worked."
+      }
+    ]
+  },
+  {
+    "number": 562,
+    "title": "Error running Postgres Demo - SyntaxError",
+    "created_at": "2025-01-09T17:05:10Z",
+    "closed_at": "2025-02-17T11:02:10Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/562",
+    "body": "Error running DEMO . I'm using Python 3.11. \r\n\r\n/home/asksuite/asksuite-dev/test-lightrag/venv311/bin/python /home/asksuite/asksuite-dev/test-lightrag/lightrag_openai_demo_costao_postgres.py \r\nTraceback (most recent call last):\r\n  File \"/home/asksuite/asksuite-dev/test-lightrag/lightrag_openai_demo_costao_postgres.py\", line 5, in <module>\r\n    from lightrag.kg.postgres_impl import PostgreSQLDB\r\n  File \"/home/asksuite/asksuite-dev/test-lightrag/venv311/lib/python3.11/site-packages/lightrag/kg/postgres_impl.py\", line 406\r\n    sql = f\"SELECT id FROM LIGHTRAG_DOC_STATUS WHERE workspace=$1 AND id IN ({\",\".join([f\"'{_id}'\" for _id in data])})\"\r\n                                                                               ^\r\nSyntaxError: f-string: expecting '}'",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/562/comments",
+    "author": "pavei",
+    "comments": [
+      {
+        "user": "WellTung666",
+        "created_at": "2025-01-10T02:57:07Z",
+        "body": "same error\uff01 "
+      },
+      {
+        "user": "WellTung666",
+        "created_at": "2025-01-10T03:45:48Z",
+        "body": "> Error running DEMO . I'm using Python 3.11.\r\n> \r\n> /home/asksuite/asksuite-dev/test-lightrag/venv311/bin/python /home/asksuite/asksuite-dev/test-lightrag/lightrag_openai_demo_costao_postgres.py Traceback (most recent call last): File \"/home/asksuite/asksuite-dev/test-lightrag/lightrag_openai_demo_costao_postgres.py\", line 5, in from lightrag.kg.postgres_impl import PostgreSQLDB File \"/home/asksuite/asksuite-dev/test-lightrag/venv311/lib/python3.11/site-packages/lightrag/kg/postgres_impl.py\", line 406 sql = f\"SELECT id FROM LIGHTRAG_DOC_STATUS WHERE workspace=$1 AND id IN ({\",\".join([f\"'{_id}'\" for _id in data])})\" ^ SyntaxError: f-string: expecting '}'\r\n\r\nThis seems to solve the problem.\r\n\r\n```\r\nid_list = \",\".join([f\"'{_id}'\" for _id in data])\r\nsql = f\"SELECT id FROM LIGHTRAG_DOC_STATUS WHERE workspace=$1 AND id IN ({id_list})\"\r\n```"
+      },
+      {
+        "user": "pavei",
+        "created_at": "2025-01-10T18:32:57Z",
+        "body": "Yes, it works! "
+      }
+    ]
+  },
+  {
+    "number": 445,
+    "title": "\u5173\u4e8e\u5355\u7eaf\u4f7f\u7528LightRAG",
+    "created_at": "2024-12-10T11:23:06Z",
+    "closed_at": "2024-12-11T10:13:49Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/445",
+    "body": "\u8bf7\u95ee\u5982\u679c\u4e0d\u7528\u5927\u6a21\u578b\uff0c\u5355\u7eaf\u4f7f\u7528LightRAG\u5206\u6790\u4e00\u4e2a\u6587\u6863\u5b9e\u4f53\u4e0e\u5b9e\u4f53\u95f4\u3001\u5b9e\u4f53\u4e0e\u4e8b\u4ef6\u3001\u4e8b\u4ef6\u4e0e\u4e8b\u4ef6\u7684\u5173\u7cfb\uff0c\u8fd9\u4e2a\u53ef\u4ee5\u8f93\u51fa\u51fa\u6765\u5417\uff1f",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/445/comments",
+    "author": "joseph16388",
+    "comments": [
+      {
+        "user": "magicyuan876",
+        "created_at": "2024-12-11T01:59:26Z",
+        "body": "\u63d0\u53d6\u5b9e\u4f53\u548c\u5173\u7cfb\u672c\u8eab\u5c31\u662f\u7528LLM\u6765\u62bd\u53d6\u7684\u5440\uff0c\u4e0d\u7528LLM\u80af\u5b9a\u4e0d\u884c\u5440"
+      },
+      {
+        "user": "joseph16388",
+        "created_at": "2024-12-11T10:13:47Z",
+        "body": "> \u63d0\u53d6\u5b9e\u4f53\u548c\u5173\u7cfb\u672c\u8eab\u5c31\u662f\u7528LLM\u6765\u62bd\u53d6\u7684\u5440\uff0c\u4e0d\u7528LLM\u80af\u5b9a\u4e0d\u884c\u5440\r\n\r\n\u597d\u7684\uff0c3Q"
+      }
+    ]
+  },
+  {
+    "number": 249,
+    "title": "RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cpu and cuda:0! (when checking argument for argument index in method wrapper_CUDA__index_select)",
+    "created_at": "2024-11-11T08:49:13Z",
+    "closed_at": "2024-11-19T07:19:54Z",
+    "labels": [
+      "bug"
+    ],
+    "url": "https://github.com/HKUDS/LightRAG/issues/249",
+    "body": "I am using a huggingface demo, but with a local model.How to deal with it?please help me , thank you very much!!\r\n**code**:\r\nimport os\r\n\r\nfrom lightrag import LightRAG, QueryParam\r\nfrom lightrag.llm import hf_model_complete, hf_embedding\r\nfrom lightrag.utils import EmbeddingFunc\r\nfrom transformers import AutoModel, AutoTokenizer\r\n\r\nWORKING_DIR = \"./dickens\"\r\n\r\nif not os.path.exists(WORKING_DIR):\r\n    os.mkdir(WORKING_DIR)\r\n\r\nrag = LightRAG(\r\n    working_dir=WORKING_DIR,\r\n    llm_model_func=hf_model_complete,\r\n    llm_model_name=\"/data/Qwen2.5-14B-Instruct\",\r\n    embedding_func=EmbeddingFunc(\r\n        embedding_dim=1024,\r\n        max_token_size=5000,\r\n        func=lambda texts: hf_embedding(\r\n            texts,\r\n            tokenizer=AutoTokenizer.from_pretrained(\r\n                r\"/data/project/raag/bge-large-zh-v1.5/\", model_max_length=512\r\n            ),\r\n            embed_model=AutoModel.from_pretrained(\r\n                r\"/data/project/raag/bge-large-zh-v1.5/\"\r\n            ),\r\n        ),\r\n    ),\r\n)\r\n\r\nwith open(r\"/data/project/raag/caiwu.txt\", \"r\", encoding=\"utf-8\") as f:\r\n    rag.insert(f.read())\r\n\r\n# Perform naive search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"naive\"))\r\n)\r\n\r\n# Perform local search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"local\"))\r\n)\r\n\r\n# Perform global search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"global\"))\r\n)\r\n\r\n# Perform hybrid search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"hybrid\"))\r\n)\r\nerror:\r\nroot@c15e0721d1a6:~# CUDA_VISIBLE_DEVICES=0  python /data/project/raag/light_rag.py\r\nINFO:lightrag:Logger initialized for working directory: /data/project/raag/dickens\r\nDEBUG:lightrag:LightRAG init with param:\r\n  working_dir = /data/project/raag/dickens,\r\n  chunk_token_size = 1200,\r\n  chunk_overlap_token_size = 100,\r\n  tiktoken_model_name = gpt-4o-mini,\r\n  entity_extract_max_gleaning = 1,\r\n  entity_summary_to_max_tokens = 500,\r\n  node_embedding_algorithm = node2vec,\r\n  node2vec_params = {'dimensions': 1536, 'num_walks': 10, 'walk_length': 40, 'window_size': 2, 'iterations': 3, 'random_seed': 3},\r\n  embedding_func = {'embedding_dim': 1024, 'max_token_size': 5000, 'func': <function <lambda> at 0x7f5eaa0bfd90>},\r\n  embedding_batch_num = 32,\r\n  embedding_func_max_async = 16,\r\n  llm_model_func = <function hf_model_complete at 0x7f5dc1cd6b00>,\r\n  llm_model_name = /data/Qwen2.5-14B-Instruct,\r\n  llm_model_max_token_size = 32768,\r\n  llm_model_max_async = 16,\r\n  key_string_value_json_storage_cls = <class 'lightrag.storage.JsonKVStorage'>,\r\n  vector_db_storage_cls = <class 'lightrag.storage.NanoVectorDBStorage'>,\r\n  vector_db_storage_cls_kwargs = {},\r\n  graph_storage_cls = <class 'lightrag.storage.NetworkXStorage'>,\r\n  enable_llm_cache = True,\r\n  addon_params = {},\r\n  convert_response_to_json_func = <function convert_response_to_json at 0x7f5dc1cbfeb0>\r\n\r\nINFO:lightrag:Load KV full_docs with 0 data\r\nINFO:lightrag:Load KV text_chunks with 0 data\r\nINFO:lightrag:Load KV llm_response_cache with 0 data\r\nINFO:lightrag:Loaded graph from /data/project/raag/dickens/graph_chunk_entity_relation.graphml with 0 nodes, 0 edges\r\nINFO:nano-vectordb:Load (0, 1024) data\r\nINFO:nano-vectordb:Init {'embedding_dim': 1024, 'metric': 'cosine', 'storage_file': '/data/project/raag/dickens/vdb_entities.json'} 0 data\r\nINFO:nano-vectordb:Load (0, 1024) data\r\nINFO:nano-vectordb:Init {'embedding_dim': 1024, 'metric': 'cosine', 'storage_file': '/data/project/raag/dickens/vdb_relationships.json'} 0 data\r\nINFO:nano-vectordb:Load (2, 1024) data\r\nINFO:nano-vectordb:Init {'embedding_dim': 1024, 'metric': 'cosine', 'storage_file': '/data/project/raag/dickens/vdb_chunks.json'} 2 data\r\nINFO:lightrag:Creating a new event loop in a sub-thread.\r\nINFO:lightrag:[New Docs] inserting 1 docs\r\nINFO:lightrag:[New Chunks] inserting 2 chunks\r\nINFO:lightrag:Inserting 2 vectors to chunks\r\nINFO:lightrag:[Entity Extraction]...\r\nINFO:accelerate.utils.modeling:We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).\r\n/usr/local/lib/python3.10/site-packages/accelerate/utils/modeling.py:1390: UserWarning: Current model requires 12544 bytes of buffer for offloaded layers, which seems does not fit any GPU's remaining memory. If you are experiencing a OOM later, please consider using offload_buffers=True.\r\n  warnings.warn(\r\nLoading checkpoint shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 8/8 [00:07<00:00,  1.00it/s]\r\n/usr/local/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:638: UserWarning: `num_beams` is set to 1. However, `early_stopping` is set to `True` -- this flag is only used in beam-based generation modes. You should set `num_beams>1` or unset `early_stopping`.\r\n  warnings.warn(\r\n/usr/local/lib/python3.10/site-packages/transformers/generation/utils.py:2097: UserWarning: You are calling .generate() with the `input_ids` being on a device type different than your model's device. `input_ids` is on cuda, whereas the model is on cpu. You may experience unexpected behaviors or slower generation. Please make sure that you have put `input_ids` to the correct device by calling for example input_ids = input_ids.to('cpu') before running `.generate()`.\r\n  warnings.warn(\r\n/usr/local/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:638: UserWarning: `num_beams` is set to 1. However, `early_stopping` is set to `True` -- this flag is only used in beam-based generation modes. You should set `num_beams>1` or unset `early_stopping`.\r\n  warnings.warn(\r\nINFO:lightrag:Writing graph with 0 nodes, 0 edges\r\nTraceback (most recent call last):\r\n  File \"/data/project/raag/light_rag.py\", line 33, in <module>\r\n    rag.insert(f.read())\r\n  File \"/usr/local/lib/python3.10/site-packages/lightrag/lightrag.py\", line 164, in insert\r\n    return loop.run_until_complete(self.ainsert(string_or_strings))\r\n  File \"/usr/local/lib/python3.10/asyncio/base_events.py\", line 649, in run_until_complete\r\n    return future.result()\r\n  File \"/usr/local/lib/python3.10/site-packages/lightrag/lightrag.py\", line 211, in ainsert\r\n    maybe_new_kg = await extract_entities(\r\n  File \"/usr/local/lib/python3.10/site-packages/lightrag/operate.py\", line 331, in extract_entities\r\n    results = await asyncio.gather(\r\n  File \"/usr/local/lib/python3.10/site-packages/lightrag/operate.py\", line 270, in _process_single_content\r\n    final_result = await use_llm_func(hint_prompt)\r\n  File \"/usr/local/lib/python3.10/site-packages/lightrag/utils.py\", line 87, in wait_func\r\n    result = await func(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/lightrag/llm.py\", line 377, in hf_model_complete\r\n    return await hf_model_if_cache(\r\n  File \"/usr/local/lib/python3.10/site-packages/lightrag/llm.py\", line 286, in hf_model_if_cache\r\n    output = hf_model.generate(\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/utils/_contextlib.py\", line 116, in decorate_context\r\n    return func(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/transformers/generation/utils.py\", line 2215, in generate\r\n    result = self._sample(\r\n  File \"/usr/local/lib/python3.10/site-packages/transformers/generation/utils.py\", line 3206, in _sample\r\n    outputs = self(**model_inputs, return_dict=True)\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1736, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1747, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/transformers/models/qwen2/modeling_qwen2.py\", line 1164, in forward\r\n    outputs = self.model(\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1736, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1747, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/transformers/models/qwen2/modeling_qwen2.py\", line 854, in forward\r\n    inputs_embeds = self.embed_tokens(input_ids)\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1736, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1747, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/modules/sparse.py\", line 190, in forward\r\n    return F.embedding(\r\n  File \"/usr/local/lib/python3.10/site-packages/torch/nn/functional.py\", line 2551, in embedding\r\n    return torch.embedding(weight, input, padding_idx, scale_grad_by_freq, sparse)\r\nRuntimeError: Expected all tensors to be on the same device, but found at least two devices, cpu and cuda:0! (when checking argument for argument index in method wrapper_CUDA__index_select)\r\n",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/249/comments",
+    "author": "Z-oo883",
+    "comments": [
+      {
+        "user": "CooFlow",
+        "created_at": "2024-11-11T12:49:00Z",
+        "body": "I solved it by change the code in llm.py\r\n\r\n`device_map='auto'` to `device_map=None`\r\n\r\n```\r\n@lru_cache(maxsize=1)\r\ndef initialize_hf_model(model_name):\r\n    hf_tokenizer = AutoTokenizer.from_pretrained(\r\n        model_name, device_map=None, trust_remote_code=True\r\n    )\r\n    hf_model = AutoModelForCausalLM.from_pretrained(\r\n        model_name, device_map=None, trust_remote_code=True, torch_dtype=torch.bfloat16).cuda()\r\n    if hf_tokenizer.pad_token is None:\r\n        hf_tokenizer.pad_token = hf_tokenizer.eos_token\r\n\r\n    return hf_model, hf_tokenizer\r\n```"
+      },
+      {
+        "user": "Z-oo883",
+        "created_at": "2024-11-12T02:31:02Z",
+        "body": "> torch_dtype=torch.bfloat16).cuda()\r\n\r\nthank you very much!"
+      }
+    ]
+  },
+  {
+    "number": 109,
+    "title": "Local, Global, and Hybrid Modes Not Working in HF Example",
+    "created_at": "2024-10-23T04:32:56Z",
+    "closed_at": "2024-10-25T01:04:27Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/109",
+    "body": "I'm using the Hugging Face example from the LightRAG repository, and only the naive mode functions correctly. The local, global, and hybrid modes fail to work.\r\n\r\nLLM Model: llam3.1 8b instruct\r\nEmbed Model: all-MiniLM-L12-V2\r\n\r\nAny advice? ",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/109/comments",
+    "author": "shmily1012",
+    "comments": [
+      {
+        "user": "TianyuFan0504",
+        "created_at": "2024-10-23T06:42:32Z",
+        "body": "Hi @shmily1012.\r\nWe have understood your question. Due to the diverse response formats of the HF model, we have not yet added optimizations to all models.\r\nYour problem may arise from the following reasons:\r\n1.The reply format of llama8B is not stable and may generate unreadable JSON, resulting in the query process being unable to proceed\r\n2.Llama8B is not strong enough to find enough entity/relation to handle this type of query.\r\n\r\nAfter our testing, models above 14B can generally perform well"
+      },
+      {
+        "user": "DayanaYuan",
+        "created_at": "2024-10-23T07:09:17Z",
+        "body": "> Hi @shmily1012. We have understood your question. Due to the diverse response formats of the HF model, we have not yet added optimizations to all models. Your problem may arise from the following reasons: 1.The reply format of llama8B is not stable and may generate unreadable JSON, resulting in the query process being unable to proceed 2.Llama8B is not strong enough to find enough entity/relation to handle this type of query.\r\n> \r\n> After our testing, models above 14B can generally perform well\r\n\r\nmy code is follow:WORKING_DIR = \"./dickens\"\r\n\r\nif not os.path.exists(WORKING_DIR):\r\n    os.mkdir(WORKING_DIR)\r\n\r\nrag = LightRAG(\r\n    working_dir=WORKING_DIR,\r\n    llm_model_func=hf_model_complete,\r\n    llm_model_name=\"/LightRAG/examples/meta-llama/Llama3-8B-instruct\",\r\n    # llm_model_name=\"meta-llama/Llama-3.1-8B-Instruct\",\r\n    embedding_func=EmbeddingFunc(\r\n        embedding_dim=384,\r\n        max_token_size=5000,\r\n        func=lambda texts: hf_embedding(\r\n            texts,\r\n            tokenizer=AutoTokenizer.from_pretrained(\r\n                \"LightRAG/examples/sentence-transformers/all-MiniLM-L6-v2\"\r\n            ),\r\n            embed_model=AutoModel.from_pretrained(\r\n                \"LightRAG/examples/sentence-transformers/all-MiniLM-L6-v2\"\r\n            ),\r\n        ),\r\n    ),\r\n)\r\n\r\n\r\nwith open(\"./book.txt\") as f:\r\n    rag.insert(f.read())\r\n\r\n# Perform naive search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"naive\"))\r\n)\r\n\r\n# Perform local search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"local\"))\r\n)\r\n\r\n# Perform global search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"global\"))\r\n)\r\n\r\n# Perform hybrid search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"hybrid\"))\r\n)\r\n\r\nbut the answer is follow:agraphs\r\n\r\nassistant\r\n\r\nBased on the provided text, some of the top themes in this story are:\r\n\r\n1. **Redemption and Change**: The story explores the theme of redemption as Ebenezer Scrooge, a miserly and bitter character, undergoes a transformation after being visited by the Ghost of Christmas Past, Present, and Yet to Come. Scrooge's experiences lead him to reevaluate his values and behavior, ultimately changing his ways and becoming a kinder and more generous person.\r\n2. **Kindness and Generosity**: The story highlights the importance of kindness and generosity, particularly around Christmas. The character of Bob Cratchit, a poor but kind and hardworking man, is a prime example of this theme. The story also shows how small acts of kindness, such as the Cratchits' humble celebrations and Scrooge's eventual generosity, can bring joy and warmth to those around them.\r\n3. **Social Class and Poverty**: The story touches on the theme of social class and poverty\r\nINFO:lightrag:Creating a new event loop in a sub-thread.\r\nLoading checkpoint shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 4/4 [00:03<00:00,  1.03it/s]\r\nWARNING:accelerate.big_modeling:Some parameters are on the meta device because they were offloaded to the cpu.\r\nSorry, I'm not able to provide an answer to that question.\r\nINFO:lightrag:Creating a new event loop in a sub-thread.\r\nLoading checkpoint shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 4/4 [00:06<00:00,  1.58s/it]\r\nINFO:lightrag:Creating a new event loop in a sub-thread.\r\nSorry, I'm not able to provide an answer to that question.\r\nLoading checkpoint shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 4/4 [00:03<00:00,  1.03it/s]\r\nWARNING:accelerate.big_modeling:Some parameters are on the meta device because they were offloaded to the cpu.\r\n/LightRAG/lightrag/operate.py:990: UserWarning: High Level context is None. Return empty High entity/relationship/source\r\n  warnings.warn(\r\nLightRAG/lightrag/operate.py:998: UserWarning: Low Level context is None. Return empty Low entity/relationship/source\r\n  warnings.warn(\r\nLoading checkpoint shards: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 4/4 [00:06<00:00,  1.58s/it]\r\nsystem\r\n\r\n---Role---\r\n\r\nYou are a helpful assistant responding to questions about data in the tables provided.\r\n\r\n\r\n---Goal---\r\n\r\nGenerate a response of the target length and format that responds to the 's question, summarizing all information in the input data tables appropriate for the response length and format, and incorporating any relevant general knowledge.\r\nIf you don't know the answer, just say so. Do not make anything up.\r\nDo not include information where the supporting evidence for it is not provided.\r\n\r\n---Target response length and format---\r\n\r\nMultiple Paragraphs\r\n\r\n---Data tables---\r\n\r\n\r\n-----Entities-----\r\n```csv\r\n\r\n-----Relationships-----\r\n\r\n-----Sources-----\r\n\r\n\r\n\r\nAdd sections and commentary to the response as appropriate for the length and format. Style the response in markdown.\r\n\r\nassistant\r\n\r\nI'm happy to help! However, I don't see any data tables provided. Could you please provide the tables for \"Entities\", \"Relationships\", and \"Sources\" so I can assist you in identifying the top themes in the story?\r\n\r\n\u8fdb\u7a0b\u5df2\u7ed3\u675f,\u9000\u51fa\u4ee3\u78010 \r\n\r\nIs this because of a problem with the 3B model?"
+      },
+      {
+        "user": "shmily1012",
+        "created_at": "2024-10-23T14:31:11Z",
+        "body": "> Hi @shmily1012. We have understood your question. Due to the diverse response formats of the HF model, we have not yet added optimizations to all models. Your problem may arise from the following reasons: 1.The reply format of llama8B is not stable and may generate unreadable JSON, resulting in the query process being unable to proceed 2.Llama8B is not strong enough to find enough entity/relation to handle this type of query.\r\n> \r\n> After our testing, models above 14B can generally perform well\r\n\r\nHi @TianyuFan0504, thanks for your quick response. I am wondering if you can you provide the full name of your 14B model. I really would like to give it a try.\r\nBR,\r\nAlex"
+      },
+      {
+        "user": "shmily1012",
+        "created_at": "2024-10-23T14:40:08Z",
+        "body": "I will try Llama3.2 11b and Qwen2 14B today, let's see."
+      },
+      {
+        "user": "TianyuFan0504",
+        "created_at": "2024-10-24T10:41:40Z",
+        "body": "> > Hi @shmily1012. We have understood your question. Due to the diverse response formats of the HF model, we have not yet added optimizations to all models. Your problem may arise from the following reasons: 1.The reply format of llama8B is not stable and may generate unreadable JSON, resulting in the query process being unable to proceed 2.Llama8B is not strong enough to find enough entity/relation to handle this type of query.\r\n> > After our testing, models above 14B can generally perform well\r\n> \r\n> Hi @TianyuFan0504, thanks for your quick response. I am wondering if you can you provide the full name of your 14B model. I really would like to give it a try. BR, Alex\r\n\r\nThere are some models we have tested:llama1b/3b/7b/11b, qwen 14b, minicpm4b, gemma2b, baichuan2b. \r\nOnly qwen  work. : ("
+      },
+      {
+        "user": "shmily1012",
+        "created_at": "2024-10-24T17:09:48Z",
+        "body": "Qwen2 works on my test bench as well. However, I noticed that the Hugging Face generator currently has a fixed response length of 200 tokens, which may require adjustment depending on our needs.Sent from my iPhoneOn Oct 24, 2024, at 3:42\u202fAM, Tianyu Fan ***@***.***> wrote:\ufeff\r\n\r\n\r\nHi @shmily1012. We have understood your question. Due to the diverse response formats of the HF model, we have not yet added optimizations to all models. Your problem may arise from the following reasons: 1.The reply format of llama8B is not stable and may generate unreadable JSON, resulting in the query process being unable to proceed 2.Llama8B is not strong enough to find enough entity/relation to handle this type of query.\r\nAfter our testing, models above 14B can generally perform well\r\n\r\nHi @TianyuFan0504, thanks for your quick response. I am wondering if you can you provide the full name of your 14B model. I really would like to give it a try. BR, Alex\r\n\r\nThere are some models we have tested:llama1b/3b/7b/11b, qwen 14b, minicpm4b, gemma2b, baichuan2b.\r\nOnly qwen  work. : (\r\n\r\n\u2014Reply to this email directly, view it on GitHub, or unsubscribe.You are receiving this because you were mentioned.Message ID: ***@***.***>"
+      },
+      {
+        "user": "shmily1012",
+        "created_at": "2024-10-25T01:04:49Z",
+        "body": "Qwen2 14B works with HF mode."
+      },
+      {
+        "user": "amenhere",
+        "created_at": "2025-01-17T03:04:47Z",
+        "body": "\u6211\u6d4b\u8bd5\u4e86qwen-vl-plus\uff0cglm-4-flash\uff0cgpt-4-turbo\u548cgpt-4o-mini-2024-07-18\u90fd\u6709\u53ef\u80fd\u51fa\u73b0\u8fd9\u4e2a\u95ee\u9898\uff0c\u800c\u4e14\u9891\u7387\u5f88\u9ad8\u3002\n\u6211\u63d0\u51fa\u7684\u7684\u95ee\u9898\u5982\u4e0b\uff1a\n\nprompt\uff1a\n\u8bf7\u6839\u636e\u4ee5\u4e0b\u6bcf\u4e2a\u6807\u7b7e\u540e\u7684\u63cf\u8ff0\uff0c\u51c6\u786e\u63d0\u53d6\u5408\u540c\u4e2d\u6bcf\u4e2a\u5b9e\u4f53\u7684\u5bf9\u5e94\u4fe1\u606f\uff1a\n\u89c4\u5219\uff1a\n1\u3001\u5f53\u524d\u5408\u540c\u4e2d\u6ca1\u6709\u8fd9\u4e2a\u6807\u7b7e\u5b9e\u4f53\u65f6\u53ef\u4ee5\u7528\"None\"\u586b\u5199\uff1b\n2\u3001\u7528\u4e2d\u6587\u8f93\u51fa\uff1b\n3\u3001\u5b9e\u4f53\u4fe1\u606f\u5fc5\u987b\u662f\u5408\u540c\u4e2d\u7684\u539f\u6587\uff0c\u4e0d\u53ef\u4ee5\u8fdb\u884c\u7f16\u9020\uff01\uff01\uff01\n4\u3001\u4e0d\u8981\u51fa\u73b0\u65e0\u5173\u7684\u63d0\u793a\u8bcd\uff0c\u5982\uff1a\u6211\u8ba4\u4e3a\uff0c\u603b\u7ed3\uff0c\u53ef\u80fd\uff0c\u7b49\u7b49\uff1b\n5\u3001\u7528json\u7684\u683c\u5f0f\u8fd4\u56de\u5b9e\u4f53\u5b57\u5178\u8868\u548c\u4ed6\u5bf9\u5e94\u7684\u5b9e\u4f53\u4fe1\u606f\uff0c\u4f8b\u5982\uff1a{\"\u5b9e\u4f53\u6807\u7b7e\":\"\u5b9e\u4f53\u5185\u5bb9\"}\uff1b\n\n####\u6807\u7b7e\u89e3\u91ca\n\u5408\u540c\u7f16\u53f7: \u5408\u540c\u7684\u552f\u4e00\u6807\u8bc6\u7b26\uff0c\u901a\u5e38\u4e3a\u4e00\u4e32\u6570\u5b57\u6216\u5b57\u6bcd\u7ec4\u5408\u3002\u7528\u4e8e\u533a\u5206\u4e0d\u540c\u5408\u540c\u3002\n\u5408\u540c\u540d\u79f0: \u5408\u540c\u7684\u6b63\u5f0f\u540d\u79f0\u6216\u6807\u9898\uff0c\u901a\u5e38\u5305\u62ec\u5408\u540c\u7c7b\u578b\u3001\u7b7e\u7ea6\u65b9\u6216\u9879\u76ee\u540d\u79f0\u7b49\u4fe1\u606f\u3002\n\u7b7e\u8ba2\u65e5\u671f: \u5408\u540c\u8fbe\u6210\u7684\u65e5\u671f\uff0c\u901a\u5e38\u662f\u7532\u65b9\u548c\u4e59\u65b9\u53cc\u65b9\u7b7e\u7f72\u5408\u540c\u7684\u5177\u4f53\u65e5\u671f\u3002\n\u5408\u540c\u6709\u6548\u671f: \u5408\u540c\u5728\u6cd5\u5f8b\u4e0a\u751f\u6548\u5e76\u6301\u7eed\u6709\u6548\u7684\u65f6\u95f4\u6bb5\uff0c\u901a\u5e38\u5305\u62ec\u5f00\u59cb\u65e5\u671f\u548c\u7ed3\u675f\u65e5\u671f\u3002\n\u5408\u540c\u4e3b\u8981\u5185\u5bb9: \u5408\u540c\u7684\u6838\u5fc3\u6761\u6b3e\u6216\u6d89\u53ca\u7684\u4e3b\u8981\u4e8b\u9879\uff0c\u7b80\u8981\u6982\u8ff0\u5408\u540c\u7684\u57fa\u672c\u7ea6\u5b9a\u3002\n\u670d\u52a1\u5185\u5bb9: \u4e59\u65b9\u63d0\u4f9b\u7684\u670d\u52a1\u6216\u7532\u65b9\u8981\u6c42\u4e59\u65b9\u5b8c\u6210\u7684\u4efb\u52a1\u548c\u5de5\u4f5c\u5185\u5bb9\u3002\n\u7532\u65b9\u540d\u79f0: \u5408\u540c\u4e2d\u7684\u4e00\u65b9\uff0c\u901a\u5e38\u4e3a\u53d1\u8d77\u65b9\u6216\u59d4\u6258\u65b9\uff0c\u5e38\u89c1\u4e8e\u8d2d\u4e70\u3001\u5408\u4f5c\u6216\u59d4\u6258\u7b49\u5408\u540c\u3002\n\u4e59\u65b9\u540d\u79f0: \u5408\u540c\u4e2d\u7684\u53e6\u4e00\u65b9\uff0c\u901a\u5e38\u4e3a\u63a5\u53d7\u65b9\u6216\u670d\u52a1\u63d0\u4f9b\u65b9\u3002\n\u7532\u65b9\u7eb3\u7a0e\u4eba\u8bc6\u522b\u53f7: \u7532\u65b9\u5728\u7a0e\u52a1\u7cfb\u7edf\u4e2d\u7684\u552f\u4e00\u8bc6\u522b\u53f7\u7801\uff0c\u7528\u4e8e\u7a0e\u52a1\u8bc6\u522b\u3002\n\u4e59\u65b9\u7eb3\u7a0e\u4eba\u8bc6\u522b\u53f7: \u4e59\u65b9\u5728\u7a0e\u52a1\u7cfb\u7edf\u4e2d\u7684\u552f\u4e00\u8bc6\u522b\u53f7\u7801\uff0c\u7528\u4e8e\u7a0e\u52a1\u8bc6\u522b\u3002\n\u7532\u65b9\u5730\u5740: \u7532\u65b9\u7684\u6ce8\u518c\u5730\u5740\u6216\u4e3b\u8981\u529e\u516c\u5730\u70b9\uff0c\u901a\u5e38\u4e3a\u6cd5\u4eba\u6ce8\u518c\u5730\u6216\u8054\u7cfb\u5730\u5740\u3002\n\u4e59\u65b9\u5730\u5740: \u4e59\u65b9\u7684\u6ce8\u518c\u5730\u5740\u6216\u4e3b\u8981\u529e\u516c\u5730\u70b9\uff0c\u901a\u5e38\u4e3a\u6cd5\u4eba\u6ce8\u518c\u5730\u6216\u8054\u7cfb\u5730\u5740\u3002\n\u7532\u65b9\u7535\u8bdd: \u7532\u65b9\u7684\u8054\u7cfb\u65b9\u5f0f\uff0c\u901a\u5e38\u662f\u7535\u8bdd\u53f7\u7801\uff0c\u7528\u4e8e\u65e5\u5e38\u6c9f\u901a\u3002\n\u4e59\u65b9\u7535\u8bdd: \u4e59\u65b9\u7684\u8054\u7cfb\u65b9\u5f0f\uff0c\u901a\u5e38\u662f\u7535\u8bdd\u53f7\u7801\uff0c\u7528\u4e8e\u65e5\u5e38\u6c9f\u901a\u3002\n\u8fdd\u7ea6\u8d23\u4efb: \u5408\u540c\u4e2d\u89c4\u5b9a\u7684\u8fdd\u7ea6\u6761\u6b3e\uff0c\u63cf\u8ff0\u5f53\u4e8b\u4e00\u65b9\u672a\u5c65\u884c\u5408\u540c\u4e49\u52a1\u65f6\u5e94\u627f\u62c5\u7684\u8d23\u4efb\u3002\n\u4e89\u8bae\u89e3\u51b3\u65b9\u5f0f: \u5f53\u5408\u540c\u53cc\u65b9\u53d1\u751f\u4e89\u8bae\u65f6\uff0c\u7ea6\u5b9a\u7684\u89e3\u51b3\u65b9\u5f0f\uff0c\u5982\u4ef2\u88c1\u3001\u8bc9\u8bbc\u6216\u8c03\u89e3\u7b49\u3002\n\n####\u5b9e\u4f53\u5b57\u5178\n{\n    \u5408\u540c\u7f16\u53f7:\n    \u5408\u540c\u540d\u79f0:\n    \u7b7e\u8ba2\u65e5\u671f:\n    \u5408\u540c\u6709\u6548\u671f:\n    \u5408\u540c\u4e3b\u8981\u5185\u5bb9:\n    \u670d\u52a1\u5185\u5bb9:\n    \u7532\u65b9\u540d\u79f0:\n    \u4e59\u65b9\u540d\u79f0:\n    \u7532\u65b9\u7eb3\u7a0e\u4eba\u8bc6\u522b\u53f7:\n    \u4e59\u65b9\u7eb3\u7a0e\u4eba\u8bc6\u522b\u53f7:\n    \u7532\u65b9\u5730\u5740:\n    \u4e59\u65b9\u5730\u5740:\n    \u7532\u65b9\u7535\u8bdd:\n    \u4e59\u65b9\u7535\u8bdd:\n    \u8fdd\u7ea6\u8d23\u4efb:\n    \u4e89\u8bae\u89e3\u51b3\u65b9\u5f0f:\n}"
+      }
+    ]
+  },
+  {
+    "number": 105,
+    "title": "AttributeError: module 'ollama' has no attribute 'embeddings'",
+    "created_at": "2024-10-22T23:18:40Z",
+    "closed_at": "2024-10-25T11:17:23Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/105",
+    "body": "I'm running the following adaptation to the ollama example:\r\n\r\n```\r\nimport os\r\n\r\nfrom lightrag import LightRAG, QueryParam\r\nfrom lightrag.llm import ollama_model_complete, ollama_embedding\r\nfrom lightrag.utils import EmbeddingFunc\r\n\r\nWORKING_DIR = \"light_rag/dickens\"\r\nMODEL_NAME = \"llama3.2:3b\"\r\n\r\nif not os.path.exists(WORKING_DIR):\r\n    os.mkdir(WORKING_DIR)\r\n\r\nrag = LightRAG(\r\n    working_dir=WORKING_DIR,\r\n    llm_model_func=ollama_model_complete,\r\n    llm_model_name=MODEL_NAME,\r\n    embedding_func=EmbeddingFunc(\r\n        embedding_dim=768,\r\n        max_token_size=8192,\r\n        func=lambda texts: ollama_embedding(texts, embed_model=\"nomic-embed-text\"),\r\n    ),\r\n)\r\n\r\n\r\nwith open(\"light_rag/dickens/book.txt\") as f:\r\n    rag.insert(f.read())\r\n\r\n# Perform naive search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"naive\"))\r\n)\r\n\r\n# Perform local search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"local\"))\r\n)\r\n\r\n# Perform global search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"global\"))\r\n)\r\n\r\n# Perform hybrid search\r\nprint(\r\n    rag.query(\"What are the top themes in this story?\", param=QueryParam(mode=\"hybrid\"))\r\n)\r\n```\r\n\r\nUnfortunately, I'm getting the following error:\r\n\r\n```\r\nINFO:lightrag:Logger initialized for working directory: light_rag/dickens\r\nDEBUG:lightrag:LightRAG init with param:\r\n  working_dir = light_rag/dickens,\r\n  chunk_token_size = 1200,\r\n  chunk_overlap_token_size = 100,\r\n  tiktoken_model_name = gpt-4o-mini,\r\n  entity_extract_max_gleaning = 1,\r\n  entity_summary_to_max_tokens = 500,\r\n  node_embedding_algorithm = node2vec,\r\n  node2vec_params = {'dimensions': 1536, 'num_walks': 10, 'walk_length': 40, 'window_size': 2, 'iterations': 3, 'random_seed': 3},\r\n  embedding_func = {'embedding_dim': 768, 'max_token_size': 8192, 'func': <function <lambda> at 0x1268d1440>},\r\n  embedding_batch_num = 32,\r\n  embedding_func_max_async = 16,\r\n  llm_model_func = <function ollama_model_complete at 0x142289800>,\r\n  llm_model_name = llama3.2:3b,\r\n  llm_model_max_token_size = 32768,\r\n  llm_model_max_async = 16,\r\n  key_string_value_json_storage_cls = <class 'lightrag.storage.JsonKVStorage'>,\r\n  vector_db_storage_cls = <class 'lightrag.storage.NanoVectorDBStorage'>,\r\n  vector_db_storage_cls_kwargs = {},\r\n  graph_storage_cls = <class 'lightrag.storage.NetworkXStorage'>,\r\n  enable_llm_cache = True,\r\n  addon_params = {},\r\n  convert_response_to_json_func = <function convert_response_to_json at 0x141af6980>\r\nINFO:lightrag:Load KV full_docs with 0 data\r\nINFO:lightrag:Load KV text_chunks with 0 data\r\nINFO:lightrag:Load KV llm_response_cache with 0 data\r\nINFO:nano-vectordb:Init {'embedding_dim': 768, 'metric': 'cosine', 'storage_file': 'light_rag/dickens/vdb_entities.json'} 0 data\r\nINFO:nano-vectordb:Init {'embedding_dim': 768, 'metric': 'cosine', 'storage_file': 'light_rag/dickens/vdb_relationships.json'} 0 data\r\nINFO:nano-vectordb:Init {'embedding_dim': 768, 'metric': 'cosine', 'storage_file': 'light_rag/dickens/vdb_chunks.json'} 0 data\r\nINFO:lightrag:Creating a new event loop in a sub-thread.\r\nINFO:lightrag:[New Docs] inserting 1 docs\r\nINFO:lightrag:[New Chunks] inserting 42 chunks\r\nINFO:lightrag:Inserting 42 vectors to chunks\r\nINFO:lightrag:Writing graph with 0 nodes, 0 edges\r\nTraceback (most recent call last):\r\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\r\n  File \"<frozen runpy>\", line 88, in _run_code\r\n  File \"light_rag/src/example.py\", line 26, in <module>\r\n    rag.insert(f.read())\r\n  File \"site-packages/lightrag/lightrag.py\", line 162, in insert\r\n    return loop.run_until_complete(self.ainsert(string_or_strings))\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/base_events.py\", line 653, in run_until_complete\r\n    return future.result()\r\n           ^^^^^^^^^^^^^^^\r\n  File \"site-packages/lightrag/lightrag.py\", line 206, in ainsert\r\n    await self.chunks_vdb.upsert(inserting_chunks)\r\n  File \"site-packages/lightrag/storage.py\", line 92, in upsert\r\n    embeddings_list = await asyncio.gather(\r\n                      ^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/site-packages/lightrag/utils.py\", line 87, in wait_func\r\n    result = await func(*args, **kwargs)\r\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"site-packages/lightrag/utils.py\", line 43, in __call__\r\n    return await self.func(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"site-packages/lightrag/llm.py\", line 421, in ollama_embedding\r\n    data = ollama.embeddings(model=embed_model, prompt=text)\r\n           ^^^^^^^^^^^^^^^^^\r\nAttributeError: module 'ollama' has no attribute 'embeddings'\r\n```",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/105/comments",
+    "author": "rcontesti",
+    "comments": [
+      {
+        "user": "LarFii",
+        "created_at": "2024-10-23T04:01:22Z",
+        "body": "You can try creating a new virtual environment and then install LightRAG in it."
+      },
+      {
+        "user": "rcontesti",
+        "created_at": "2024-10-23T13:44:06Z",
+        "body": "> You can try creating a new virtual environment and then install LightRAG in it.\r\n\r\nThanks, I was able to solve it that way. I'm surprised that it works that way since in both env I have installed the same ollama version. Any clues of what might be going on with ollama? "
+      }
+    ]
+  },
+  {
+    "number": 60,
+    "title": "Embeddings with ndim != 4096",
+    "created_at": "2024-10-19T16:28:08Z",
+    "closed_at": "2024-10-23T03:13:55Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/60",
+    "body": "I'm having trouble running this with embedding funcs with `ndim != 4096`.\r\n\r\nSo tying this with \r\n\r\n```python3\r\nrag = LightRAG(\r\n    working_dir=WORKING_DIR,\r\n    llm_model_func=llm_model_func,\r\n    embedding_func=EmbeddingFunc(\r\n        embedding_dim=768, max_token_size=8192, func=embedding_func\r\n    ),\r\n)\r\n```\r\n\r\nI keep getting\r\n\r\n```\r\nvenv/lib/python3.12/site-packages/nano_vectordb/dbs.py\", line 71, in __post_init__\r\n    storage[\"embedding_dim\"] == self.embedding_dim\r\nAssertionError: Embedding dim mismatch, expected: 768, but loaded: 4096\r\n```\r\n\r\nIs this `4096` somehow a magic number?",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/60/comments",
+    "author": "Florents-Tselai",
+    "comments": [
+      {
+        "user": "cortseverns",
+        "created_at": "2024-10-19T17:11:35Z",
+        "body": "> I'm having trouble running this with embedding funcs with `ndim != 4096`.\r\n> \r\n> So tying this with\r\n> \r\n> ```python\r\n> rag = LightRAG(\r\n>     working_dir=WORKING_DIR,\r\n>     llm_model_func=llm_model_func,\r\n>     embedding_func=EmbeddingFunc(\r\n>         embedding_dim=768, max_token_size=8192, func=embedding_func\r\n>     ),\r\n> )\r\n> ```\r\n> \r\n> I keep getting\r\n> \r\n> ```\r\n> venv/lib/python3.12/site-packages/nano_vectordb/dbs.py\", line 71, in __post_init__\r\n>     storage[\"embedding_dim\"] == self.embedding_dim\r\n> AssertionError: Embedding dim mismatch, expected: 768, but loaded: 4096\r\n> ```\r\n> \r\n> Is this `4096` somehow a magic number?\r\n\r\nDifferent embedding models have different defaults. Have you changed away from nomic-embed-text?"
+      },
+      {
+        "user": "Florents-Tselai",
+        "created_at": "2024-10-19T18:26:28Z",
+        "body": "> > I'm having trouble running this with embedding funcs with `ndim != 4096`.\r\n> > So tying this with\r\n> > ```python\r\n> > rag = LightRAG(\r\n> >     working_dir=WORKING_DIR,\r\n> >     llm_model_func=llm_model_func,\r\n> >     embedding_func=EmbeddingFunc(\r\n> >         embedding_dim=768, max_token_size=8192, func=embedding_func\r\n> >     ),\r\n> > )\r\n> > ```\r\n> > \r\n> > \r\n> >     \r\n> >       \r\n> >     \r\n> > \r\n> >       \r\n> >     \r\n> > \r\n> >     \r\n> >   \r\n> > I keep getting\r\n> > ```\r\n> > venv/lib/python3.12/site-packages/nano_vectordb/dbs.py\", line 71, in __post_init__\r\n> >     storage[\"embedding_dim\"] == self.embedding_dim\r\n> > AssertionError: Embedding dim mismatch, expected: 768, but loaded: 4096\r\n> > ```\r\n> > \r\n> > \r\n> >     \r\n> >       \r\n> >     \r\n> > \r\n> >       \r\n> >     \r\n> > \r\n> >     \r\n> >   \r\n> > Is this `4096` somehow a magic number?\r\n> \r\n> Different embedding models have different defaults. Have you changed away from nomic-embed-text?\r\n\r\nThat's what the `embedding_dim` is supposed to set I assume \r\n```\r\nembedding_func=EmbeddingFunc(\r\n        embedding_dim=768, max_token_size=8192, func=embedding_func\r\n    )\r\n```"
+      },
+      {
+        "user": "Florents-Tselai",
+        "created_at": "2024-10-19T18:35:25Z",
+        "body": "* and yes, I got the same error when I tried an embedding model with `embedding_dim=2048` for example. "
+      },
+      {
+        "user": "LarFii",
+        "created_at": "2024-10-20T10:13:57Z",
+        "body": "The embedding model's dimension should match the one you've set. I suggest you try setting `embedding_dim=4096` and see if that works : )."
+      },
+      {
+        "user": "Florents-Tselai",
+        "created_at": "2024-10-20T11:45:07Z",
+        "body": "> The embedding model's dimension should match the one you've set. I suggest you try setting `embedding_dim=4096` and see if that works : ).\n\nWhy would I do that ? \nI know my embedding model it's not 4096.\nAnyway I tried that and again it doesn't work.\n\nLooks like whatever the embedding model ndim is, from the storage layer it tries to fetch vectors with ndim=4096\n"
+      },
+      {
+        "user": "boogle",
+        "created_at": "2024-10-21T04:18:04Z",
+        "body": "\u628a\u4f60WORKING_DIR\u76ee\u5f55\u4e0b\uff0c\u751f\u6210\u7684\u914d\u7f6e\u6587\u4ef6\u5220\u9664\u540e\uff0c\u91cd\u65b0\u8fd0\u884c\u5373\u53ef\u3002"
+      },
+      {
+        "user": "LarFii",
+        "created_at": "2024-10-21T06:00:33Z",
+        "body": "> > The embedding model's dimension should match the one you've set. I suggest you try setting `embedding_dim=4096` and see if that works : ).\r\n> \r\n> Why would I do that ? I know my embedding model it's not 4096. Anyway I tried that and again it doesn't work.\r\n> \r\n> Looks like whatever the embedding model ndim is, from the storage layer it tries to fetch vectors with ndim=4096\r\n\r\nOne potential solution is to create a new working directory and try again. If this doesn't work, please provide the specific log and more detailed information about the runtime environment."
+      },
+      {
+        "user": "thinkthinking",
+        "created_at": "2024-10-21T15:43:49Z",
+        "body": "> \u628a\u4f60WORKING_DIR\u76ee\u5f55\u4e0b\uff0c\u751f\u6210\u7684\u914d\u7f6e\u6587\u4ef6\u5220\u9664\u540e\uff0c\u91cd\u65b0\u8fd0\u884c\u5373\u53ef\u3002\r\n\r\nit works, thank you"
+      }
+    ]
+  },
+  {
+    "number": 51,
+    "title": "Can't run any example",
+    "created_at": "2024-10-18T19:25:37Z",
+    "closed_at": "2024-10-18T23:59:08Z",
+    "labels": [],
+    "url": "https://github.com/HKUDS/LightRAG/issues/51",
+    "body": "I'm not able to run the example.\r\n\r\nI've tried this with python 3.9, 3.10, and 3.11. The initial bit of the examples work up until I run\r\n```python\r\nwith open(\"./book.txt\") as f:\r\n    rag.insert(f.read())\r\n\r\n```\r\n\r\nWhen `rag.insert(f.read())`, is run the following error appears every time:\r\n\r\n```logs\r\nRuntimeError                              Traceback (most recent call last)\r\nCell In[9], line 1\r\n----> 1 rag.insert(our_docs)\r\n\r\nFile /home/jupyter/projects/LightRAG/lightrag/lightrag.py:166, in LightRAG.insert(self, string_or_strings)\r\n    164 def insert(self, string_or_strings):\r\n    165     loop = always_get_an_event_loop()\r\n--> 166     return loop.run_until_complete(self.ainsert(string_or_strings))\r\n\r\nFile /opt/conda/envs/lightrag/lib/python3.11/asyncio/base_events.py:626, in BaseEventLoop.run_until_complete(self, future)\r\n    615 \"\"\"Run until the Future is done.\r\n    616 \r\n    617 If the argument is a coroutine, it is wrapped in a Task.\r\n   (...)\r\n    623 Return the Future's result, or raise its exception.\r\n    624 \"\"\"\r\n    625 self._check_closed()\r\n--> 626 self._check_running()\r\n    628 new_task = not futures.isfuture(future)\r\n    629 future = tasks.ensure_future(future, loop=self)\r\n\r\nFile /opt/conda/envs/lightrag/lib/python3.11/asyncio/base_events.py:586, in BaseEventLoop._check_running(self)\r\n    584 def _check_running(self):\r\n    585     if self.is_running():\r\n--> 586         raise RuntimeError('This event loop is already running')\r\n    587     if events._get_running_loop() is not None:\r\n    588         raise RuntimeError(\r\n    589             'Cannot run the event loop while another loop is running')\r\n\r\nRuntimeError: This event loop is already running\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/HKUDS/LightRAG/issues/51/comments",
+    "author": "wrosko",
+    "comments": [
+      {
+        "user": "jannikdev",
+        "created_at": "2024-10-18T20:06:01Z",
+        "body": "Hi, the problem is that you are running this in a Jupyter notebook which is itself already running a loop. To do this in a notebook add \r\n`import nest_asyncio` and\r\n`nest_asyncio.apply()`\r\nbefore trying to run the async loop.\r\n\r\nIf you are wondering where you are trying to run something asynchronously: insert just wraps around ainsert and waits for completion. It will always start an event loop."
+      },
+      {
+        "user": "ashishjaddu",
+        "created_at": "2024-10-18T20:51:00Z",
+        "body": "Hi, I tried it this way in my notebook and it worked for me. Hope this helps you.\r\n\r\n```python\r\nfrom lightrag.utils import EmbeddingFunc\r\nfrom lightrag import LightRAG, QueryParam\r\nfrom lightrag.llm import gpt_4o_mini_complete, gpt_4o_complete\r\nimport os\r\nimport nest_asyncio\r\n\r\nWORKING_DIR = \"./dickens\"\r\nnest_asyncio.apply()\r\n\r\nos.environ[\"OPENAI_API_KEY\"] = \"sk-proj-\"\r\nif not os.path.exists(WORKING_DIR):\r\n    os.mkdir(WORKING_DIR)\r\n\r\nfrom lightrag.llm import hf_model_complete, hf_embedding\r\nfrom transformers import AutoModel, AutoTokenizer\r\n\r\nbook_file_path = os.path.join(WORKING_DIR, \"book.txt\")\r\n\r\nrag = LightRAG(\r\n    working_dir=WORKING_DIR,\r\n    llm_model_func=gpt_4o_mini_complete\r\n)\r\n\r\nasync def insert_book_content():\r\n    with open(book_file_path, 'r') as f:\r\n        await rag.insert(f.read()) \r\n\r\nawait insert_book_content()\r\n"
+      },
+      {
+        "user": "wrosko",
+        "created_at": "2024-10-18T23:59:09Z",
+        "body": "> Hi, the problem is that you are running this in a Jupyter notebook which is itself already running a loop. To do this in a notebook add `import nest_asyncio` and `nest_asyncio.apply()` before trying to run the async loop.\r\n> \r\n> If you are wondering where you are trying to run something asynchronously: insert just wraps around ainsert and waits for completion. It will always start an event loop.\r\n\r\nThanks @jannikdev this solves the issue. I appreciate it"
+      }
+    ]
+  }
+]

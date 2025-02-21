@@ -1,0 +1,47 @@
+[
+  {
+    "number": 93,
+    "title": "smartscreen",
+    "created_at": "2024-10-11T18:07:28Z",
+    "closed_at": "2024-10-11T20:30:28Z",
+    "labels": [
+      "not a bug"
+    ],
+    "url": "https://github.com/cafali/SnapKey/issues/93",
+    "body": "Hi SnapKey Team,\r\n\r\nI've been interested in using SnapKey, but I've encountered a couple of security warnings. SmartScreen flagged it as malicious, and VirusTotal showed one flag. Could you provide any information or assurances regarding these concerns?\r\n\r\nThanks for your help, [ro6axe]",
+    "comments_url": "https://api.github.com/repos/cafali/SnapKey/issues/93/comments",
+    "author": "ro6axe",
+    "comments": [
+      {
+        "user": "kaxonomy",
+        "created_at": "2024-10-11T20:07:09Z",
+        "body": "Brother, it's open source."
+      },
+      {
+        "user": "cafali",
+        "created_at": "2024-10-11T20:08:24Z",
+        "body": "> Hi SnapKey Team,\r\n> \r\n> I've been interested in using SnapKey, but I've encountered a couple of security warnings. SmartScreen flagged it as malicious, and VirusTotal showed one flag. Could you provide any information or assurances regarding these concerns?\r\n> \r\n> Thanks for your help, [ro6axe]\r\n\r\nmalware"
+      },
+      {
+        "user": "ro6axe",
+        "created_at": "2024-10-11T20:11:12Z",
+        "body": "Open source can still contain viruses"
+      },
+      {
+        "user": "AoElite",
+        "created_at": "2024-10-11T20:23:28Z",
+        "body": "It's a small project with only a few files, just look at the source code."
+      },
+      {
+        "user": "ro6axe",
+        "created_at": "2024-10-11T20:30:22Z",
+        "body": "Ok i check it and it was safe thank u"
+      },
+      {
+        "user": "ro6axe",
+        "created_at": "2024-10-11T20:30:28Z",
+        "body": "Thank u all"
+      }
+    ]
+  }
+]

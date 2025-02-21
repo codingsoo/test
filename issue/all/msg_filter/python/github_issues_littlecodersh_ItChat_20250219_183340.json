@@ -1,0 +1,312 @@
+[
+  {
+    "number": 479,
+    "title": "\u8bf7\u95ee\u5982\u679c\u7b2c\u4e00\u6b21\u626b\u7801\u767b\u9646\u540e\uff0c\u7136\u540e\u624b\u673a\u5fae\u4fe1\u65ad\u7f51\uff0c\u8fd8\u80fd\u7ee7\u7eed\u4f7f\u7528\u5417",
+    "created_at": "2017-08-12T09:12:29Z",
+    "closed_at": "2017-09-20T02:27:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/479",
+    "body": "\u8bf7\u95ee\u5982\u679c\u7b2c\u4e00\u6b21\u626b\u7801\u767b\u9646\u540e\u5f00\u59cb\u7fa4\u53d1\u6d88\u606f\uff0c\u7136\u540e\u624b\u673a\u5fae\u4fe1\u65ad\u7f51\uff0c\u8fd8\u80fd\u7ee7\u7eed\u53d1\u9001\u5417\uff0c\u5982\u679c\u6b64\u65f6\u6211\u518d\u626b\u7801\u767b\u5f55web\u5fae\u4fe1\u4f1a\u4e0d\u4f1a\u81ea\u52a8\u5173\u95ed\u4e86\u7b2c\u4e00\u6b21\u7684\u529f\u80fd",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/479/comments",
+    "author": "daydaystudylab",
+    "comments": [
+      {
+        "user": "xiaoxiaoyao",
+        "created_at": "2017-08-12T16:01:26Z",
+        "body": "\u5b9e\u8df5\u8bc1\u660e\uff0c\u6ca1\u5565\u95ee\u9898\uff0c\u53d1\u9001\u548c\u624b\u673a\u65e0\u5173\uff0c\u53ea\u8981\u7a0b\u5e8f\u5f00\u7740\u5c31OK\u3002\u518d\u6b21\u626b\u7801\u767b\u5f55\u4f1a\u628a\u7a0b\u5e8f\u8e22\u4e0b\u53bb"
+      }
+    ]
+  },
+  {
+    "number": 445,
+    "title": "\u5c0f\u767d\u95ee\u9898  \u5982\u4f55\u4f20ticket\u53c2\u6570\u8fdb\u6765",
+    "created_at": "2017-07-12T02:55:32Z",
+    "closed_at": "2017-07-16T02:55:34Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/445",
+    "body": "api\u5982\u4e0b\r\n```\r\ndef add_friend(self, userName, status=2, verifyContent='', autoUpdate=True):\r\n    ''' add a friend or accept a friend\r\n        for options\r\n            - userName: 'UserName' for friend's info dict\r\n            - status:\r\n                - for adding status should be 2\r\n                - for accepting status should be 3\r\n            - ticket: greeting message\r\n            - userInfo: friend's other info for adding into local storage\r\n        it is defined in components/contact.py\r\n    '''\r\n    raise NotImplementedError()\r\n```\r\n\u6211\u7684\u8c03\u7528\u65b9\u5f0f\u5982\u4e0b\r\n\r\n```\r\nw.add_friend('@888888888888888')\r\n```\r\n\u4f46\u662f\u8fd9\u6837\u5bf9\u65b9\u53ea\u80fd\u6536\u5230\u4e00\u4e2a\u597d\u53cb\u8bf7\u6c42\uff0c\u5982\u679c\u6211\u8981\u53d1\u4e00\u6bb5\u8bf4\u660e \u201c\u6211\u662f\u8c01\u8c01\u8c01\u201d\uff0c\u662f\u5426\u5bf9\u5e94 ticket \u53c2\u6570\uff1f\u5e94\u8be5\u5982\u4f55\u4f20\u53c2\uff1f\r\n\r\n\u8c22\u8c22\r\n",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/445/comments",
+    "author": "lishoujun",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2017-07-16T02:55:34Z",
+        "body": "\u5199\u5728verifyContent\u91cc\u9762\u3002"
+      }
+    ]
+  },
+  {
+    "number": 324,
+    "title": "itchat\u53ef\u4ee5\u914d\u5408socket\u4f7f\u7528\u5417\uff1f",
+    "created_at": "2017-04-17T09:19:57Z",
+    "closed_at": "2017-04-22T06:27:19Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/324",
+    "body": "itchat\u600e\u6837\u624d\u80fd\u4e0esocket\u670d\u52a1\u540c\u65f6\u8fd0\u884c\uff1f\r\n",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/324/comments",
+    "author": "wangzhipeng404",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2017-04-22T06:27:19Z",
+        "body": "@wangzhipeng404 \u522b\u8ba9run\u963b\u585e\u7ebf\u7a0b\u5373\u53ef"
+      },
+      {
+        "user": "wangzhipeng404",
+        "created_at": "2017-04-25T03:54:26Z",
+        "body": "\u770b\u4e86\u4e00\u4e0b\u6e90\u7801, itchat.run(blockThread=False)\u8fd9\u6837\u5c31\u884c\u4e86\uff0c\u8c22\u8c22"
+      }
+    ]
+  },
+  {
+    "number": 198,
+    "title": "\u5982\u4f55\u83b7\u5f97\u5f53\u524d\u767b\u9646\u7528\u6237\u7684UserName",
+    "created_at": "2017-01-03T05:24:24Z",
+    "closed_at": "2017-01-03T05:27:56Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/198",
+    "body": "\u76ee\u524d\u901a\u8fc7FromUserName\u83b7\u5f97\u6d88\u606f\u7684\u4e3b\u4eba\uff0c\u4f46\u662f\u5982\u4f55\u5224\u65ad\u8fd9\u4e2aUser\u662f\u5e10\u53f7\u672c\u4eba\u8fd8\u662f\u597d\u53cb\uff1f",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/198/comments",
+    "author": "yangqi",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2017-01-03T05:27:56Z",
+        "body": "\u81ea\u5df1\u7684UserName\u5728\u8fd9\u91cc\uff1a\r\n```python\r\nitchat.originInstance.storageClass.userName\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 192,
+    "title": "\u7fa4\u56fe\u7247\u4e0b\u8f7d",
+    "created_at": "2016-12-27T02:53:51Z",
+    "closed_at": "2016-12-28T10:06:43Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/192",
+    "body": "\u8bf7\u95ee\u5927\u725b\uff0c\u8fd9\u4e2a\u5e93\u80fd\u622a\u83b7\u7fa4\u56fe\u7247\u6d88\u606f\u5417\uff1f\u8fd8\u6709\u7528\u5e93\u767b\u5f55\u540e\u80fd\u5728\u7ebf\u591a\u957f\u65f6\u95f4\uff0c\u80fd\u8bbe\u7f6e\u5417\uff1f",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/192/comments",
+    "author": "bbsdkjdx",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-12-27T09:33:48Z",
+        "body": "@bbsdkjdx \u53ef\u4ee5\u7684\u3002\u53ef\u4ee5\u5f88\u4e45\uff0c\u4f60\u4e0d\u60f3\u4fdd\u6301\u767b\u9646\u7684\u65f6\u5019\u4f7f\u7528itchat.logout()\u5c31\u53ef\u4ee5\u4e86\u3002"
+      },
+      {
+        "user": "bbsdkjdx",
+        "created_at": "2016-12-28T04:02:36Z",
+        "body": "\u8c22\u8c22\u60a8\u7684\u89e3\u7b54\uff0c\u6211\u53ea\u662f\u60f3\u8ba9\u5b83\u4e00\u76f4\u5728\u7ebf\uff0c\u6709\u65f6\u5019\u6389\u7ebf\u4e86\uff0c\u4e0d\u77e5\u9053\u662f\u56e0\u4e3a\u7535\u8111\u5f85\u673a\u5bfc\u81f4\u7684\u8fd8\u662f\u5728\u7ebf\u65f6\u95f4\u6709\u4e0a\u9650\u5bfc\u81f4\u7684\u3002\u5982\u679c\u6709\u4e0a\u9650\uff0c\u4e0d\u77e5\u9053\u80fd\u4e0d\u80fd\u8bbe\u7f6e\u8fd9\u4e2a\u4e0a\u9650\u3002"
+      },
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-12-28T04:08:32Z",
+        "body": "@bbsdkjdx \u7535\u8111\u5f85\u673a\u5e94\u8be5\u662f\u4f1a\u5bfc\u81f4\u8fd9\u4e2a\u95ee\u9898\u7684\uff0c\u53e6\u5916\uff0c\u957f\u65f6\u95f4\u5f85\u673a\u9700\u8981\u4e3b\u673a\u548c\u624b\u673a\u4fdd\u6301\u6301\u7eed\u8054\u7f51\u3002\r\n\u662f\u6ca1\u6709\u4e0a\u9650\u53ef\u4ee5\u8bbe\u7f6e\u7684\u3002"
+      }
+    ]
+  },
+  {
+    "number": 174,
+    "title": "\u5982\u4f55\u83b7\u5f97\u7fa4\u6210\u5458\u5217\u8868",
+    "created_at": "2016-12-03T22:40:10Z",
+    "closed_at": "2016-12-04T10:29:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/174",
+    "body": "\u5982\u4f55\u83b7\u53d6\u4e00\u4e2a\u7fa4\u7684\u6240\u6709\u6210\u5458\u5217\u8868",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/174/comments",
+    "author": "featheraaa",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-12-04T04:23:12Z",
+        "body": "@featheraaa \u5728MemberList\u8fd9\u4e2a\u952e\u91cc\u9762\u3002\r\n\u5982\u679c\u83b7\u53d6\u5230\u7684MemberList\u91cc\u9762\u662f\u7a7a\u7684\uff0c\u8bf4\u660e\u8fd9\u4e2a\u7fa4\u521d\u59cb\u5316\u7684\u65f6\u5019\u6ca1\u6709\u5e26\u7528\u6237\uff0c\u53ef\u4ee5\u7528\u8fd9\u4e2a\u547d\u4ee4\u8ba9\u540e\u53f0\u66f4\u65b0\uff1a\r\n```python\r\ndetailedChatroom = itchat.update_chatroom('@@abcdef123456', detailedMember=True)\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 163,
+    "title": "\u5f02\u5e38 Connection aborted",
+    "created_at": "2016-11-25T06:13:32Z",
+    "closed_at": "2016-11-27T05:26:45Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/163",
+    "body": "\u6302\u4e86\u4e4b\u540e\u6bcf\u9694\u4e00\u6bb5\u65f6\u95f4(\u51e0\u4e2a\u5c0f\u65f6)\u5c31\u4f1a\u51fa\u73b0\u5982\u4e0b\u9519\u8bef\u5e76\u9000\u51fa\u3002\u6309\u7ecf\u9a8c\u662f\u53ea\u6709\u53d1\u9001\u6d88\u606f\u7684\u65f6\u5019\u624d\u51fa\u9519\uff0c\u9519\u8bef\u6765\u81eaitchat.send\uff0c\u82e5\u6ca1\u6536\u5230\u6d88\u606f\u4e0d\u4f1a\u62a5\u9519\u3002\u68c0\u67e5\u53d1\u9001\u7684string `reply`\u6ca1\u6709\u53d1\u73b0\u95ee\u9898\u3002\u6709\u4ec0\u4e48\u53ef\u80fd\u7684\u539f\u56e0\u5bfc\u81f4\u8fd9\u4e2a\u9519\u8bef\u5462\uff1f\r\n\r\n``` \r\n Traceback (most recent call last):\r\n  File \"main.py\", line 229, in <module>\r\n    itchat.run()\r\n  File \"/usr/local/lib/python2.7/dist-packages/itchat/components/register.py\", line 78, in run\r\n    while self.alive: self.configured_reply()\r\n  File \"/usr/local/lib/python2.7/dist-packages/itchat/components/register.py\", line 51, in configured_reply\r\n    r = replyFn(msg)\r\n  File \"main.py\", line 28, in reply_text\r\n    itchat.send(reply, msg['FromUserName'])\r\n  File \"/usr/local/lib/python2.7/dist-packages/itchat/components/messages.py\", line 370, in send\r\n    r = self.send_msg(msg, toUserName)\r\n  File \"/usr/local/lib/python2.7/dist-packages/itchat/components/messages.py\", line 225, in send_msg\r\n    r = self.send_raw_msg(1, msg, toUserName)\r\n  File \"/usr/local/lib/python2.7/dist-packages/itchat/components/messages.py\", line 221, in send_raw_msg\r\n    data=json.dumps(payloads, ensure_ascii=False).encode('utf8'))\r\n  File \"/usr/local/lib/python2.7/dist-packages/requests/sessions.py\", line 535, in post\r\n    return self.request('POST', url, data=data, json=json, **kwargs)\r\n  File \"/usr/local/lib/python2.7/dist-packages/requests/sessions.py\", line 488, in request\r\n    resp = self.send(prep, **send_kwargs)\r\n  File \"/usr/local/lib/python2.7/dist-packages/requests/sessions.py\", line 609, in send\r\n    r = adapter.send(request, **kwargs)\r\n  File \"/usr/local/lib/python2.7/dist-packages/requests/adapters.py\", line 473, in send\r\n    raise ConnectionError(err, request=request)\r\nrequests.exceptions.ConnectionError: ('Connection aborted.', BadStatusLine(\"''\",))\r\n```",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/163/comments",
+    "author": "qinst64",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-11-25T06:19:45Z",
+        "body": "@qing6010 \u624b\u673a\u4fdd\u6301\u5728\u7ebf\u5417\uff1f"
+      },
+      {
+        "user": "qinst64",
+        "created_at": "2016-11-25T06:23:54Z",
+        "body": "\u53ef\u80fd\u6709\u4e0d\u5728\u7ebf\u60c5\u51b5\uff0c\u8fd9\u4e2a\u4e0d\u80fd100%\u80af\u5b9a\u3002\u4f46\u662f\u4e4b\u524d\u624b\u673a\u6709\u5f3a\u5236kill\u6389\u5fae\u4fe1\u4e00\u6bb5\u65f6\u95f4\uff0c\u7136\u540e\u518d\u6253\u5f00\u5fae\u4fe1\uff0c\u53d1\u73b0\u673a\u5668\u4eba\u4f1a\u81ea\u5df1\u81ea\u52a8\u56de\u590d\u3002\u611f\u89c9\u82e5\u662f\u8fd9\u4e2a\u539f\u56e0\uff0c\u9664\u975e\u5f88\u957f\u65f6\u95f4\u4e0d\u767b\u5f55\uff1f\u6211\u53ef\u4ee5\u6d4b\u8bd5\u4e0b"
+      },
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-11-25T06:26:20Z",
+        "body": "@qing6010 \u4fdd\u6301\u624b\u673a\u5728\u7ebf\u53ef\u80fd\u662f\u4e00\u4e2a\u89e3\u51b3\u65b9\u6848\uff0c\u5982\u679c\u4fdd\u6301\u5728\u7ebf\u540e\u4f9d\u65e7\u5b58\u5728\u8be5\u95ee\u9898\u7684\uff0c\u6211\u4eec\u53ef\u4ee5\u518d\u8ba8\u8bba\u3002\u5fae\u4fe1\u540e\u53f0\u662f\u4f1a\u68c0\u6d4b\u767b\u9646\u7f51\u9875\u7248\u5fae\u4fe1\u6240\u7528\u7684\u624b\u673a\u7aef\u662f\u5426\u5728\u7ebf\uff0c\u82e5\u4e0d\u5728\u7ebf\u4f1a\u62d2\u7edd\u8fde\u63a5\u3002"
+      },
+      {
+        "user": "qinst64",
+        "created_at": "2016-11-26T06:33:22Z",
+        "body": "@littlecodersh \u786e\u4fdd\u624b\u673a\u5728\u7ebf\u540e\u4e00\u5929\u90fd\u6ca1\u6709\u65ad\uff0c\u5927\u6982\u5c31\u662f\u8fd9\u4e2a\u539f\u56e0\u3002\u754c\u9762\u4e0acatch\u8fd9\u4e2aerror\u5e76\u63d0\u793a\u5c31\u66f4\u597d\u3002\u53ef\u5173\u4e86"
+      }
+    ]
+  },
+  {
+    "number": 98,
+    "title": "requests.exceptions.SSLError: EOF occurred in violation of protocol (_ssl.c:590)",
+    "created_at": "2016-10-16T04:22:53Z",
+    "closed_at": "2016-10-16T11:52:14Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/98",
+    "body": "\u6211\u7684\u4e00\u4e2a\u7a0b\u5e8f\uff0c\u662f\u5229\u7528itchat\u6765\u4e0d\u65ad\u53d1\u6d88\u606f\u7684\u3002\u6bcf\u6b21\u5f00\u59cb\u540e\uff0c\u5927\u7ea6\u7ecf\u8fc7\u51e0\u5341\u5206\u949f\u540e\uff0c\u5c31\u4f1a\u51fa\u73b0\u5982\u4e0b\u9519\u8bef\uff1a\n\n```\nUnhandled exception in thread started by <function do at 0x10e84b140>\nTraceback (most recent call last):\n  File \"./test.py\", line 90, in do\n    sendIMEI(currentIMEI, mpUserName)\n  File \"./test.py\", line 54, in sendIMEI\n    itchat.send(msg=text.decode(\"utf-8\"), toUserName=UserName)\n  File \"/Library/Python/2.7/site-packages/itchat/__init__.py\", line 67, in send\n    return __client.send_msg(msg, toUserName)\n  File \"/Library/Python/2.7/site-packages/itchat/client.py\", line 445, in send_msg\n    r = self.s.post(url, data = json.dumps(payloads, ensure_ascii = False).encode('utf8'), headers = headers)\n  File \"/Library/Python/2.7/site-packages/requests/sessions.py\", line 522, in post\n    return self.request('POST', url, data=data, json=json, **kwargs)\n  File \"/Library/Python/2.7/site-packages/requests/sessions.py\", line 475, in request\n    resp = self.send(prep, **send_kwargs)\n  File \"/Library/Python/2.7/site-packages/requests/sessions.py\", line 596, in send\n    r = adapter.send(request, **kwargs)\n  File \"/Library/Python/2.7/site-packages/requests/adapters.py\", line 497, in send\n    raise SSLError(e, request=request)\nrequests.exceptions.SSLError: EOF occurred in violation of protocol (_ssl.c:590)\n```\n\n\u4e0d\u77e5\u9053\u662f\u4ec0\u4e48\u539f\u56e0\u5462\uff1f\n",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/98/comments",
+    "author": "shishirui",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-10-16T04:28:50Z",
+        "body": "@shishirui \u8fd9\u662fssl\u7684\u95ee\u9898\u3002\n\u4f60\u7684python\u7248\u672c\u662f\u591a\u5c11\uff1f\u7248\u672c\u8fc7\u4f4e\u53ef\u80fd\u51fa\u73b0\u8fd9\u4e2a\u95ee\u9898\u3002\n\u5982\u679c\u7248\u672c\u6ca1\u6709\u95ee\u9898\uff0c\u53ef\u4ee5\u5728send\u8bed\u5f55\u5916\u9762catch\u8fd9\u4e2aexception\u3002\n"
+      },
+      {
+        "user": "shishirui",
+        "created_at": "2016-10-16T04:48:43Z",
+        "body": "@littlecodersh \u6211\u7528\u7684\u662fPython 2.7.10\uff0c\u6211\u8fd9\u5c31\u52a0\u4e0acatch\u8bd5\u8bd5\u3002\n"
+      }
+    ]
+  },
+  {
+    "number": 96,
+    "title": "itchat\u53ef\u4ee5\u901a\u8fc7\u641c\u7d22\u516c\u4f17\u53f7\uff0c\u5bf9\u516c\u4f17\u53f7\u6dfb\u52a0\u5173\u6ce8\u5417",
+    "created_at": "2016-10-11T01:26:43Z",
+    "closed_at": "2016-10-17T00:39:10Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/96",
+    "body": "\u5982\u9898\u3002\u6211\u770b\u66f4\u591a\u7684\u662f\u5173\u4e8e\u6d88\u606f\u548c\u804a\u5929\u7684\u3002\u91cc\u9762\u4e5f\u6709\u4e2a\u6dfb\u52a0\u670b\u53cb\u7684\u65b9\u6cd5\uff0c\u516c\u4f17\u53f7\u4e0d\u77e5\u9053\u662f\u5426\u53ef\u4ee5\u6dfb\u52a0\u5173\u6ce8\u5462\uff1f\uff1f\uff1f\uff1f\n",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/96/comments",
+    "author": "dingwa990",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-10-13T11:29:42Z",
+        "body": "@dingwa990 \u53ef\u4ee5\u5440\uff0c\u53ef\u4ee5\u901a\u8fc7\u540d\u7247\u6dfb\u52a0\u5173\u6ce8\u3002\n\n``` python\nimport itchat\n\n@itchat.msg_register(itchat.content.CARD)\ndef print_cd(msg):\n    r = itchat.add_friend(msg['RecommendInfo']['UserName'], 1)\n\nitchat.auto_login(True)\nitchat.run()\n```\n"
+      },
+      {
+        "user": "dingwa990",
+        "created_at": "2016-10-14T02:11:29Z",
+        "body": "\u540d\u7247\u53ea\u80fd\u51e0\u4e2a\u6216\u5c11\u91cf\u53ef\u4ee5\u3002\u6279\u91cf\u7684\u516c\u4f17\u53f7\u7684\u8bdd\u8fd8\u662f\u901a\u8fc7\u641c\u7d22\u51fa\u6765\u5173\u6ce8\u3002\n\u53e6\u5916\u8bf7\u95ee\uff0cSyncCheck\u8fd4\u56de\uff1awindow.synccheck={retcode:\"1101\",selector:\"0\"}\uff0cretcode\u6709\u51e0\u79cd\u610f\u601d\uff1f1101\u8868\u793a\u4ec0\u4e48\uff1f\n"
+      },
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-10-14T02:30:20Z",
+        "body": "@dingwa990 \u76ee\u524d\u7f51\u9875\u7248\u5fae\u4fe1\u6ca1\u6709\u529e\u6cd5\u641c\u7d22\u516c\u4f17\u53f7\uff0c\u6240\u4ee5\u5c31\u6ca1\u6709\u529e\u6cd5\u4e86\u3002\n1101\u4e00\u822c\u6765\u8bf4\u5c31\u662f\u624b\u673a\u7aef\u9000\u51fa\u4e86\u767b\u9646\u3002\n"
+      },
+      {
+        "user": "dingwa990",
+        "created_at": "2016-10-14T02:34:54Z",
+        "body": "@littlecodersh \u624b\u673a\u7aef\u6ca1\u9000\u51fa\u54e6\uff0c\u521a\u521a\u767b\u5f55\u7684\u8fd8\u3002\n"
+      },
+      {
+        "user": "dingwa990",
+        "created_at": "2016-10-14T02:56:13Z",
+        "body": "SyncCheck\u8bf7\u6c42\u65f6\u5019\uff0c\u4e3a\u4ec0\u4e48\u7ecf\u5e38\u62a5\uff1a\u201c\u57fa\u7840\u8fde\u63a5\u5df2\u5173\u95ed\uff0c\u8fde\u63a5\u88ab\u610f\u5916\u5173\u95ed\u201d \u5462\uff1f\n"
+      },
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-10-14T03:00:38Z",
+        "body": "@dingwa990 \u56e0\u4e3a\u4f60\u7f51\u7edc\u73af\u5883\u4e0d\u597d\u5427\n"
+      }
+    ]
+  },
+  {
+    "number": 94,
+    "title": "\u5982\u4f55\u4fdd\u5b58\u8bed\u97f3\u8fdb\u6307\u5b9a\u76ee\u5f55\uff1f",
+    "created_at": "2016-10-07T07:39:52Z",
+    "closed_at": "2016-10-07T09:13:35Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/94",
+    "body": "\u5404\u4f4d\u597d\uff0c\n\n\u60f3\u8bf7\u6559\u4e00\u4e0b\u5982\u4f55\u628a\u8bed\u97f3\u6587\u4ef6\u4fdd\u5b58\u8fdb\u6307\u5b9a\u76ee\u5f55\uff1f\n\n\u770b\u4e86\u4e0b\u6587\u6863\u7684handler\u7ae0\u8282\u90e8\u5206\uff0c\u4ee5\u53ca\u6e90\u7801\uff08hclient.py\uff09\uff0c\u662f\u53ea\u80fd\u628a\u8bed\u97f3\u6587\u4ef6\u4fdd\u5b58\u5728python\u811a\u672c\u7684\u8fd0\u884c\u76ee\u5f55\u4e2d\u5417\uff1f\u8fd8\u662f\u53ef\u4ee5\u81ea\u5b9a\u4e49\u5462\uff1f\n\nRegards,\nJackson.\n",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/94/comments",
+    "author": "huming2207",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-10-07T08:26:55Z",
+        "body": "@huming2207 \u7528\u8fd9\u4e2a\u547d\u4ee4\uff1a\n\n``` python\nmsg['Text'](theDirYouWantWithFileName)\n```\n\n\u6e90\u7801\u7684\u8bdd\u5728client.py\u7684318\u884c\uff1a\n\n``` python\nwith open(voiceDir, 'wb') as f: f.write(tempStorage.getvalue())\n```\n"
+      },
+      {
+        "user": "ioflows",
+        "created_at": "2016-11-25T08:43:41Z",
+        "body": "\u60f3\u8bf7\u6559\u4e00\u4e0b\u539f\u59cb\u8bed\u97f3\u7684\u4fdd\u5b58\u683c\u5f0f\u548c\u7f16\u7801\uff0c\u4fdd\u5b58\u4e3aMP3/WAV/OGG/AMR\u8fd9\u4e9b\u683c\u5f0f\u5728Ubuntu\u4e0b\u5747\u652f\u6301\u64ad\u653e\uff0c\u4f46\u662f\u5982\u679c\u5c06\u4fdd\u5b58\u540e\u7684\u6587\u4ef6\u76f4\u63a5\u62ff\u53bb\u505a\u8bed\u97f3\u8bc6\u522b\uff0c\u5747\u4f1a\u62a5\u65e0\u6cd5\u8bc6\u522b\u6587\u4ef6\u7684\u9519\u8bef\uff08\u731c\u6d4b\u53ef\u80fd\u7f3a\u5c11\u90e8\u5206\u5934\u6587\u4ef6\u4fe1\u606f\uff09\uff0c\u901a\u8fc7pydub\u8bfb\u53d6\u518d\u91cd\u65b0\u8f6c\u6210wav\uff0c\u867d\u7136\u4e0d\u62a5\u9519\uff0c\u4f46\u662f\u8bc6\u522b\u7ed3\u679c\u57fa\u672c\u4e0d\u9760\u8c31\uff0c\u6545\u60f3\u8bf7\u6559\u4e00\u4e0b\u89e3\u51b3\u65b9\u6848\uff0c\u611f\u8c22\uff01"
+      },
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-11-25T14:22:38Z",
+        "body": "@scjiaer \u770b\u6587\u4ef6\u5934\u662f\u4e2aid3\u7684metadata\uff0c\u6211\u76ee\u524d\u4e5f\u6ca1\u6709\u627e\u5230\u8f6c\u6362\u7684\u65b9\u6cd5\u3002"
+      }
+    ]
+  },
+  {
+    "number": 79,
+    "title": "\u5728\u83b7\u53d6\u56fe\u7247\u7684\u65f6\u5019\uff0c \u5982\u4f55\u80fd\u83b7\u5f97\u56fe\u7247\u6587\u4ef6 \uff1f",
+    "created_at": "2016-09-16T04:20:02Z",
+    "closed_at": "2016-09-16T07:33:18Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/79",
+    "body": "\u5728\u83b7\u53d6\u56fe\u7247\u7684\u65f6\u5019\uff0c \u5982\u4f55\u80fd\u83b7\u5f97\u56fe\u7247\u6587\u4ef6 \uff1f\n\u5c31\u5982\u4f55\u4e0b\u8f7d\u5230\u76f8\u5e94\u7684\u56fe\u7247\u5462\uff1f\n\n\u56fe\u7247\u6d88\u606f\n\n``` python\nMsgType: 3\nFromUserName: \u53d1\u9001\u65b9ID\nToUserName: \u63a5\u6536\u65b9ID\nMsgId: \u7528\u4e8e\u83b7\u53d6\u56fe\u7247\nContent:\n    <msg>\n        <img length=\"6503\" hdlength=\"0\" />\n        <commenturl></commenturl>\n    </msg>\n```\n\n\u83b7\u5f97msgid \uff0c \u63a5\u4e0b\u6765\u5982\u4f55\u83b7\u5f97\u56fe\u7247\u6587\u4ef6\u672c\u8eab\u5462\uff1f\n",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/79/comments",
+    "author": "9cat",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-09-16T07:26:28Z",
+        "body": "@9cat \u50cf\u793a\u4f8b\u7a0b\u5e8f\u91cc\u9762\u4e00\u6837\u64cd\u4f5c\u5c31\u53ef\u4ee5\u4e86\u3002\n\n``` python\n@itchat.msg_register(['Picture', 'Recording', 'Attachment', 'Video'])\ndef download_files(msg):\n    msg['Text'](msg['FileName'])\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 68,
+    "title": "\u65b0\u5173\u6ce8\uff0c\u65e0\u6cd5\u4e3b\u52a8\u53d1\u9001\u56fe\u7247",
+    "created_at": "2016-08-23T10:44:37Z",
+    "closed_at": "2016-08-25T07:00:21Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/littlecodersh/ItChat/issues/68",
+    "body": "\u4ee3\u7801\u5982\u4e0b\n\n``` python\n    @itchat.msg_register('Friends')\n    def add_friend(msg):\n        itchat.add_friend(**msg['Text']);\n        itchat.get_contract();\n        # return '@img@test.gif';\n        itchat.send_image('@img@test.gif' ,  msg['RecommendInfo']['UserName']);\n```\n\n\u65e0\u8bba\u7528 `send_image`  \u8fd8\u662f `return '@img@test.gif'`\u90fd\u4e0d\u884c\uff0c\u6c42\u6559\n",
+    "comments_url": "https://api.github.com/repos/littlecodersh/ItChat/issues/68/comments",
+    "author": "codebean",
+    "comments": [
+      {
+        "user": "littlecodersh",
+        "created_at": "2016-08-25T07:00:13Z",
+        "body": "@codebean \u53d1\u9001\u56fe\u7247\u7684\u547d\u4ee4\u7528\u9519\u4e86\uff0c\u53ef\u4ee5\u5c1d\u8bd5\u8fd9\u4e24\u4e2a\u547d\u4ee4\uff1a\n1. `itchat.send('@img@test.gif')`\n2. `itchat.send_image('test.gif')`\n"
+      }
+    ]
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "number": 489,
+    "title": "ESP8266\u7f16\u8bd1\u9519\u8bef",
+    "created_at": "2018-08-16T15:05:14Z",
+    "closed_at": "2018-08-17T08:22:09Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/alibaba/AliOS-Things/issues/489",
+    "body": "**Describe the bug**\r\nExecuting task: aos make helloworld@esp8266 <\r\n\r\naos-cube version: 0.2.50\r\nCheck if required tools for esp8266 exist\r\nMaking config file for first time\r\nprocessing components: helloworld esp8266 platform/mcu/esp8266 vcall init auto_component\r\napp_version:app-1.0.0-20180816.2301\r\nkernel_version:AOS-R-1.3.1\r\napp_version:app-1.0.0-20180816.2301\r\nkernel_version:AOS-R-1.3.1\r\nBuild AOS Now\r\nTOOLCHAIN_PATH=/Users/chenmeng/LoT/AliOS-Things/build/compiler/gcc-xtensa-lx106/OSX/bin/\r\nCompiling alicrypto\r\nCompiling auto_component\r\nCompiling cli\r\nCompiling board_esp8266\r\nCompiling framework\r\nCompiling hal\r\nCompiling helloworld\r\nCompiling kernel_init\r\nCompiling vfs_device\r\nCompiling newlib_stub\r\nCompiling log\r\nCompiling kv\r\nCompiling xtensa\r\nCompiling esp8266\r\nCompiling rhino\r\nCompiling vcall\r\nCompiling espos\r\nkernel/vcall/espos/platform/rhino/espos_queue.c: In function 'espos_queue_create':\r\nkernel/vcall/espos/platform/rhino/espos_queue.c:53:12: warning: assignment makes integer from pointer without a cast [enabled by default]\r\n     *queue = (espos_queue_t *)kqueue;\r\n            ^\r\nCompiling vfs\r\nCompiling yloop\r\nMaking out/helloworld@esp8266/ld/eagle.app.v6.new.1024.app1.ld\r\nMaking out/helloworld@esp8266/libraries/alicrypto.a\r\nMaking out/helloworld@esp8266/libraries/auto_component.a\r\nMaking out/helloworld@esp8266/libraries/cli.a\r\nMaking out/helloworld@esp8266/libraries/board_esp8266.a\r\nMaking out/helloworld@esp8266/libraries/framework.a\r\nMaking out/helloworld@esp8266/libraries/hal.a\r\nMaking out/helloworld@esp8266/libraries/helloworld.a\r\nMaking out/helloworld@esp8266/libraries/kernel_init.a\r\nMaking out/helloworld@esp8266/libraries/vfs_device.a\r\nMaking out/helloworld@esp8266/libraries/newlib_stub.a\r\nMaking out/helloworld@esp8266/libraries/log.a\r\nMaking out/helloworld@esp8266/libraries/kv.a\r\nMaking out/helloworld@esp8266/libraries/xtensa.a\r\nMaking out/helloworld@esp8266/libraries/esp8266.a\r\nMaking out/helloworld@esp8266/libraries/rhino.a\r\nMaking out/helloworld@esp8266/libraries/vcall.a\r\nMaking out/helloworld@esp8266/libraries/espos.a\r\nMaking out/helloworld@esp8266/libraries/vfs.a\r\nMaking out/helloworld@esp8266/libraries/yloop.a\r\nMaking helloworld@esp8266.elf\r\n\r\nMaking helloworld@esp8266.bin\r\nMaking helloworld@esp8266.hex\r\nno definite address hint,using default mem configuration\r\n\r\n                        AOS MEMORY MAP\r\n|=================================================================|\r\n| MODULE                                   | ROM       | RAM      |\r\n|=================================================================|\r\n| newlib_stub                              | 0         | 277      |\r\n| kv                                       | 0         | 3622     |\r\n| vcall                                    | 0         | 2686     |\r\n| kernel_init                              | 0         | 782      |\r\n| rhino                                    | 0         | 17957    |\r\n| framework                                | 0         | 382      |\r\n| vfs                                      | 0         | 3367     |\r\n| libgcc                                   | 0         | 1196     |\r\n| libmain                                  | 0         | 30187    |\r\n| libpp                                    | 0         | 62406    |\r\n| esp8266                                  | 0         | 9072     |\r\n| board_esp8266                            | 0         | 305      |\r\n| libcirom                                 | 0         | 29505    |\r\n| yloop                                    | 0         | 1396     |\r\n| libnet80211                              | 0         | 45787    |\r\n| xtensa                                   | 0         | 6863     |\r\n| libhal                                   | 0         | 37       |\r\n| log                                      | 0         | 533      |\r\n| espos                                    | 0         | 1138     |\r\n| helloworld                               | 0         | 236      |\r\n| cli                                      | 0         | 6612     |\r\n| hal                                      | 0         | 207      |\r\n| libwpa                                   | 0         | 17862    |\r\n| liblwip                                  | 0         | 39438    |\r\n| libcrypto                                | 0         | 14512    |\r\n| libphy                                   | 0         | 48619    |\r\n| *fill*                                   | 0         | 1604     |\r\n|=================================================================|\r\n| TOTAL (bytes)                            | 0         | 346588   |\r\n|=================================================================|\r\n/Users/xxxx/LoT/AliOS-Things/build/cmd/osx/dash: 1: python2: not found\r\nmv: eagle.app.flash.bin: No such file or directory\r\nBuild complete\r\nMaking .gdbinit\r\n\u6700\u540e\u65e0\u6cd5\u627e\u5230\u6587\u4ef6eagle.app.flash.bin\uff0c\u6700\u540ebinary\u6587\u4ef6\u5939\u4e0b\u6ca1\u6709\u6587\u4ef6xxxxx@esp8266-0x1000.bin\r\n**environment**\r\n1. branch(version):  \u6700\u65b0\u7248\u672c\r\n2. Desktop OS(windows linux or macOS): macOS\r\n3. example: \r\n\r\n**Expected behavior**\r\n\r\n\r\n**Screenshots**\r\n\r\n\r\n**Additional context**\r\n",
+    "comments_url": "https://api.github.com/repos/alibaba/AliOS-Things/issues/489/comments",
+    "author": "godchenmeng",
+    "comments": [
+      {
+        "user": "librae8226",
+        "created_at": "2018-08-17T06:25:35Z",
+        "body": "\u8fd9\u91cc\u9762\u6709\u4e24\u4e2a\u95ee\u9898\uff1a\r\n1. Mac \u4e0b\u7684 python \u73af\u5883\u6ca1\u6709 python2 \u8fd9\u4e2a\u4e1c\u897f\uff0c\u5176\u5b9e\u5b83\u662f\u4e2a\u8f6f\u94fe\u63a5\u3002\r\n    \u89e3\u51b3\u65b9\u6cd5\uff1a\r\n    1) \u53ef\u4ee5\u76f4\u63a5\u628a\u5b83\u94fe\u63a5\u5230 python2.7\r\n    2) \u4fee\u6539 `platform/mcu/esp8266/gen_crc_bin.mk`: `python2` -> `python`\r\n2. \u4e0d\u4f1a\u751f\u6210 xxx@esp8266-0x1000.bin\r\n    \u89e3\u51b3\u65b9\u6cd5\uff1a\u4fee\u6539 `site_scons/scons_upload.py`\uff0c\u5982\u4e0b\r\n````\r\ndiff --git a/site_scons/scons_upload.py b/site_scons/scons_upload.py\r\nindex ec0511b80d..417db4c97e 100755\r\n--- a/site_scons/scons_upload.py\r\n+++ b/site_scons/scons_upload.py\r\n@@ -101,7 +101,7 @@ def upload_esp8266(target, aos_path):\r\n         error('Unsupported Operating System!')\r\n     cmd = 'esptool.py'\r\n     port = miniterm.ask_for_port()\r\n-    image_path = os.path.join(os.getcwd(), 'out', target, 'binary', target + '-0x1000.bin').replace('\\\\', '/')\r\n+    image_path = os.path.join(os.getcwd(), 'out', target, 'binary', target').replace('\\\\', '/')\r\n     boot_bin_path = os.path.join(aos_path, 'platform/mcu/esp8266/bsp/boot_v1.7_921600.bin').replace('\\\\', '/')\r\n     init_bin_path = os.path.join(aos_path, 'platform/mcu/esp8266/bsp/esp_init_data_default.bin').replace('\\\\', '/')\r\n     blank_bin_path = os.path.join(aos_path, 'platform/mcu/esp8266/bsp/blank.bin').replace('\\\\', '/')\r\n````"
+      }
+    ]
+  },
+  {
+    "number": 326,
+    "title": "aos-cube \u4f9d\u8d56 scons \u4e00\u76f4\u5b89\u88c5\u4e0d\u6210\u529f",
+    "created_at": "2018-06-04T09:30:02Z",
+    "closed_at": "2022-03-01T11:41:26Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/alibaba/AliOS-Things/issues/326",
+    "body": "\u95ee\u9898\u63cf\u8ff0\uff1a \u73af\u5883\u4e0b\uff0c`aos-cube` \u4f9d\u8d56 `scons` \u4e00\u76f4\u5b89\u88c5\u4e0d\u6210\u529f\uff0c\u5bfc\u81f4 `aos-cube` \u65e0\u6cd5\u5b89\u88c5\uff0c\u5728\u5b9e\u9a8c\u7528\u673a\u5747\u51fa\u73b0\u6b64\u72b6\u51b5\u3002\r\n\r\n\u73af\u5883\uff1aOS X 10.13\uff0cPython 2.7.15, `setuptools` 39.2.0, `wheel` 0.31.1\r\n\r\n\u9519\u8bef\u4ee3\u7801\uff1a\r\n\r\n```shell\r\nRunning setup.py install for scons ... error\r\n\r\n    Complete output from command /Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python -u -c \"import setuptools, tokenize;__file__='/private/tmp/pip-install-RIQgaT/scons/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\\r\\n', '\\n');f.close();exec(compile(code, __file__, 'exec'))\" install --record /private/tmp/pip-record-pxsHqb/install-record.txt --single-version-externally-managed --compile --user --prefix=:\r\n\r\n    usage: -c [global_opts] cmd1 [cmd1_opts] [cmd2 [cmd2_opts] ...]\r\n\r\n       or: -c --help [cmd1 cmd2 ...]\r\n\r\n       or: -c --help-commands\r\n\r\n       or: -c cmd --help\r\n  error: option --single-version-externally-managed not recognized\r\n    ----------------------------------------\r\n\r\nCommand \"/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python -u -c \"import setuptools, tokenize;__file__='/private/tmp/pip-install-RIQgaT/scons/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\\r\\n', '\\n');f.close();exec(compile(code, __file__, 'exec'))\" install --record /private/tmp/pip-record-pxsHqb/install-record.txt --single-version-externally-managed --compile --user --prefix=\" failed with error code 1 in /private/tmp/pip-install-RIQgaT/scons/\r\n```",
+    "comments_url": "https://api.github.com/repos/alibaba/AliOS-Things/issues/326/comments",
+    "author": "cxlwill",
+    "comments": [
+      {
+        "user": "librae8226",
+        "created_at": "2018-06-04T11:39:26Z",
+        "body": "\u8c22\u8c22\uff0c\u5f88\u591a\u670b\u53cb\u9047\u5230\u4e86\r\n\u8bf7\u66f4\u65b0\u4e0b python \u7684 `setuptools` \u548c `wheel` \u5305\r\n```\r\npip install --upgrade setuptools\r\npip install --upgrade wheel\r\n```"
+      },
+      {
+        "user": "librae8226",
+        "created_at": "2018-06-05T02:38:32Z",
+        "body": "\u8fd9\u6837\u7684\u8bdd\u63a8\u8350\u4f7f\u7528 `virtualenv`\r\n```\r\npip install virtualenv\r\nvirtualenv ~/.virtualenvs/python-venv\r\n. ~/.virtualenvs/python-venv/bin/activate\r\npip install --upgrade setuptools\r\npip install --upgrade wheel\r\npip install aos-cube\r\n```"
+      },
+      {
+        "user": "wgj1922",
+        "created_at": "2018-06-05T22:38:05Z",
+        "body": "\u6211\u5b89\u88c5\u65f6\u4e5f\u78b0\u5230\u4e86\u8fd9\u4e2a\u95ee\u9898\uff0c\u6309\u7167\u7f51\u4e0a\u7ed9\u7684\u5404\u79cd\u65b9\u6cd5\u8bd5\u8fc7\uff0c\u90fd\u89e3\u51b3\u4e0d\u4e86\u3002\r\n\u540e\u6765\u6211\u662f\u628a\u5b89\u88c5\u5305\u4e0b\u8f7d\u5230\u672c\u5730\u5b89\u88c5\u6210\u529f\u7684\uff0c\u65b9\u6cd5\u5982\u4e0b\uff0c\u53ef\u4ee5\u53c2\u8003\uff1a\r\n* \u5148\u4e0b\u8f7d\u4f60\u8981\u5b89\u88c5\u7684\u5305\uff0c\u5e76\u89e3\u538b\u5230\u78c1\u76d8\u4e0b\uff08\u5f85\u4e0b\u8f7d\u94fe\u63a5\u5728\u6267\u884cpip install\u547d\u4ee4\u5931\u8d25\u65f6\uff0c\u4f1a\u6253\u5370\u51fa\u6765\uff0c\u5c06\u8fd9\u4e2a\u94fe\u63a5\u62f7\u8d1d\u51fa\u6765\uff0c\u5728\u6d4f\u89c8\u5668\u4e2d\u8f93\u5165\u5c31\u53ef\u4ee5\u76f4\u63a5\u4e0b\u8f7d\u672c\u5730\u5b89\u88c5\u5305\uff09\uff1b\r\n* \u547d\u4ee4\u884c\u65b9\u5f0f\uff0c\u8fdb\u5165\u5230\u8be5\u5b89\u88c5\u5305\u7684setup.py \u76ee\u5f55\u4e0b \uff1b\r\n* \u6267\u884c python setup.py build\r\n* \u6267\u884c python setup.py install"
+      },
+      {
+        "user": "laoyouji007",
+        "created_at": "2018-06-19T09:49:21Z",
+        "body": "@wgj1922 \r\n\u89e3\u538b\u5b89\u88c5\u5b8cscons\u4e4b\u540e\uff0c\u8fd8\u8981\u518d\u6b21\u8fd0\u884c\u4e00\u4e0b\u547d\u4ee4\u624d\u884c\uff1apip install --user aos-cube  \u786e\u5b9e\u53ef\u884c\uff01"
+      },
+      {
+        "user": "dupig",
+        "created_at": "2018-08-10T11:34:07Z",
+        "body": "\u5728Mac\u4e0a\u8c03\u7528\u8def\u5f84\u4e0d\u6b63\u786e\u4f1a\u5bfc\u81f4\u70e7\u5f55\u65f6scons\u65e0\u6548\u3002\u89e3\u51b3\u65b9\u6cd5\u662f\u53bbVS\u7ec8\u7aef\u8f93\u5165which scons\u770b\u770b\u662f\u4e0d\u662f\u5728python 2.7\u76ee\u5f55\u4e0b\u3002\u5982\u679c\u662f\u5728\u7cfb\u7edf\u7684usr/local/bin\u76ee\u5f55\u4e0b\u5219\u5728finder\u91cc\u5220\u6389\uff0c\u7136\u540e\u8c03\u7528\u8def\u5f84\u5c31\u4f1a\u66f4\u65b0\u56depython 2.7\u7684\u76ee\u5f55\u5c31OK\u4e86\u3002"
+      }
+    ]
+  }
+]

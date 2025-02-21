@@ -1,0 +1,144 @@
+[
+  {
+    "number": 493,
+    "title": "[BUG] Unable to execute function defined in the same Python interpreter.",
+    "created_at": "2025-02-04T23:50:44Z",
+    "closed_at": "2025-02-06T07:22:17Z",
+    "labels": [
+      "bug"
+    ],
+    "url": "https://github.com/huggingface/smolagents/issues/493",
+    "body": "**Describe the bug**\nUnable to execute function defined in the same Python interpreter. See example below:\n\n**Code to reproduce the error**\n\n```python\nfrom smolagents import CodeAgent, DuckDuckGoSearchTool, LiteLLMModel\nimport applescript\n\ndef tell_siri(command_text: str):\n    \"\"\"Execute a Siri command.\"\"\"\n\n    result = applescript.run(f\"\"\"\n        tell application \"System Events\" to tell the front menu bar of process \"SystemUIServer\"\n            tell (first menu bar item whose description is \"Siri\")\n                perform action \"AXPress\"\n            end tell\n        end tell\n\n        delay 2\n\n        tell application \"System Events\"\n            set textToType to \"{command_text}\"\n            keystroke textToType\n            key code 36\n        end tell\n    \"\"\")\n\ntask = \"\"\"\n0. Always check syntax on every step before code execution.\n1. use tell_siri function to \"turn off master bedroom light\", wait 2 seconds, and turn on \"master bedroom light\" again.\n\"\"\"\n\nqwen_coder_model = LiteLLMModel(model_id=\"ollama/qwen2.5-coder:32b\")\n\nagent8 = CodeAgent(\n    tools=[DuckDuckGoSearchTool()],\n    additional_authorized_imports=[\"*\"],\n    model=qwen_coder_model\n)\nagent8.run(task8)\n```\n\n**Error logs (if any)**\n\n```\n \u2500 Executing parsed code: \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \n  import time                                                                                                                                                                                                                    \n                                                                                                                                                                                                                                 \n  tell_siri(\"turn off master bedroom light\")                                                                                                                                                                                     \n  time.sleep(2)                                                                                                                                                                                                                  \n  tell_siri(\"master bedroom light on\")                                                                                                                                                                                           \n \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \nCode execution failed at line 'tell_siri(\"turn off master bedroom light\")' due to: InterpreterError:It is not permitted to evaluate other functions than the provided tools or functions defined/imported in previous code (tried\nto execute tell_siri).\n```\n\n**Expected behavior**\nThe function is local to the CodeAgent environment, I expect it to have access to the local functions.\n\n**Packages version:**\nRun `pip freeze | grep smolagents` and paste it here.\n\n`smolagents==1.7.0`\n\n**Additional context**\nAdd any other context about the problem here.\n",
+    "comments_url": "https://api.github.com/repos/huggingface/smolagents/issues/493/comments",
+    "author": "didip",
+    "comments": [
+      {
+        "user": "Manni08",
+        "created_at": "2025-02-05T05:16:02Z",
+        "body": "When authorized_imports is set to \"*\", the system prompt is updated to:\n\n\"You can import from any package you want.\"\n\nHowever, this setting only allows unrestricted imports from installed packages\u2014it does not provide a mechanism to reference or execute functions defined within the same interpreter session. As a result, functions declared dynamically in the interpreter cannot be automatically passed or accessed elsewhere.\n\nUse the following code - \n\n```\n@tool\ndef tell_siri(command_text: str) -> None:\n    \"\"\"\n    Execute a Siri Command\n\n    Args:\n        command_text: command text\n    \"\"\"\n\n    result = applescript.run(f\"\"\"\n        tell application \"System Events\" to tell the front menu bar of process \"SystemUIServer\"\n            tell (first menu bar item whose description is \"Siri\")\n                perform action \"AXPress\"\n            end tell\n        end tell\n\n        delay 2\n\n        tell application \"System Events\"\n            set textToType to \"{command_text}\"\n            keystroke textToType\n            key code 36\n        end tell\n    \"\"\")\n\n\nagent8 = CodeAgent(\n    tools=[DuckDuckGoSearchTool(), tell_siri],\n    additional_authorized_imports=[\"*\"],\n    model=model\n)\n\n```"
+      },
+      {
+        "user": "didip",
+        "created_at": "2025-02-06T07:22:17Z",
+        "body": "Thanks for the response."
+      }
+    ]
+  },
+  {
+    "number": 454,
+    "title": "fix: support o1",
+    "created_at": "2025-01-31T14:48:39Z",
+    "closed_at": "2025-02-05T10:44:42Z",
+    "labels": [],
+    "url": "https://github.com/huggingface/smolagents/pull/454",
+    "body": "Remove `max_tokens` for `o1` models",
+    "comments_url": "https://api.github.com/repos/huggingface/smolagents/issues/454/comments",
+    "author": "ricklamers",
+    "comments": [
+      {
+        "user": "ricklamers",
+        "created_at": "2025-01-31T14:49:06Z",
+        "body": "I couldn't get it working without these changes. Maybe this needs to be changed, but this is working for me."
+      },
+      {
+        "user": "aymeric-roucher",
+        "created_at": "2025-02-05T10:44:42Z",
+        "body": "This fix is not needed anymore! Now that we've removed the default parameter `max_tokens`, the model works out of the box for me. Tell us if you still have errors and we'll reopen!"
+      },
+      {
+        "user": "ricklamers",
+        "created_at": "2025-02-05T13:39:50Z",
+        "body": "Nice!"
+      }
+    ]
+  },
+  {
+    "number": 108,
+    "title": "Always getting the error: \"AssertionError exception: no description\" ",
+    "created_at": "2025-01-07T21:09:23Z",
+    "closed_at": "2025-01-20T16:21:39Z",
+    "labels": [],
+    "url": "https://github.com/huggingface/smolagents/issues/108",
+    "body": "No matter what I do to modify the docstring I always get the same error as mentioned in the title.\r\n\r\nHere is a tool that I have created.\r\n\r\nI would like to know what within my docstrings is causing this.\r\n\r\n```python\r\n\r\ncg = CoinGeckoAPI(demo_api_key=os.getenv('coingecko_api_key'))\r\n\r\n@tool\r\ndef get_coins_list(currency: str) -> list:\r\n    \"\"\"\r\n    This tool makes a query to the CoinGecko API to get a response of ALL of the supported coins with their price, market cap, volume and related market data in USD.\r\n\r\n    Args:\r\n        currency: The dollar value which the coin should be represented into\r\n    \"\"\"\r\n    return cg.get_coins_markets(vs_currency=currency)\r\n\r\n```",
+    "comments_url": "https://api.github.com/repos/huggingface/smolagents/issues/108/comments",
+    "author": "jondoescoding",
+    "comments": [
+      {
+        "user": "whoahaow",
+        "created_at": "2025-01-07T21:34:16Z",
+        "body": "does it fix it?\r\n\r\n```python\r\ncg = CoinGeckoAPI(api_key=os.getenv('coingecko_api_key'))\r\n\r\nclass GetCoinsListTool(Tool):\r\n    name = \"get_coins_list\"\r\n    description = \"\"\"\r\n    This tool makes a query to the CoinGecko API to get a response of ALL of the supported coins with their price, market cap, volume and related market data in USD.\r\n    \"\"\"\r\n    inputs = {\r\n        \"currency\": {\r\n            \"type\": \"string\",\r\n            \"description\": \"The currency in which the coin data should be represented (e.g., 'usd', 'eur').\"\r\n        }\r\n    }\r\n    output_type = \"list\"\r\n\r\n    def forward(self, currency: str) -> list:\r\n        return cg.get_coins_markets(vs_currency=currency)\r\n```"
+      },
+      {
+        "user": "jondoescoding",
+        "created_at": "2025-01-07T21:45:48Z",
+        "body": "Got the same error.\r\n\r\n```python\r\nException has occurred: AssertionError\r\nexception: no description\r\n\r\nException has occurred: AssertionError\r\nexception: no description\r\n  File \"...\\coingecko_agent\\agent.py\", line 7, in <module>\r\n    coin_list_tool = GetCoinsListTool()\r\n                     ^^^^^^^^^^^^^^^^^^\r\nAssertionError: \r\n\r\n```"
+      },
+      {
+        "user": "whoahaow",
+        "created_at": "2025-01-07T22:25:44Z",
+        "body": "I don't know if this is suitable for you, but here's what I did:\r\n```python\r\nfrom smolagents import CodeAgent, HfApiModel, Tool\r\nimport os\r\nfrom pycoingecko import CoinGeckoAPI\r\nimport json\r\n\r\n# Initialize CoinGecko API client\r\ncg = CoinGeckoAPI(api_key=os.getenv('coingecko_api_key'))\r\n\r\n# Define the GetCoinsListTool class\r\nclass GetCoinsListTool(Tool):\r\n    name = \"get_coins_list\"\r\n    description = \"\"\"\r\n    This tool makes a query to the CoinGecko API to get a response of ALL of the supported coins with their price, market cap, volume and related market data in USD.\r\n    You need to import json. The output is a JSON string. You should use the `json` module to parse this string into a Python list.\r\n    \"\"\"\r\n    inputs = {\r\n        \"currency\": {\r\n            \"type\": \"string\",\r\n            \"description\": \"The currency in which the coin data should be represented (e.g., 'usd', 'eur').\"\r\n        }\r\n    }\r\n    output_type = \"string\"  # Change to 'string'\r\n\r\n    def forward(self, currency: str) -> str:\r\n        coins_data = cg.get_coins_markets(vs_currency=currency)\r\n        return json.dumps(coins_data)  # Convert the list to a JSON string\r\n\r\n# Initialize the model\r\nmodel = HfApiModel(model_id=\"Qwen/Qwen2.5-Coder-32B-Instruct\")\r\n\r\n# Initialize the agent with the tool\r\nagent = CodeAgent(\r\n    tools=[GetCoinsListTool()],\r\n    model=model,\r\n    add_base_tools=True,\r\n    additional_authorized_imports=[\"json\"]  # Authorize the json module\r\n)\r\n\r\n# Run the agent with a task\r\ntask = \"Get the list of coins in USD and print the first 5 entries. Then present it as usual text.\"\r\nresult = agent.run(task)\r\n\r\n# Print the result\r\nprint(\"Agent Output:\")\r\nprint(result)\r\n```"
+      },
+      {
+        "user": "jondoescoding",
+        "created_at": "2025-01-07T23:24:32Z",
+        "body": "Works like a charm. Thanks! But why does the the @tool decorator not work?"
+      },
+      {
+        "user": "aymeric-roucher",
+        "created_at": "2025-01-09T10:24:13Z",
+        "body": "@jondoescoding could you provide your full error trace and package versions? I tried to reproduce but for me your code snippet works"
+      }
+    ]
+  },
+  {
+    "number": 101,
+    "title": "Code Agent -> max_iterations",
+    "created_at": "2025-01-07T10:20:29Z",
+    "closed_at": "2025-01-07T14:53:36Z",
+    "labels": [],
+    "url": "https://github.com/huggingface/smolagents/issues/101",
+    "body": "CodeAgent stops after 5 iterations. Any way to explicitely increase this limit ?",
+    "comments_url": "https://api.github.com/repos/huggingface/smolagents/issues/101/comments",
+    "author": "flaming-potato",
+    "comments": [
+      {
+        "user": "paulmartrencharpro",
+        "created_at": "2025-01-07T10:32:15Z",
+        "body": "Yes, the CodeAgent class' parent MultiStepAgent has a max_steps parameter that you can change.\r\n\r\n`agent = CodeAgent(tools=[DuckDuckGoSearchTool(), PythonInterpreterTool()], model=HfApiModel(), max_steps=20)`"
+      },
+      {
+        "user": "aymeric-roucher",
+        "created_at": "2025-01-07T14:53:36Z",
+        "body": "Closing this since @paulmartrencharpro explained the resolution very well! \ud83d\ude04 "
+      },
+      {
+        "user": "flaming-potato",
+        "created_at": "2025-01-07T15:46:06Z",
+        "body": "Thanks a lot :)"
+      }
+    ]
+  },
+  {
+    "number": 44,
+    "title": "LLM using wrong function to send a request to an agent",
+    "created_at": "2025-01-02T23:30:08Z",
+    "closed_at": "2025-01-09T22:54:20Z",
+    "labels": [],
+    "url": "https://github.com/huggingface/smolagents/issues/44",
+    "body": "Notice in `Step 0`, it tried to call `home_automation.request`, gets an error, then calls the correct function `home_automation()`\r\n\r\n```bash\r\nroot# python demo.py \r\nYou: turn on the kitchen light plz\r\n\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 New run \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e\r\n\u2502                                                                           \u2502\r\n\u2502 turn on the kitchen light plz                                             \u2502\r\n\u2502                                                                           \u2502\r\n\u2570\u2500 LiteLLMModel - gpt-4o-mini \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\r\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 Step 0 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\r\n\u256d\u2500 Executing this code: \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e\r\n\u2502   1 home_automation.request(\"Please turn on the kitchen light.\")          \u2502\r\n\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\r\nCode execution failed: Code execution failed at line \r\n'home_automation.request(\"Please turn on the kitchen light.\")' because of the\r\nfollowing error:\r\nObject <smolagents.agents.ManagedAgent object at 0x7d83aaf84ce0> has no \r\nattribute request\r\n[Step 0: Duration 1.71 seconds| Input tokens: 2,018 | Output tokens: 61]\r\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 Step 1 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\r\n\u256d\u2500 Executing this code: \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e\r\n\u2502   1 home_automation(\"turn on the kitchen light\")                          \u2502\r\n\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\r\n\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 New run \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e\r\n\u2502                                                                           \u2502\r\n\u2502 You're a helpful agent named 'home_automation'.                           \u2502\r\n\u2502 You have been submitted this task by your manager.                        \u2502\r\n\u2502 ---                                                                       \u2502\r\n\u2502 Task:                                                                     \u2502\r\n\u2502 turn on the kitchen light                                                 \u2502\r\n\u2502 ---                                                                       \u2502\r\n\u2502 You're helping your manager solve a wider task: so make sure to not       \u2502\r\n\u2502 provide a one-line answer, but give as much information as possible to    \u2502\r\n\u2502 give them a clear understanding of the answer.                            \u2502\r\n\u2502                                                                           \u2502\r\n\u2502 Your final_answer WILL HAVE to contain these parts:                       \u2502\r\n\u2502 ### 1. Task outcome (short version):                                      \u2502\r\n\u2502 ### 2. Task outcome (extremely detailed version):                         \u2502\r\n\u2502 ### 3. Additional context (if relevant):                                  \u2502\r\n\u2502                                                                           \u2502\r\n\u2502 Put all these in your final_answer tool, everything that you do not pass  \u2502\r\n\u2502 as an argument to final_answer will be lost.                              \u2502\r\n\u2502 And even if your task resolution is not successful, please return as much \u2502\r\n\u2502 context as possible, so that your manager can act upon this feedback.     \u2502\r\n\u2502 {additional_prompting}                                                    \u2502\r\n\u2502                                                                           \u2502\r\n\u2570\u2500 LiteLLMModel - gpt-4o-mini \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\r\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501 Step 0 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\r\n\u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e\r\n\u2502 Calling tool: 'turn_on_light' with arguments: {'light': 'kitchen'}        \u2502\r\n\u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f\r\n```\r\n\r\n\r\nHere's my code:\r\n\r\n```python\r\nhome_automation_agent = ToolCallingAgent(\r\n    tools=[turn_on_light],\r\n    model=model,\r\n)\r\n\r\nmanaged_home_automation_agent = ManagedAgent( \r\n    agent=home_automation_agent,\r\n    name=\"home_automation\",\r\n    description=\"Controls the home automation system.\"\r\n)\r\n\r\nsms_agent = ToolCallingAgent(\r\n    tools=[send_sms, phone_number_lookup],\r\n    model=model,\r\n)\r\n\r\nmanaged_sms_agent = ManagedAgent( \r\n    agent=sms_agent,\r\n    name=\"sms\",\r\n    description=\"Sends text messages.\"\r\n)\r\n\r\nagent = CodeAgent(\r\n    model=model,\r\n    tools=[],\r\n    managed_agents=[managed_home_automation_agent, managed_sms_agent],\r\n)\r\n```",
+    "comments_url": "https://api.github.com/repos/huggingface/smolagents/issues/44/comments",
+    "author": "vqndev",
+    "comments": [
+      {
+        "user": "aymeric-roucher",
+        "created_at": "2025-01-09T22:54:20Z",
+        "body": "Hi @vqndev, thank you for submitting!\r\nThis is a great example of self-healing in a multi-step agent!\r\nIn step 0, `gpt4o-mini` does a mistake by calling a tool incorrectly. Then it rectifies the code in the second step (because it saw the error message in its memory) and finally solves the task!\r\n\r\nAll in all it's not a framework issue, it's just the LLM being dumb! Which often happens with smaller LLMs, GPT-4o would be less likely to do this first mistake."
+      },
+      {
+        "user": "vqndev",
+        "created_at": "2025-01-13T15:41:14Z",
+        "body": "Thanks! "
+      }
+    ]
+  }
+]
