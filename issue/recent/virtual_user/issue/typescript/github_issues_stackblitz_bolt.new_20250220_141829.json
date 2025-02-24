@@ -1,0 +1,20 @@
+[
+  {
+    "number": 2733,
+    "title": "npm ERR! code ERR_INVALID_PROTOCOL on Safari browser only",
+    "created_at": "2024-11-19T08:15:14Z",
+    "closed_at": "2024-11-19T23:50:45Z",
+    "labels": [],
+    "url": "https://github.com/stackblitz/bolt.new/issues/2733",
+    "body": "### Describe the bug\n\nWhen running `npm run dev`, there is an error with the dev server that is only observer on Safari browser:\r\n```\r\nnpm ERR! code ERR_INVALID_PROTOCOL\r\nnpm ERR! Protocol \"https:\" not supported. Expected \"http:\"\r\n\r\nnpm ERR! A complete log of this run can be found in: /home/.npm/_logs/2024-11-19T07_40_58_889Z-debug-0.log\r\n```\n\n### Link to the Bolt URL that caused the error\n\nN/A\n\n### Steps to reproduce\n\nUsing Safari:\r\n1. Start a NextJS project\r\n2. Try to start the dev server with `nom run dev`\n\n### Expected behavior\n\nThe development server should start after installing the package dependencies.\n\n### Screen Recording / Screenshot\n\n_No response_\n\n### Platform\n\n- OS: macOS\r\n- Browser: Safari\r\n- Version: 18.2\r\n\n\n### Additional context\n\nThis issue has only been observer with the Safari browser.",
+    "comments_url": "https://api.github.com/repos/stackblitz/bolt.new/issues/2733/comments",
+    "author": "everspader",
+    "comments": [
+      {
+        "user": "kc0tlh",
+        "created_at": "2024-11-19T23:50:45Z",
+        "body": "@everspader Bolt.new does not currently support Safari due to limitations in the browser that do not support WebContainers (the core technology that powers Bolt). We are adding a banner to indicate this soon, but in the meantime, please switch to Google Chrome or another Chromium based browser.\r\n\r\nIf this does not resolve your issue, please subscribe to #2021 for updates as we are investigating additional causes of this error there!"
+      }
+    ]
+  }
+]

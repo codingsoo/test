@@ -1,0 +1,53 @@
+[
+  {
+    "id": "https://github.com/facebook/fresco/issues/2422",
+    "source": {
+      "issue_number": 2422
+    },
+    "initial_question": {
+      "title": "animated-gif package breaks downloadable gifs with rounding",
+      "body": "### Description\r\n\r\nI'm using **com.facebook.fresco:fresco** and **com.facebook.fresco:animated-gif** for show animated gif.\r\nI load a gif image (non animated) from the Internet and apply **RoundingParams**.  \r\nI expect to see round image, but I get square.\r\nGifs from app resources work fine.\r\nI need **animated-gif** package for animation, but how to disable it for non animated gifs?\r\n\r\n### Reproduction\r\n\r\nIf enable **animated-gif** package then **RoundingParams** will broken but animation will worked fine.\r\n\r\n### Solution\r\n\r\nDisabling **animated-gif** package resolve problem, but all animated gifs break.\r\n\r\n### Additional Information\r\n\r\n* Fresco version: 2.0.0\r\n* animated-gif: 2.0.0\r\n* Platform version: any device\r\n"
+    },
+    "satisfaction_conditions": [
+      "Non-animated GIF images must display with correct rounding when loaded",
+      "Animated GIF support must remain functional",
+      "Solution must work with remote images loaded from the internet",
+      "System must correctly differentiate between animated and non-animated GIFs"
+    ],
+    "created_at": "2019-10-18T16:19:03Z"
+  },
+  {
+    "id": "https://github.com/facebook/fresco/issues/1863",
+    "source": {
+      "issue_number": 1863
+    },
+    "initial_question": {
+      "title": "How to set loopcount for AnimatedImage after v1.4.0?",
+      "body": "Now I aim to play a gif image 5 time.\r\nAnd I found there is  a method getLoopCount for get the number of loops for a  animatedImage, \r\nbut the question is I don't know how to dynamic set loopCount.\r\nWaiting for your help."
+    },
+    "satisfaction_conditions": [
+      "GIF animation plays a specified number of times (5 in this case)",
+      "Loop count can be modified programmatically after image loading",
+      "Animation control persists throughout the image lifecycle"
+    ],
+    "created_at": "2017-08-11T03:04:18Z"
+  },
+  {
+    "id": "https://github.com/facebook/fresco/issues/1645",
+    "source": {
+      "issue_number": 1645
+    },
+    "initial_question": {
+      "title": "When trying to fetchImageFromBitmapCache() for GIF image, imageReference is always null",
+      "body": "I want to allow users to save GIF images in our app. I am trying to get GIF image from Fresco cache via `fetchImageFromBitmapCache()` but it always returns NULL for GIF images.\r\nFor JPG and PNG images there is no problem."
+    },
+    "satisfaction_conditions": [
+      "GIF images must be successfully retrieved from cache",
+      "Animated image content must be handled differently from static images",
+      "Complete image data must be preserved for saving",
+      "Saved GIF files must be properly formatted and playable",
+      "Appropriate error handling must be implemented"
+    ],
+    "created_at": "2017-01-30T09:49:57Z"
+  }
+]

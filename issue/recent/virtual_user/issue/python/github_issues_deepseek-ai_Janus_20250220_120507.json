@@ -1,0 +1,25 @@
+[
+  {
+    "number": 67,
+    "title": "Where is installition folder",
+    "created_at": "2025-01-28T17:03:31Z",
+    "closed_at": "2025-01-29T08:45:45Z",
+    "labels": [],
+    "url": "https://github.com/deepseek-ai/Janus/issues/67",
+    "body": "I cannot find model folders, it isnt in env",
+    "comments_url": "https://api.github.com/repos/deepseek-ai/Janus/issues/67/comments",
+    "author": "Karag0",
+    "comments": [
+      {
+        "user": "flobeier",
+        "created_at": "2025-01-28T17:25:44Z",
+        "body": "The model files will be downloaded when you run the demo. On my system (Ubuntu 24.10) they are saved in `~/.cache/huggingface/hub`."
+      },
+      {
+        "user": "Karag0",
+        "created_at": "2025-01-29T08:45:43Z",
+        "body": "@flobeier Hi i found it in appdata local pip"
+      }
+    ]
+  }
+]

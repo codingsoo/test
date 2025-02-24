@@ -1,0 +1,107 @@
+[
+  {
+    "number": 4492,
+    "title": "Model m2m-100 in fairseq-interactive mode",
+    "created_at": "2022-06-15T11:27:53Z",
+    "closed_at": "2022-06-16T08:56:56Z",
+    "labels": [
+      "question",
+      "needs triage"
+    ],
+    "url": "https://github.com/facebookresearch/fairseq/issues/4492",
+    "body": "I have a nice implementation of `fairseq-generate` on the pretrained m2m-100 model for EN-RU language pair. At the binarization stage with `fairseq-preprocess`, I noticed that `--srcdict` and `--tgtdict` options contain **the same** file, `model_dict.128k.txt` - exactly as it is recommended on the m2m-100 web page. That file is subsequently used in `--fixed-dictionary` option in `fairseq-generate`.\r\nThe main lack of this workflow is that I need to preprocess a **reference** translation file, which is a priori absent when my goal is simple translation without necessity to measure the quality of the translation. Thereby it's reasonable to assume that, if my EN-RU translation successfully completes with `fairseq-generate`, there is an opportunity to do the same with `fairseq-interactive`.\r\n\r\nInitially, when I tried `fairseq-interactive`, I got the error that files `dict.en.txt` and `dict.ru.txt` are not found. Really these dictionaries are not distributed with pretrained m2m-100 models. Then, if I copy the only available model dictionary `model_dict.128k.txt` twice, and rename one of those copies to `dict.en.txt`, the other - to `dict.ru.txt`, then there is no more error, but the output text turns out to be translated into a **random** language (EL, PT, etc. or even EN), as if my option `--target-lang ru` was ignored. The same occurs if I use `dict.en.txt` and `dict.ru.txt` files from my binarized data folder - they are the same as `model_dict.128k.txt`.\r\n\r\nThe full `fairseq-interactive` translation command which I use:\r\n\r\n`fairseq-interactive --input=testdata/ex.txt --path 1.2B_last_checkpoint.pt . --source-lang en --target-lang ru --tokenizer moses --bpe sentencepiece --sentencepiece-model spm.128k.model > testdata/ex.txt.out`\r\n\r\nAny ideas and suggestions to use m2m-100 in fairseq-interactive correctly?",
+    "comments_url": "https://api.github.com/repos/facebookresearch/fairseq/issues/4492/comments",
+    "author": "molokanov50",
+    "comments": [
+      {
+        "user": "gmryu",
+        "created_at": "2022-06-16T01:11:44Z",
+        "body": "To be honest, I have not tested m2m-100 myself.\r\nFrom a side perspecitive, I guess you should give the following arguments:\r\n```\r\n--task translation_multi_simple_epoch \\\r\n--lang-pairs language_pairs.txt \\\r\n--decoder-langtok --encoder-langtok src \r\n```\r\nor what is the command you used to generate? just switch that generate to interactive, add tokenizer,bpe.\r\n\r\n\r\nAnyway, for this case I believe TranslationTask (default task if not specified) read the model_dict.128k.txt, moses tokenized and spm your data correctly.\r\nThe reason you got random language is m2m-100 model requires a special token in sentences to identify which language pair is used. A normal translation task do not need to."
+      }
+    ]
+  },
+  {
+    "number": 3050,
+    "title": "Load_model_ensemble_and_task() gives error for multiple models",
+    "created_at": "2020-12-20T09:45:49Z",
+    "closed_at": "2020-12-25T18:27:41Z",
+    "labels": [
+      "question",
+      "needs triage"
+    ],
+    "url": "https://github.com/facebookresearch/fairseq/issues/3050",
+    "body": "\r\n#### What is your question?\r\n\r\nHi, I am having problems loading pretrained models. I used the code given in the readme file, and I have tried it for two models, but the load_model_ensemble_and_task()  function is raising different errors for both of them.\r\n\r\n**When I try to load \"wav2vec_large.pt\" model, I get** \r\n\r\nKeyError                                  Traceback (most recent call last)\r\n<ipython-input-3-ca5356f4acbd> in <module>\r\n----> 1 model, cfg, task = fairseq.checkpoint_utils.load_model_ensemble_and_task([cp])\r\n\r\n~/fairseq/checkpoint_utils.py in load_model_ensemble_and_task(filenames, arg_overrides, task, strict, suffix, num_shards)\r\n    277             if not PathManager.exists(filename):\r\n    278                 raise IOError(\"Model file not found: {}\".format(filename))\r\n--> 279             state = load_checkpoint_to_cpu(filename, arg_overrides)\r\n    280             if shard_idx == 0:\r\n    281                 args = state[\"args\"]\r\n\r\n~/fairseq/checkpoint_utils.py in load_checkpoint_to_cpu(path, arg_overrides)\r\n    230         for arg_name, arg_val in arg_overrides.items():\r\n    231             setattr(args, arg_name, arg_val)\r\n--> 232     state = _upgrade_state_dict(state)\r\n    233     return state\r\n    234 \r\n\r\n~/fairseq/checkpoint_utils.py in _upgrade_state_dict(state)\r\n    432 \r\n    433     # set any missing default values in the task, model or other registries\r\n--> 434     registry.set_defaults(state[\"args\"], tasks.TASK_REGISTRY[state[\"args\"].task])\r\n    435     registry.set_defaults(state[\"args\"], models.ARCH_MODEL_REGISTRY[state[\"args\"].arch])\r\n    436     for registry_name, REGISTRY in registry.REGISTRIES.items():\r\n\r\nKeyError: 'speech_pretraining' \r\n\r\n **And when I try to load \"wav2vec_small_960h.pt\", I get:**\r\n\r\nRuntimeError: Error(s) in loading state_dict for Wav2VecCtc:\r\n\tsize mismatch for w2v_encoder.proj.weight: copying a param with shape torch.Size([32, 768]) from checkpoint, the shape in current model is torch.Size([512, 768]).\r\n\tsize mismatch for w2v_encoder.proj.bias: copying a param with shape torch.Size([32]) from checkpoint, the shape in current model is torch.Size([512]).\r\n\r\n#### Code\r\n\r\nimport torch\r\nimport fairseq\r\n\r\ncp = \"wav2vec_large.pt\"\r\nmodel, cfg, task = fairseq.checkpoint_utils.load_model_ensemble_and_task([cp])\r\n\r\n#### What's your environment?\r\nI am trying this in a container which is created from the jupyter/base-notebook image.\r\n\r\n - fairseq Version: 0.10.1\r\n - PyTorch Version (e.g., 1.0): 1.7.0\r\n - How you installed fairseq (`pip`, source): pip \r\n - Python version: 3.8.6\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/facebookresearch/fairseq/issues/3050/comments",
+    "author": "myazann",
+    "comments": [
+      {
+        "user": "ajmssc",
+        "created_at": "2020-12-24T19:08:30Z",
+        "body": "try `pip install soundfile git+git://github.com/pytorch/fairseq.git@b8ea8a9b72c82192da07e3377adf4ebbde16716d`"
+      }
+    ]
+  },
+  {
+    "number": 2782,
+    "title": "Error when trying to train with pipeline parallelism",
+    "created_at": "2020-10-23T15:59:08Z",
+    "closed_at": "2020-10-26T08:40:55Z",
+    "labels": [
+      "question",
+      "needs triage"
+    ],
+    "url": "https://github.com/facebookresearch/fairseq/issues/2782",
+    "body": "Hi guys,\r\n\r\nI was trying to train a transformer model with pipeline parallelism. Is this supposed to work already? \r\n\r\nThe command i tried (following the translation example):\r\n`fairseq-train     data-bin/iwslt14.tokenized.de-en     --arch transformer_iwslt_de_en_pipeline_parallel --share-decoder-input-output-embed     --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0     --lr 5e-4 --lr-scheduler inverse_sqrt --warmup-updates 4000     --dropout 0.3 --weight-decay 0.0001     --criterion label_smoothed_cross_entropy --label-smoothing 0.1     --max-tokens 4096     --eval-bleu     --eval-bleu-args '{\"beam\": 5, \"max_len_a\": 1.2, \"max_len_b\": 10}'     --eval-bleu-detok moses     --eval-bleu-remove-bpe     --eval-bleu-print-samples     --best-checkpoint-metric bleu --maximize-best-checkpoint-metric --pipeline-model-parallel --pipeline-encoder-balance '[8]' --pipeline-encoder-devices '[0]' --pipeline-decoder-balance '[1,6,1]' --pipeline-decoder-devices '[0,1,0]' --pipeline-chunks 1 --distributed-world-size 2`\r\n\r\nerror:\r\n```\r\n2020-10-23 17:17:08 | INFO | fairseq.tasks.translation | [de] dictionary: 8848 types\r\n2020-10-23 17:17:08 | INFO | fairseq.tasks.translation | [en] dictionary: 6632 types\r\n2020-10-23 17:17:08 | INFO | fairseq.data.data_utils | loaded 7283 examples from: data-bin/iwslt14.tokenized.de-en/valid.de-en.de\r\n2020-10-23 17:17:08 | INFO | fairseq.data.data_utils | loaded 7283 examples from: data-bin/iwslt14.tokenized.de-en/valid.de-en.en\r\n2020-10-23 17:17:08 | INFO | fairseq.tasks.translation | data-bin/iwslt14.tokenized.de-en valid de-en 7283 examples\r\nTraceback (most recent call last):\r\n  File \"/secondary/thies/.virtualenvs/pytorch-23102020/bin/fairseq-train\", line 33, in <module>\r\n    sys.exit(load_entry_point('fairseq', 'console_scripts', 'fairseq-train')())\r\n  File \"/tertiary/thies/fairseq/fairseq_cli/train.py\", line 352, in cli_main\r\n    distributed_utils.call_main(cfg, main)\r\n  File \"/tertiary/thies/fairseq/fairseq/distributed_utils.py\", line 301, in call_main\r\n    cfg.distributed_training.distributed_world_size,\r\n  File \"/secondary/thies/.virtualenvs/pytorch-23102020/lib/python3.6/site-packages/torch/multiprocessing/spawn.py\", line 247, in spawn\r\n    return start_processes(fn, args, nprocs, join, daemon, start_method='spawn')\r\n  File \"/secondary/thies/.virtualenvs/pytorch-23102020/lib/python3.6/site-packages/torch/multiprocessing/spawn.py\", line 205, in start_processes\r\n    while not context.join():\r\n  File \"/secondary/thies/.virtualenvs/pytorch-23102020/lib/python3.6/site-packages/torch/multiprocessing/spawn.py\", line 166, in join\r\n    raise ProcessRaisedException(msg, error_index, failed_process.pid)\r\ntorch.multiprocessing.spawn.ProcessRaisedException: \r\n\r\n-- Process 0 terminated with the following error:\r\nTraceback (most recent call last):\r\n  File \"/secondary/thies/.virtualenvs/pytorch-23102020/lib/python3.6/site-packages/torch/multiprocessing/spawn.py\", line 59, in _wrap\r\n    fn(i, *args)\r\n  File \"/tertiary/thies/fairseq/fairseq/distributed_utils.py\", line 283, in distributed_main\r\n    main(cfg, **kwargs)\r\n  File \"/tertiary/thies/fairseq/fairseq_cli/train.py\", line 74, in main\r\n    model = task.build_model(cfg.model)\r\n  File \"/tertiary/thies/fairseq/fairseq/tasks/translation.py\", line 327, in build_model\r\n    model = super().build_model(args)\r\n  File \"/tertiary/thies/fairseq/fairseq/tasks/fairseq_task.py\", line 548, in build_model\r\n    model = models.build_model(args, self)\r\n  File \"/tertiary/thies/fairseq/fairseq/models/__init__.py\", line 56, in build_model\r\n    return ARCH_MODEL_REGISTRY[cfg.arch].build_model(cfg, task)\r\n  File \"/tertiary/thies/fairseq/fairseq/model_parallel/models/pipeline_parallel_transformer/model.py\", line 277, in build_model\r\n    checkpoint=args.pipeline_checkpoint,\r\n  File \"/tertiary/thies/fairseq/fairseq/model_parallel/models/pipeline_parallel_transformer/model.py\", line 57, in __init__\r\n    + [encoder.final_layer_norm]\r\n  File \"/secondary/thies/.virtualenvs/pytorch-23102020/lib/python3.6/site-packages/torch/nn/modules/module.py\", line 796, in __getattr__\r\n    type(self).__name__, name))\r\ntorch.nn.modules.module.ModuleAttributeError: 'TransformerEncoder' object has no attribute 'embedding_layer'\r\n```",
+    "comments_url": "https://api.github.com/repos/facebookresearch/fairseq/issues/2782/comments",
+    "author": "thies1006",
+    "comments": [
+      {
+        "user": "shruti-bh",
+        "created_at": "2020-10-23T17:28:40Z",
+        "body": "For training, a single `Pipe()` module is created for the Transformer encoder-decoder model. So, you need to set `--pipeline-balance` and `--pipeline-devices` in the training command, instead of `--pipeline-encoder-balance`, `--pipeline-encoder-devices`, `--pipeline-decoder-balance`, `--pipeline-decoder-devices`.\r\nFor inference/generation, two `Pipe()` modules are created, one for the encoder and one for the decoder, since the encoder and decoder are called separately during generation. So, in that case, you need to set `--pipeline-encoder-balance`, `--pipeline-encoder-devices`, `--pipeline-decoder-balance`, `--pipeline-decoder-devices` instead."
+      }
+    ]
+  },
+  {
+    "number": 2727,
+    "title": "colon-separated list of dataset",
+    "created_at": "2020-10-13T06:31:44Z",
+    "closed_at": "2020-10-15T10:29:33Z",
+    "labels": [
+      "question",
+      "needs triage"
+    ],
+    "url": "https://github.com/facebookresearch/fairseq/issues/2727",
+    "body": "## \u2753 Questions and Help\r\n\r\nHi, I am pre-training a model on a large dataset that cannot fit into the CPU memory. So I tried the solution mentioned in #880 by @myleott . I splitted my dataset into 4 splits, and each split is read separately. \r\n\r\nHowever this could not solve the problem as each time a split is loaded the memory usage increases and at some point I get OOM. \r\n\r\nHere's my command:\r\n\r\n```\r\n#!/bin/bash\r\n#SBATCH --job-name=gpu-32node\r\n#SBATCH --partition=gpu_p1\r\n#SBATCH --qos=qos_gpu-t3\r\n#SBATCH --output=x.out\r\n#SBATCH --error=x.err\r\n#SBATCH --nodes=32\r\n#SBATCH --ntasks-per-node=1\r\n#SBATCH --gres=gpu:4\r\n#SBATCH --time=20:00:00\r\n#SBATCH --cpus-per-task=40\r\n#SBATCH --hint=nomultithread\r\n\r\nmodule purge\r\n\r\nset -x\r\n\r\nDATA_PATH='data-bin/data-bin1:data-bin/data-bin2:data-bin/data-bin3:data-bin/data-bin4'\r\nMAX_TOKENS=8192\r\nMAX_UPDATE=190000\r\nSAVE_INTERVAL=5000\r\nLR=0.0008\r\nMAX_EPOCH=32\r\nDISTRIBUTED_WORLD_SIZE=128\r\nSENTENCE_PIECE_MODEL='sentencepiece.model'\r\nVALID_SUBSET='valid'\r\n\r\nsrun fairseq-train $DATA_PATH \\\r\n    --optimizer=adam \\\r\n    --adam-betas='(0.9, 0.999)' \\\r\n    --adam-eps=1e-06 \\\r\n    --arch='bart_base' \\\r\n    --bpe='sentencepiece' \\\r\n    --sentencepiece-vocab $SENTENCE_PIECE_MODEL \\\r\n    --clip-norm=0.1 \\\r\n    --log-interval=10 \\\r\n    --mask=0.3 \\\r\n    --mask-length='span-poisson' \\\r\n    --mask-random=0.1 \\\r\n    --permute-sentences=1 \\\r\n    --poisson-lambda=3.5 \\\r\n    --replace-length=1 \\\r\n    --rotate=0 \\\r\n    --max-update $MAX_UPDATE \\\r\n    --total-num-update $MAX_UPDATE \\\r\n    --save-dir $SAVE_DIR \\\r\n    --save-interval-updates=$SAVE_INTERVAL \\\r\n    --skip-invalid-size-inputs-valid-test \\\r\n    --task='denoising' \\\r\n    --update-freq=2 \\\r\n    --restore-file=$MODEL_PATH \\\r\n    --required-batch-size-multiple 8 \\\r\n    --fp16 \\\r\n    --lr=$LR \\\r\n    --weight-decay=0.01 \\\r\n    --lr-scheduler polynomial_decay \\\r\n    --activation-fn 'gelu' \\\r\n    --pooler-activation-fn 'tanh' \\\r\n    --tensorboard-logdir=$TENSORBOARD_LOGS \\\r\n    --max-tokens=$MAX_TOKENS \\\r\n    --distributed-world-size=$DISTRIBUTED_WORLD_SIZE \\\r\n    --distributed-port 12345 \\\r\n    --dropout 0.1 \\\r\n    --dataset-impl 'mmap' \\\r\n    --max-epoch $MAX_EPOCH \\\r\n    --warmup-updates $((6*$MAX_UPDATE/100)) \\\r\n    --no-epoch-checkpoints \\\r\n    --valid-subset $VALID_SUBSET\r\n```\r\n\r\nAm I doing something wrong?",
+    "comments_url": "https://api.github.com/repos/facebookresearch/fairseq/issues/2727/comments",
+    "author": "moussaKam",
+    "comments": [
+      {
+        "user": "myleott",
+        "created_at": "2020-10-14T13:58:18Z",
+        "body": "A couple things:\r\n1) have you installed pyarrow? `pip install pyarrow`, it should automatically kick in and improve memory utilization\r\n2) are you using the master version of fairseq? There was a known memory leak with colon-separated datasets, which was fixed 1 or 2 months back."
+      }
+    ]
+  },
+  {
+    "number": 1879,
+    "title": "Production with fairseq, translation",
+    "created_at": "2020-03-22T12:37:07Z",
+    "closed_at": "2020-03-23T12:07:17Z",
+    "labels": [
+      "question",
+      "needs triage"
+    ],
+    "url": "https://github.com/facebookresearch/fairseq/issues/1879",
+    "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\nI want to port my trained model to production. It seems the CLI is not a good option as I want to avoid having to reload my model. So I am testing the `from_pretrained` python functions provided in hub_utils, but I cannot seem to make it work.\r\n\r\n#### Code\r\nGiven a model trained with sentencepiece, I execute the following file `run.py` inside the fairseq root\r\n\r\n```\r\nfrom fairseq.models.transformer import TransformerModel\r\nde2en = TransformerModel.from_pretrained(\r\n  'checkpoints/transformer/',\r\n  checkpoint_file='checkpoint_best.pt',\r\n  data_name_or_path='data-bin/de-en/',\r\n  bpe='sentencepiece',\r\n  bpe_codes='examples/translation/de-en/sentencepiece.bpe.model'\r\n)\r\nprint(de2en.translate('du bist ein ferd'))\r\n```\r\n\r\nthis results in the following error\r\n```\r\nTraceback (most recent call last):\r\n  File \"run.py\", line 7, in <module>\r\n    bpe_codes='examples/translation/de-en/sentencepiece.bpe.model'\r\n  File \"/home/ubuntu/fairseq/fairseq/models/fairseq_model.py\", line 221, in from_pretrained\r\n    return hub_utils.GeneratorHubInterface(x[\"args\"], x[\"task\"], x[\"models\"])\r\n  File \"/home/ubuntu/fairseq/fairseq/hub_utils.py\", line 112, in __init__\r\n    self.bpe = encoders.build_bpe(args)\r\n  File \"/home/ubuntu/fairseq/fairseq/registry.py\", line 41, in build_x\r\n    return builder(args, *extra_args, **extra_kwargs)\r\n  File \"/home/ubuntu/fairseq/fairseq/data/encoders/sentencepiece_bpe.py\", line 21, in __init__\r\n    vocab = file_utils.cached_path(args.sentencepiece_vocab)\r\nAttributeError: 'Namespace' object has no attribute 'sentencepiece_vocab'\r\n```\r\n\r\n#### What have you tried?\r\nI have tried giving it various paths for the sentencepiece, but nothing works. I can't seem to figure exactly how `hub_utils` functions.\r\n\r\n#### What's your environment?\r\n\r\n - fairseq 0.9\r\n - PyTorch 1.5\r\n - OS ubuntu 18.04\r\n - How you installed fairseq (`pip`, source): source, about a week ago\r\n - Build command you used (if compiling from source): same as official readme\r\n - Python version: 3.7.4\r\n - CUDA/cuDNN version: 10.1\r\n - GPU models and configuration: p3.2 instance on amazon\r\n - Any other relevant information:\r\n",
+    "comments_url": "https://api.github.com/repos/facebookresearch/fairseq/issues/1879/comments",
+    "author": "alrojo",
+    "comments": [
+      {
+        "user": "kkaiser",
+        "created_at": "2020-03-22T15:49:27Z",
+        "body": "`bpe_codes` takes a file that must be in the same directory as specified in the first argument\r\n```\r\nfrom fairseq.models.transformer import TransformerModel\r\nde2en = TransformerModel.from_pretrained(\r\n  'checkpoints/transformer/',\r\n  checkpoint_file='checkpoint_best.pt',\r\n  data_name_or_path='data-bin/de-en/',\r\n  bpe='sentencepiece',\r\n  bpe_codes='sentencepiece.bpe.model'\r\n)\r\nprint(de2en.translate('du bist ein ferd'))\r\n```\r\n\r\npath to file: `checkpoints/transformer/sentencepiece.bpe.model`"
+      }
+    ]
+  }
+]

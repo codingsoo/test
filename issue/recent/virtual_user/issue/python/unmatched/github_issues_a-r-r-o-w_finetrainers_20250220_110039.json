@@ -1,0 +1,66 @@
+[
+  {
+    "number": 143,
+    "title": "nan loss",
+    "created_at": "2024-12-24T08:21:25Z",
+    "closed_at": "2024-12-26T01:43:07Z",
+    "labels": [],
+    "url": "https://github.com/a-r-r-o-w/finetrainers/issues/143",
+    "body": "### System Info / \u7cfb\u7d71\u4fe1\u606f\r\n\r\nCUDA:  12.4  \r\npython: 3.10\r\ndiffusers: 0.33.0.dev0\r\n\r\n### Information / \u95ee\u9898\u4fe1\u606f\r\n\r\n- [ ] The official example scripts / \u5b98\u65b9\u7684\u793a\u4f8b\u811a\u672c\r\n- [X] My own modified scripts / \u6211\u81ea\u5df1\u4fee\u6539\u7684\u811a\u672c\u548c\u4efb\u52a1\r\n\r\n### Reproduction / \u590d\u73b0\u8fc7\u7a0b\r\n\r\n1. I randomly selected a few videos to fine-tune hunyuanvideo\r\n2. But I ended up with nan loss at the first step.\r\n3. the log is \r\n`Training steps:   2%|\u2588\u2588                                                                                                        | 1/50 [00:56<46:19, 56.73s/it, loss=nan, lr=2e-7]`\r\n\r\n\r\n\r\n\r\n\r\n### Expected behavior / \u671f\u5f85\u8868\u73b0\r\n\r\nGet the correct loss value.",
+    "comments_url": "https://api.github.com/repos/a-r-r-o-w/finetrainers/issues/143/comments",
+    "author": "tanshuai0219",
+    "comments": [
+      {
+        "user": "a-r-r-o-w",
+        "created_at": "2024-12-25T22:24:39Z",
+        "body": "@tanshuai0219 I believe we interacted in the Diffusers issue too. Upgrading pytorch to 2.5.1 has been confirmed to fix the nan training loss problem by atleast 3 other people now. Could you give it a try?"
+      },
+      {
+        "user": "BlackTea-c",
+        "created_at": "2025-01-17T03:42:20Z",
+        "body": "same problem.butmy torch version is 2.5.1"
+      }
+    ]
+  },
+  {
+    "number": 47,
+    "title": "New prepare dataset = instant oom even on one video",
+    "created_at": "2024-10-18T16:38:31Z",
+    "closed_at": "2024-10-20T20:34:32Z",
+    "labels": [],
+    "url": "https://github.com/a-r-r-o-w/finetrainers/issues/47",
+    "body": "I have run prepare_dataset.py in the past but since the rework I can't get past encoding videos, it takes up my 24gb 4090 and my 64gb of RAM",
+    "comments_url": "https://api.github.com/repos/a-r-r-o-w/finetrainers/issues/47/comments",
+    "author": "Cubey42",
+    "comments": [
+      {
+        "user": "a-r-r-o-w",
+        "created_at": "2024-10-18T19:40:25Z",
+        "body": "Could you share the exact command you are running with? Will try to repro on 24gb 4090 as well. It's important to make sure `--enable_tiling`, and `--enable_slicing` (if batch_size is > 1) are used. The intermediate states in VAE can take close to 20 GB by themselves apart from model weights if tiling is not enabled."
+      }
+    ]
+  },
+  {
+    "number": 40,
+    "title": "How to load the fine-tuned I2V model's LoRA module",
+    "created_at": "2024-10-16T17:25:21Z",
+    "closed_at": "2024-10-16T18:07:54Z",
+    "labels": [],
+    "url": "https://github.com/a-r-r-o-w/finetrainers/issues/40",
+    "body": "I have successfully fine-tuned an I2V model (locally, without pushing to HF) and would like to load it for inference. I use the following code suggested in the readme\r\n\r\n```\r\nmodel_name = \"THUDM/CogVideoX-5b-I2V\" \r\npipe = CogVideoXImageToVideoPipeline.from_pretrained(\r\n    model_name, torch_dtype=torch.bfloat16\r\n).to(\"cuda\")\r\n\r\npipe.load_lora_weights(\"MyLocalLoRAPath\", adapter_name=[\"cogvideox-lora\"])\r\npipe.set_adapters([\"cogvideox-lora\"], [1.0])\r\n```\r\n\r\nHowever I encounter the error \r\n\r\n```\r\nFile ~/anaconda3/envs/cogvideox-i2v/lib/python3.11/site-packages/diffusers/loaders/lora_pipeline.py:2451, in CogVideoXLoraLoaderMixin.load_lora_into_transformer(cls, state_dict, transformer, adapter_name, _pipeline):\r\n\r\nif adapter_name in getattr(transformer, \"peft_config\", {}):\r\naise ValueError(\r\n   f\"Adapter name {adapter_name} already in use in the transformer - please select a new adapter name.\"    )\r\n\r\nTypeError: unhashable type: 'list'\r\n```\r\n\r\nNote: in the trained LoRA folders, there is only a `pytorch_lora_weights.safetensors`",
+    "comments_url": "https://api.github.com/repos/a-r-r-o-w/finetrainers/issues/40/comments",
+    "author": "Yuancheng-Xu",
+    "comments": [
+      {
+        "user": "a-r-r-o-w",
+        "created_at": "2024-10-16T17:48:29Z",
+        "body": "In pipe.load_lora_weights, please pass just the string for adapter_name and not a list. Just saw that the README has a mistake. Will fix asap"
+      },
+      {
+        "user": "euminds",
+        "created_at": "2024-12-03T03:01:22Z",
+        "body": "> I have successfully fine-tuned an I2V model (locally, without pushing to HF) and would like to load it for inference. I use the following code suggested in the readme\r\n> \r\n> ```\r\n> model_name = \"THUDM/CogVideoX-5b-I2V\" \r\n> pipe = CogVideoXImageToVideoPipeline.from_pretrained(\r\n>     model_name, torch_dtype=torch.bfloat16\r\n> ).to(\"cuda\")\r\n> \r\n> pipe.load_lora_weights(\"MyLocalLoRAPath\", adapter_name=[\"cogvideox-lora\"])\r\n> pipe.set_adapters([\"cogvideox-lora\"], [1.0])\r\n> ```\r\n> \r\n> However I encounter the error\r\n> \r\n> ```\r\n> File ~/anaconda3/envs/cogvideox-i2v/lib/python3.11/site-packages/diffusers/loaders/lora_pipeline.py:2451, in CogVideoXLoraLoaderMixin.load_lora_into_transformer(cls, state_dict, transformer, adapter_name, _pipeline):\r\n> \r\n> if adapter_name in getattr(transformer, \"peft_config\", {}):\r\n> aise ValueError(\r\n>    f\"Adapter name {adapter_name} already in use in the transformer - please select a new adapter name.\"    )\r\n> \r\n> TypeError: unhashable type: 'list'\r\n> ```\r\n> \r\n> Note: in the trained LoRA folders, there is only a `pytorch_lora_weights.safetensors`\r\n\r\n\r\nIs your device a 4090 24GB or H100 or A100?\r\n"
+      }
+    ]
+  }
+]

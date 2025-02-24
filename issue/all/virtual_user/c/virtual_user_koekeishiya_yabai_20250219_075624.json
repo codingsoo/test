@@ -1,0 +1,490 @@
+[
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/2080",
+    "source": {
+      "issue_number": 2080
+    },
+    "initial_question": {
+      "title": "Command stopped working with new update",
+      "body": "Hi, I was using this command pretty heavily (I found it here on github a couple of months ago):\r\n```\r\nshift + alt - t: layer=\"$(yabai --message query --windows --window | jq --raw-output .layer)\" && yabai --message window --layer \"$([ \"$layer\" = 'below' ] && echo 'normal' || echo 'below')\"\r\n```\r\nSuddenly it stopped working, could someone help me understading why? \r\n\r\nThank's"
+    },
+    "satisfaction_conditions": [
+      "Command successfully toggles window layer state between 'normal' and 'below'",
+      "Command correctly reads the current window layer state",
+      "Command uses the correct property name for layer querying",
+      "Command executes without errors when triggered by the keyboard shortcut",
+      "Command maintains compatibility with current yabai version"
+    ],
+    "created_at": "2024-02-06T21:23:26Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/1441",
+    "source": {
+      "issue_number": 1441
+    },
+    "initial_question": {
+      "title": "Zoomed windows are occluded if not preemptively raised",
+      "body": "Zooming a window which hasn't been raised will cause it to be occluded by other windows.\r\n(or more specifically all windows which have been raised since the window in question itself was raised)\r\n\r\nThis will frequently happen if you use `focus_follows_mouse = autofocus`. \r\nA common use case (at least for me) is to hover a window I want to fullscreen and then pressing the corresponding binding. \r\nAs it currently is I have to press the window before or after zooming it.\r\n\r\nA solution would be to force-raise any window which are zoomed."
+    },
+    "satisfaction_conditions": [
+      "User must have control over window raising behavior"
+    ],
+    "created_at": "2022-09-22T20:48:02Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/1434",
+    "source": {
+      "issue_number": 1434
+    },
+    "initial_question": {
+      "title": "How to auto-focus first window of current display when a floating window is closed?",
+      "body": "Dear yabai developer and enthusiasts,\r\n\r\nThe following line in the configuration file seems not working..\r\n\r\n```\r\nyabai -m signal -add event=window_destroyed action=\"yabai -m window --focus first\"\r\n```\r\n\r\nThank you in advance!"
+    },
+    "satisfaction_conditions": [
+      "Window focus automatically changes when a floating window is closed",
+      "System responds to window destruction events",
+      "Focus changes target an existing window on the current display",
+      "Configuration changes persist across window management sessions"
+    ],
+    "created_at": "2022-09-21T07:26:21Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/1428",
+    "source": {
+      "issue_number": 1428
+    },
+    "initial_question": {
+      "title": "Move a window with manage=off & sticky=on to a spacific position on the screen",
+      "body": "Is that possible? Thanks in advance!"
+    },
+    "satisfaction_conditions": [
+      "Window remains visible across workspace switches",
+      "Window can be positioned at specific screen coordinates",
+      "Window operates outside window manager control",
+      "Configuration persists for specified application"
+    ],
+    "created_at": "2022-09-19T17:31:19Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/1407",
+    "source": {
+      "issue_number": 1407
+    },
+    "initial_question": {
+      "title": "Trigger focus app under mouse",
+      "body": "Hi,\r\n\r\nI don't use the focus_follow_mouse option but I was wondering if there was a way to trigger a focus window under mouse through a yabai command.\r\n\r\nI work on a little script and it looks like it would be helpful."
+    },
+    "satisfaction_conditions": [
+      "Window under mouse cursor becomes focused when command is executed",
+      "Command can be triggered on-demand rather than automatically",
+      "Command is compatible with yabai window manager",
+      "Command is scriptable/automatable"
+    ],
+    "created_at": "2022-09-12T10:04:56Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/1375",
+    "source": {
+      "issue_number": 1375
+    },
+    "initial_question": {
+      "title": "color format for window borders",
+      "body": "Great tool, so far been loving yabai. However, when trying to customize it for my use, I haven't really figured out the color format I should use for the window borders. I've tried with standard HEX (ex. 58a6ff) but as I've seen in the config files of other people, the format they use seems to be different (ex. 0xE0808080).\r\n\r\nWhat color format is used to configure window borders? Thank you in advance, and please excuse my ignorance if I haven't found the place where this information could be!"
+    },
+    "satisfaction_conditions": [
+      "Color values must be specified in 0xAARRGGBB format",
+      "Alpha channel must be correctly positioned as the first value after 0x",
+      "Standard hex color codes must be convertible to the required format"
+    ],
+    "created_at": "2022-08-29T03:22:32Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/1362",
+    "source": {
+      "issue_number": 1362
+    },
+    "initial_question": {
+      "title": "[Question] Move all instances of application to a different desktop",
+      "body": "Hello guys.\r\n\r\nFirst of all, great job you're doing here with Yabai.\r\n\r\nI have a simple question, let's say we have multiple instances of the same app (Chrome, VSCode, whatever), what is the easiest way to move all of them at once to another desktop?\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "All windows of the specified application must move simultaneously to the target desktop",
+      "The solution must work with different applications (not limited to a single app)",
+      "The target desktop must be specifiable"
+    ],
+    "created_at": "2022-08-18T13:44:27Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/1301",
+    "source": {
+      "issue_number": 1301
+    },
+    "initial_question": {
+      "title": "auto_balance does not apply after mirror",
+      "body": "To repro:\r\n- Have auto-balance on (`yabai -m config auto_balance on`)\r\n- Make a simple 3 window layout side-by-side\r\n- `yabai -m space --mirror y-axis`\r\n\r\nWhat happens (at least on my computer): windows tree is rotated but resulting windows are not balanced. Is that working as intended?"
+    },
+    "satisfaction_conditions": [
+      "System behavior correctly reflects the documented auto_balance functionality",
+      "Mirror operation preserves window layout structure without triggering rebalancing",
+      "User understands when auto_balance is triggered"
+    ],
+    "created_at": "2022-06-12T06:46:06Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/741",
+    "source": {
+      "issue_number": 741
+    },
+    "initial_question": {
+      "title": "Native window/desktop switching moves windows between spaces",
+      "body": "To reproduce this:\r\n\r\n1. Create multiple spaces.\r\n2. Keep an app like a browser in space 1\r\n3. Have another an app in space 8 (say, a text editor)\r\n4. Cmd+Tab to pick the browser\r\n5. This should trigger OSX's native desktop change animation to bring space 1 (and desktop 1) into focus\r\n6. The app has moved from space 8 to space 2. Other windows have moved spaces too (if I were to guess, they all moved one space to the right)\r\n\r\nFor step 3, I can avoid using cmd+tab, but this behavior is unavoidable when for example, clicking openable links that triggers the native desktop-switch animation to bring the browser into focus.\r\n\r\nBasically, it seems like the native desktop change animation is garbling the assignment of windows to spaces. Any way to fix this? I'd like the windows to be pinned to specific spaces unless I reassign them myself.\r\n\r\nI'm on yabai-v3.1.0 and on MacOS Catalina 10.15.7."
+    },
+    "satisfaction_conditions": [
+      "Windows remain in their assigned spaces when switching between desktops",
+      "Space ordering remains stable during desktop switches"
+    ],
+    "created_at": "2020-11-30T20:24:32Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/731",
+    "source": {
+      "issue_number": 731
+    },
+    "initial_question": {
+      "title": "disable SIP on big sur",
+      "body": "i use this command as per wiki\r\n\r\n```\r\ncsrutil disable --with kext --with dtrace --with nvram --with basesystem\r\n```\r\n\r\nhowever, `csrutil status` still give me this\r\n\r\n\r\n```\r\nSystem Integrity Protection status: unknown (Custom Configuration).\r\n\r\nConfiguration:\r\n        Apple Internal: disabled\r\n        Kext Signing: enabled\r\n        Filesystem Protections: disabled\r\n        Debugging Restrictions: disabled\r\n        DTrace Restrictions: enabled\r\n        NVRAM Protections: enabled\r\n        BaseSystem Verification: enabled\r\n\r\nThis is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.\r\n```\r\n\r\nwhich seesm dtrace/nvram and basesystem restriction still enabled"
+    },
+    "satisfaction_conditions": [
+      "System Integrity Protection (SIP) configuration allows the required functionality",
+      "Filesystem Protections and Debugging Restrictions are confirmed as disabled",
+      "System remains operational despite 'unsupported configuration' warning",
+      "SIP status verification command provides readable output"
+    ],
+    "created_at": "2020-11-20T16:40:09Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/727",
+    "source": {
+      "issue_number": 727
+    },
+    "initial_question": {
+      "title": "How do I only tile certain apps?",
+      "body": "My current configuration is has the layout set to `bsp` to tile windows and I'm using a list of apps that are specifically disabled with `yabai -m rule --add manage=off app=\"$app\"`.\r\n\r\nI want to invert my configuration so that all apps float by default and I have a specific list of apps that are managed. How would I accomplish this? I tried setting the global mode to `float` and manually setting `manage=on` on those apps but it didn't work."
+    },
+    "satisfaction_conditions": [
+      "Default window behavior must be floating, with specific apps tiled",
+      "Space layout configuration must support tiling functionality",
+      "Window management rules must correctly identify and affect target applications"
+    ],
+    "created_at": "2020-11-19T04:56:11Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/719",
+    "source": {
+      "issue_number": 719
+    },
+    "initial_question": {
+      "title": "How to focus most recent window in a space after switching spaces",
+      "body": "After switching spaces I often have to manually focus a window in that space, which gets really annoying really quickly. Instead I'd like yabai to always focus the most recent window in the space I'm in. I tried the following commands in my skhdrc (here shown for spaces 1 and 2):\r\n\r\n```\r\nalt - 1 : yabai -m space --focus 1 && yabai -m window --focus \"$(yabai -m query --windows --space | jq .[0].id)\"\r\nalt - 2 : yabai -m space --focus 2 && yabai -m window --focus \"$(yabai -m query --windows --space | jq .[0].id)\"\r\n```\r\n\r\nbut those didn't seem to solve anything.\r\n\r\nBtw, I have `When switching to an application, switch to a Space with open windows for the application` unchecked in System Preferences -> Mission Control."
+    },
+    "satisfaction_conditions": [
+      "Window focus automatically updates when switching spaces",
+      "Window focus persists across display and space changes",
+      "Correct window selection when multiple windows exist in a space",
+      "Handles edge cases with floating or invisible windows",
+      "Integration with system window management"
+    ],
+    "created_at": "2020-11-15T23:19:05Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/712",
+    "source": {
+      "issue_number": 712
+    },
+    "initial_question": {
+      "title": "Focusing desktop not working on Big Sur",
+      "body": "Attempting to focus a desktop via `yabai -m window --space 2` does not work. I tried running `sudo yabai --load-sa` but the issue persists.\r\n\r\nEdit: To add, window shadows and opacity are also not working."
+    },
+    "satisfaction_conditions": [
+      "Shell script configuration file must have valid syntax"
+    ],
+    "created_at": "2020-11-13T00:59:12Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/674",
+    "source": {
+      "issue_number": 674
+    },
+    "initial_question": {
+      "title": "Question: is it possible to auto-stack new windows?",
+      "body": "Hello,\r\n\r\nFisrt off, that you for making yabai and being so incredibly helpful to those who use it. it's appreciated :)\r\n\r\nIs it possible to configure (on a per-space basis or globally) a rule like `yabai -m window --insert stack`, so that new windows created in that space automatically stack onto the most recent window?\r\n\r\nMy use case is that I really like stacks, but i also really like bsp layout and the ability to have more than one stack in a given space.\r\nIf i set the layout of a space to `bsp`, i can have multiple stacks but all new windows cause splits\r\nIf i set the layout of a space to `stack`, all new windows stack, but it's no longer possible to split a stack and have multiple stacks\r\n\r\nI'm stuck on this one. Any advice or direction would be greatly appreciated"
+    },
+    "satisfaction_conditions": [
+      "Multiple separate stacks can coexist in BSP layout"
+    ],
+    "created_at": "2020-09-28T14:14:40Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/670",
+    "source": {
+      "issue_number": 670
+    },
+    "initial_question": {
+      "title": "Switch space on currently focused monitor",
+      "body": "Hi, this is more of a question. I was wondering if it is possible to tell yabai to switch space based on where the mouse is?\r\n\r\nI have two monitors and I want to be able to use a shortcut to switch spaces based on where the mouse, like this:\r\n\r\n```\r\nyabai -m space --focus 2 --display mouse\r\n```\r\n\r\nUnfortunately `--display mouse` seems to move the mouse in the second space\r\n\r\nIs something like this possible?"
+    },
+    "satisfaction_conditions": [
+      "Space switching must respect mouse cursor location",
+      "Command execution must not unintentionally move the mouse cursor",
+      "Space switching must work with multiple monitors",
+      "Must be able to target specific space numbers"
+    ],
+    "created_at": "2020-09-25T10:35:47Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/623",
+    "source": {
+      "issue_number": 623
+    },
+    "initial_question": {
+      "title": "Is it possible to draw/move a window off screen?",
+      "body": "Hey @koekeishiya \ud83d\udc4b \r\n\r\nWondering if it's possible to intentionally draw/move an application window off the screen?  \r\nI'd like to have an application running which I can Cmd+Tab to to gain focus, but I don't want it displayed (minimization isn't an option).\r\n\r\nIf not, I'm sure I could cook up my own little patch to use personally, I just wanted to see if it was possible natively.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Window must remain functionally accessible via Command+Tab",
+      "Window must not be visible on screen during normal operation",
+      "Application must remain in running state"
+    ],
+    "created_at": "2020-07-22T19:47:53Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/576",
+    "source": {
+      "issue_number": 576
+    },
+    "initial_question": {
+      "title": "how to controll the second monitor?",
+      "body": "The main monitor create three desktop and I can focus them,\r\nThen I create three desktop on the second monitor But I don't kown the index of second monitor\r\nso,I can't focus them by shortcuts\r\nneed help"
+    },
+    "satisfaction_conditions": [
+      "User must be able to identify spaces on the second monitor",
+      "User must be able to focus (switch to) specific spaces on the second monitor",
+      "Space identification method must work with the system's space indexing",
+      "Solution must support multiple spaces across multiple monitors"
+    ],
+    "created_at": "2020-06-15T09:56:28Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/542",
+    "source": {
+      "issue_number": 542
+    },
+    "initial_question": {
+      "title": "Add ability to move between spaces while in Mission Control with \"fast focus desktop\" command.",
+      "body": "I have `ctrl + left|right` set to the `fast focus desktop` command, unfortunately this doesn't work while in Mission Control.\r\n\r\nIs it possible to add this feature? Perhaps just allow `fast focus desktop` to function as regular `move to left|right space` command while in Mission Control?"
+    },
+    "satisfaction_conditions": [
+      "Desktop switching commands must work both in normal mode and Mission Control mode",
+      "System must handle the command differently when in Mission Control vs normal mode",
+      "The same keyboard shortcut must trigger appropriate behavior in both contexts",
+      "Desktop switching must occur in the specified direction (left/right)",
+      "Command execution must gracefully handle failure states"
+    ],
+    "created_at": "2020-05-28T06:27:24Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/538",
+    "source": {
+      "issue_number": 538
+    },
+    "initial_question": {
+      "title": "\"scripting-addition\" \"payload is not installed, some features will not work!\"",
+      "body": "Hello,\r\n\r\n> \"scripting-addition\r\n> payload is not installed, some features will not work!\"\r\n\r\nI keep getting this message after starting yabai. Do I need to fully disable SIP? I believe I followed all of the instructions correctly.\r\n\r\n1. Rebooted in cmd-R mode; `csrutil enable --without debug`\r\n2. Compiled and installed via brew\r\n3. `brew services start yabai`\r\n4. Added yabai to the accessibility whitelist \r\n5. `sudo yabai --install-sa`\r\n6. `brew services stop yabai`\r\n7. `brew services start yabai`\r\n\r\nI also can't get it to focus to different spaces. `yabai --check-sa` doesn't return anything. I've also restarted the computer a few times. Output from `csrutil status` is below.\r\n\r\nThank you, I'm excited to get yabai up and running!\r\n\r\nMacBook Pro (13-inch, Late 2011)\r\nMacOS High Sierra v10.13.6 (max version supported)\r\nyabai v3.0.2\r\nxCode v9.4.1\r\n```\r\n$ csrutil status\r\nSystem Integrity Protection status: enabled (Custom Configuration).\r\n\r\nConfiguration:\r\n    Apple Internal: disabled\r\n    Kext Signing: enabled\r\n    Filesystem Protections: enabled\r\n    Debugging Restrictions: disabled\r\n    DTrace Restrictions: enabled\r\n    NVRAM Protections: enabled\r\n    BaseSystem Verification: enabled\r\n\r\nThis is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.\r\n```\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Scripting addition must be successfully installed and verified",
+      "System Integrity Protection (SIP) must be configured to allow scripting addition installation",
+      "Yabai service must start without scripting addition error messages"
+    ],
+    "created_at": "2020-05-25T02:28:27Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/522",
+    "source": {
+      "issue_number": 522
+    },
+    "initial_question": {
+      "title": "[Question] How to go from a vertical split to a horizontal split?",
+      "body": "Sorry if it's a noob question but I've been using chunkwm/yabai for ~2 years and I haven't figured this out yet.\r\n\r\nLet's say I have two windows like this:\r\n```\r\n==========================\r\n        window 1\r\n--------------------------\r\n        window 2\r\n==========================\r\n```\r\n\r\nHow can I change it to this?\r\n```\r\n==========================\r\n            |\r\n  window 1  |  window 2\r\n            |\r\n==========================\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Window layout successfully changes from vertical stack to horizontal split",
+      "Both windows remain visible and accessible after the transformation",
+      "Windows occupy roughly equal space in the final layout"
+    ],
+    "created_at": "2020-05-13T14:07:31Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/496",
+    "source": {
+      "issue_number": 496
+    },
+    "initial_question": {
+      "title": "Firefox picture-in-picture",
+      "body": "I've been using yabai for a while now, and I really love it. But I've run into an issue today, where after restarting my computer, yabai will not pick up and resize the picture-in-picture window when watching a video in Firefox. It's been working for me for at least a couple months, and now I can't get it to work.\r\n\r\nAny help is appreciated. Thanks!"
+    },
+    "satisfaction_conditions": [
+      "Picture-in-Picture window behavior is correctly managed by yabai",
+      "Configuration changes are compatible with Firefox version in use",
+      "Window management rules are properly recognized by yabai",
+      "User can control PIP window behavior according to preference"
+    ],
+    "created_at": "2020-04-27T19:46:37Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/480",
+    "source": {
+      "issue_number": 480
+    },
+    "initial_question": {
+      "title": "Setup, Tiling bsp issue",
+      "body": "Hello, I wasn't able to find anything about this issue in the wiki or past issues, if it present, please point me in that direction.\r\n\r\nI previously used chunkwm and skhd on High Sierra. I recently upgraded to Catalina (10.15.4), I have uninstalled chunkwm and installed yabai, however, the tiling does not seem to be working as I would expect. \r\n\r\nUsing the example yabairc and skhdrc, I am able to switch application windows via hotkey (`alt + h`, `alt + l`), so it appears that yabai is working, however, there is no tiling happening. As per the default in the example file, the layout option is set to `yabai -m config layout bsp`. \r\n\r\nAll windows seem to just float, or act as they normally would in macOS. My expectation is that they would tile as they did when I used chunkwm. I have checked both the err and out logs, both are empty. Sip is disabled, I have made the yabairc executable. `Displays have separate Spaces` is enabled in Mission Control and I have disabled `Automatically rearrange Spaces based on most recent use` in Mission Control.\r\n\r\nHave I missed something in the setup? Or have I not properly configured Yabai?"
+    },
+    "satisfaction_conditions": [
+      "System prerequisites are properly configured"
+    ],
+    "created_at": "2020-04-18T00:31:46Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/469",
+    "source": {
+      "issue_number": 469
+    },
+    "initial_question": {
+      "title": "Sluggish on Chromium-based browser (when immediately switching to another tab after opening a new tab)",
+      "body": "Hi,\r\nI have been experiencing this issue for a long time when using yabai. \r\n\r\nThe thing is: in Chrome, open a new tab by clicking the \"+\" button and then **immediately** click the tab next to it on its left. There is a significant delay to switch to that tab (around 1\\~2 seconds). Also, similarly, after I open a new tab, I immediately click the \"x\" button of the tab next to it instead of the tab itself, this tab will be closed after 1~2 seconds. \r\n\r\nHowever, if I stop the yabai service (by running `brew services stop yabai`), the issue I described above is gone and the smooth is back. \r\n\r\nExcept for Chrome, I have tried other Chromium-based browsers such as Brave, and all of them have the same issue. I also tried Firefox and Safari but both of them performed very well as normal. \r\n\r\nI don't know how to investigate the source of this issue. Please do me a favor. Thank you very much.\r\n\r\nyabai version: the latest\r\nmacOS: 10.15.3 (the latest)"
+    },
+    "satisfaction_conditions": [
+      "Tab switching operations in Chromium-based browsers must complete without noticeable delay",
+      "Tab closing operations in Chromium-based browsers must execute without delay",
+      "Window manager must handle rapid window title change notifications efficiently",
+      "Solution must maintain window manager functionality while fixing performance issues",
+      "Fix must work across multiple Chromium-based browsers"
+    ],
+    "created_at": "2020-04-03T03:23:51Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/409",
+    "source": {
+      "issue_number": 409
+    },
+    "initial_question": {
+      "title": "Running yabai with SIP enabled, will signals work?",
+      "body": "Thanks for a great software!\r\n\r\nI'm running yabai with SIP enabled. I'm trying to get signals to work with a bitbar plugin.\r\n\r\nI've added the following signals and is not getting any output in the error or out log. But still its not being triggered at least to my knowledge :)\r\n\r\n```\r\n# yabai -m signal --add event=space_changed \\\r\n#   action=\"set SHELL=/bin/sh && open -g \\\"bitbar://refreshPlugin?name=yabai-window-info.*?.sh\\\"\"\r\n# yabai -m signal --add event=window_resized \\\r\n#   action=\"set SHELL=/bin/sh && open -g \\\"bitbar://refreshPlugin?name=yabai-window-info.*?.sh\\\"\"\r\n# yabai -m signal --add event=window_focused \\\r\n#   action=\"set SHELL=/bin/sh && open -g \\\"bitbar://refreshPlugin?name=yabai-window-info.*?.sh\\\"\"\r\n# yabai -m signal --add event=application_activated \\\r\n#   action=\"set SHELL=/bin/sh && open -g \\\"bitbar://refreshPlugin?name=yabai-window-info.*?.sh\\\"\"\r\n```\r\n\r\nSo my question was if we're suppose to add this to the list below in the WIKI if its a requirement to disable SIP in order for it to work.\r\n\r\n```\r\nThe following features of yabai require System Integrity Protection to be disabled:\r\n\r\nfocus/create/destroy space without animation\r\nmove space (and its windows) left, right or to another display\r\nremove window shadows\r\nenable window transparency\r\ncontrol window layers (make windows appear topmost)\r\nsticky windows (make windows appear on all spaces)\r\nmove window by clicking anywhere in its frame\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Signals functionality works with SIP enabled",
+      "Debug output is accessible for troubleshooting",
+      "Documentation accurately reflects SIP requirements",
+      "Signal events can be monitored and verified"
+    ],
+    "created_at": "2020-02-12T10:22:55Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/392",
+    "source": {
+      "issue_number": 392
+    },
+    "initial_question": {
+      "title": "Move/resize named window",
+      "body": "The `window` command only works with the focused window as far as I can see. Is it possible to resize and move a window by `title`? \r\n\r\nSomething like `yabai -m window title=\"^MyTitle.*$\" --resize=abs:1000:1000`"
+    },
+    "satisfaction_conditions": [
+      "Window must be identifiable and manipulatable by its title",
+      "Window resizing operation must execute successfully to specified dimensions",
+      "Multiple window operations (resize and move) must complete successfully even if requiring separate commands",
+      "Window selection must work without requiring window focus"
+    ],
+    "created_at": "2020-01-29T15:37:00Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/373",
+    "source": {
+      "issue_number": 373
+    },
+    "initial_question": {
+      "title": "Command to move app to a different space and follow it? Currently if I send an app to a new space I have to manually move to that space",
+      "body": "I can't find a reference for the command I need to use to move an app to a new space and automatically follow focus. `yabai -m window --space X` doesn't do it. I tried also changing the `mouse_follow_focus` to `on` but it had no effect. There is nothing to show in my configs as my yabai config is just the default config and skhd I only have this one command I'm testing right now as I'm just setting things up.\r\n  \r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Window successfully moves to the specified target space",
+      "Focus automatically follows the window to the new space",
+      "Both actions (move and focus) must execute reliably as a single operation"
+    ],
+    "created_at": "2020-01-20T01:59:48Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/367",
+    "source": {
+      "issue_number": 367
+    },
+    "initial_question": {
+      "title": "config --space do not work correctly with external monitor",
+      "body": "Hi, \r\n\r\nthe `--space` option in the .yabai config file seems to ignore spaces on a second monitor and mess with space numbers.\r\n\r\nWith the following configuration, the 120 padding is applied to the screen named \"Desktop 1\" in mission control. I tried to change the value after the --space option but the screens on the external monitor seems to be out of reach.\r\n\r\n ```\r\nyabai -m config layout                       bsp\r\nyabai -m config top_padding                  50\r\nyabai -m config bottom_padding               50\r\nyabai -m config left_padding                 50\r\nyabai -m config right_padding                50\r\nyabai -m config window_gap                   20\r\n\r\nyabai -m config --space 2 top_padding     120\r\nyabai -m config --space 2 bottom_padding  120\r\nyabai -m config --space 2 left_padding    200\r\nyabai -m config --space 2 right_padding   200\r\nyabai -m config --space 2 window_gap      50\r\n```\r\n\r\n```\r\nExternal Monitor:\r\n[Fullscreen App] - [Fullscreen App] - [Desktop 3]\r\n\r\nMacbook screen:\r\n[Fullscreen App] - [Desktop 1] - [Desktop 2]\r\n```\r\n\r\nOS: Catalina 10.15.1\r\n\r\n\u26a0\ufe0f The System Integrity Protection is not disabled on my computer.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Space indexing must be consistent across all monitors",
+      "Space numbering must account for fullscreen applications"
+    ],
+    "created_at": "2020-01-17T15:04:55Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/363",
+    "source": {
+      "issue_number": 363
+    },
+    "initial_question": {
+      "title": "How to kill a window?",
+      "body": "Hey, how can I actually kill a window, like in I3 (command + q)?"
+    },
+    "satisfaction_conditions": [
+      "Window must be completely terminated/closed",
+      "Action must be executable through a keyboard command",
+      "Solution must work within the macOS environment"
+    ],
+    "created_at": "2020-01-07T00:57:54Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/326",
+    "source": {
+      "issue_number": 326
+    },
+    "initial_question": {
+      "title": "Float the next window going to be opened",
+      "body": "I used the following to open iTerm in floating mode (only when I wanted to) - in chunkwm\r\n``` \r\n cmd  - return      : chunkc set window_float_next 1; /Applications/iTerm.app/Contents/MacOS/iTerm2 \r\n```\r\nHow can I implement an equivalent in yabai wm. The following didn't work (the new window remains titled)\r\n``` \r\ncmd  - return      : /Applications/iTerm.app/Contents/MacOS/iTerm2 ;\\\r\n       \t\t     yabai -m window --toggle float \r\n```\r\nWhat am I missing? Sorry, if it has already been addressed/answered and that I didn't search properly.\r\nAny help is highly appreciated."
+    },
+    "satisfaction_conditions": [
+      "New iTerm2 window opens in floating mode when triggered",
+      "Solution handles both newly created and restored windows",
+      "Window floating state change occurs immediately upon window appearance",
+      "Command execution affects only the newly opened window"
+    ],
+    "created_at": "2019-11-29T05:04:45Z"
+  },
+  {
+    "id": "https://github.com/koekeishiya/yabai/issues/198",
+    "source": {
+      "issue_number": 198
+    },
+    "initial_question": {
+      "title": "Support for After Effects",
+      "body": "Would it be possible to add support for After Effects? Some of the Creative Cloud apps (e.g. Illustrator, Indesign) are already managed by yabai but After Effects is not.\r\n\r\n### window information:\r\n```\r\n{\r\n\t\"id\":4960,\r\n\t\"pid\":41041,\r\n\t\"app\":\"Adobe After Effects CC 2018.3 (15.1.2)\",\r\n\t\"title\":\"Adobe After Effects CC 2018 - Unbenanntes Projekt\",\r\n\t\"frame\":{\r\n\t\t\"x\":222.0000,\r\n\t\t\"y\":186.0000,\r\n\t\t\"w\":3440.0000,\r\n\t\t\"h\":1440.0000\r\n\t},\r\n\t\"level\":0,\r\n\t\"role\":\"AXWindow\",\r\n\t\"subrole\":\"AXFloatingWindow\",\r\n\t\"movable\":1,\r\n\t\"resizable\":1,\r\n\t\"display\":1,\r\n\t\"space\":2,\r\n\t\"visible\":0,\r\n\t\"focused\":0,\r\n\t\"split\":\"none\",\r\n\t\"floating\":1,\r\n\t\"sticky\":0,\r\n\t\"border\":0,\r\n\t\"zoom-parent\":0,\r\n\t\"zoom-fullscreen\":0,\r\n\t\"native-fullscreen\":0\r\n},{\r\n\t\"id\":3056,\r\n\t\"pid\":14564,\r\n\t\"app\":\"Adobe Illustrator CC 2018\",\r\n\t\"title\":\"Unbenannt-1* bei 150 % (RGB/GPU-Vorschau) \",\r\n\t\"frame\":{\r\n\t\t\"x\":0.0000,\r\n\t\t\"y\":0.0000,\r\n\t\t\"w\":3440.0000,\r\n\t\t\"h\":1440.0000\r\n\t},\r\n\t\"level\":0,\r\n\t\"role\":\"AXWindow\",\r\n\t\"subrole\":\"AXStandardWindow\",\r\n\t\"movable\":1,\r\n\t\"resizable\":1,\r\n\t\"display\":1,\r\n\t\"space\":2,\r\n\t\"visible\":0,\r\n\t\"focused\":0,\r\n\t\"split\":\"none\",\r\n\t\"floating\":0,\r\n\t\"sticky\":0,\r\n\t\"border\":0,\r\n\t\"zoom-parent\":0,\r\n\t\"zoom-fullscreen\":0,\r\n\t\"native-fullscreen\":0\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "After Effects window must be recognized and managed by yabai",
+      "Window management rule must correctly match After Effects application name",
+      "Window management behavior must be consistent with other Creative Cloud applications"
+    ],
+    "created_at": "2019-08-06T17:06:54Z"
+  }
+]

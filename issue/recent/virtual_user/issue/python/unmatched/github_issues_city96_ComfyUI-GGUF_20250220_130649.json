@@ -1,0 +1,20 @@
+[
+  {
+    "number": 56,
+    "title": "Error occurred when executing DualCLIPLoaderGGUF:",
+    "created_at": "2024-08-21T14:15:20Z",
+    "closed_at": "2024-08-21T22:53:26Z",
+    "labels": [],
+    "url": "https://github.com/city96/ComfyUI-GGUF/issues/56",
+    "body": "I'm getting this errors message wen loading the dual clip Gguf loader, im using the t5-v1_1-xxl-encoder-Q5_K_M.gguf\r\n\r\nError occurred when executing DualCLIPLoaderGGUF:\r\n\r\nmodule 'comfy.sd' has no attribute 'load_text_encoder_state_dicts'\r\n\r\nFile \"K:\\ComfyUI\\ComfyUI\\execution.py\", line 316, in execute\r\noutput_data, output_ui, has_subgraph = get_output_data(obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"K:\\ComfyUI\\ComfyUI\\execution.py\", line 191, in get_output_data\r\nreturn_values = _map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"K:\\ComfyUI\\ComfyUI\\execution.py\", line 168, in _map_node_over_list\r\nprocess_inputs(input_dict, i)\r\nFile \"K:\\ComfyUI\\ComfyUI\\execution.py\", line 157, in process_inputs\r\nresults.append(getattr(obj, func)(**inputs))\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"K:\\ComfyUI\\ComfyUI\\custom_nodes\\ComfyUI-GGUF\\nodes.py\", line 224, in load_clip\r\nreturn (self.load_patcher(clip_paths, clip_type, self.load_data(clip_paths)),)\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"K:\\ComfyUI\\ComfyUI\\custom_nodes\\ComfyUI-GGUF\\nodes.py\", line 183, in load_patcher\r\nclip = comfy.sd.load_text_encoder_state_dicts(\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+    "comments_url": "https://api.github.com/repos/city96/ComfyUI-GGUF/issues/56/comments",
+    "author": "kakachiex2",
+    "comments": [
+      {
+        "user": "a-ru2016",
+        "created_at": "2024-08-21T14:19:06Z",
+        "body": "Please update comfyUI."
+      }
+    ]
+  }
+]

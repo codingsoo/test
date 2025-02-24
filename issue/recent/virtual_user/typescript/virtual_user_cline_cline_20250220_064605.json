@@ -1,0 +1,63 @@
+[
+  {
+    "id": "https://github.com/cline/cline/issues/1211",
+    "source": {
+      "issue_number": 1211
+    },
+    "initial_question": {
+      "title": "cline checkpoints results in constant password prompts if commit signing is enabled",
+      "body": "### What happened?\n\nOnce I upgraded cline to 3.1.0 I started getting popups about my gpg password after every cline action. This is rather disrupting. The reason is that we sign commits by default and cline creates checkpoint commits using the default git configuration, so it also tries to sign every commit. It would be nice to either have a way to disable checkpoint feature, or prevent git from using global config by setting `GIT_CONFIG_GLOBAL=/dev/null` when calling git to commit the checkpoint.\n\n### Steps to reproduce\n\n1. enable commit signing in the default git config using: `git config --global commit.gpgSign true`. You also need gpg to be configured.\r\n2. try using cline, you should see pop-ups for a password on every step\r\n\r\n\n\n### Relevant API REQUEST output\n\n_No response_\n\n### Operating System\n\nMacOS\n\n### Cline Version\n\n3.1.2\n\n### Additional context\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Global git commit signing settings do not interfere with cline operations",
+      "Solution works with existing GPG and git configurations"
+    ],
+    "created_at": "2025-01-09T10:17:22Z"
+  },
+  {
+    "id": "https://github.com/cline/cline/issues/969",
+    "source": {
+      "issue_number": 969
+    },
+    "initial_question": {
+      "title": "MCP hub not available error",
+      "body": "### Which API Provider are you using?\r\n\r\nAnthropic\r\n\r\n### Which Model are you using?\r\n\r\nClaude 3.5 Sonnet\r\n\r\n### What happened?\r\n\r\nWhen sending a message to Cline chat, I got a \"API Streaming failed: MCP hub not available\" error.\r\n\r\n### Steps to reproduce\r\n\r\n1. Install Cline for VS Code w/ fresh settings\r\n2. Send a message to Cline chat\r\n3. Get a \"API Streaming failed: MCP hub not available\" error.\r\n\r\n### Relevant API REQUEST output\r\n\r\n_No response_\r\n\r\n### Additional context\r\n\r\nUsing Windows 11 w/ a WSL project open."
+    },
+    "satisfaction_conditions": [
+      "Cline chat functionality is restored and able to successfully stream API responses",
+      "The solution persists after implementation until the next triggering event",
+      "VSCode interface remains responsive and functional after the fix"
+    ],
+    "created_at": "2024-12-20T18:13:43Z"
+  },
+  {
+    "id": "https://github.com/cline/cline/issues/415",
+    "source": {
+      "issue_number": 415
+    },
+    "initial_question": {
+      "title": "Bug: You might want to check Openrouter Claude 3.5 Sonnet prompt caching in latest version",
+      "body": "### Which API Provider are you using?\n\nOpenRouter\n\n### Which Model are you using?\n\n Claude 3.5 Sonnet\n\n### What happened?\n\nI could be wrong, but it seems as if prompt caching isn't working like it did in previous versions. I'm spending on tokens much faster, it seems. \n\n### Steps to reproduce\n\n1.Test caching compared to previous versions.\r\n2.\r\n3.\r\n\n\n### Relevant API REQUEST output\n\n_No response_\n\n### Additional context\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Cache invalidation occurs only in documented edge cases"
+    ],
+    "created_at": "2024-09-27T19:30:12Z"
+  },
+  {
+    "id": "https://github.com/cline/cline/issues/53",
+    "source": {
+      "issue_number": 53
+    },
+    "initial_question": {
+      "title": "529 Overload Error",
+      "body": "Hello, \r\n\r\nI'm new to Claude Dev and have this error \"API Request Failed\r\n\r\n529 {\"type\":\"error\",\"error\":{\"type\":\"overloaded_error\",\"message\":\"Overloaded\"}}\"\r\n\r\nI wanted to know if it is a personnal issue or an API issue. (I have 0 token send nad find it wierd)(Newbie developer BTW)\r\n\r\nTHnaks in advance for your project."
+    },
+    "satisfaction_conditions": [
+      "User understands the temporary nature of the error",
+      "User has a working alternative if the primary API remains unavailable",
+      "User can distinguish between personal setup issues and API-side problems"
+    ],
+    "created_at": "2024-08-08T10:23:19Z"
+  }
+]

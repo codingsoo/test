@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/kubewall/kubewall/issues/38",
+    "source": {
+      "issue_number": 38
+    },
+    "initial_question": {
+      "title": "Ability to Sync Kubeconfig files from a config directory",
+      "body": "Would be nice to have all the kubeconfig files snyced from a specific directory as this would avoid adding every cluster kubeconfig individually. "
+    },
+    "satisfaction_conditions": [
+      "Kubeconfig files in specified directories are successfully detected and loaded",
+      "Multiple kubeconfig file locations are supported simultaneously",
+      "Configuration changes are reflected without manual per-file addition"
+    ],
+    "created_at": "2024-10-01T10:46:13Z"
+  }
+]

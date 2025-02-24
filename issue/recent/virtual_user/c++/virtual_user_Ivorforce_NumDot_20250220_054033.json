@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/Ivorforce/NumDot/pull/51",
+    "source": {
+      "issue_number": 51
+    },
+    "initial_question": {
+      "title": "Adding rounding functions",
+      "body": null
+    },
+    "satisfaction_conditions": [
+      "Header files from xtensor dependencies must be properly accessible during compilation",
+      "Build system must correctly handle all three dependencies (xtl, xtensor, xsimd)",
+      "Build process must complete without compilation errors",
+      "Solution must work across different operating systems and shells"
+    ],
+    "created_at": "2024-09-12T19:37:41Z"
+  }
+]

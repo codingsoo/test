@@ -1,0 +1,44 @@
+[
+  {
+    "number": 34310,
+    "title": "26.0.2 26.0.1 26.0.0 regression in overriding redirectToAdmin=false with custom theme",
+    "created_at": "2024-10-24T14:38:27Z",
+    "closed_at": "2025-02-05T00:06:01Z",
+    "labels": [
+      "kind/bug",
+      "help wanted",
+      "team/ui",
+      "area/welcome/ui",
+      "status/auto-expire",
+      "status/auto-bump",
+      "priority/normal",
+      "status/expired-by-bot"
+    ],
+    "url": "https://github.com/keycloak/keycloak/issues/34310",
+    "body": "### Before reporting an issue\n\n- [X] I have read and understood the above terms for submitting issues, and I understand that my issue may be closed without action if I do not follow them.\n\n### Area\n\nwelcome/ui\n\n### Describe the bug\n\ncustom theme `import` or `parent` does not work as expected\n\n### Version\n\n26.0.2\n\n### Regression\n\n- [X] The issue is a regression\n\n### Expected behavior\n\nKeycloak starts with custom theme fix-welcome that inherits from theme keycloak that has redirectToAdmin=false which restores welcome page.\r\n\r\nworks with 24.x.x-25.x.x\n\n### Actual behavior\n\nWARN  [org.keycloak.theme.DefaultThemeManager] (executor-thread-4) Not found theme 'common/keycloak.v2.v2.v2' referenced as import of theme 'fix-welcome'. Unable to load WELCOME theme 'fix-welcome' due to this.\r\nERROR [org.keycloak.theme.DefaultThemeManager] (executor-thread-4) Failed to find WELCOME theme fix-welcome, using built-in themes\r\nWARN  [org.keycloak.theme.DefaultThemeManager] (executor-thread-1) Not found theme 'common/keycloak.v2.v2.v2' referenced as import of theme 'fix-welcome'. Unable to load WELCOME theme 'fix-welcome' due to this.\r\nERROR [org.keycloak.theme.DefaultThemeManager] (executor-thread-1) Failed to find WELCOME theme fix-welcome, using built-in themes\r\n\r\nexits with non-zero exit code\n\n### How to Reproduce?\n\n```\r\n/opt/keycloak/themes/fix-welcome\r\n\u251c\u2500\u2500 theme.properties\r\n\u2514\u2500\u2500 welcome\r\n    \u2514\u2500\u2500 theme.properties\r\n```\r\n\r\n```ini\r\n#./theme.properties\r\nparent=keycloak\r\nimport=common/keycloak\r\n```\r\n\r\n```ini\r\n#./welcome/theme.properties\r\nparent=keycloak\r\nimport=common/keycloak\r\nredirectToAdmin=false\r\n```\r\ntried also import=keycloak.v2 and import=base same issue\r\n\r\nI execute it in customized kerberos-enabled docker image\r\n\r\n```Dockerfile\r\nFROM registry.access.redhat.com/ubi9:latest as stage\r\nRUN mkdir -p /mnt/rootfs                                                                         && \\\r\n    dnf install --installroot /mnt/rootfs krb5-workstation krb5-libs curl sed grep coreutils vim iputils --releasever 9 --nodocs -y  && \\\r\n    dnf --installroot /mnt/rootfs clean all                                                      && \\\r\n    rpm --root /mnt/rootfs -e --nodeps setup\r\n    \r\nFROM quay.io/keycloak/keycloak as builder\r\nENV KC_SPI_THEME_WELCOME_THEME=fix-welcome\r\nENV KEYCLOAK_WELCOME_THEME=fix-welcome\r\nENV KC_DB=mariadb\r\nENV KC_FEATURES=kerberos\r\nENV KC_HEALTH_ENABLED=false \r\nENV KC_METRICS_ENABLED=false\r\nENV QUARKUS_TRANSACTION_MANAGER_ENABLE_RECOVERY=true\r\nWORKDIR /opt/keycloak\r\nCOPY --from=stage /fix-welcome /opt/keycloak/themes/fix-welcome\r\nRUN /opt/keycloak/bin/kc.sh build\r\n\r\nFROM quay.io/keycloak/keycloak\r\nCOPY --from=stage /mnt/rootfs /\r\nCOPY --from=builder /opt/keycloak/ /opt/keycloak/\r\nENV KC_SPI_THEME_WELCOME_THEME=fix-welcome\r\nENV KEYCLOAK_WELCOME_THEME=fix-welcome\r\nENV QUARKUS_TRANSACTION_MANAGER_ENABLE_RECOVERY=true\r\nENTRYPOINT [\"/opt/keycloak/bin/kc.sh\"]\r\n```\n\n### Anything else?\n\nRedirection breaks our existing systems more specifically - interaction with reverse proxy.\r\nI know it was decided to enable it by default and \"drop\" welcome page feature.\r\nPlease fix theme overriding or add option to easily disable redirectToAdmin in welcom epage.\r\n\r\nThanks in advance!",
+    "comments_url": "https://api.github.com/repos/keycloak/keycloak/issues/34310/comments",
+    "author": "mszmidt",
+    "comments": [
+      {
+        "user": "edewit",
+        "created_at": "2024-10-25T08:54:02Z",
+        "body": "If you just want to set `redirectToAdmin` then you don't need `parent` or `import` as nothing will be shown anyway right? "
+      },
+      {
+        "user": "edewit",
+        "created_at": "2024-10-28T09:22:36Z",
+        "body": "you don't need the `theme.properties` in the root of your theme, right? Also I'm not sure what you want to achieve, the `redirectToAdmin` is true by default, but it will only redirect to the admin ui when there is an admin user, but from your docker file I don't the admin user environment variables. "
+      },
+      {
+        "user": "mszmidt",
+        "created_at": "2024-10-30T14:12:15Z",
+        "body": "Thanks!\r\nIt worked partially.\r\n\r\n> you don't need parent or import as nothing will be shown anyway right?\r\n\r\nNot exactly nothing, tweaked that way welcome page in 24.x.x-25.x.x presents keycloak logo on dark background.\r\n\r\nRight now when i enter welcome page it redirects to admin console which is acceptable as the other redirect (realm -> admin -> realm) doesn't happen (because welcome page is activated).\r\n\r\n> but from your docker file I don't the admin user environment variables.\r\n\r\nI set admin vars on runtime. \r\n\r\ntd;lr\r\nBug is still there. \r\nIn our case creating theme without imports worked.\r\n"
+      },
+      {
+        "user": "edewit",
+        "created_at": "2024-11-06T14:26:43Z",
+        "body": "I'm not sure what the bug is though"
+      }
+    ]
+  }
+]

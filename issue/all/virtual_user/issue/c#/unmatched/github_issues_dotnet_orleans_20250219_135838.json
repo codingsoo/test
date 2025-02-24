@@ -1,0 +1,264 @@
+[
+  {
+    "number": 7957,
+    "title": "Cannot transform data from IEnumerable between two assemblies",
+    "created_at": "2022-08-31T10:55:00Z",
+    "closed_at": "2022-09-01T23:02:56Z",
+    "labels": [
+      "question",
+      ":heavy_check_mark: Resolution: Answered",
+      "Status: Resolved"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/7957",
+    "body": "Hi! I have two services and one of them take a Grain which was specified in another service. So after i take it we execute method which shold return class object with fields smth like that\r\n```\r\nclass Person{\r\npublic string Name{get;set;}\r\npublic IEnumerable<Children> ChildrenList {get;set;}\r\n. . .\r\n}\r\n```\r\nAfter method execution we handle the break point in another service where we calculating that data in IEnumerable (we have local function that makes some calculations). Like this\r\n\r\n```\r\npublic class PeopleHandler{\r\npublic async Task ExecuteAsync(personName){\r\nvar name = _context.People.First(_ => _.Name == personName);\r\nvar children = GetChildren(name);\r\n\r\nreturn new Person(name, childrens)\r\n\r\nIEnumerable GetChildren (string personName){\r\nvar children =  _context.GetChildren.Select(. . .) . . .\r\n\r\n return children;\r\n }\r\n}\r\n}\r\n```\r\n\r\nAttention. We don't use ToList() at the end. We handle it like that to another service. So we execute method \r\n\r\n```\r\npublic async Task GetPersonInformation (personName){\r\n  var peopleHandler = _client.GetGrain<PeopleHandler>(grainId);\r\n  var person = await peopleHandler.ExecuteAsync(personName);\r\n\r\n var childrens = person.ChildrenList.ToList() // or any other method that makes programm to calculate data 'First() etc.'\r\n}\r\n```\r\n\r\nAfter that we got an exception about NullReferenceException in Children. We can't calculate data between services. I decided to make it ToList() before we return data from the ExecuteAsync method and i got a result but what was the reason of that? If it wasn't a local function i understand that private functions can be not visible in first assembly but this is local function and we need to know everything about public method including it's private methods inside of it. So i changed return Type of GetChildren and got my result. What do you think?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/7957/comments",
+    "author": "NikitaPozharskyi",
+    "comments": [
+      {
+        "user": "mnmr",
+        "created_at": "2022-09-01T08:45:47Z",
+        "body": "When you call a method on a grain, the data (objects) get serialized into a stream of bytes. These bytes are then sent over the network to the receiving grain, where the objects are re-created. However, if you do not call ToList() before sending the data, there is no data to send (because LINQ lazy-evaluates the query).\r\n\r\nAs a general recommendation, use concrete types (i.e. List<T> instead of IList<T> or IEnumerable<T>) when passing data between grains. This avoids surprises and is more explicit than relying on the serialization logic to automagically do the right thing."
+      }
+    ]
+  },
+  {
+    "number": 6368,
+    "title": "Explanation regarding IAsyncStream<T>.GetAllSubscriptionHandles()",
+    "created_at": "2020-02-28T13:47:26Z",
+    "closed_at": "2020-03-09T11:39:40Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/6368",
+    "body": "Hi,\r\n\r\nI am working on the subscription logic in our app to ensure that I resubscribe to a stream instead of creating a new handle each time (whenever possible).\r\nWhat I expected from the `IAsyncStream<T>.GetAllSubscriptionHandles()` function is to return the handles for a given grain type + primary key. Since we're only subscribing once to each stream in our grains, I assumed that I should only have one handle in the list (if a previous subscription already existed obviously) and that I could reuse it to resubscribe.\r\n\r\nBut after a few tests, I realized that different activations of a grain were retrieving the handles from other activations too.\r\n\r\nSo I decided to test this pattern in a sample project, and I couldn't reproduce it. In the end, when I created two activations of a grain, `IAsyncStream<T>.GetAllSubscriptionHandles()` only retrieved the handles for each specific activation (which is the pattern I expected). So I gave a look at the JSON payload and I noticed a few differences between my main and my test projects.\r\n\r\nHere is the JSON of my test project :\r\n```json\r\n{\r\n  \"$id\": \"1\",\r\n  \"$type\": \"Orleans.Streams.PubSubGrainState, Orleans.Runtime\",\r\n  \"Producers\": {\r\n    \"$type\": \"System.Collections.Generic.HashSet`1[[Orleans.Streams.PubSubPublisherState, Orleans.Core]], System.Collections\",\r\n    \"$values\": []\r\n  },\r\n  \"Consumers\": {\r\n    \"$type\": \"System.Collections.Generic.HashSet`1[[Orleans.Streams.PubSubSubscriptionState, Orleans.Core]], System.Collections\",\r\n    \"$values\": [\r\n      {\r\n        \"$id\": \"2\",\r\n        \"$type\": \"Orleans.Streams.PubSubSubscriptionState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$id\": \"3\",\r\n          \"$type\": \"Orleans.Streams.StreamId, Orleans.Core\",\r\n          \"Guid\": \"79dd573a-efc3-4e3a-9957-3f0b7452d51a\",\r\n          \"ProviderName\": \"SMS\",\r\n          \"Namespace\": \"test\"\r\n        },\r\n        \"SubscriptionId\": {\r\n          \"$id\": \"4\",\r\n          \"$type\": \"Orleans.Runtime.GuidId, Orleans.Core.Abstractions\",\r\n          \"Guid\": \"f0b37117-16db-4cf1-9cf6-3373740aaf22\"\r\n        },\r\n        \"consumerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamConsumerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"0000000000000000000000000000000103ffffffc024bd45\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      },\r\n      {\r\n        \"$id\": \"5\",\r\n        \"$type\": \"Orleans.Streams.PubSubSubscriptionState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$ref\": \"3\"\r\n        },\r\n        \"SubscriptionId\": {\r\n          \"$id\": \"6\",\r\n          \"$type\": \"Orleans.Runtime.GuidId, Orleans.Core.Abstractions\",\r\n          \"Guid\": \"99a2600d-c107-4485-a05f-1fcd51e15c7c\"\r\n        },\r\n        \"consumerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamConsumerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"0000000000000000000000000000000203ffffffc024bd45\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      }\r\n    ]\r\n  }\r\n}\r\n```\r\n\r\nEach subscription has a different `GrainId`, one for the activation with `1` as the primary key, and `2` for the other.\r\n\r\nHere is the one from my main project :\r\n```json\r\n{\r\n  \"$id\": \"1\",\r\n  \"$type\": \"Orleans.Streams.PubSubGrainState, Orleans.Runtime\",\r\n  \"Producers\": {\r\n    \"$type\": \"System.Collections.Generic.HashSet`1[[Orleans.Streams.PubSubPublisherState, Orleans.Core]], System.Collections\",\r\n    \"$values\": [\r\n      {\r\n        \"$id\": \"2\",\r\n        \"$type\": \"Orleans.Streams.PubSubPublisherState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$id\": \"3\",\r\n          \"$type\": \"Orleans.Streams.StreamId, Orleans.Core\",\r\n          \"Guid\": \"6395d740-6e55-11e8-b566-0800200c9a66\",\r\n          \"ProviderName\": \"SMS\",\r\n          \"Namespace\": \"M7.Heartbeat\"\r\n        },\r\n        \"producerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamProducerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"450a8ec3eeba4965f566fb006ede70950400000000000000\",\r\n          \"ObserverId\": \"23706d43-baaf-4a48-8301-4d6a767e0a82\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      }\r\n    ]\r\n  },\r\n  \"Consumers\": {\r\n    \"$type\": \"System.Collections.Generic.HashSet`1[[Orleans.Streams.PubSubSubscriptionState, Orleans.Core]], System.Collections\",\r\n    \"$values\": [\r\n      {\r\n        \"$id\": \"4\",\r\n        \"$type\": \"Orleans.Streams.PubSubSubscriptionState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$ref\": \"3\"\r\n        },\r\n        \"SubscriptionId\": {\r\n          \"$id\": \"5\",\r\n          \"$type\": \"Orleans.Runtime.GuidId, Orleans.Core.Abstractions\",\r\n          \"Guid\": \"75abe7f9-390f-4ce1-a26a-67d1cc028c2b\"\r\n        },\r\n        \"consumerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamConsumerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"450a8ec3eeba4965f566fb006ede70950400000000000000\",\r\n          \"ObserverId\": \"583016d5-3639-43e5-885b-5aa6b32c9df7\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      },\r\n      {\r\n        \"$id\": \"6\",\r\n        \"$type\": \"Orleans.Streams.PubSubSubscriptionState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$ref\": \"3\"\r\n        },\r\n        \"SubscriptionId\": {\r\n          \"$id\": \"7\",\r\n          \"$type\": \"Orleans.Runtime.GuidId, Orleans.Core.Abstractions\",\r\n          \"Guid\": \"a2338aff-2ef7-4acd-bef9-ee37c6488718\"\r\n        },\r\n        \"consumerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamConsumerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"450a8ec3eeba4965f566fb006ede70950400000000000000\",\r\n          \"ObserverId\": \"583016d5-3639-43e5-885b-5aa6b32c9df7\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      },\r\n      {\r\n        \"$id\": \"8\",\r\n        \"$type\": \"Orleans.Streams.PubSubSubscriptionState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$ref\": \"3\"\r\n        },\r\n        \"SubscriptionId\": {\r\n          \"$id\": \"9\",\r\n          \"$type\": \"Orleans.Runtime.GuidId, Orleans.Core.Abstractions\",\r\n          \"Guid\": \"a25178cd-61ec-4fa1-bd31-2803033b3142\"\r\n        },\r\n        \"consumerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamConsumerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"450a8ec3eeba4965f566fb006ede70950400000000000000\",\r\n          \"ObserverId\": \"583016d5-3639-43e5-885b-5aa6b32c9df7\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      },\r\n      {\r\n        \"$id\": \"10\",\r\n        \"$type\": \"Orleans.Streams.PubSubSubscriptionState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$ref\": \"3\"\r\n        },\r\n        \"SubscriptionId\": {\r\n          \"$id\": \"11\",\r\n          \"$type\": \"Orleans.Runtime.GuidId, Orleans.Core.Abstractions\",\r\n          \"Guid\": \"3aad6d49-6792-4bd2-b6a2-3c7320afa268\"\r\n        },\r\n        \"consumerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamConsumerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"450a8ec3eeba4965f566fb006ede70950400000000000000\",\r\n          \"ObserverId\": \"583016d5-3639-43e5-885b-5aa6b32c9df7\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      },\r\n      {\r\n        \"$id\": \"12\",\r\n        \"$type\": \"Orleans.Streams.PubSubSubscriptionState, Orleans.Core\",\r\n        \"Stream\": {\r\n          \"$ref\": \"3\"\r\n        },\r\n        \"SubscriptionId\": {\r\n          \"$id\": \"13\",\r\n          \"$type\": \"Orleans.Runtime.GuidId, Orleans.Core.Abstractions\",\r\n          \"Guid\": \"35820dd5-adb6-4ce2-bf01-c7af0ff90a43\"\r\n        },\r\n        \"consumerReference\": {\r\n          \"$type\": \"Orleans.Streams.OrleansCodeGenStreamConsumerExtensionReference, Orleans.Core\",\r\n          \"GrainId\": \"450a8ec3eeba4965f566fb006ede70950400000000000000\",\r\n          \"ObserverId\": \"583016d5-3639-43e5-885b-5aa6b32c9df7\",\r\n          \"GenericArguments\": \"\"\r\n        }\r\n      },\r\n    ]\r\n  }\r\n}\r\n```\r\n\r\nI have a few more activations subscribing to the same topic, but here is the thing : Every subscription has the same `GrainId` + an `ObserverId` which is also the same every time. I guess then this is why the `IAsyncStream<T>.GetAllSubscriptionHandles()` function returns all the handles everytime, but the thing is that these subscriptions are made in different activations and even in different grains.\r\nThis main project has a bit of a different pattern than my test one, especially regarding which class actually do the subscription, etc. But even when trying to reapply this pattern, I am not able to have that `ObserverId` in the JSON.\r\n\r\nEDIT : There is one thing that I forgot to mention and which seems to make a difference : The streams for which GrainId is always the same + there is an observer id, are streams that were created (and for which producers) are within a nugget package that is referenced in our main project. I don't see why this would make things behave differently, but I have been able to reproduce the pattern by subscribing with a simple client to streams in that nugget, whereas all the other streams in my app do have a different GrainId + no observerId.\r\n\r\nSo my questions are :\r\n- First of all, do I misinterpret how  `IAsyncStream<T>.GetAllSubscriptionHandles()`  should be working ?\r\n- What is the signification of that `ObserverId` inside the JSON payload ?\r\n- What could make different grains, and different activations have the same ids inside that JSON ?\r\n\r\nThank you in advance for your help.\r\n\r\nRegards,\r\nNicolas",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/6368/comments",
+    "author": "DiAifU",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2020-03-05T22:51:06Z",
+        "body": "I'm a bit confused by the terminology here. When you say \"a grain activation\" I *think* you actually mean \"a grain\" as a grain with a unique key withing the grain class. Is this correct? We use the term \"grain activation\" for a different purpose, to mean \"instantiation of a grain at a certain point in time.\"\r\n\r\nThe scope of stream subscription is indeed the grain. So, when a grain calls `GetAllSubscriptionHandles()`, it receives only the its own subscriptions. There's also a way to subscribe on behalf of a grain, but I'll leave it out for now for simplicity.\r\n\r\n`ObserverId` is for client observers. Do you have clients producing events to or consuming them from the streams?"
+      },
+      {
+        "user": "DiAifU",
+        "created_at": "2020-03-06T00:24:42Z",
+        "body": "Hi,\r\nSorry about the confusion, I am indeed talking about a grain with a unique key when I was using \u00ab\u00a0grain activation\u00a0\u00bb.\r\nSo in this case, let\u2019s say I have a grain A (class name), with a primary key 1, producing on a stream with guid a-a-a-a, and grains B with different primary keys (1 to 10 for example), consuming that  a-a-a-a stream, should each B grain get 1 handle if they subscribe once, or get all the handles ?\r\n \r\nBecause depending on whether I run my test project or my main project, I seem to have different results.\r\n\r\nRegarding `ObserverId`, these specific streams have only grains producing and consuming them within the silo. No client is subscribed to these streams"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2020-03-06T00:31:19Z",
+        "body": ">should each B grain get 1 handle if they subscribe once, or get all the handles ?\r\n\r\nEach grain would get only its own handle. Unless it subscribes more than once to the same stream, which is also supported."
+      },
+      {
+        "user": "DiAifU",
+        "created_at": "2020-03-06T00:39:33Z",
+        "body": "And my problem is here. As you can see in the second json within my first post, each consumer seems to be from the same grain, but it is not. It's actually from different grains, and whenever I call `GetAllSubscriptionHandles()` from one of these grains, I also get the handles from the others."
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2020-03-06T03:43:33Z",
+        "body": "I'm not sure I understand. All consumers seem to have the same GrainId - `450a8ec3eeba4965f566fb006ede70950400000000000000`."
+      },
+      {
+        "user": "DiAifU",
+        "created_at": "2020-03-06T07:38:13Z",
+        "body": "This is what I see too, but to build this JSON, I actually subscribed from different grains"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2020-03-06T19:17:06Z",
+        "body": "Could this JSON be from a different case? Unless I'm missing something, it shows 5 subscriptions from the same grain - `450a8ec3eeba4965f566fb006ede70950400000000000000`. `ObserverId` confuses me. This looks as if these are for client subscriptions.\r\n\r\n/cc @jason-bragg in case he has a different insight."
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2020-03-06T22:53:04Z",
+        "body": "Is it possible that the test code is running the subscription logic outside of the grain's context?  I ask because that used to cause an error, but we added support for grain calls to be called from outside grains, which may also allow subscription creation from outside the context.  If this was done then all of the subscriptions from outside the grain context would all look like they are from the same grain.\r\n\r\nSubscribing to a stream from outside a grain context (unless through the client) is not supported, but it may be doing the wrong thing instead of failing, due to the change.  Please check storage and see what the pubsub state is for that stream.  If the grain ID in the pubsub is not the same as it should be it may be the ID of the system target that handles the grain calls made when outside the grain context instead of the grain the subscribe logic lives in."
+      }
+    ]
+  },
+  {
+    "number": 5969,
+    "title": "Is it safe to inject ITimerRegistry using DI?",
+    "created_at": "2019-09-23T17:02:33Z",
+    "closed_at": "2019-09-27T20:33:59Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5969",
+    "body": "Hi everyone!\r\n\r\nI found out that there is `Orleans.Timers.ITimerRegistry` interface, which is injectable as a service using DI.\r\n\r\nSuppose we have `FooGrain`, `BarService` and `ITimerRegistry`:\r\n\r\n```\r\npublic class FooGrain : Grain\r\n{\r\n    private readonly BarService _barService;\r\n\r\n    public FooGrain(BarService barService)\r\n    {\r\n        _barService = barService;\r\n    }\r\n\r\n    public Task DoFoo()\r\n    {\r\n        _barService.DoBar();\r\n\r\n        return Task.CompletedTask;\r\n    }\r\n}\r\n\r\npublic class BarService\r\n{\r\n    private readonly ITimerRegistry _timerRegistry;\r\n\r\n    public BarService(ITimerRegistry timerRegistry)\r\n    {\r\n        _timerRegistry = timerRegistry;\r\n    }\r\n\r\n    public void DoBar()\r\n    {\r\n        _timerRegistry.RegisterTimer(\r\n            grain: null,\r\n            asyncCallback: _ =>\r\n            {\r\n                Console.WriteLine(nameof(DoBar));\r\n                return Task.CompletedTask;\r\n            },\r\n            state: null,\r\n            dueTime: TimeSpan.FromSeconds(1),\r\n            period: TimeSpan.FromSeconds(10)\r\n        );\r\n    }\r\n}\r\n```\r\n\r\nAs you can see, I've passed `null` as a `grain` parameter to `ITimerRegistry.RegisterTimer`, and it still works, the timer does tick.\r\n\r\nMy question is: is it safe? I AFAIR timers are participants of grain messaging system and are alvays scheduled with Orleans scheduler.\r\n\r\nBut if I passed `null` as a grain, what schedule does they participate? Can I be sure that timers, that were created in the way I've shown above, are scheduling in the correct way and never run concurrently with other tasks?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5969/comments",
+    "author": "vyshkant",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2019-09-24T02:40:24Z",
+        "body": "Users are not supposed to interact directly with `ITimerRegistry` but it's possible to inject it and use it. I would recommend that you do not pass `null` for the grain since that will *not* produce valid behavior. You must have an instance of the grain to register the timer for, otherwise the timer will not be associated with any grain and will be scheduled on a null context"
+      }
+    ]
+  },
+  {
+    "number": 5768,
+    "title": "[Question]: Silo connection via bus.",
+    "created_at": "2019-07-19T05:41:34Z",
+    "closed_at": "2019-07-20T21:39:02Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5768",
+    "body": "Hello, tell me please, is there a way to connect Silo nodes to a bus like Redis or Azure Queue?\r\nI tried to use Azure AppService as hosting my .net core webapi application, which also contains Silo, but the AppService does not allow opening a private endpoint for Silo connections. \r\nAnd I wondered if it was possible to connect the nodes without a direct connection.",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5768/comments",
+    "author": "KSemenenko",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-07-19T22:41:32Z",
+        "body": "Currently, direct TCP connectivity between silo nodes is a requirement. "
+      }
+    ]
+  },
+  {
+    "number": 5147,
+    "title": "Unexpected token 'Error' introducing type specifier when calling grain method. ",
+    "created_at": "2018-10-30T12:41:33Z",
+    "closed_at": "2018-10-31T15:17:54Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5147",
+    "body": "Hi! Im getting\r\n\"Unexpected token 'Error' introducing type specifier \" every time when i call method Recieve on my grain  which have following signature:\r\n\r\n```\r\nTask Recieve(IEnumerable<GrainsInterfaces.EventData> messages)\r\n\r\npublic class EventData\r\n    {\r\n        public ArraySegment<byte> Body { get; set; }\r\n\r\n        public IDictionary<string, object> Properties { get; set; }\r\n\r\n        public SystemPropertiesCollection SystemProperties { get; set; }\r\n\r\n        public sealed class SystemPropertiesCollection : Dictionary<string, object>\r\n        {\r\n            public long SequenceNumber { get; set; }\r\n\r\n            public DateTime EnqueuedTimeUtc { get; set; }\r\n\r\n            public string Offset { get; set; }\r\n\r\n            public string PartitionKey { get; set; }\r\n        }\r\n    }\r\n```\r\n\r\nGrain has  [StatelessWorker] and [Reentrant] attributes.\r\n\r\nOther method, which has simplier signature:\r\n\r\n Task<string> SayHello(string greetings) works ok.\r\n\r\nDo you know what can cause this? Is there any limitation if comes to data contract? ",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5147/comments",
+    "author": "darthkurak",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-10-30T17:59:36Z",
+        "body": "`IEnumerable<T>` is not supported as an argument or return type because it is evaluated lazily. Try using `IList<T>` or something like that instead."
+      }
+    ]
+  },
+  {
+    "number": 2416,
+    "title": "Serializing Entity with ObservableCollection",
+    "created_at": "2016-11-14T12:22:59Z",
+    "closed_at": "2016-11-15T08:46:02Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/2416",
+    "body": "Hello \r\n\r\nI have a PCL with entities to be shared between the backend and the frontend.\r\nIn order to use these entities in the frontend I want to take advantage of an observable collection. To avoid issues with the events raised by the observable collection during deserialization I created an additional array property. The code:\r\n```C#\r\n[IgnoreDataMember]\r\n[JsonIgnore]\r\n[NonSerialized]\r\npublic ObservableCollection<UserTenantEntity> TenantCollection { get; set; }\r\n[DataMember]\r\npublic UserTenantEntity[] TenantArray { get; set; }\r\n```\r\nI was trying to make Orleans ignore the property TenantCollection (you can see IgnoreDataMember, JsonIgrnore, NonSerialized). But Orleans keeps producing in DeepCopier method this line:\r\n```C#\r\nresult.@TenantCollection = (global::System.Collections.ObjectModel.ObservableCollection<global::Visible.Realm.UserTenantEntity>)global::Orleans.Serialization.SerializationManager.@DeepCopyInner(input.@TenantCollection);\r\n```\r\n\r\nWhen running the test I get this message:\r\n```\r\nType 'Visible.Realm.UserTenantEntity' in Assembly 'RealmService.Entities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' is not marked as serializable.\r\n```\r\nThis message disappears if instead of using an ObservableCollection is used a List.\r\n\r\nIs there any way to instruct Orleans not to serialize a property? \r\n\r\nThank you,\r\nMauricio.\r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/2416/comments",
+    "author": "mauriciomagni",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2016-11-14T17:41:05Z",
+        "body": "The serializer likely doesn't know how to serialize `ObservableCollection<T>`, so it is falling back to the 'fallback serializer', which uses `BinaryFormatter` by default. `BinaryFormatter` can only serialize types marked as `[Serializable]`, so it's unable to serialize `UserTenantEntity` and hence the exception.\n\nWhat I don't understand is how you're able to put `[NonSerialized]` on a property, when AFAICT, `[NonSerialized]` is for fields only.\n\n``` C#\n[AttributeUsage(AttributeTargets.Field, Inherited = false)]\n[ComVisible(true)]\npublic sealed class NonSerializedAttribute : Attribute\n```\n\nOrleans _does_ respect `[NonSerialized]` - we use it often. You will need to use a field instead of a property, though.\n\nDoes this answer your question?\n"
+      },
+      {
+        "user": "mauriciomagni",
+        "created_at": "2016-11-14T20:12:54Z",
+        "body": "Hello Reuben\n\nThe NonSerialized attribute was a desperate intent using bait and switch to see if it worked, but it did not (the attribute was tweaked to accept properties).\nI was trying to instruct Orleans to just ignore my observablecollection property, I was unable to reached that goal. \n\nI even tried to create a class to force a json serialization but that make my testing failed in a really weird way (no message at all). \n\nIs it possible to ask Orleans code generator to ignore a property?\n\nThank you in advance,\nMauricio.\n"
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2016-11-14T20:27:46Z",
+        "body": "We could potentially include a NonSerialized attribute which is valid on autoproperties to instruct our serializer. As a work around, you can make this a field-backed property (manual get and set) and use NonSerialized on it. Does that work? \n"
+      }
+    ]
+  },
+  {
+    "number": 2101,
+    "title": "Stream throwing an exception",
+    "created_at": "2016-08-28T02:04:08Z",
+    "closed_at": "2016-09-05T21:42:26Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/2101",
+    "body": "I'm writing a tracking service where the devices connect to the server via TCP and I need to report to a company the status of the devices, I have a DeviceGrain where I deserialize the message, make some calculations and then, via a stream, report the data to a CompanyGrain, on my OnActivateAsync I have the following piece of code:\n\n```\n_stream = GetStream();\n\n            //when a new message arrive\n            _stream.SubscribeAsync((data, token) =>\n            {\n                if (data.GetType().ToString().Contains(\"Alert\"))\n                {\n                    _notificationHub.Invoke(\"SendAlert\", new object());\n                }\n                else if(data.GetType().ToString().Contains(\"Notification\"))\n                {\n                    var status = (StatusNotification)data;\n                    DeviceStatus deviceStatus;\n                    var exists = devicesStatus.TryGetValue(status.Id, out deviceStatus);\n                    if (exists)\n                    {\n                        devicesStatus[status.Id] = status.Status;\n                    }\n                    else\n                    {\n                        devicesStatus.Add(status.Id, status.Status);\n                    }\n                }\n```\n\nThe method GetStream is written as follows:\n\n```\nprivate IAsyncStream<object> GetStream()\n\n        {\n            var streamProvider = base.GetStreamProvider(\"SMSProvider\");\n            var companyStream = streamProvider.GetStream<object>(this.GetPrimaryKey(), \"Devices\");\n            return companyStream;\n        }\n```\n\nEverything works fine, the code inside the SuscribeAsync gets executed as it should (when a message arrives) bue it always throws the exception written below.\n\nExtension not installed on grain GrainCollection.DeviceGrain attempting to invoke type Orleans.Streams.OrleansCodeGenStreamConsumerExtensionMethodInvoker from invokable Orleans.Runtime.ActivationData\nException = Orleans.Runtime.GrainExtensionNotInstalledException: Extension not installed on grain GrainCollection.DeviceGrain attempting to invoke type Orleans.Streams.OrleansCodeGenStreamConsumerExtensionMethodInvoker from invokable Orleans.Runtime.ActivationData\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/2101/comments",
+    "author": "miker1423",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2016-08-29T02:23:34Z",
+        "body": "Is it possible you are missing await before subscribe?\n"
+      },
+      {
+        "user": "miker1423",
+        "created_at": "2016-08-29T02:28:34Z",
+        "body": "I thought so, I added async and await and the error persisted.\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-08-29T22:25:07Z",
+        "body": "Just to clarify, you changed the code to `await _stream.SubscribeAsync((data, token) =>`?\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-08-29T22:38:19Z",
+        "body": "This is very strange. Even though the lambda should be totally fine. Can you try defining the callback as a method on the grain class? Just to compare.\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2016-08-30T00:59:22Z",
+        "body": "As Sergey stated, you must await the subscribe call or this can occure.  Assuming you are:\n\nIs your grain marked reentrant?  That could cause this behavior.\n\nAre there any conditions under which your grain could activate without subscribing?\n\nWhat stream provider are you using?\n\nAre you using implicit subscriptions or explicit subscriptions?  Looks like implicit..\n"
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2016-08-30T01:17:56Z",
+        "body": "@jason-bragg even if the grain is marked as reentrant, we should not be allowing reentrancy before activation has completed - should we? It's like allowing calls to a half-constructed object.\n\n@miker1423 I think a larger code snippet would be useful here.\n"
+      },
+      {
+        "user": "miker1423",
+        "created_at": "2016-08-30T04:49:02Z",
+        "body": "@jason-bragg answering your questions:\n1.- The grain isn't reentrant.\n2.- No, the stream is created inside the OnActivateAsync method as well as the suscribe method.\n3.- I'm using the simple message stream as my provider\n4.- I'm using Implicit subscriptions\n\n@ReubenBond, the thing is that the only thing I'm doing in the OnActivateAsync method...\nI'll omit all the trivial code only leaving the stream part.\n\n```\nusing Orleans;\nusing Orleans.Streams;\nusing Orleans.Runtime;\nnamespace GrainCollection\n{\n         [ImplicitStreamSubscription(\"Devices\")]\n         public class CompanyGrain : Grain, ICompanyGrain\n         {\n                 private IAsyncStream<DeviceNotification> _stream;\n\n                public override async Task OnActivateAsync()\n                {\n                        _stream = GetStream();\n                        await _stream.SuscribeAsync((data, token) => \n                          {\n                            if(data.IsAlert){ TriggerAlerts(data); }\n                            else { UpdateStatus(data); }\n                          }\n                }\n\n                private IAsyncStream<DeviceNotification> GetStream()\n                {\n                      var streamProvider = base.GetStreamProvider(\"SMSProvider\");\n                      var companyStream = streamProvider.GetStream<DeviceNotification>(this.GetPrimaryKey(), \"Devices\");\n                      return companyStream;\n                }\n\n         }\n}\n```\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2016-08-30T17:29:40Z",
+        "body": "@miker1423 \nThe referenced exception reports that the grain having issue is \"GrainCollection.DeviceGrain\", but the code you've referenced is from GrainCollection.CompanyGrain.  Does GrainCollection.DeviceGrain have a [ImplicitStreamSubscription(\"Devices\")] attribute on it?\n"
+      },
+      {
+        "user": "miker1423",
+        "created_at": "2016-08-30T18:08:40Z",
+        "body": "@jason-bragg sorry, my fault, wrong class, I'll edit it. \nEDIT: I remembered why I showed that code, the exception is raised when the Company grain is executed.\n\nBut here is the device grain Code also:\n\n```\nusing Orleans;\nusing Orleans.Streams;\nusing Orleans.Runtime;\nusing Orleans.Runtime.Configuration;\n\nnamespace GrainCollection\n{\n         [ImplicitStreamSubscription(\"Devices\")]\n         public class DeviceGrain : Grain, IDeviceGrain, IRemindable\n         {\n                private IAsyncStream<DeviceNotification> _stream;\n\n                public override Task OnActivateAsync()\n                {\n                       _stream = GetStream();\n                       return TaskDone.Done;\n                }\n\n                private Task UpdateLocation(Point newLocation)\n                {\n                       _stream.OnNextAsync(new DeviceNotification {\n                            Id = this.GetPrimaryKeyLong(),\n                            Status = _status, //Private variable\n                            Location = newLocation,\n                            IsAlert = false\n                        });\n                }\n         }\n}\n```\n"
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2016-08-30T19:08:16Z",
+        "body": "@miker1423 your `DeviceGrain` class has an `[ImplicitSubscription(...)]`, but you are not subscribing to that stream in `OnActivateAsync`\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2016-08-30T19:31:43Z",
+        "body": "TL;DR - Remove the ImplicitSubscription attribute from the DeviceGrain.\n\nThe ImplicitSubscription attribute is used on grains that one wants to implicitly subscribe to a stream.  The DeviceGrain produces on the stream but does not subscribe to it.  By having an ImplicitSubscription attribute on the grain, the streaming infrastructure is trying to deliver events to DeviceGrains, and getting the referenced exception because those activations are not subscribing to the stream during grain activation.\n"
+      }
+    ]
+  },
+  {
+    "number": 767,
+    "title": "Bootstrap providers not called while running tests inherited from TestingSiloHost",
+    "created_at": "2015-09-08T17:31:18Z",
+    "closed_at": "2015-09-08T18:40:32Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/767",
+    "body": "I have a test class inherired from **TestingSiloHost**\nAnd I have configured BootStrap provider in **OrleansConfigurationForTesting.xml** as below\n\n```\n <Globals>\n<StorageProviders>\n  <Provider Type=\"Orleans.Storage.AzureTableStorage\" Name=\"AzureStore\" DataConnectionString=\"UseDevelopmentStorage=true\" />\n</StorageProviders>\n<SeedNode Address=\"localhost\" Port=\"22222\"/>\n<BootstrapProviders>\n  <Provider Type=\"DependencyInjectionWrapper.DependencyRegistration\"\n           Name=\"dependencyinjection\"\n           InstanceCount=\"1\"/>\n</BootstrapProviders>\n<Messaging ResponseTimeout=\"30s\"/>\n```\n\n  </Globals>\n\nBut DependencyRegistration class is not called when running the tests. Is Bootstrap supported for test cases as well?\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/767/comments",
+    "author": "ponsakthi",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2015-09-08T17:46:09Z",
+        "body": "you also need to make sure the dll with that provider is copied to test dir. Add `[DeploymentItem(\"My.dll\")]` to the test class. Is it still does not work, please share your full silo log, at Info tracing level.\n"
+      },
+      {
+        "user": "ponsakthi",
+        "created_at": "2015-09-08T18:40:32Z",
+        "body": "With help of @gabikliot , I was able to figure out the issue\n\nThe issue is that , the \u201cOrleansConfigurationForTesting.xml\u201d file was not directly under the test project. I had moved it under a subfolder \u201cconfig\u201d. Hence when the test project was built the intended config file was not copied to output folder. Instead, it referred an old config file in output folder which did not have \u201cBootStrapProvider\u201d tags.\n\nThanks a lot @gabikliot \n"
+      }
+    ]
+  }
+]

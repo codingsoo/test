@@ -1,0 +1,33 @@
+[
+  {
+    "id": "https://github.com/AutoMapper/AutoMapper/issues/3407",
+    "source": {
+      "issue_number": 3407
+    },
+    "initial_question": {
+      "title": "DuplicateTypeMapConfigurationException due to MapperConfigurationExpression.AddMap(IEnumerable<Type>)",
+      "body": "I have multiple assemblies and each has multiple types derived from `AutoMapper.Profile` so that mappings are nicely organized.\r\n\r\nWhen creating the `MapperConfiguration` I used the `AddMaps(IEnumerable<Type>)` overload and passed all those derived types that are available in the current `AppDomain`.\r\n\r\nThen calling `AssertConfigurationIsValid()` throws `DuplicateTypeMapConfigurationException`.\r\n\r\n### Mapping configuration\r\n\r\n```csharp\r\npublic class DependencyModule : Module\r\n{\r\n    protected override void Load(ContainerBuilder builder)\r\n    {\r\n        // Here we collect all types that are\r\n        // - derived from AutoMapper.Profile and\r\n        // - loaded into the current AppDomain.\r\n        IEnumerable<Type> profileTypes = GetAutoMapperProfileTypes();\r\n\r\n        var mapperConfiguration =\r\n            new MapperConfiguration(\r\n                config =>\r\n                {\r\n                    config.AllowNullCollections = true;\r\n                    config.AddMaps(profileTypes);\r\n                }\r\n            );\r\n\r\n        // This throws DuplicateTypeMapConfigurationException.\r\n        mapperConfiguration.AssertConfigurationIsValid();\r\n\r\n        IMapper mapper = mapperConfiguration.CreateMapper();\r\n\r\n        builder.RegisterInstance(mapper);\r\n    }\r\n}\r\n```\r\n\r\n### Version: 8.1.1\r\n\r\n### Expected behavior\r\n\r\nThe expected behavior is `DuplicateTypeMapConfigurationException` not to be thrown.\r\n\r\n### Actual behavior\r\n\r\n`DuplicateTypeMapConfigurationException` was thrown and based on the exception message it seemed that the same assembly is loaded exactly `n` times where `n` is the number of types derived from `AutoMapper.Profile` in that specific assembly.\r\n\r\nIf skipping `mapperConfiguration.AssertConfigurationIsValid();` then no `Exception` is thrown.\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\n    private IEnumerable<Type> GetAutoMapperProfileTypes()\r\n    {\r\n        return new Type[]\r\n        {\r\n            typeof(CustomProfile1),\r\n            typeof(CustomProfile2)\r\n        };\r\n    }\r\n    \r\n    public class Entity1 { }\r\n    \r\n    public class Entity2 { }\r\n    \r\n    public class Model1 { }\r\n    \r\n    public class Model2 { }\r\n    \r\n    public class CustomProfile1 : AutoMapper.Profile\r\n    {\r\n        public CustomProfile1()\r\n        {\r\n            CreateMap<Entity1, Model1>();\r\n        }\r\n    }\r\n    \r\n    public class CustomProfile2 : AutoMapper.Profile\r\n    {\r\n        public CustomProfile2()\r\n        {\r\n            CreateMap<Entity2, Model2>();\r\n        }\r\n    }\r\n\r\n```\r\n\r\n### Suggested change\r\n\r\nChange `MapperConfigurationExpression.cs` as below:\r\n\r\nIn `AddMaps(IEnumerable<Type>)` method call `.Distinct()` after calling `.Select()`.\r\n\r\nSimilarly in `AddMapsCore(IEnumerable<Assembly>)` method call `.Distinct()` in between `.Where()` and `.SelectMany()`.\r\n\r\n### Remarks\r\n\r\nAs for `AddMaps(IEnumerable<Type>)` I might misused/misunderstood it but it might not be 100% obvious that to you should pass *only one type per assembly*. Otherwise, you risk `DuplicateTypeMapConfigurationException` to be thrown.\r\n\r\nAdding the above suggested `.Distinct()` calls help avoid `DuplicateTypeMapConfigurationException` that I think is worth thinking about.\r\n\r\nIf you like this idea then I would happily make this minor change."
+    },
+    "satisfaction_conditions": [
+      "All valid Profile types must be properly registered and functional"
+    ],
+    "created_at": "2020-05-06T17:12:04Z"
+  },
+  {
+    "id": "https://github.com/AutoMapper/AutoMapper/issues/3190",
+    "source": {
+      "issue_number": 3190
+    },
+    "initial_question": {
+      "title": "Breaking change between v8.1.0 and v8.1.1 when mapping to a dictionary",
+      "body": "Hello,\r\n\r\nI meant to post this a while ago when 8.1.1 was released but I got caught up in things at work so I never got a chance. I'm not sure if this was an intentional breaking change or not, but there was a breaking change in 8.1.1 when mapping from a collection of Key/Values to a Dictionary (the Key/Value type is not `KeyValuePair` because it is an EF entity).\r\n\r\n### Expected behavior\r\nIn 8.1.0 of AutoMapper, this mapping worked without any issues. It would map the Key/Values into the Dictionary.\r\n\r\n### Actual behavior\r\nIn 8.1.1, the following error is thrown:\r\n\r\n```\r\nAutoMapperMappingException: Error mapping types.\r\n\r\nMapping types:\r\nOrder -> OrderModel\r\nUserQuery+Order -> UserQuery+OrderModel\r\n\r\nType Map configuration:\r\nOrder -> OrderModel\r\nUserQuery+Order -> UserQuery+OrderModel\r\n\r\nDestination Member:\r\nAttributes\r\n```\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\nvoid Main()\r\n{\r\n    var services = new ServiceCollection();\r\n    services.AddAutoMapper(this.GetType().Assembly);\r\n    \r\n    using var root = services.BuildServiceProvider();\r\n    var mapper = root.GetRequiredService<IMapper>();\r\n    \r\n    var model = mapper.Map<OrderModel>(new Order\r\n    {\r\n        OrderNumber = \"PO1001\",\r\n        Attributes =\r\n        {\r\n            new Order.Attribute { Key = \"Key1\", Value = \"Value1\" },\r\n            new Order.Attribute { Key = \"Key2\", Value = \"Value2\" },\r\n        }\r\n    });\r\n}\r\n\r\npublic class Order\r\n{\r\n    public String OrderNumber { get; set; }\r\n    public ICollection<Attribute> Attributes { get; set; } = new HashSet<Attribute>();\r\n\r\n    public class Attribute\r\n    {\r\n        public String Key { get; set; }\r\n        public String Value { get; set; }\r\n    }\r\n}\r\n\r\npublic class OrderModel\r\n{\r\n    public String OrderNumber { get; set; }\r\n    public IDictionary<String, String> Attributes { get; set; } = new Dictionary<String, String>();\r\n}\r\n\r\npublic class Profile : AutoMapper.Profile\r\n{\r\n    public Profile()\r\n    {\r\n        this.CreateMap<Order, OrderModel>();\r\n    }\r\n}\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Successful mapping from collection of custom key-value objects to a dictionary",
+      "Explicit type mapping configuration is present",
+      "No AutoMapperMappingException is thrown during mapping execution",
+      "Compatibility with AutoMapper version 8.1.1 and later"
+    ],
+    "created_at": "2019-08-12T17:42:02Z"
+  }
+]

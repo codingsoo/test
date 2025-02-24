@@ -1,0 +1,274 @@
+[
+  {
+    "number": 802,
+    "title": "CosyVoice2, \u8c03\u7528 FastAPI \u7684 `inference_zero_shot` \u63a5\u53e3\u540e\uff0c\u751f\u6210\u97f3\u9891\u7684\u97f3\u8272\u53d8\u7c97\u4e86",
+    "created_at": "2024-12-29T05:19:14Z",
+    "closed_at": "2025-01-09T13:36:02Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/802",
+    "body": "**Describe the bug**\r\nCosyVoice1 \u662f\u6b63\u5e38\u7684\uff0c\u4f46\u662fCosyVoice2 \u751f\u6210\u7684\u97f3\u9891\u4e2d\uff0c\u4eba\u7684\u97f3\u8272\u53d8\u7c97\u3002prompt \u97f3\u9891\u548c 1 \u4e2d\u4f7f\u7528\u7684\u662f\u4e00\u6a21\u4e00\u6837\u7684\u3002\r\n\r\n**Expected behavior**\r\nNormal voice quality. \r\n\r\n**Desktop (please complete the following information):**\r\n - OS: Ubuntu 22.04\r\n",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/802/comments",
+    "author": "AspadaX",
+    "comments": [
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-12-29T09:25:01Z",
+        "body": "\u5148\u770b\u76f4\u63a5python\u91cc\u53c2\u7167readme\u91cc\u547d\u4ee4\u751f\u6210\u662f\u4e0d\u662f\u4e5f\u662f\u8fd9\u6837"
+      },
+      {
+        "user": "hit-xpf",
+        "created_at": "2024-12-29T10:20:31Z",
+        "body": "`torchaudio.save(output_wav, tts_speech, sample_rate)`\r\n\u4fdd\u5b58\u7684\u65f6\u5019\uff0c\u53d7sample_rate\u5f71\u54cd\uff0c\u6211\u7684\u8f93\u51fa\u4e5f\u662f\u5bf9\u4e0d\u4e0a\uff08\u752816000\u7684sample_rate\uff09\u3002\r\n\u4e0d\u77e5\u9053\u662f\u4e0d\u662f\u524d\u4e00\u6b65\u5bf9\u8fd4\u56de\u7684response\u7684\u97f3\u9891\u5b57\u8282\u6d41\u7684\u5904\u7406\u6709\u95ee\u9898\u3002\u3002\u3002"
+      },
+      {
+        "user": "AspadaX",
+        "created_at": "2024-12-29T14:12:41Z",
+        "body": "> \u5148\u770b\u76f4\u63a5python\u91cc\u53c2\u7167readme\u91cc\u547d\u4ee4\u751f\u6210\u662f\u4e0d\u662f\u4e5f\u662f\u8fd9\u6837\r\n\r\n\u6211\u8fd9\u91cc\u770b\u4e86\u4e00\u4e0b 2 \u548c 1 \u7684\u6a21\u578b\u6587\u4ef6\u5939\u91cc\u9762\u7684 `cosyvoice.yaml`\u3002\u91cc\u9762\u7684 sample rate 2\u662f 24000\uff0c1\u662f 22050\u3002\u7136\u540e`CosyVoice2` class \u5728 init \u7684\u65f6\u5019\u4f1a\u52a0\u8f7d\u914d\u7f6e\u6587\u4ef6\u91cc\u9762\u5199\u7684 sample rate\uff1f\u662f\u56e0\u4e3a\u8fd9\u4e2a\u539f\u56e0\u5417\uff1f"
+      },
+      {
+        "user": "hit-xpf",
+        "created_at": "2024-12-31T03:41:25Z",
+        "body": "@hit-xpf \r\n\u8f93\u51fa\u4fdd\u5b58\u7684 `sample_rete` \u7528 22050 \u5927\u81f4\u53ef\u4ee5\u3002\u8fd8\u6ca1\u6709\u8bd5 24000"
+      },
+      {
+        "user": "EnochX",
+        "created_at": "2024-12-31T03:52:41Z",
+        "body": "\u786e\u5b9e\u662fsample_rate\u7684\u95ee\u9898\uff0c\u6539\u621024000\u5c31\u597d\u4e86"
+      },
+      {
+        "user": "cpken",
+        "created_at": "2025-01-02T10:35:56Z",
+        "body": "\u4fdd\u5b58\u97f3\u9891\u7684\u65f6\u5019\uff0c\u8981\u7528prompt\u97f3\u9891\u7684 sample_rete\uff0c\u624d\u4e0d\u4f1a\u5bfc\u81f4\u5bfc\u51fa\u97f3\u9891\u53d8\u5dee\u3002"
+      },
+      {
+        "user": "CodePothunter",
+        "created_at": "2025-01-09T05:00:44Z",
+        "body": "\u5f97\u4fdd\u5b58\u621022050\u6216\u800524000"
+      },
+      {
+        "user": "AspadaX",
+        "created_at": "2025-01-09T13:36:02Z",
+        "body": "> \u786e\u5b9e\u662fsample_rate\u7684\u95ee\u9898\uff0c\u6539\u621024000\u5c31\u597d\u4e86\r\n\r\n\u662f\u7684\uff0c\u4fee\u6539\u6210 24000 \u540e\u58f0\u97f3\u6b63\u5e38\u3002\u6211\u8fd9\u91cc prompt \u97f3\u9891\u662f 44K \u5de6\u53f3\u7684 sample rate\uff0c\u4e0d\u8fc7\u5e76\u4e0d\u59a8\u788d\u3002\r\n\r\n\u6211\u8fd9\u91cc\u6d4b\u8bd5\u540e\u53d1\u73b0\uff0csample rate \u8d8a\u9ad8\uff0c\u58f0\u97f3\u8d8a\u7ec6\uff0c\u53cd\u4e4b\u4ea6\u7136\u3002\u4e4b\u524d CosyVoice 1 \u7684\u65f6\u5019\u7528\u7684\u662f 22050\uff0c\u8fd9\u4e2a\u91c7\u6837\u7387\u5728 2 \u91cc\u9762\u5c31\u4f1a\u8ba9\u58f0\u97f3\u53d8\u7c97\u3002"
+      }
+    ]
+  },
+  {
+    "number": 616,
+    "title": "modify the output sampling rate to 16000hz",
+    "created_at": "2024-11-04T07:34:49Z",
+    "closed_at": "2024-11-10T08:17:46Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/616",
+    "body": "I tried to modify the output sampling rate to 16000hz, but the audio sounds clunky, how should I correctly output 16000Hz.",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/616/comments",
+    "author": "yanxp1227",
+    "comments": [
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-11-05T04:53:29Z",
+        "body": "use torchaudio.resample(22050, 16000)"
+      }
+    ]
+  },
+  {
+    "number": 601,
+    "title": "how does llm model prosody?",
+    "created_at": "2024-10-28T01:58:56Z",
+    "closed_at": "2024-11-04T04:02:16Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/601",
+    "body": "\r\nWhich of the LLM inputs, speech_token or embedding, contains prosody information? Isn\u2019t the speech_feat input for flow_matching supposed to carry prosody information? Does the LLM only focus on reconstructing semantic content, while flow_matching handles the reconstruction of prosody and timbre?",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/601/comments",
+    "author": "yangyazhou97",
+    "comments": [
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-11-04T03:32:11Z",
+        "body": "llm focus on semantic and prosody, llm also influence timbre, flow matching focus on timbre and audio quality"
+      }
+    ]
+  },
+  {
+    "number": 219,
+    "title": "Why there are different configs between cosyvoice.yaml and cosyvoice.fromscratch.yaml",
+    "created_at": "2024-07-29T02:41:33Z",
+    "closed_at": "2024-07-30T03:17:00Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/219",
+    "body": "I found in cosyvoice.yaml , the llm num_blocks is 14, while that config in cosyvoice.fromscratch.yaml Half reduced, it seems that it will get a smaller model from cosyvoice.fromscratch.yaml. Is that means the cosyvoice.fromscratch.yaml is used to train the smaller model while the cosyvoice.yaml is used to train the cosyvoide-base?",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/219/comments",
+    "author": "JohnHerry",
+    "comments": [
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-07-29T23:58:14Z",
+        "body": "cosyvoice.fromscratch.yaml is intended for train on libritts 960h, so it has smaller model size"
+      },
+      {
+        "user": "JohnHerry",
+        "created_at": "2024-07-30T01:31:31Z",
+        "body": "> cosyvoice.fromscratch.yaml is intended for train on libritts 960h, so it has smaller model size\r\n\r\nThank you very much.  I see in the paper that Cosyvoice-tiny takes 12 layers, but in the `cosyvoice.fromscrath.yaml`, its `num_blocks` is only 7,  it is even smaller then in the paper."
+      }
+    ]
+  },
+  {
+    "number": 190,
+    "title": "TypeError: padding() missing 1 required positional argument: 'use_spk_embedding'",
+    "created_at": "2024-07-22T15:07:30Z",
+    "closed_at": "2024-07-23T08:02:03Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/190",
+    "body": "**Describe the bug**\r\nWhen running `bash run.sh` in the training recipe (under `examples/libritts/cosyvoice`), I get the following error: \r\n\r\n``` \r\nTypeError: padding() missing 1 required positional argument: 'use_spk_embedding'\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/190/comments",
+    "author": "rlenain",
+    "comments": [
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-07-23T01:45:27Z",
+        "body": "use latest yaml, it has use_spk_embedding in cosyvoice.yaml"
+      },
+      {
+        "user": "JohnHerry",
+        "created_at": "2024-09-05T02:30:32Z",
+        "body": "> use latest yaml, it has use_spk_embedding in cosyvoice.yaml\r\n\r\nin the latest config, use_spk_embedding is false, is that means when training flow model from scratch,  we shell use the spk_embedding of current utterance instead of  a random one from the utter speaker?"
+      },
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-09-05T02:32:51Z",
+        "body": "no, set use_spk_embedding to false when train base model. set to true if you want to train a sft model for a specific speaker"
+      },
+      {
+        "user": "JohnHerry",
+        "created_at": "2024-09-05T02:34:45Z",
+        "body": "> no, set use_spk_embedding to false when train base model. set to true if you want to train a sft model for a specific speaker\r\n\r\nYes, I means the base model of flow-matching.  which need the spk_embedding as condition."
+      },
+      {
+        "user": "JohnHerry",
+        "created_at": "2024-09-05T02:35:49Z",
+        "body": "there are too much samples, If I can use a random spk_embedding from the same speaker, the computation of preprocessing will save a lot."
+      },
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-09-05T02:38:25Z",
+        "body": "> > no, set use_spk_embedding to false when train base model. set to true if you want to train a sft model for a specific speaker\r\n> \r\n> Yes, I means the base model of flow-matching. which need the spk_embedding as condition.\r\n\r\nno, when train base model, use utt_embedding which is extracted from current utterance. only when sft training, use spk_embedding"
+      }
+    ]
+  },
+  {
+    "number": 143,
+    "title": "where is the BPE tokenizer model used in CosyVoice",
+    "created_at": "2024-07-15T12:36:17Z",
+    "closed_at": "2024-07-17T03:48:09Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/143",
+    "body": "I read from paper that CosyVocie use BEP to tokenize text inputs. it has a 51886 dict size, but I did not find where to get the BPE model, where can I get it ?",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/143/comments",
+    "author": "JohnHerry",
+    "comments": [
+      {
+        "user": "JohnHerry",
+        "created_at": "2024-07-16T03:47:10Z",
+        "body": "> see cosyvoice.yaml for tokenizer\r\n\r\nYes, I  had seen in cosyvoice.yaml that it use whisper installed tokenizer, but the whisper multilingual tokenzier contains only 50256 tokens in its .tiktoken file, while in CosyVoice yaml config,  the \"text_token_size\" is set as 51866,  there are more tokens in cosyvoice,  So I had thought that you have your self-version BPE."
+      },
+      {
+        "user": "JohnHerry",
+        "created_at": "2024-07-17T03:48:09Z",
+        "body": "Get it, the extra tokens are from whisper."
+      }
+    ]
+  },
+  {
+    "number": 78,
+    "title": "\u5982\u679c\u7528WeTextProcessing\u7684\u8bdd\uff0c\u50cf [laughter] \u8fd9\u79cd\u7279\u6b8a\u7b26\u53f7\u8fd8\u53ef\u4ee5\u8bc6\u522b\u51fa\u6765\u5417",
+    "created_at": "2024-07-10T02:31:29Z",
+    "closed_at": "2024-07-10T15:12:40Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/78",
+    "body": "\u60f3\u95ee\u4e00\u4e0b\uff1a\u5982\u679c\u7528WeTextProcessing\u7684\u8bdd\uff0c\u50cf [laughter] \u8fd9\u79cd\u7279\u6b8a\u7b26\u53f7\u8fd8\u53ef\u4ee5\u8bc6\u522b\u51fa\u6765\u5417\uff1f\u611f\u8c22\uff01",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/78/comments",
+    "author": "KevinWang676",
+    "comments": [
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-07-10T03:06:30Z",
+        "body": "yes it will. you can try more example to see if there is any bug"
+      },
+      {
+        "user": "KevinWang676",
+        "created_at": "2024-07-10T03:16:56Z",
+        "body": "@aluminumbox Thanks for your reply. I tried to include [laughter] in my texts, however, the model could not recognize this symbol [laughter] and could not generate laughs. Can you help us resolve this issue? Thanks!"
+      },
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-07-10T03:35:02Z",
+        "body": "> @aluminumbox Thanks for your reply. I tried to include [laughter] in my texts, however, the model could not recognize this symbol [laughter] and could not generate laughs. Can you help us resolve this issue? Thanks!\r\n\r\nprint normalized text in your code, check if [laughter] is kept. also remember use cosyvoice-300m-instruct model"
+      },
+      {
+        "user": "KevinWang676",
+        "created_at": "2024-07-10T07:14:47Z",
+        "body": "@aluminumbox I see. So, only cosyvoice-300m-instruct supports fine-grained control like [laughter] and other models like cosyvoice-300m do not. Am I right? Thanks!"
+      },
+      {
+        "user": "aluminumbox",
+        "created_at": "2024-07-10T15:12:40Z",
+        "body": "> @aluminumbox I see. So, only cosyvoice-300m-instruct supports fine-grained control like [laughter] and other models like cosyvoice-300m do not. Am I right? Thanks!\r\n\r\nyes, check readme to learn how to use the 3 models"
+      }
+    ]
+  },
+  {
+    "number": 71,
+    "title": "\u5982\u5f88\u6539\u6210 ip\u8fd0\u884c",
+    "created_at": "2024-07-09T08:36:35Z",
+    "closed_at": "2024-07-10T15:11:07Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/71",
+    "body": " python3 webui.py --port 50000 --model_dir pretrained_models/CosyVoice-300M   \u5982\u4f55\u4fee\u6539\u542f\u52a8\u7684host , \u9ed8\u8ba4\u662f\u672c\u673a\u8bbf\u95ee\uff0c\u5982\u5f88\u6539\u6210IP \u8bbf\u95ee",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/71/comments",
+    "author": "zkxmaster",
+    "comments": [
+      {
+        "user": "cacard",
+        "created_at": "2024-07-09T09:48:18Z",
+        "body": "\u4f60\u4e3a\u5565\u6539IP\uff1f\u9ed8\u8ba4\u5c31\u80fd\u901a\u8fc7localhost\u6216127.0.0.1\u6216\u4f60\u7684IP\u8bbf\u95ee\u3002"
+      },
+      {
+        "user": "xxxzsgxxx",
+        "created_at": "2024-07-09T10:24:21Z",
+        "body": "> \u4f60\u4e3a\u5565\u6539IP\uff1f\u9ed8\u8ba4\u5c31\u80fd\u901a\u8fc7localhost\u6216127.0.0.1\u6216\u4f60\u7684IP\u8bbf\u95ee\u3002\r\n\r\nlocalhost\u548c127.0.0.1\u53ef\u4ee5\uff0c\u5916\u7f51IP\u5730\u5740\u662f\u4e0d\u884c\u7684\u3002"
+      },
+      {
+        "user": "lilongwei5054",
+        "created_at": "2024-07-09T11:18:44Z",
+        "body": "> \u4f60\u4e3a\u5565\u6539IP\uff1f\u9ed8\u8ba4\u5c31\u80fd\u901a\u8fc7localhost\u6216127.0.0.1\u6216\u4f60\u7684IP\u8bbf\u95ee\u3002\r\n\r\n\u56e0\u4e3a\u5f88\u591a\u8c03\u8bd5\u5927\u6a21\u578b\u7684\u8bbe\u5907\u662f\u4e13\u7528\u7684\u8bbe\u5907\uff0c\u4e00\u822c\u914d\u5907\u9ad8\u6027\u80fd\u663e\u5361\uff0c\u653e\u5728\u673a\u623f\uff0c\u4e0d\u662f\u81ea\u5df1\u7684\u5de5\u4f5c\u7535\u8111\uff0c\u800c\u6211\u4eec\u4e00\u822c\u662f\u901a\u8fc7xshell\u8fdc\u7a0b\u8c03\u8bd5\u7684\uff0c\u56e0\u6b64\u65e0\u6cd5\u901a\u8fc7localhost\u8bbf\u95ee\uff0c\u6240\u4ee5\u5e0c\u671b\u5728\u81ea\u5df1\u7684\u5de5\u4f5c\u7535\u8111\u4e0a\u80fd\u901a\u8fc7\u5c40\u57df\u7f51\u7c7b\u4f3c192.168.x.x \u6765\u8bbf\u95ee\u3002"
+      },
+      {
+        "user": "hongdangshao",
+        "created_at": "2024-07-09T12:42:41Z",
+        "body": "demo.launch(server_name=\"0.0.0.0\",...)"
+      },
+      {
+        "user": "xxxzsgxxx",
+        "created_at": "2024-07-09T16:27:23Z",
+        "body": "> demo.launch(server_name=\"0.0.0.0\",...)\r\n\r\n\u6211\u4e5f\u78b0\u5230\u4e86\u8fd9\u4e2a\u95ee\u9898\uff0cdemo.launch\u6dfb\u52a0\u53ef\u4ee5\u5de5\u4f5c\u3002\r\n\r\n\u53ef\u4ee5patch\u4e00\u4e0b\uff1a\r\n\r\n```\r\ncat host.patch\r\n169c169\r\n<     demo.launch(server_name=args.host,server_port=args.port)\r\n---\r\n>     demo.launch(server_port=args.port)\r\n180,185d179\r\n<     parser.add_argument('--host',\r\n<                     type=str,\r\n<                     default='0.0.0.0',\r\n<                     help='Specify the IP address to listen on. Default is 0.0.0.0.')\r\n<\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 7,
+    "title": "ImportError: cannot import name 'Annotated' from 'pydantic.typing'",
+    "created_at": "2024-07-05T08:38:19Z",
+    "closed_at": "2024-07-05T08:58:43Z",
+    "labels": [],
+    "url": "https://github.com/FunAudioLLM/CosyVoice/issues/7",
+    "body": "example.py is copied from official example. \r\n\r\n2024-07-05 16:29:50,876 - modelscope - INFO - PyTorch version 2.0.1+cu118 Found.\r\n2024-07-05 16:29:50,876 - modelscope - INFO - Loading ast index from /root/.cache/modelscope/ast_indexer\r\n2024-07-05 16:29:52,012 - modelscope - INFO - Loading done! Current index file version is 1.15.0, with md5 51af4c199ce0493bf05f6e6a4c460b07 and a total number of 980 components indexed\r\ntransformer is not installed, please install it if you want to use related modules\r\nTraceback (most recent call last):\r\n  File \"example.py\", line 1, in <module>\r\n    from cosyvoice.cli.cosyvoice import CosyVoice\r\n  File \"/mnt/bigclass/project/cosyvoice/CosyVoice/cosyvoice/cli/cosyvoice.py\", line 18, in <module>\r\n    from cosyvoice.cli.frontend import CosyVoiceFrontEnd\r\n  File \"/mnt/bigclass/project/cosyvoice/CosyVoice/cosyvoice/cli/frontend.py\", line 23, in <module>\r\n    import inflect\r\n  File \"/mnt/bigclass/anaconda3/envs/cosyvoice/lib/python3.8/site-packages/inflect/__init__.py\", line 77, in <module>\r\n    from pydantic.typing import Annotated\r\nImportError: cannot import name 'Annotated' from 'pydantic.typing' (/mnt/bigclass/anaconda3/envs/cosyvoice/lib/python3.8/site-packages/pydantic/typing.py)\r\n\r\nI update pydantic.typing from 2.7.0 to 2.8.3, still ...\r\nNeed I add transformers to requirements.txt?",
+    "comments_url": "https://api.github.com/repos/FunAudioLLM/CosyVoice/issues/7/comments",
+    "author": "neuxys",
+    "comments": [
+      {
+        "user": "DarkLand-Chen",
+        "created_at": "2024-07-05T08:48:30Z",
+        "body": "File \"/mnt/bigclass/anaconda3/envs/cosyvoice/lib/python3.8/site-packages/inflect/init.py\", line 77  \u4fee\u6539  from pydantic.typing import Annotated  \u6539\u6210 from typing_extensions import Annotated"
+      }
+    ]
+  }
+]

@@ -1,0 +1,97 @@
+[
+  {
+    "number": 245,
+    "title": "1.5test branch AssertionError('First input (fp16) and second input (bf16) must have the same dtype!')",
+    "created_at": "2024-11-18T08:00:10Z",
+    "closed_at": "2024-11-18T08:13:45Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/245",
+    "body": "   noise_pred = self.transformer(\r\n                 ^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 685, in forward\r\n    hidden_states, encoder_hidden_states = block(\r\n                                           ^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 282, in forward\r\n    attn_hidden_states, attn_encoder_hidden_states = self.attn1(\r\n                                                     ^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1532, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1541, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/diffusers/models/attention_processor.py\", line 495, in forward\r\n    return self.processor(\r\n           ^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 129, in __call__\r\n    hidden_states = sageattn_func(query, key, value, attn_mask=attention_mask, dropout_p=0.0,is_causal=False)\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py\", line 451, in _fn\r\n    return fn(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/ComfyUI/custom_nodes/ComfyUI-CogVideoXWrapper/custom_cogvideox_transformer_3d.py\", line 50, in sageattn_func\r\n    return sageattn(query, key, value, attn_mask=attn_mask, dropout_p=dropout_p,is_causal=is_causal)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/sageattention/core.py\", line 106, in sageattn\r\n    o = attn_true(q_int8, k_int8, v, q_scale, k_scale, tensor_layout=tensor_layout, output_dtype=dtype)\r\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/sageattention/attn_qk_int8_per_block.py\", line 113, in forward\r\n    _attn_fwd[grid](\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/runtime/jit.py\", line 167, in <lambda>\r\n    return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)\r\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/runtime/jit.py\", line 416, in run\r\n    self.cache[device][key] = compile(\r\n                              ^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/compiler/compiler.py\", line 191, in compile\r\n    module = src.make_ir(options)\r\n             ^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/compiler/compiler.py\", line 117, in make_ir\r\n    return ast_to_ttir(self.fn, self, options=options)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/data/wangxi/miniconda3/envs/comfyuimain/lib/python3.11/site-packages/triton/compiler/code_generator.py\", line 1231, in ast_to_ttir\r\n    raise CompilationError(fn.src, node, repr(e)) from e\r\ntriton.compiler.errors.CompilationError: at 39:55:    O_block_ptr = Out + (off_z * stride_oz + off_h * stride_oh) + offs_m[:, None] * stride_on + offs_k[None, :]\r\n\r\n    m_i = tl.zeros([BLOCK_M], dtype=tl.float32) - float(\"inf\")\r\n    l_i = tl.zeros([BLOCK_M], dtype=tl.float32) + 1.0\r\n    acc = tl.zeros([BLOCK_M, HEAD_DIM], dtype=tl.float32)\r\n\r\n    q = tl.load(Q_ptrs, mask = offs_m[:, None] < qo_len)\r\n    q_scale = tl.load(Q_scale_ptr)\r\n    acc, l_i = _attn_fwd_inner(acc, l_i, m_i, q, q_scale, kv_len, K_ptrs, K_scale_ptr, V_ptrs, stride_kn, stride_vn,\r\n                                    start_m,\r\n                                    BLOCK_M, HEAD_DIM, BLOCK_N,\r\n                                    4 - STAGE, offs_m, offs_n\r\n                                                       ^\r\nAssertionError('First input (fp16) and second input (bf16) must have the same dtype!')\r\n\r\ncommit 6f9e4ff6477d51ef29e2f7eea9ff2bbd6986b007 (HEAD -> 1.5_test, origin/1.5_test)\r\nAuthor: kijai <40791699+kijai@users.noreply.github.com>\r\nDate:   Sun Nov 17 22:23:40 2024 +0200\r\n\r\n    Update custom_cogvideox_transformer_3d.py\r\n\r\ncommit e70da23ac2b4724624537e503b0cdaf93d24a74e\r\nAuthor: kijai <40791699+kijai@users.noreply.",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/245/comments",
+    "author": "magicwang1111",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-11-18T08:09:53Z",
+        "body": "I think I had this too with sageattention 1.0.5, reverting back to 1.0.3 made it work again. "
+      }
+    ]
+  },
+  {
+    "number": 136,
+    "title": "Error when running fastmode",
+    "created_at": "2024-10-07T12:06:11Z",
+    "closed_at": "2024-10-07T18:06:43Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/136",
+    "body": "When I try activating fastmode, I get the error CUDA error: \r\n\r\nCUBLAS_STATUS_NOT_SUPPORTED when calling `cublasLtMatmulAlgoGetHeuristic( ltHandle, computeDesc.descriptor(), Adesc.descriptor(), Bdesc.descriptor(), Cdesc.descriptor(), Ddesc.descriptor(), preference.descriptor(), 1, &heuristicResult, &returnedResult)`.\r\n\r\nI suspect my CUDA version is not correct, I have v11.8. Which one do I need?\r\n\r\nRTX 4090, Windows 11.",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/136/comments",
+    "author": "jpgallegoar",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-10-07T12:41:03Z",
+        "body": "You need torch that's compiled for cuda 124."
+      }
+    ]
+  },
+  {
+    "number": 77,
+    "title": "Error occurred when executing DownloadAndLoadCogVideoModel",
+    "created_at": "2024-09-20T16:59:48Z",
+    "closed_at": "2024-09-20T17:45:45Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/77",
+    "body": "When I tried CogVideoX-5b-I2V, I encountered this problem. Does anyone know how to solve it\uff1f\r\n![Uploading PixPin_2024-09-21_00-55-09.jpg\u2026]()\r\n",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/77/comments",
+    "author": "TryingToDoBetter25",
+    "comments": [
+      {
+        "user": "TryingToDoBetter25",
+        "created_at": "2024-09-20T17:01:37Z",
+        "body": "Traceback (most recent call last):\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\execution.py\", line 152, in recursive_execute\r\n    output_data, output_ui = get_output_data(obj, input_data_all)\r\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\execution.py\", line 82, in get_output_data\r\n    return_values = map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True)\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\execution.py\", line 75, in map_node_over_list\r\n    results.append(getattr(obj, func)(**slice_dict(input_data_all, i)))\r\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\ComfyUI\\custom_nodes\\ComfyUI-CogVideoXWrapper\\nodes.py\", line 98, in loadmodel\r\n    transformer = CogVideoXTransformer3DModel.from_pretrained(base_path, subfolder=\"transformer\")\r\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\huggingface_hub\\utils\\_validators.py\", line 114, in _inner_fn\r\n    return fn(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\diffusers\\models\\modeling_utils.py\", line 774, in from_pretrained\r\n    accelerate.load_checkpoint_and_dispatch(\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\accelerate\\big_modeling.py\", line 613, in load_checkpoint_and_dispatch\r\n    load_checkpoint_in_model(\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 1821, in load_checkpoint_in_model\r\n    set_module_tensor_to_device(\r\n  File \"F:\\1AI\\1\\ComfyUI_CogVideoX-\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 341, in set_module_tensor_to_device\r\n    raise ValueError(f\"{module} does not have a parameter or a buffer named {tensor_name}.\")\r\nValueError: CogVideoXPatchEmbed(\r\n  (proj): Conv2d(32, 3072, kernel_size=(2, 2), stride=(2, 2))\r\n  (text_proj): Linear(in_features=4096, out_features=3072, bias=True)\r\n) does not have a parameter or a buffer named pos_embedding.\r\n"
+      },
+      {
+        "user": "kijai",
+        "created_at": "2024-09-20T17:25:44Z",
+        "body": "Did you update diffusers to 0.30.3?"
+      }
+    ]
+  },
+  {
+    "number": 62,
+    "title": "Error occurred when executing DownloadAndLoadCogVideoModel:  CogVideoXPatchEmbed( (proj): Conv2d(32, 3072, kernel_size=(2, 2), stride=(2, 2)) (text_proj): Linear(in_features=4096, out_features=3072, bias=True) ) does not have a parameter or a buffer named pos_embedding.",
+    "created_at": "2024-09-18T21:05:16Z",
+    "closed_at": "2024-09-18T21:15:36Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/62",
+    "body": "Error occurred when executing DownloadAndLoadCogVideoModel:\r\n\r\nCogVideoXPatchEmbed(\r\n(proj): Conv2d(32, 3072, kernel_size=(2, 2), stride=(2, 2))\r\n(text_proj): Linear(in_features=4096, out_features=3072, bias=True)\r\n) does not have a parameter or a buffer named pos_embedding.\r\n\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 317, in execute\r\noutput_data, output_ui, has_subgraph = get_output_data(obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 192, in get_output_data\r\nreturn_values = _map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 169, in _map_node_over_list\r\nprocess_inputs(input_dict, i)\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\execution.py\", line 158, in process_inputs\r\nresults.append(getattr(obj, func)(**inputs))\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\ComfyUI\\custom_nodes\\ComfyUI-CogVideoXWrapper\\nodes.py\", line 92, in loadmodel\r\ntransformer = CogVideoXTransformer3DModel.from_pretrained(base_path, subfolder=\"transformer\")\r\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\huggingface_hub\\utils\\_validators.py\", line 114, in _inner_fn\r\nreturn fn(*args, **kwargs)\r\n^^^^^^^^^^^^^^^^^^^\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\diffusers\\models\\modeling_utils.py\", line 774, in from_pretrained\r\naccelerate.load_checkpoint_and_dispatch(\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\accelerate\\big_modeling.py\", line 613, in load_checkpoint_and_dispatch\r\nload_checkpoint_in_model(\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 1821, in load_checkpoint_in_model\r\nset_module_tensor_to_device(\r\nFile \"C:\\Users\\Gaming\\Desktop\\ComfyUI_windows_portable\\python_embeded\\Lib\\site-packages\\accelerate\\utils\\modeling.py\", line 341, in set_module_tensor_to_device\r\nraise ValueError(f\"{module} does not have a parameter or a buffer named {tensor_name}.\")",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/62/comments",
+    "author": "brad12d3",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-09-18T21:07:50Z",
+        "body": "I2V model requires diffusers version 0.30.3 which came out yesterday."
+      }
+    ]
+  },
+  {
+    "number": 21,
+    "title": "\"Prompt outputs failed validation: Value not in list\"",
+    "created_at": "2024-08-28T07:19:18Z",
+    "closed_at": "2024-08-28T15:51:50Z",
+    "labels": [],
+    "url": "https://github.com/kijai/ComfyUI-CogVideoXWrapper/issues/21",
+    "body": "I've updated ComfyUI, and I installed the latest CogVideoXWrapper through ComfyUI manager via this Git's URL. I've loaded the \"cogvideox_5b_example_01.json\" workflow, and pointed the Load Clip node to my existing model (t5xxl_fp8_e4m3fn.safetensors).\r\n\r\nAfter hitting queue prompt, I get this error:\r\n\r\nPrompt outputs failed validation: Value not in list: format: 'video/nvenc_h264-mp4' not in ['image/gif', 'image/webp', 'video/ProRes', 'video/av1-webm', 'video/h264-mp4', 'video/h265-mp4', 'video/webm']\r\nVHS_VideoCombine:\r\n    - Value not in list: format: 'video/nvenc_h264-mp4' not in ['image/gif', 'image/webp', 'video/ProRes', 'video/av1-webm', 'video/h264-mp4', 'video/h265-mp4', 'video/webm']",
+    "comments_url": "https://api.github.com/repos/kijai/ComfyUI-CogVideoXWrapper/issues/21/comments",
+    "author": "Gyramuur",
+    "comments": [
+      {
+        "user": "kijai",
+        "created_at": "2024-08-28T12:49:51Z",
+        "body": "This is because I forgot the nvenc format selected on the video combine node, it's not supported by all platforms. Just change to some other encode format or recreate the video combine node to get past that."
+      }
+    ]
+  }
+]

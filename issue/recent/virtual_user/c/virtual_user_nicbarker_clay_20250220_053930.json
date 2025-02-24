@@ -1,0 +1,63 @@
+[
+  {
+    "id": "https://github.com/nicbarker/clay/pull/251",
+    "source": {
+      "issue_number": 251
+    },
+    "initial_question": {
+      "title": "[Core] add CLAY_DISABLE_SIMD flag to conditionally disable SIMD includes",
+      "body": "`#include <emmintrin.h>` was problematic for my use case as emmintrin.h depends on libc. \r\nI propose adding a CLAY_DISABLE_SIMD flag to conditionally disable SIMD includes to solve this kind of issues."
+    },
+    "satisfaction_conditions": [
+      "SIMD functionality can be disabled at compile time",
+      "No unwanted libc dependencies are pulled in when SIMD is disabled",
+      "Compatible with binding generators and cross-language usage"
+    ],
+    "created_at": "2025-02-06T18:26:11Z"
+  },
+  {
+    "id": "https://github.com/nicbarker/clay/issues/211",
+    "source": {
+      "issue_number": 211
+    },
+    "initial_question": {
+      "title": "examples/SDL2-video-demo compilation error",
+      "body": "Error log:\nCMake Error at CMakeLists.txt:40 (target_link_libraries):\n  Target \"SDL2_video_demo\" links to:\n\n    SDL2_ttf::SDL2_ttf-static\n\n\nSolution:\n include(FetchContent)\n set(FETCHCONTENT_QUIET FALSE)\n+set(BUILD_SHARED_LIBS OFF CACHE BOOL \"Build static libraries\" FORCE)\n\n FetchContent_Declare("
+    },
+    "satisfaction_conditions": [
+      "Build process uses the correct CMakeLists.txt file",
+      "Generated makefile correctly references the SDL2-video-demo directory"
+    ],
+    "created_at": "2025-01-19T08:39:10Z"
+  },
+  {
+    "id": "https://github.com/nicbarker/clay/issues/61",
+    "source": {
+      "issue_number": 61
+    },
+    "initial_question": {
+      "title": "Include Path Issues (C++)",
+      "body": "This is a relatively minor issue and I'm sure I'll find a work around, but more so just wanted to let you know of the use case regardless. I've been building a small sample to play around with Clay in C++ using Zig as the build system and I kept running into a weird error that was driving me crazy for awhile. \r\n\r\nWith Zig, fetching dependencies is fairly trivial, just tell it to fetch a link and then point it at the right files and you are good to go. Apparently because of a header inside of the C++ stdlib `#include <version>` and the `VERSION` file at the root of this repository, a compilation conflict was happening in my include paths (namely including the root of this repo to ensure `clay.h` is in my path). Was wondering if in the GitHub releases you could also have one with the header nested inside of an `include/` directory or something to side step this? I could see it being an issue in CMake as well.\r\n\r\nEither way, the framework seems super cool, and excited to keep working with it!"
+    },
+    "satisfaction_conditions": [
+      "Include path resolution must not have naming conflicts with C++ standard library headers",
+      "Project header files must be accessible through the build system's include paths",
+      "No compilation errors related to include path conflicts"
+    ],
+    "created_at": "2024-12-20T03:12:40Z"
+  },
+  {
+    "id": "https://github.com/nicbarker/clay/issues/11",
+    "source": {
+      "issue_number": 11
+    },
+    "initial_question": {
+      "title": "Pre-built binaries missing for Linux in the Odin bindings ",
+      "body": "Trying to build an example outputs:\r\n\r\ncannot find -l \"[pathtoclay]/clay/bindings/odin/clay-odin//linux/libclay.a\""
+    },
+    "satisfaction_conditions": [
+      "Linux library file is accessible at the expected path"
+    ],
+    "created_at": "2024-08-31T18:56:43Z"
+  }
+]

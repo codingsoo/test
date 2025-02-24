@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/6Kmfi6HP/EDtunnel/issues/36",
+    "source": {
+      "issue_number": 36
+    },
+    "initial_question": {
+      "title": "About Drivepage and store",
+      "body": "Hi there. I've noticed there is a drivepage when the project uploaded to cf pages. So, is there any ways to edit the files that uploaded to the driver? I'm wondering because there is no button to edit or even remove the files uploaded to it. \r\nCould you please give some ideas about it. Sincerely thank you for your help."
+    },
+    "satisfaction_conditions": [
+      "User understands the immutable nature of uploaded files",
+      "Local file list display can be cleared",
+      "User understands distinction between local display and actual storage"
+    ],
+    "created_at": "2024-11-04T13:17:35Z"
+  }
+]

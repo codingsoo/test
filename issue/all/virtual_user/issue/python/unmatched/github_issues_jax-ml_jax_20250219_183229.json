@@ -1,0 +1,189 @@
+[
+  {
+    "number": 18766,
+    "title": "randint can not create random values of full uint32 range",
+    "created_at": "2023-12-01T13:13:01Z",
+    "closed_at": "2023-12-19T19:56:09Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/18766",
+    "body": "### Description\r\n\r\n```\r\n        seed = jax.random.randint(rngs_i1, (1,), minval=0, maxval=2 ** 32 - 1, dtype=jnp.uint32)\r\n```\r\n\r\nthis fails in random.py:495\r\n\r\n```\r\n@partial(jit, static_argnums=(1, 4))\r\ndef _randint(key, shape, minval, maxval, dtype) -> Array:\r\n  _check_shape(\"randint\", shape, np.shape(minval), np.shape(maxval))\r\n  if not jnp.issubdtype(dtype, np.integer):\r\n    raise TypeError(f\"randint only accepts integer dtypes, got {dtype}\")\r\n\r\n  check_arraylike(\"randint\", minval, maxval)\r\n  minval = jnp.asarray(minval)\r\n  maxval = jnp.asarray(maxval)  #<---------------------- here\r\n  if not jnp.issubdtype(minval.dtype, np.integer):\r\n    minval = minval.astype(int)\r\n  if not jnp.issubdtype(maxval.dtype, np.integer):\r\n    maxval = maxval.astype(int)\r\n```\r\n\r\nI think these lines should be\r\n```\r\n  minval = jnp.asarray(minval, dtype=dtype)\r\n  maxval = jnp.asarray(maxval, dtype=dtype)\r\n```\r\n\r\n\r\n### What jax/jaxlib version are you using?\r\n\r\njax v0.4.20\r\n\r\n### Which accelerator(s) are you using?\r\n\r\nCPU\r\n\r\n### Additional system info?\r\n\r\nPython3.11 on Windows11\r\n\r\n### NVIDIA GPU info\r\n\r\nN/A",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/18766/comments",
+    "author": "RogerJL",
+    "comments": [
+      {
+        "user": "jakevdp",
+        "created_at": "2023-12-01T13:35:04Z",
+        "body": "Hi - thanks for the report! I'm confused by the error you're seeing \u2013 it should have errored at the function boundary. Perhaps you're running your code in a `disable_jit` context?\r\n\r\nIn any case, the issue here is that JAX always chooses the default integer type for python integers, rather than doing value-based dtype semantics. That is a deliberate choice we made, because value-based semantics can lead to bigger problems.\r\n\r\nThe fix you suggest will work as long as the code is run under `disable_jit()`, but otherwise will have no effect.\r\n\r\nThe best fix here would be to cast the out-of-bound integer to `uint32` at the start \u2013 then your code will work whether or not `diable_jit` is activated:\r\n```python\r\nseed = jax.random.randint(rngs_i1, (1,), minval=0, maxval=jnp.uint32(2 ** 32 - 1), dtype=jnp.uint32)\r\n```\r\nNote, however, that this will not generate the full range of `uint32` values, which includes `2 ** 32 - 1` (the semantics of `randint` are that the maximum value is exclusive). If you want the full range of unsigned integers, you can do this:\r\n```python\r\njax.random.bits(rngs_i1, (1,), dtype=jnp.uint32)\r\n```"
+      },
+      {
+        "user": "RogerJL",
+        "created_at": "2023-12-01T16:36:09Z",
+        "body": "Yes, it is very likely that I was running under disable_jit()  - the example was taken from Gymnasium.\r\nThanks for the random.bits idea\r\nBut how do you handle int8, shouldn't there be opportunity for optimizations (or do you only care about floating point types)?"
+      },
+      {
+        "user": "jakevdp",
+        "created_at": "2023-12-01T16:41:35Z",
+        "body": "> But how do you handle int8, shouldn't there be opportunity for optimizations (or do you only care about floating point types)?\r\n\r\nI don't understand the question. Can you elaborate?"
+      }
+    ]
+  },
+  {
+    "number": 17629,
+    "title": "Unexpected exception from jax.lax.fori_loop",
+    "created_at": "2023-09-15T20:16:25Z",
+    "closed_at": "2023-09-15T20:29:48Z",
+    "labels": [
+      "bug",
+      "question"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/17629",
+    "body": "### Description\r\n\r\nThere appears to be an issue with `jax.lax.fori_loop`. When I try to use this function, I get the following exception:\r\n\r\n\"the input carry component loop_carry[1][3].positions has type float32[0] but the corresponding output carry component has type float32[10,3], so the shapes do not match\"\r\n\r\nThe code producing this error is the following:\r\n\r\n```python\r\n@partial(jax.jit, static_argnames=('targetForce', 'timesteps')\r\ndef loss(model: controller, ball: BouncingBall, targetForce: float = 1.0, timesteps: int = 10):\r\n\r\n    positions = jp.array([[0]*3]*timesteps, dtype=jp.float32)\r\n    velocities = jp.array([[0]*6]*timesteps, dtype=jp.float32)\r\n    constraints = jp.array([[0]*6]*timesteps, dtype=jp.float32)\r\n    carry_i = (positions, velocities, constraints, ball, model)\r\n\r\n    def step(i: int, carry: tuple):\r\n\r\n        positions_s, velocities_s, constraints_s, ball_s, model_s = carry\r\n\r\n        positions_s = positions_s.at[i,:].add(ball_s.state.x.pos[0])\r\n        velocities_s = velocities_s.at[i,:].add(ball_s.state.qd)\r\n        constraints_s = constraints_s.at[i,:].add(ball_s.state.qf_constraint)\r\n\r\n        x = jp.array([ball_s.state.x.pos[0][2], ball_s.state.qd[2]])\r\n        force = model_s(x.transpose())\r\n\r\n        newstate = pipeline.step(ball_s.system, ball_s.state, force)\r\n        ball_s = ball_s.create(ball_s.system, newstate, positions_s, velocities_s, ball_s.contacts, constraints_s, model_s)\r\n        \r\n        newStuff = (positions_s, velocities_s, constraints_s, ball_s, model_s)\r\n\r\n        return newStuff\r\n\r\n    positions, velocities, constraints, ball, model = jax.lax.fori_loop(0, timesteps, step, carry_i)\r\n\r\n    states = (positions, velocities, constraints)\r\n\r\n    loss_value = jp.linalg.norm(constraints[:,2] - jp.array([targetForce]*timesteps))\r\n\r\n    return loss_value, states\r\n```\r\n\r\nA similar exception is being thrown for velocities and constraints.\r\n\r\nIn this function, `controller` extends `equinox.Module`, and `BouncingBall` is a `flax.struct.dataclass` that wraps a Brax `System` with some other arrays for state information at different timesteps.\r\n\r\nWhen I disable jit compiling using \r\n```python\r\nfrom jax.config import config\r\nconfig.update('jax_disable_jit', True)\r\n```\r\n\r\nthe function runs without issues, but when it is JIT compiled it throws these exceptions.\r\n\r\n### What jax/jaxlib version are you using?\r\n\r\njax v0.4.14, jaxlib 0.4.14\r\n\r\n### Which accelerator(s) are you using?\r\n\r\nCPU\r\n\r\n### Additional system info\r\n\r\nPython 3.10.12, Ubuntu 22.04, Intel Xeon E3-1230 V2\r\n\r\n### NVIDIA GPU info\r\n\r\n_No response_",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/17629/comments",
+    "author": "cdagher",
+    "comments": [
+      {
+        "user": "jakevdp",
+        "created_at": "2023-09-15T20:21:51Z",
+        "body": "When running `fori_loop` under `jit`, the shapes of input arrays must match the shapes of output arrays. From the error message:\r\n```\r\nthe input carry component loop_carry[1][3].positions has type float32[0] but the corresponding output carry component has type float32[10,3], so the shapes do not match\r\n```\r\nIt looks like `loop_carry[1][3]` is the variable you call `ball`, and on input `ball.positions` has shape `(0,)` and on output `ball.positions` has shape `(10, 3)`.\r\n\r\nThe way to fix this is to ensure that the input arrays have the same shape as the output arrays. I would look for where you're initializing `ball` in your code, and make sure it's initialized with the same shape arrays as you expect on output."
+      }
+    ]
+  },
+  {
+    "number": 9087,
+    "title": "Cannot do \"nan_to_num\" in customized JVP functions",
+    "created_at": "2022-01-04T12:13:43Z",
+    "closed_at": "2022-02-08T10:18:53Z",
+    "labels": [
+      "question",
+      "better_errors"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/9087",
+    "body": "\r\nWe were trying to remove NAN in a customized JVP function but hit some issues. Please see below for a (overly) simplified example. Not sure if it's a feature or bug. If the behavior is as expected, please help provide some guidance on how to remove or mask out NAN (as well as INF) values in a customized JVP function. Thanks!\r\n\r\nJax version: 0.2.26\r\nJaxlib version: 0.1.75\r\n\r\n```python\r\nimport jax\r\nimport jax.numpy as jnp\r\n\r\n@jax.custom_jvp\r\ndef func(x):\r\n    return jnp.sum(x)\r\n\r\n@func.defjvp\r\ndef func_jvp(primals, tangents):\r\n    tangent, = tangents\r\n    tangent = jnp.nan_to_num(tangent)\r\n    return func(*primals), func(tangent)\r\n\r\nval_and_grad = jax.value_and_grad(func)\r\n\r\nval_and_grad(jnp.ones(3))\r\n```\r\n\r\nStack trace:\r\n```\r\nTraceback (most recent call last):\r\n  File \"bin/reproduce_simple_case.py\", line 16, in <module>\r\n    val_and_grad(jnp.ones(3))\r\n  File \"bin/reproduce_simple_case.py\", line 11, in func_jvp\r\n    tangent = jnp.nan_to_num(tangent)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/numpy/lax_numpy.py\", line 2455, in nan_to_num\r\n    x = where(isneginf(x), array(neginf, dtype=x.dtype), x)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/numpy/lax_numpy.py\", line 2170, in where\r\n    return _where(condition, x, y)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/numpy/lax_numpy.py\", line 2149, in _where\r\n    return lax.select(condition, x, y) if not core.is_empty_shape(np.shape(x)) else x\r\njax._src.source_info_util.JaxStackTraceBeforeTransformation: AssertionError\r\n\r\nThe preceding stack trace is the source of the JAX operation that, once transformed by JAX, triggered the following exception.\r\n\r\n--------------------\r\n\r\nThe above exception was the direct cause of the following exception:\r\n\r\nTraceback (most recent call last):\r\n  File \"bin/reproduce_simple_case.py\", line 16, in <module>\r\n    val_and_grad(jnp.ones(3))\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/traceback_util.py\", line 162, in reraise_with_filtered_traceback\r\n    return fun(*args, **kwargs)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/api.py\", line 1064, in value_and_grad_f\r\n    g = vjp_py(jax.lax._one(ans))\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/tree_util.py\", line 326, in <lambda>\r\n    func = lambda *args, **kw: original_func(*args, **kw)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/api.py\", line 2373, in _vjp_pullback_wrapper\r\n    ans = fun(*args)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/tree_util.py\", line 326, in <lambda>\r\n    func = lambda *args, **kw: original_func(*args, **kw)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/ad.py\", line 123, in unbound_vjp\r\n    arg_cts = backward_pass(jaxpr, reduce_axes, consts, dummy_args, cts)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/ad.py\", line 223, in backward_pass\r\n    params, call_jaxpr, invals, cts_in, cts_in_avals, reduce_axes)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/ad.py\", line 558, in call_transpose\r\n    out_flat = primitive.bind(fun, *all_args, **new_params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/core.py\", line 1661, in bind\r\n    return call_bind(self, fun, *args, **params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/core.py\", line 1652, in call_bind\r\n    outs = primitive.process(top_trace, fun, tracers, params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/core.py\", line 1664, in process\r\n    return trace.process_call(self, fun, tracers, params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/core.py\", line 633, in process_call\r\n    return primitive.impl(f, *tracers, **params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/dispatch.py\", line 129, in _xla_call_impl\r\n    *unsafe_map(arg_spec, args))\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/linear_util.py\", line 263, in memoized_fun\r\n    ans = call(fun, *args)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/dispatch.py\", line 156, in _xla_callable_uncached\r\n    *arg_specs).compile().unsafe_call\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/profiler.py\", line 206, in wrapper\r\n    return func(*args, **kwargs)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/dispatch.py\", line 170, in lower_xla_callable\r\n    fun, abstract_args, pe.debug_info_final(fun, \"jit\"))\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/profiler.py\", line 206, in wrapper\r\n    return func(*args, **kwargs)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/partial_eval.py\", line 1566, in trace_to_jaxpr_final\r\n    jaxpr, out_avals, consts = trace_to_subjaxpr_dynamic(fun, main, in_avals)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/partial_eval.py\", line 1543, in trace_to_subjaxpr_dynamic\r\n    ans = fun.call_wrapped(*in_tracers)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/linear_util.py\", line 166, in call_wrapped\r\n    ans = self.f(*args, **dict(self.params, **kwargs))\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/ad.py\", line 223, in backward_pass\r\n    params, call_jaxpr, invals, cts_in, cts_in_avals, reduce_axes)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/ad.py\", line 558, in call_transpose\r\n    out_flat = primitive.bind(fun, *all_args, **new_params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/core.py\", line 1661, in bind\r\n    return call_bind(self, fun, *args, **params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/core.py\", line 1652, in call_bind\r\n    outs = primitive.process(top_trace, fun, tracers, params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/core.py\", line 1664, in process\r\n    return trace.process_call(self, fun, tracers, params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/partial_eval.py\", line 1352, in process_call\r\n    jaxpr, out_avals, consts = trace_to_subjaxpr_dynamic(f, self.main, in_avals)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/partial_eval.py\", line 1543, in trace_to_subjaxpr_dynamic\r\n    ans = fun.call_wrapped(*in_tracers)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/linear_util.py\", line 166, in call_wrapped\r\n    ans = self.f(*args, **dict(self.params, **kwargs))\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/interpreters/ad.py\", line 229, in backward_pass\r\n    **eqn.params)\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/lax/lax.py\", line 3104, in _select_transpose_rule\r\n    assert not ad.is_undefined_primal(pred)\r\njax._src.traceback_util.UnfilteredStackTrace: AssertionError\r\n\r\nThe stack trace below excludes JAX-internal frames.\r\nThe preceding is the original exception that occurred, unmodified.\r\n\r\n--------------------\r\n\r\nThe above exception was the direct cause of the following exception:\r\n\r\nTraceback (most recent call last):\r\n  File \"bin/reproduce_simple_case.py\", line 16, in <module>\r\n    val_and_grad(jnp.ones(3))\r\n  File \"/home/tiger/.local/lib/python3.7/site-packages/jax/_src/lax/lax.py\", line 3104, in _select_transpose_rule\r\n    assert not ad.is_undefined_primal(pred)\r\nAssertionError\r\n```",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/9087/comments",
+    "author": "connection-on-fiber-bundles",
+    "comments": [
+      {
+        "user": "connection-on-fiber-bundles",
+        "created_at": "2022-01-04T12:22:11Z",
+        "body": "Sorry, some further investigation shows that it's ok to use `nan_to_num` in customized JVP functions. It's that we cannot use the `tangents` (the second argument of the customized JVP function) in `nan_to_num`. Even more general, `tangents` cannot show up in the condition part in the `jnp.where` functions."
+      },
+      {
+        "user": "connection-on-fiber-bundles",
+        "created_at": "2022-01-04T13:22:55Z",
+        "body": "Just realized doing `nan_to_num` on `tangents` may break the linearity required for doing transpose automatically (hinted by the function raising the exception, namely `_select_transpose_rule`). Not sure if it's the source of the issue though. \r\n\r\nLet's say we are writing the customized JVP function for the loss function of our model, which would only be used in back-propagation. Does that mean we could write a customized VJP function, instead of JVP, to be used in BP, and we don't need to worry about the linearity and can do `nan_to_num` in customized VJP function in that case?"
+      },
+      {
+        "user": "mattjj",
+        "created_at": "2022-01-07T03:49:12Z",
+        "body": "Thanks for the questions! You pretty much nailed it.\r\n\r\nIndeed it seems JAX considers `nan_to_num` to be nonlinear (because of the `where` as you say), and so using it on tangents makes the result non-transposable. (This is a pretty confusing error message though...)\r\n\r\nAnd yes, if you write a custom VJP then you're telling JAX how to perform the transposition, so automatic transposition is no longer necessary and this issue won't come up.\r\n\r\nDoes using a custom VJP make sense for your use case?"
+      }
+    ]
+  },
+  {
+    "number": 8605,
+    "title": "\"TypeError: iteration over a 0-d array\" when putting tuple of carriers to jax.lax.scan",
+    "created_at": "2021-11-18T22:55:27Z",
+    "closed_at": "2021-11-19T00:01:34Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/8605",
+    "body": "I have got a function: \r\n```python\r\ndef holtExponentialSmoothingAdditiveError(params, x): # \r\n    s0, alpha, beta = params\r\n    def step(s, x):\r\n        previousLevel, previousTrend = s\r\n        a = jax.nn.sigmoid(alpha)\r\n        b = jax.nn.sigmoid(beta)\r\n        trainingError = x - previousLevel - previousTrend\r\n        levelEquasion = previousLevel + previousTrend + a*trainingError\r\n        trendEquasion = previousTrend + b*trainingError\r\n\r\n        return (levelEquasion, trendEquasion), previousLevel + previousTrend + trainingError\r\n    return jax.lax.scan(step, s0, x)\r\n```\r\n\r\ntimeSeries : [452500. 765000. 549000. 560000. 580000. 570000. 510000. 499000. 510000.\r\n 503625. 516500. 583000. 575000. 590000. 558750. 583250. 601000. 600000.\r\n 606000. 560000. 569000. 550000. 573750. 605000. 570000. 595000. 579000.\r\n 603500. 610500. 612500. 600000. 615000. 640000. 630000. 633000. 675000.\r\n 665000. 673750. 675000. 690000. 725000. 730000. 745000. 767500. 770000.\r\n 768250. 747000. 760000. 757500. 715000. 662500.]\r\n\r\nWhen I execute:\r\n\r\n```python\r\nalpha = 0.16\r\nbeta = 0.1\r\nprint(timeSeries)\r\nholtTimeSeries = holtExponentialSmoothingAdditive((timeSeries[0], alpha, beta), timeSeries)\r\n```\r\n\r\nI receive an error:\r\n\r\n```---------------------------------------------------------------------------\r\nTypeError                                 Traceback (most recent call last)\r\n/tmp/ipykernel_31725/277494675.py in <module>\r\n      2 beta = 0.1\r\n      3 print(timeSeries)\r\n----> 4 holtTimeSeries = holtExponentialSmoothingAdditiveError((timeSeries[0], alpha, beta), timeSeries)\r\n\r\n/tmp/ipykernel_31725/2370628103.py in holtExponentialSmoothingAdditiveError(params, x)\r\n     10 \r\n     11         return (levelEquasion, trendEquasion), previousLevel + previousTrend + trainingError\r\n---> 12     return jax.lax.scan(step, s0, x)\r\n\r\n    [... skipping hidden 12 frame]\r\n\r\n/tmp/ipykernel_31725/2370628103.py in step(s, x)\r\n      2     s0, alpha, beta = params\r\n      3     def step(s, x):\r\n----> 4         previousLevel, previousTrend = s\r\n      5         a = jax.nn.sigmoid(alpha)\r\n      6         b = jax.nn.sigmoid(beta) \r\n\r\n    [... skipping hidden 1 frame]\r\n\r\n~/.local/lib/python3.9/site-packages/jax/_src/lax/lax.py in _iter(tracer)\r\n   2215 def _iter(tracer):\r\n   2216   if tracer.ndim == 0:\r\n-> 2217     raise TypeError(\"iteration over a 0-d array\")  # same as numpy error\r\n   2218   else:\r\n   2219     n = int(tracer.shape[0])\r\n\r\nTypeError: iteration over a 0-d array\r\n```\r\n\r\nIt looks like ```jax.lax.scan``` doesn't like when I pass carriers as a tuple, although I don't understand, why doesn't it work. May somebody explain to me, whether it is a bug or my mistake? \r\nNote, that I have simpleExponentialSmoothing coded very similar to holt's exponential smoothing and it works just fine, the only difference is that I pass single value in carry instead of tuple.\r\nTimeSeries is <class 'numpy.ndarray'> array, the same I pass to simpleExponentialSmoothing function.\r\n",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/8605/comments",
+    "author": "EmperorTransisthor",
+    "comments": [
+      {
+        "user": "jakevdp",
+        "created_at": "2021-11-18T23:09:38Z",
+        "body": "It looks like you're passing a single value to `s` via `s0`, and then attempting to iterate over it using\r\n```\r\npreviousLevel, previousTrend = s\r\n```\r\nPerhaps you meant for `s0` to be a tuple of two values?"
+      },
+      {
+        "user": "jakevdp",
+        "created_at": "2021-11-18T23:11:26Z",
+        "body": "For example, this executes without an error:\r\n```python\r\nholtExponentialSmoothingAdditiveError(((0.0, timeSeries[0]), alpha, beta), timeSeries)\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 4474,
+    "title": "Cross multiplication on JAX is faster in CPU compared to GPU",
+    "created_at": "2020-10-07T13:59:03Z",
+    "closed_at": "2020-10-10T03:23:03Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/4474",
+    "body": "I tried taking the cross product of two (10,000 * 10,000) matrics on NumPy, TensorFlow and Jax to compare the time it takes to complete the operation.\r\nOn CPU:\r\nNumpy took **58.32** seconds\r\nTensorFlow took **64.802** seconds\r\nJax took **0.034** seconds\r\n\r\nOn GPU:\r\nNumpy took **59.04** seconds (understandable because NumPy doesn't use GPU or TPU acceleration)\r\nTensorFlow took **0.197** seconds\r\nJax took **2.02** seconds\r\n\r\nWhy is Jax slower on GPU(2.02 seconds) as compared to CPU(0.034 seconds)?",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/4474/comments",
+    "author": "CleanPegasus",
+    "comments": [
+      {
+        "user": "clemisch",
+        "created_at": "2020-10-07T14:36:32Z",
+        "body": "From the large difference on CPU I suspect you did not use `.block_until_ready()` on the result array when measuring the time? JAX normally computes asynchronously, which means that the function call returns immediately even though the actual numerical computation is not finished. \r\n\r\nSo, instead of \r\n\r\n```python\r\n%timeit fun(arr)\r\n```\r\n\r\nfor `fun` returning an array, rather use \r\n\r\n```python\r\n%timeit fun(arr).block_until_ready()\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 4164,
+    "title": "How to create a device array for flax.jax_utils.prefetch_to_device?",
+    "created_at": "2020-08-28T03:33:40Z",
+    "closed_at": "2020-08-28T03:56:53Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/4164",
+    "body": "I was trying to call the function in a line like this:\r\n```\r\ntarget_iter = jax_utils.prefetch_to_device(iter(target_data), 2, devices=[1])\r\n```\r\nBut the \"devices\" parameter wants a jaxlib.xla_extension.Device array. I wonder how to make one. Specifically, I want to place the iterator on my GPU:1. ",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/4164/comments",
+    "author": "BoyuanJackChen",
+    "comments": [
+      {
+        "user": "mattjj",
+        "created_at": "2020-08-28T03:53:19Z",
+        "body": "In general Flax questions are better on the Flax issue tracker, but this one is easy enough to answer here! You can use `jax.devices()` or `jax.local_devices()` to get lists of available devices."
+      }
+    ]
+  },
+  {
+    "number": 2097,
+    "title": "Optimizer does not change weights",
+    "created_at": "2020-01-28T15:36:28Z",
+    "closed_at": "2020-01-29T11:23:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/2097",
+    "body": "I want to train a simple binary classifier in JAX STAX:\r\n```python\r\nimport jax.numpy as np\r\nfrom jax import grad, jit, random\r\nfrom jax.experimental import optimizers, stax\r\nfrom jax.experimental.stax import Dense, Relu, Sigmoid\r\nfrom sklearn.datasets import make_circles\r\nfrom sklearn.model_selection import train_test_split\r\nfrom sklearn.preprocessing import StandardScaler\r\n\r\n\r\ndef prepare_circles(n_samples):\r\n    X, y = make_circles(n_samples, noise=0.2, factor=0.5, random_state=1)\r\n    X = StandardScaler().fit_transform(X)\r\n    X_train, X_test, y_train, y_test = train_test_split(\r\n        X, y, test_size=0.4, random_state=42\r\n    )\r\n    return X_train, X_test, y_train, y_test\r\n\r\n\r\nlearning_rate = 0.01\r\nn_epochs = 100\r\nn_features = 2\r\nn_hidden_layers = 1\r\nn_nodes = 4\r\nn_samples = 1000\r\n\r\nX_train, X_test, y_train, y_test = prepare_circles(n_samples)\r\n\r\ninit_fun, apply_fun = stax.serial(\r\n    Dense(n_nodes), Relu, Dense(n_nodes), Relu, Dense(1), Sigmoid\r\n)\r\nout_shape, params = init_fun(random.PRNGKey(2), (n_samples, n_features))\r\nprint(params)\r\n\r\nopt_init, opt_update, get_params = optimizers.adam(step_size=learning_rate)\r\nopt_state = opt_init(params)\r\n\r\n\r\ndef loss(params, x, y):\r\n    p = apply_fun(params, x)\r\n    ce_loss = -np.sum(y * np.log(y) + (1 - y) * np.log(1 - y))\r\n    return ce_loss\r\n\r\n\r\n# Define a compiled update step\r\n@jit\r\ndef step(i, opt_state, x, y):\r\n    params = get_params(opt_state)\r\n    return opt_update(i, grad(loss)(params, x, y), opt_state)\r\n\r\n\r\nfor i in range(n_epochs):\r\n    opt_state = step(i, opt_state, X_train, y_train)\r\n\r\nparams = get_params(opt_state)\r\nprint(params)\r\n```\r\n\r\nThe problem is that the weights seem to be not updated at all.\r\nIs it a bug or am I missing something?",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/2097/comments",
+    "author": "homocomputeris",
+    "comments": [
+      {
+        "user": "hawkinsp",
+        "created_at": "2020-01-29T02:12:56Z",
+        "body": "Thanks for the issue report!\r\n\r\n`grad(loss)(params, x, y)` takes the derivative of `loss` with respect to `params`, but your loss function doesn't actually depend on the parameters (only on `y`).\r\n\r\n```\r\ndef loss(params, x, y):\r\n    p = apply_fun(params, x)\r\n    ce_loss = -np.sum(y * np.log(y) + (1 - y) * np.log(1 - y))\r\n    return ce_loss\r\n```\r\n\r\nDid you mean to use `p` in `loss`?\r\n\r\nDoes that answer your question?\r\n"
+      }
+    ]
+  },
+  {
+    "number": 1615,
+    "title": "Orthogonal initialization fails for (at least) 2d matrices",
+    "created_at": "2019-11-01T01:22:34Z",
+    "closed_at": "2019-11-01T01:37:51Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jax-ml/jax/issues/1615",
+    "body": "The following code should generate an orthogonal 10x10 matrix.  \r\n\r\n```\r\nfrom jax.nn.initializers import orthogonal, uniform\r\nfrom jax import random\r\n\r\nkey = random.PRNGKey(0)\r\n\r\no_init = orthogonal()\r\northogonal_matrix = o_init(key, (10,10))\r\n```\r\n\r\nHowever, the actual output is the following:\r\n\r\n```\r\n--------------------------------------------------------------------------\r\nValueError                                Traceback (most recent call last)\r\n<ipython-input-7-af5241da1f40> in <module>\r\n----> 1 o_init(key, (10,10))\r\n\r\n~/VirtualEnvs/Jax/lib/python3.7/site-packages/jax/nn/initializers.py in init(key, shape, dtype)\r\n     93     Q *= np.sign(np.diag(R)) # needed for a uniform distribution\r\n     94     if n_rows < n_cols: Q = Q.T\r\n---> 95     Q = np.reshape(Q, onp.delete(shape, column_axis) + (shape[column_axis],))\r\n     96     Q = np.moveaxis(Q, -1, column_axis)\r\n     97     return scale * Q\r\n\r\n~/VirtualEnvs/Jax/lib/python3.7/site-packages/jax/numpy/lax_numpy.py in reshape(a, newshape, order)\r\n    730 def reshape(a, newshape, order=\"C\"):\r\n    731   try:\r\n--> 732     return a.reshape(newshape, order=order)  # forward to method for ndarrays\r\n    733   except AttributeError:\r\n    734     return _reshape(a, newshape, order=order)\r\n\r\n~/VirtualEnvs/Jax/lib/python3.7/site-packages/jax/numpy/lax_numpy.py in _reshape_method(a, *newshape, **kwargs)\r\n    760   if len(newshape) == 1 and not isinstance(newshape[0], int):\r\n    761     newshape = newshape[0]\r\n--> 762   return _reshape(a, newshape, order=order)\r\n    763 \r\n    764 \r\n\r\n~/VirtualEnvs/Jax/lib/python3.7/site-packages/jax/numpy/lax_numpy.py in _reshape(a, newshape, order)\r\n    736 def _reshape(a, newshape, order=\"C\"):\r\n    737   dummy_val = onp.broadcast_to(0, shape(a))  # zero strides\r\n--> 738   computed_newshape = onp.reshape(dummy_val, newshape).shape\r\n    739 \r\n    740   if order == \"C\":\r\n\r\n<__array_function__ internals> in reshape(*args, **kwargs)\r\n\r\n~/VirtualEnvs/Jax/lib/python3.7/site-packages/numpy/core/fromnumeric.py in reshape(a, newshape, order)\r\n    299            [5, 6]])\r\n    300     \"\"\"\r\n--> 301     return _wrapfunc(a, 'reshape', newshape, order=order)\r\n    302 \r\n    303 \r\n\r\n~/VirtualEnvs/Jax/lib/python3.7/site-packages/numpy/core/fromnumeric.py in _wrapfunc(obj, method, *args, **kwds)\r\n     59 \r\n     60     try:\r\n---> 61         return bound(*args, **kwds)\r\n     62     except TypeError:\r\n     63         # A TypeError occurs if the object does have such a method in its\r\n\r\nValueError: cannot reshape array of size 100 into shape (20,)\r\n```\r\n\r\nAs a sanity check, running almost the identical code for a uniform initialization works fine:\r\n```\r\nfrom jax.nn.initializers import orthogonal, uniform\r\nfrom jax import random\r\n\r\nkey = random.PRNGKey(0)\r\n\r\nu_init = uniform()\r\nuniform_matrix = u_init(key, (10,10))\r\n```\r\n\r\nFrom looking at the code for the orthogonal initializer, it seems like the problem occurs after the QR decomposition is completed and the Q matrix is being reshaped.  Here is the source:\r\n```\r\ndef orthogonal(scale=1.0, column_axis=-1):\r\n   \"\"\"\r\n   Construct an initializer for uniformly distributed orthogonal matrices.\r\n  \r\n   If the shape is not square, the matrices will have orthonormal rows or columns\r\n   depending on which side is smaller.\r\n   \"\"\"\r\n   def init(key, shape, dtype=np.float32):\r\n     if len(shape) < 2:\r\n        raise ValueError(\"orthogonal initializer requires at least a 2D shape\")\r\n     n_rows, n_cols = onp.prod(shape) // shape[column_axis], shape[column_axis]\r\n     matrix_shape = (n_cols, n_rows) if n_rows < n_cols else (n_rows, n_cols)\r\n     A = random.normal(key, matrix_shape, dtype)\r\n     Q, R = np.linalg.qr(A)\r\n     Q *= np.sign(np.diag(R)) # needed for a uniform distribution\r\n     if n_rows < n_cols: Q = Q.T\r\n     Q = np.reshape(Q, onp.delete(shape, column_axis) + (shape[column_axis],))\r\n     Q = np.moveaxis(Q, -1, column_axis)\r\n     return scale * Q\r\n    return init    \r\n```\r\n\r\nIt looks as if the line ```Q = np.reshape(Q, onp.delete(shape, column_axis) + (shape[column_axis],))``` is trying to reshape the array into some shape, but that shape is not properly getting specified.  Specifically, the line ```onp.delete(shape, column_axis) + (shape[column_axis],)``` does not seem to be doing what it was intended to do.  ",
+    "comments_url": "https://api.github.com/repos/jax-ml/jax/issues/1615/comments",
+    "author": "ramasesh",
+    "comments": [
+      {
+        "user": "hawkinsp",
+        "created_at": "2019-11-01T01:24:56Z",
+        "body": "What version of the `jax` package do you have? I think this may be already fixed in the latest release (0.1.49)."
+      }
+    ]
+  }
+]

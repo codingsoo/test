@@ -1,0 +1,455 @@
+[
+  {
+    "id": "https://github.com/hexojs/hexo/issues/4319",
+    "source": {
+      "issue_number": 4319
+    },
+    "initial_question": {
+      "title": "Is there other way to create a new post",
+      "body": "I try to copy and paste a file to generate a new post in posts but it doesn't show in hexo ,Is \"hexo new\" the only way to create a new reachable post?"
+    },
+    "satisfaction_conditions": [
+      "Post file exists in correct directory structure",
+      "Post contains valid front-matter metadata",
+      "Post content follows Markdown format"
+    ],
+    "created_at": "2020-05-19T07:27:20Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/3518",
+    "source": {
+      "issue_number": 3518
+    },
+    "initial_question": {
+      "title": "Count all posts with custom post.variable",
+      "body": "My `custom.post.variable` is `fruit`.\r\nSo my `.md` files have:\r\n\r\n``` \r\ntitle: food\r\nfruit: apple\r\n``` \r\n\r\nand\r\n\r\n```\r\ntitle: more food\r\nfruit: banana\r\n``` \r\n\r\nand\r\n\r\n```\r\ntitle: still more food\r\nfruit: banana\r\n``` \r\n\r\nand\r\n\r\n```\r\ntitle: try some food\r\nfruit: banana\r\n``` \r\n\r\nand\r\n\r\n```\r\ntitle: enjoy food\r\nfruit: apple\r\n``` \r\n\r\nHow to count all posts with `fruit: apple`? "
+    },
+    "satisfaction_conditions": [
+      "Must count occurrences of identical property values across multiple posts",
+      "Must handle dynamic/arbitrary property values",
+      "Must process front matter variables from markdown files",
+      "Must handle undefined/missing properties gracefully",
+      "Must output grouped count results"
+    ],
+    "created_at": "2019-04-03T13:30:42Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/3517",
+    "source": {
+      "issue_number": 3517
+    },
+    "initial_question": {
+      "title": "Custom site.variables",
+      "body": "I aim to summarize all post.variables in one place, in a widget.\r\n\r\nLets say I have three posts:\r\n\r\n```\r\nlayout: post\r\ntitle: Hello World\r\nanimal: bear\r\n``` \r\n\r\nAnother `.md` file:\r\n```\r\nlayout: post\r\ntitle: Hello Earth\r\nanimal: cow\r\n``` \r\n\r\nAnother `.md` file:\r\n```\r\nlayout: post\r\ntitle: Hello Plant\r\nanimal: mouse\r\n``` \r\n\r\nFrom all the above three posts, how can I extract/summarize in a widget all entries for `post.animal`?\r\nSo only front-end output like this list:\r\n```\r\n- bear\r\n- cow\r\n- mouse\r\n```\r\n\r\nOr better, how to make custom site.variables to use in posts?"
+    },
+    "satisfaction_conditions": [
+      "All post.animal values must be successfully extracted from multiple markdown files",
+      "Only posts containing the 'animal' variable should be included in the output",
+      "The solution must work within the site's templating system"
+    ],
+    "created_at": "2019-04-02T21:36:41Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/2962",
+    "source": {
+      "issue_number": 2962
+    },
+    "initial_question": {
+      "title": "RAM memory on GCP for 3000-4000 blog posts",
+      "body": "I am trying to deploy HEXO on Google Cloud Platform with 3000-4000 blog posts.\r\n\r\nHow much RAM memory do you recommend for me to take for this?\r\n\r\nAnybody has experience deploying HEXO blog on Google Cloud Platform and can share a guide?\r\n\r\nThanks."
+    },
+    "satisfaction_conditions": [
+      "Resource allocation is cost-effective for static content serving",
+      "Solution can scale to handle traffic spikes"
+    ],
+    "created_at": "2018-01-12T13:36:33Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/2926",
+    "source": {
+      "issue_number": 2926
+    },
+    "initial_question": {
+      "title": "Different layouts for different posts",
+      "body": "I am trying to have different layouts for different posts.\r\n\r\nHow to do?\r\n\r\nFor example...\r\n\r\nsource/_posts > title-alpha.md uses layout `alpha`\r\nsource/_posts > title-clown.md uses layout `clown`\r\n\r\nI know I have to create a custom layout in themes folder... `alpha.ejs` and `clown.ejs`,\r\nand also in .md files to specify `layout: alpha` and `layout: clown`.\r\n\r\nBut this does not work!\r\nIn my config file I have `default_layout: post`, but how can I have multiple layouts at the same time for different posts?"
+    },
+    "satisfaction_conditions": [
+      "Posts with different layout specifications render with distinct visual/structural layouts",
+      "Layout specification in individual post files is recognized by the system",
+      "Multiple layout templates can coexist within the theme system"
+    ],
+    "created_at": "2017-12-20T01:49:01Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/1919",
+    "source": {
+      "issue_number": 1919
+    },
+    "initial_question": {
+      "title": "Is there a command to install a theme from the specified git repository?",
+      "body": "Actually, I expect the command to complete the task as same as the below:\n\n``` bash\nrm -rf themes/themedir # For updating the theme\ngit clone --depth=1 --branch=master git://someserver/themerepo themes/themedir\nrm -rf !$/.git # Remove the .git directory\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Theme files are successfully retrieved from the remote git repository",
+      "Theme files are placed in the correct themes directory structure",
+      "Theme can be updated without conflicts or legacy files",
+      "Theme installation process maintains proper version control"
+    ],
+    "created_at": "2016-04-26T05:19:03Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/1692",
+    "source": {
+      "issue_number": 1692
+    },
+    "initial_question": {
+      "title": "hexo\u80fd\u5728markdown\u4e2d\u63d2\u5165\u4e00\u6bb5html\u4ee3\u7801\u4e0d\u88ab\u6e32\u67d3\u4e48\uff1f(\u00b4\uff65_\uff65`)",
+      "body": "hexo\u80fd\u5728markdown\u4e2d\u63d2\u5165\u4e00\u6bb5html\u4ee3\u7801\u4e0d\u88ab\u6e32\u67d3\u4e48\uff1f(\u00b4\uff65_\uff65`)\n"
+    },
+    "satisfaction_conditions": [
+      "HTML code appears as plain text in the rendered Markdown output",
+      "Markdown processing continues normally outside the HTML code block",
+      "HTML code remains readable and properly formatted in the output"
+    ],
+    "created_at": "2016-01-03T06:48:44Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/1685",
+    "source": {
+      "issue_number": 1685
+    },
+    "initial_question": {
+      "title": "How to change Default Front-matter when using `hexo n`",
+      "body": "When using `hexo n` to new a blog, its default Front-matter like this :\n\n```\ntitle: xx\ndate: 2016-01-02 11:38:22\ntags:\n```\n\nI want to add an element ,for example `categories`,like this :\n\n```\ntitle: xx\ndate: 2016-01-02 11:38:22\ncategories:\ntags:\n```\n\nWhat can I do?\nAny suggestion?\nThanks.\n"
+    },
+    "satisfaction_conditions": [
+      "Original front-matter fields (title, date, tags) must be preserved",
+      "Changes must persist across multiple new post creations",
+      "Modified front-matter must maintain valid YAML format"
+    ],
+    "created_at": "2016-01-02T03:55:16Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/1633",
+    "source": {
+      "issue_number": 1633
+    },
+    "initial_question": {
+      "title": "What is skip_render supposed to do?",
+      "body": "When I set `skip_render` to a glob that matches files in my source, they still get copied into the output and served by the server.\n\nMoreover, I can specify config like:\n\n```\nskip_render:\n - '*.html'\n - '*.md'\n - '*'\n - '**/*'\n```\n\nand it has no apparent effect at all. `hexo generate` and `hexo server` both behave exactly like normal.\n\nDoes this configuration do anything? What is the intended use?\n"
+    },
+    "satisfaction_conditions": [
+      "Files matching skip_render patterns must be copied to output without processing"
+    ],
+    "created_at": "2015-12-08T11:33:26Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/1104",
+    "source": {
+      "issue_number": 1104
+    },
+    "initial_question": {
+      "title": "\u9875\u9762\u6587\u7ae0\u6570\u663e\u793a",
+      "body": "\u6211\u60f3\u5b9e\u73b0\uff1a\u9996\u9875\u53ea\u663e\u793a\u4e00\u7bc7\u6587\u7ae0\uff0c\u5f52\u6863\u9875\u9762\u663e\u793a\u5168\u90e8\u6587\u7ae0\n\u5e94\u8be5\u5982\u4f55\u8bbe\u7f6e\uff1f\nper_page: 1\npagination_dir: page\n\u8fd9\u513f\u6539\u6210\u201c1\u201d\u7684\u8bdd\uff0c\u5f52\u6863\u9875\u9762\u4e5f\u53ea\u663e\u793a\u4e00\u7bc7\u6587\u7ae0\u4e86\n"
+    },
+    "satisfaction_conditions": [
+      "Homepage displays exactly one article",
+      "Archive page displays all articles",
+      "Different pagination settings can be applied to different page types"
+    ],
+    "created_at": "2015-03-11T10:16:46Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/862",
+    "source": {
+      "issue_number": 862
+    },
+    "initial_question": {
+      "title": "Deploy via git and rsync",
+      "body": "```\ndeploy:\n  type: github\n  message: \"Blog updated: {{ now('YYYY-MM-DD HH:mm:ss') }}\"\n  repo: git@github.com:robin-lee/blog.git\n  branch: master\n  type: rsync\n  host: xxxxx\n  user: robin\n  root: blog\n```\n\nIs it possible to deploy via rsync and git? \nWith my above config hexo deploy only deploys to the type lower in the list.\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple deployment methods must execute successfully",
+      "Configuration syntax must support multiple deployment targets",
+      "Each deployment target must maintain its distinct configuration parameters",
+      "Deployment order must be predictable and consistent"
+    ],
+    "created_at": "2014-09-27T11:01:43Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/788",
+    "source": {
+      "issue_number": 788
+    },
+    "initial_question": {
+      "title": "\u5220\u9664\u5b9a\u4e49\u9519\u8bef\u7684\u5206\u7c7b",
+      "body": "\u6211\u5728\u5199\u6587\u7ae0\u7684\u65f6\u5019\uff0c\u7ed9\u6587\u7ae0\u5b9a\u4e49\u4e86\u5206\u7c7b\uff0c\u4f46\u662f\u540e\u6765\u66f4\u6539\u4e86\u5206\u7c7b\u7684\u540d\u79f0\uff0c\u9020\u6210\u7684\u7ed3\u679c\u662f\u539f\u6765\u7684\u5206\u7c7b\u548c\u73b0\u5728\u7684\u5206\u7c7b\u90fd\u5b58\u5728\u4e86\u3002\n\u6bd4\u5982\u8bf4\uff1a\u6211\u5728\u5199\u4e00\u7bc7\u6587\u7ae0\u7684\u65f6\u5019\uff0c\u5148\u7ed9\u6587\u7ae0\u5b9a\u4e49\u4e86\u4e00\u4e2a\u5206\u7c7b\u201c\u5206\u7c7b1\u201d\uff0c\u540e\u6765\u628a\u5206\u7c7b\u540d\u79f0\u6539\u4e3a\u4e86\u201c\u5206\u7c7b2\u201d\uff0c\u4e5f\u5c31\u662f\u8bf4\u539f\u6765\u7684\u201c\u5206\u7c7b1\u201d\u5df2\u7ecf\u4e0d\u5b58\u5728\u4e86\uff0c\u4f46\u662f\u6211\u535a\u5ba2\u91cc\u4f9d\u7136\u6709\u201c\u5206\u7c7b1\u201d\u8fd9\u4e2a\u5206\u7c7b\uff0c\u6211\u8be5\u600e\u4e48\u628a\u8fd9\u4e2a\u5206\u7c7b\u5220\u9664\uff1f\n\u8bf7\u5927\u5bb6\u591a\u591a\u6307\u6559\u4e0b\uff5e\uff5e\n"
+    },
+    "satisfaction_conditions": [
+      "Outdated category names are removed from the blog's category list",
+      "Blog content reflects current category names only"
+    ],
+    "created_at": "2014-08-12T11:10:14Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/776",
+    "source": {
+      "issue_number": 776
+    },
+    "initial_question": {
+      "title": "hexo\u5b89\u88c5\u8fc7\u7a0b\u4e2d\u51fa\u73b0\u95ee\u9898\uff0c\u63d0\u793anpm WARN optional dep failed, continuing fsevents@0.2.0",
+      "body": "\u8bf7\u95ee\u8fd9\u662f\u4ec0\u4e48\u95ee\u9898\uff1f\u4f1a\u4e0d\u4f1a\u5f71\u54cd\u6211\u4ee5\u540e\u7684\u4f7f\u7528\u5462\uff1f\n"
+    },
+    "satisfaction_conditions": [
+      "Warning message is correctly identified as non-critical",
+      "User understands warning severity level"
+    ],
+    "created_at": "2014-08-07T01:22:06Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/748",
+    "source": {
+      "issue_number": 748
+    },
+    "initial_question": {
+      "title": "\u6211\u60f3\u79fb\u9664\u93c8\u63a5\u4e2d\u7684target=\"_blank\"\uff0c\u6211\u60f3\u8a2d\u7f6e\u767c\u4f48\u6642source\u767c\u4f48\u5230source\u5206\u652f\u3002",
+      "body": "\u5728\u65b0\u6a19\u7c64\u9801\u6253\u958b\u9801\u9762\uff0c\u9f20\u6a19\u4e2d\u9375\u5de5\u4f5c\u7684\u5f88\u597d\u3002\n\u6211\u8a0e\u53ad`target=\"_blank\"`\uff0c\u6240\u4ee5\u6211\u60f3\u79fb\u9664\u6211\u9801\u9762\u4e2d\u7684`target=\"_blank\"`\u5c6c\u6027\u3002\n\u6211\u60f3\u77e5\u9053\u6700\u5408\u9069\u7684\u8a2d\u7f6e\u65b9\u5f0f\u662f\u4ec0\u9ebc\uff1f\n\n\u6211\u5e0c\u671b\u767c\u4f48\u7684\u540c\u6642\uff0c\u5c07\u6e90\u6587\u4ef6\u767c\u4f48\u5230Github source\u5206\u652f\uff0c\u6211\u80fd\u5426\u8a2d\u7f6e\uff1f\u5982\u4f55\u53bb\u8a2d\u7f6e\uff1f\n"
+    },
+    "satisfaction_conditions": [
+      "Links no longer open in new tabs by default",
+      "Middle-click functionality remains intact",
+      "Theme/template modifications persist after changes",
+      "External link behavior is configurable"
+    ],
+    "created_at": "2014-07-27T02:55:40Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/697",
+    "source": {
+      "issue_number": 697
+    },
+    "initial_question": {
+      "title": "Is this a template render error?",
+      "body": "I markdown a code snippet as follows:\n\n``````\n```\n{% extends \"default.html\" %}\n{% block body %}\n{% for key in user_info %}\n    {{ key }}:{{ user_info[key] }}<br/>\n{% endfor %}\n{% endblock %}\n```\n``````\n\nWhen I ran `hexo server`, I got an error:\n\n```\nError: ENOENT, no such file or directory 'G:\\hexo\\source\\_posts\\2014\\06\\28\\default.html'\n```\n\nis this an issue? @tommy351 \n"
+    },
+    "satisfaction_conditions": [
+      "Template syntax must be properly escaped in markdown files"
+    ],
+    "created_at": "2014-06-28T12:27:30Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/629",
+    "source": {
+      "issue_number": 629
+    },
+    "initial_question": {
+      "title": "\u8bf7\u6559\u4e00\u4e2a\u4e3b\u9898\u7684\u95ee\u9898\u3002",
+      "body": "\u8bf7\u95ee\u6211\u4fee\u6539\u4e86\u6211\u7684\u6a21\u677f\u4e4b\u540e\uff0c\u8f93\u5165hexo g ,hexo d\u547d\u4ee4\u63d0\u4ea4\u540e\uff0c\u6a21\u677f\u5e76\u6ca1\u6709\u53d1\u751f\u4fee\u6539\u3002\u8fd9\u4e2a\u5e94\u8be5\u600e\u4e48\u64cd\u4f5c\uff1f\n"
+    },
+    "satisfaction_conditions": [
+      "Build cache is properly cleared"
+    ],
+    "created_at": "2014-05-14T02:31:23Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/544",
+    "source": {
+      "issue_number": 544
+    },
+    "initial_question": {
+      "title": "front-matter \u81ea\u5b9a\u4e49\u9879",
+      "body": "front-matter \u91cc\u6211\u80fd\u5426\u81ea\u5b9a\u4e49\u4e00\u9879\uff0c\u7136\u540e\u663e\u793a\u5728article\u91cc\uff1f\u4f8b\u5982\u6211\u60f3\u52a0\u4e00\u4e2a\u4f5c\u8005\u9879\uff0c\u5e76\u5e0c\u671b\u663e\u793a\u5728\u6bcf\u4e00\u7bc7\u6587\u7ae0\u5c3e\u90e8\uff0c\u548ctag\uff0ccategory\u5728\u4e00\u5904\u3002thanks~\n"
+    },
+    "satisfaction_conditions": [
+      "Front-matter must accept custom field additions"
+    ],
+    "created_at": "2014-03-19T14:23:38Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/540",
+    "source": {
+      "issue_number": 540
+    },
+    "initial_question": {
+      "title": "Is there a way to only generate post file that created in recent days?",
+      "body": "I have many posts in hexo system.And when I complete my writing,I use `hexo g` to generate files then upload them to my website.\n\nThe generate action is quickly but it generate all the posts in `_posts` folder.\nI just want to know is there a way to generate post file just created in recent days? \nI only have to get recent post file not all files.\n\nIf there is no way,I want to write a plugin to do this.\n\nI choose `console` plugin type,but I need to get `date` property in each post files but don't know how to get it.I found `generate` plugin type has a param `locals` to get all posts but `console` plugin type don't.\n\nSo can you help me or give me some references?\n\nThanks.\n"
+    },
+    "satisfaction_conditions": [
+      "Solution must integrate with Hexo's existing build process",
+      "Generated files must be accessible for website upload",
+      "Solution must preserve normal post rendering functionality"
+    ],
+    "created_at": "2014-03-18T02:08:57Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/486",
+    "source": {
+      "issue_number": 486
+    },
+    "initial_question": {
+      "title": "source \u4e0b\u6dfb\u52a0\u6587\u4ef6\u5939\uff0chexo g \u51fa\u9519[error] Error: ENOENT, open 'path/to/hexo/project/source/\u672a\u547d\u540d\u6587\u4ef6\u5939'",
+      "body": "source \u4e0b\u6dfb\u52a0\u6587\u4ef6\u5939\uff0chexo g \u51fa\u9519[error] Error: ENOENT, open 'path/to/hexo/project/source/\u672a\u547d\u540d\u6587\u4ef6\u5939'\n\n\u5728 mac \u7684 Finder \u4e0b\u53f3\u952e\u6dfb\u52a0\u7684\u6587\u4ef6\u5939\uff0c\u521d\u59cb\u540d\u5b57\u662f\u201c\u672a\u547d\u540d\u6587\u4ef6\u5939\u201d\uff0c\u7136\u540e\u6211\u6539\u6210\u4e86images\uff0c\u4f46\u65e0\u8bba\u662f\u5426\u5220\u6389\u8fd9\u4e2a\u6587\u4ef6\u5939\uff0c\u4e00\u76f4\u4f1a\u51fa\u8fd9\u4e2a\u9519\u8bef\n"
+    },
+    "satisfaction_conditions": [
+      "File system path references must be cleared of any stale/invalid entries"
+    ],
+    "created_at": "2014-02-09T07:57:29Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/480",
+    "source": {
+      "issue_number": 480
+    },
+    "initial_question": {
+      "title": "md\u3001html\u7684\u90e8\u4efd\u7b26\u865f\u6703\u6d88\u5931",
+      "body": "\u7576\u6211\u5728html\u6216md\u4e0a\u4f7f\u7528`{{  }}`\u7b26\u865f\uff0c\u90fd\u7121\u6cd5\u6b63\u5e38\u986f\u793a\uff0c\u7406\u8ad6\u4e0a\u5728`pre`\u6216`html`\u88e1\u9762\u61c9\u8a72\u8981\u80fd\u6b63\u5e38\u5448\u73fe\u3002\n\ngithub\u4e0a\u5c31\u80fd\u6b63\u5e38\u5448\u73fe\uff1a\n\n```\n{{test}}\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Special characters '{{' and '}}' must display correctly in the rendered output",
+      "Content within pre/code blocks must preserve literal character sequences",
+      "Solution must work in both HTML and Markdown contexts",
+      "Output must match GitHub's rendering behavior"
+    ],
+    "created_at": "2014-02-05T15:00:37Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/428",
+    "source": {
+      "issue_number": 428
+    },
+    "initial_question": {
+      "title": "File or folder whose name is prefixed with _ (underscore) and hidden files will be ignored.\u662f\u4ec0\u4e48\u610f\u601d\uff1f",
+      "body": "\u8bf7\u95ee\u4f5c\u8005\u8fd9\u53e5\u8bdd\u662f\u4ec0\u4e48\u610f\u601d\uff1fignore\u7684\u8bdd\uff0c\u90a3_widget\u8fd9\u6587\u4ef6\u5939\u4e0d\u5c31\u6ca1\u7528\u4e86\u4e48\uff1f\n"
+    },
+    "satisfaction_conditions": [
+      "Files/folders with underscore prefix remain accessible for inclusion/reference",
+      "Files/folders with underscore prefix cannot be accessed as primary/main layouts",
+      "Clear distinction between 'ignored' and 'unusable' is maintained"
+    ],
+    "created_at": "2014-01-10T20:10:47Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/411",
+    "source": {
+      "issue_number": 411
+    },
+    "initial_question": {
+      "title": "hexo 2.4+striped\u4e3b\u9898\u7684\u95ee\u9898",
+      "body": "\u5728\u4f7f\u7528hexo 2.3\u7248\u672c+striped\u4e3b\u9898\u7684\u65f6\u5019\uff0c\u4e00\u5207\u6b63\u5e38\u3002\n\u5347\u7ea7\u52302.4\u7248\u672c\uff0chexo g\u540e\u751f\u6210public\u76ee\u5f55\uff0c\u6b64\u76ee\u5f55\u4e0b\u7684\u7684index.htm\u6587\u4ef6\u662fstriped\u4e3b\u9898\u7684\u5185\u5bb9\uff0c\u800c\u4e0d\u662f\u6587\u7ae0\u7684\u5185\u5bb9\u3002\n\u7531\u4e8e2.3\u4e00\u5207\u6b63\u5e38\uff0c\u521d\u6b65\u5224\u5b9a\u662fhexo 2.4\u7684\u95ee\u9898\uff0c\u80fd\u4e0d\u80fd\u89e3\u51b3\u4e00\u4e0b\uff1f\n"
+    },
+    "satisfaction_conditions": [
+      "Homepage displays blog content instead of theme template",
+      "No file conflicts between theme and generated content",
+      "Theme remains functional after modifications",
+      "Changes persist after site regeneration"
+    ],
+    "created_at": "2013-12-30T11:22:11Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/388",
+    "source": {
+      "issue_number": 388
+    },
+    "initial_question": {
+      "title": "source/*htm{,l} processed",
+      "body": "I'd like to put a 404 page in `source` directory according to the instruction of githubpages. However, sadly, it' been processed :(\nSo, how can I keep it origin?\nOr, how could I write a `404.ejs` file and make it processed to generate a 404.html to `public` directory?\nthx :)\n"
+    },
+    "satisfaction_conditions": [
+      "The 404 page must not be processed/modified by the site generator"
+    ],
+    "created_at": "2013-12-04T07:34:14Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/295",
+    "source": {
+      "issue_number": 295
+    },
+    "initial_question": {
+      "title": "Jekyll to Hexo",
+      "body": "Hi,\n\nIn **Jekyll** markdown file in the yaml section I use several records, who are not handle by **Hexo** :\n- _image:_ /img/nodejs-logo.png\n- _imagecap:_\n- _extlink:_\n- _comments:_ true\n- _meta-description:_ \"NodeJS News : Isaac Schlueter :: The Road to Node.js v1.0. A great talk on Node futur\"\n\nIs the a way to use them, without refactor all my markdown files ?\n\nThank's,\n\nVincent\n"
+    },
+    "satisfaction_conditions": [
+      "Custom YAML front matter fields from Jekyll must be accessible in Hexo",
+      "No modification required to existing markdown files",
+      "Theme/template system must recognize custom front matter variables"
+    ],
+    "created_at": "2013-09-04T13:34:43Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/198",
+    "source": {
+      "issue_number": 198
+    },
+    "initial_question": {
+      "title": "\u5982\u4f55\u5728\u9875\u9762\u4e2d\u663e\u793a\u4e0a\u4e00\u7bc7/\u4e0b\u4e00\u7bc7\u6587\u7ae0\u7684\u94fe\u63a5?",
+      "body": "\u8fd9\u4e2a\u529f\u80fd\u8be5\u5982\u4f55\u5b9e\u73b0?\u4ee3\u7801\u82e6\u624b,\u8fd8\u8bf7\u5404\u4f4d\u591a\u591a\u8d50\u6559,\u8c22\u8c22\u5148~\n"
+    },
+    "satisfaction_conditions": [
+      "Post metadata is correctly accessed and displayed",
+      "Navigation links maintain proper sequence",
+      "Template integration is functional"
+    ],
+    "created_at": "2013-06-04T12:36:48Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/133",
+    "source": {
+      "issue_number": 133
+    },
+    "initial_question": {
+      "title": "\u5173\u4e8eImage Tag",
+      "body": "{% img path %} \u8fd9\u6837\u4f1a\u751f\u6210\u5982\u4e0bhtml\u4ee3\u7801\n# img src=\"path\"\n\n\u4f46\u662f\u5982\u679c\u6211\u60f3\u8981\u751f\u6210\n# p##img src=\"path\"##p\n\n\u8fd9\u6837\u7684html\u4ee3\u7801\u6211\u5e94\u8be5\u600e\u4e48\u6837\u5199md\u6587\u4ef6\u5462\uff0c\u6211\u5df2\u7ecf\u8bd5\u8fc7\u5728img\u6807\u8bb0\u524d\u540e\u52a0\u6570\u4e2a\u7a7a\u683c\u6216\u8005\u6362\u884c\u7b26\uff0c\u4e0d\u8d77\u4f5c\u7528\u3002\u3002\u3002\n## \u8868\u793a<>,\u6211\u60f3\u8981\u56fe\u7247\u6807\u7b7e\u88ab\u6bb5\u843d\u6807\u7b7e\u5305\u7740\u3002\n\n\u8c22\u8c22\n"
+    },
+    "satisfaction_conditions": [
+      "Generated HTML output must wrap the img element in paragraph tags",
+      "Markdown syntax must maintain the original image path/source",
+      "Solution must work within the existing markdown/template system"
+    ],
+    "created_at": "2013-03-30T14:08:52Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/37",
+    "source": {
+      "issue_number": 37
+    },
+    "initial_question": {
+      "title": "scripts\u529f\u80fd",
+      "body": "\u6309\u7167\u6587\u6863\u6dfb\u52a0\u4e86\u81ea\u52a8\u6253\u5f00newpost\u7684\u529f\u80fd\uff0c\u4f46\u662f\u62a5\u9519\u3002\n\n```\nhexo new_post 'test'\nPost created at /Users/pharaohnie/hexo/source/_posts/2013-01-07-test.md\n\n/Users/pharaohnie/hexo/scripts/autoopen:4\n    spawn('open', [target]);\n                   ^\nReferenceError: target is not defined\n    at EventEmitter.<anonymous> (/Users/pharaohnie/hexo/scripts/autoopen:4:20)\n    at EventEmitter.emit (events.js:96:17)\n    at /usr/local/share/npm/lib/node_modules/hexo/lib/cli/new.js:46:14\n    at fs.close (/usr/local/share/npm/lib/node_modules/hexo/node_modules/graceful-fs/graceful-fs.js:90:5)\n    at Object.oncomplete (fs.js:297:15)\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Script must successfully respond to 'newPost' event",
+      "Script must be placed in correct location and loaded by Hexo"
+    ],
+    "created_at": "2013-01-07T02:44:55Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/30",
+    "source": {
+      "issue_number": 30
+    },
+    "initial_question": {
+      "title": "Make swig optional for certain files?",
+      "body": "I understand that swig is required for tag plugins as added in eb9f0c7e. However, when my markdown document contains barely:\n\n```\n   {{\\foo}}\n```\n\n(I happened to have something like this in one of my blog post about TeX, in which `{` and `\\` are used quite often, but note that I put this code block in a 4 spaces indention which means the Markdown processor should output that code block as is)\n\nIt will trigger the following error:\n\n```\nif ((typeof _context !== \"undefined\" && typeof _context.\\foo !== \"undefined\")\n                                                          ^\nSyntaxError: Unexpected token ILLEGAL\n    at Object.Function (unknown source)\n    at createRenderFunc (/usr/local/share/npm/lib/node_modules/hexo/node_modules/swig/lib/swig.js:45:10)\n    at createTemplate (/usr/local/share/npm/lib/node_modules/hexo/node_modules/swig/lib/swig.js:97:14)\n    at getTemplate (/usr/local/share/npm/lib/node_modules/hexo/node_modules/swig/lib/swig.js:125:20)\n    at Object.exports.compile (/usr/local/share/npm/lib/node_modules/hexo/node_modules/swig/lib/swig.js:187:14)\n    at load (/usr/local/share/npm/lib/node_modules/hexo/lib/processor/load.js:68:25)\n    at _asyncMap (/usr/local/share/npm/lib/node_modules/hexo/node_modules/async/lib/async.js:190:13)\n    at async.forEach (/usr/local/share/npm/lib/node_modules/hexo/node_modules/async/lib/async.js:94:25)\n    at _asyncMap (/usr/local/share/npm/lib/node_modules/hexo/node_modules/async/lib/async.js:187:17)\n    at async.parallel.results (/usr/local/share/npm/lib/node_modules/hexo/node_modules/async/lib/async.js:459:34)\n```\n\nBecause swig incorrectly considered `\\foo` as a variable but it's not. Similar problem can happen to any code block with `{{}}`.\n\nMy question is: how do we input a code block with `{{}}`? I guess we should either escape it before sending to `swig.compile()` or allow to turn swig off for document like this. Any idea?\n"
+    },
+    "satisfaction_conditions": [
+      "Regular template functionality must remain available for intended template usage"
+    ],
+    "created_at": "2013-01-02T21:38:14Z"
+  },
+  {
+    "id": "https://github.com/hexojs/hexo/issues/12",
+    "source": {
+      "issue_number": 12
+    },
+    "initial_question": {
+      "title": "Running hexo locally",
+      "body": "I want to just `npm install hexo` and run hexo commands but when I do this, I get:\n\n`-bash: hexo: command not found`\n\nHow can I run hexo without installing it globally?\n"
+    },
+    "satisfaction_conditions": [
+      "Hexo commands execute successfully without global installation",
+      "Local project files are accessible",
+      "Command can be executed from project directory"
+    ],
+    "created_at": "2012-12-14T10:03:17Z"
+  }
+]

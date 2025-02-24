@@ -1,0 +1,222 @@
+[
+  {
+    "number": 2995,
+    "title": "Issues with returning related objects to user",
+    "created_at": "2021-03-26T11:49:26Z",
+    "closed_at": "2023-02-27T22:59:51Z",
+    "labels": [
+      "question",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/2995",
+    "body": "Hi there, I'm trying to get some related fields via GET method, but when I try it I only get default value e.g null. \r\nMaybe there's someone who can explain where I'm wrong?\r\n\r\nIt seems like all the errors I'm getting is where there's a list of related objects.\r\n\r\nI'm getting the Item object in swagger, but without SupplierItem and Images relations.\r\n\r\nmodels\\item.py \r\n\r\n```\r\nclass Item(Base):\r\n    id = Column(Integer, primary_key=True, index=True)\r\n    title = Column(String, index=True)\r\n    article = Column(String, index=True)\r\n    description = Column(String, index=True)\r\n\r\n    vat_id = Column(Integer, ForeignKey(\"vat.id\"))\r\n    vat = relationship(\"Vat\")\r\n\r\n    manufacturer_id = Column(Integer, ForeignKey(\"manufacturer.id\"))\r\n    manufacturer = relationship(\"Manufacturer\", back_populates=\"items\")\r\n\r\n    unit_id = Column(Integer, ForeignKey(\"unit.id\"))\r\n\r\n    price = relationship(\"Price\", back_populates=\"item\")\r\n    images = relationship(\"Image\", back_populates=\"item\")\r\n    supplier_items = relationship(\"SupplierItem\", back_populates=\"item\")\r\n\r\n    is_active = Column(Boolean, default=True)\r\n```\r\n\r\nmodels\\supplier_item.py\r\n\r\n```\r\nclass SupplierItem(Base):\r\n    id = Column(Integer, primary_key=True, index=True)\r\n    title = Column(String, index=True, unique=True)\r\n    is_active = Column(Boolean, default=True)\r\n\r\n    price = relationship(\"Price\", back_populates=\"supplier_item\")\r\n\r\n    supplier_id = Column(Integer, ForeignKey(\"supplier.id\"))\r\n    supplier = relationship(\"Supplier\", back_populates=\"supplier_items\")\r\n\r\n    item_id = Column(Integer, ForeignKey(\"item.id\"))\r\n    item = relationship(\"Item\", back_populates=\"supplier_items\")\r\n```\r\n\r\nschemas\\item.py\r\n\r\n```\r\nclass ItemBase(BaseModel):\r\n    id: int\r\n    title: Optional[str] = None\r\n    description: Optional[str] = None\r\n    article: Optional[str] = None\r\n    manufacturer: Optional[Manufacturer] = None\r\n    unit: Optional[Unit] = None\r\n    price: Optional[List[Price]] = None\r\n    vat: Optional[Vat] = None\r\n    image: Optional[List[Image]] = None\r\n    supplier_item: Optional[List[SupplierItem]] = None\r\n```\r\n\r\nendpoints\\items.py\r\n```\r\n@router.get(\"/{id}\", response_model=schemas.Item)\r\ndef read_item(\r\n        *,\r\n        db: Session = Depends(deps.get_db),\r\n        id: int,\r\n        current_user: models.User = Depends(deps.get_current_active_user),\r\n) -> Any:\r\n    \"\"\"\r\n    Get item by ID.\r\n    \"\"\"\r\n    item = crud.item.get(db=db, id=id)\r\n    if not item:\r\n        raise HTTPException(status_code=404, detail=\"Item not found\")\r\n    if not crud.user.is_superuser(current_user):\r\n        raise HTTPException(status_code=400, detail=\"Not enough permissions\")\r\n    return item\r\n```\r\n\r\nOS MacOS 11.2.3\r\nFastAPI version 0.54.2\r\nPython 3.7.7",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/2995/comments",
+    "author": "kgorshkoff",
+    "comments": [
+      {
+        "user": "waynerv",
+        "created_at": "2021-03-30T01:50:45Z",
+        "body": "1. You shouldn`t directly use Sqlalchemy model as Pydantic's field type.\r\n2. add `class config:orm_mode=True` for Item model."
+      },
+      {
+        "user": "kgorshkoff",
+        "created_at": "2021-03-30T07:05:19Z",
+        "body": "Issue was that I misspelled couple Pydantic types, so I had issues.\r\n"
+      }
+    ]
+  },
+  {
+    "number": 2749,
+    "title": "How to change Input Request MediaType",
+    "created_at": "2021-02-03T10:20:58Z",
+    "closed_at": "2023-02-27T23:37:43Z",
+    "labels": [
+      "question",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/2749",
+    "body": "Hi Guys,\r\n\r\nIs there a way to change the input media type accepted for a specific route?\r\n\r\nE.G.\r\n\r\nI would like to set the route /foo/bar to accept only the media type 'application/octet-stream', and i would like also that this is reflected to the openapi template.\r\n\r\nSomething like the \"consume\" tag in Spring.",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/2749/comments",
+    "author": "KiraPC",
+    "comments": [
+      {
+        "user": "valentin994",
+        "created_at": "2021-02-03T12:04:39Z",
+        "body": "You could fetch that in the request header and then check if it is the right one.\r\n"
+      },
+      {
+        "user": "valentin994",
+        "created_at": "2021-02-03T12:17:41Z",
+        "body": "> Hi Guys,\r\n> \r\n> Is there a way to change the input media type accepted for a specific route?\r\n> \r\n> E.G.\r\n> \r\n> I would like to set the route /foo/bar to accept only the media type 'application/octet-stream', and i would like also that this is reflected to the openapi template.\r\n> \r\n> Something like the \"consume\" tag in Spring.\r\n\r\nOne approach is this one below, or you could add middleware that processes the headers first.\r\n\r\n```\r\n@app.get(\"/req\")\r\nasync def get_header(request: Request):\r\n    print(request.headers)\r\n    return {\"do with them what you want\"}\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 2281,
+    "title": "value_error.jsondecode  Invalid control character at when posting multi line text in FastAPI",
+    "created_at": "2020-11-01T11:54:37Z",
+    "closed_at": "2023-02-28T00:40:49Z",
+    "labels": [
+      "question",
+      "answered",
+      "reviewed",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/2281",
+    "body": "hello\r\nthis is one of my endpoints which is for posting(creating) new document\r\n```\r\n@app.post(\"/documents\", response_model=Doc, status_code=status.HTTP_201_CREATED, tags=[\"Web Panel\"])\r\ndef create_doc(doc: DocDef , token: str = Depends(verified_admin), db: Session = Depends(get_db)):\r\n    pass\r\n    `print(\"hi\")`\r\n```\r\nmy schemas are:\r\n```\r\nclass DocDef(BaseModel):\r\n    name: str\r\n    doc: str\r\n\r\n\r\nclass Doc(DocDef):\r\n    id: int\r\n    \r\n    class Config:\r\n        orm_mode = True\r\n```\r\nbut when I want to test a multi line text document I receive an error \r\nrequest body :\r\n```\r\n{\r\n  \"name\": \"string\",\r\n  \"doc\": \" this is test.\r\nthis is test too.\"\r\n}\r\n```\r\nresponse body:\r\n```\r\n{\r\n  \"detail\": [\r\n    {\r\n      \"loc\": [\r\n        \"body\",\r\n        46\r\n      ],\r\n      \"msg\": \"Invalid control character at: line 3 column 25 (char 46)\",\r\n      \"type\": \"value_error.jsondecode\",\r\n      \"ctx\": {\r\n        \"msg\": \"Invalid control character at\",\r\n        \"doc\": \"{\\n  \\\"name\\\": \\\"string\\\",\\n  \\\"doc\\\": \\\" this is test.\\nthis is test too.\\\"\\n}\",\r\n        \"pos\": 46,\r\n        \"lineno\": 3,\r\n        \"colno\": 25\r\n      }\r\n    }\r\n  ]\r\n}\r\n```\r\n\r\n\r\nplease help how can I fix this \r\nregards\r\n",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/2281/comments",
+    "author": "MohashN",
+    "comments": [
+      {
+        "user": "ycd",
+        "created_at": "2020-11-01T14:03:39Z",
+        "body": "Looks very similar to #1982, as @ArcLightSlavik said \r\n\r\n> In JSON a literal line break is not allowed inside a string, it needs to be replaced by \\n\r\n\r\nSo when you want to write a multiline text just go like this\r\n\r\n```python\r\n{\r\n  \"name\": \"string\",\r\n  \"doc\": \" this is test.\\nthis is test too.\"\r\n}\r\n"
+      },
+      {
+        "user": "MohashN",
+        "created_at": "2020-11-01T16:01:53Z",
+        "body": "Thanks for reply\r\nSo if I would like to post raw text, Is this only solution?"
+      },
+      {
+        "user": "ycd",
+        "created_at": "2020-11-01T16:06:51Z",
+        "body": "Yes, JSON doesn't allow breaking lines for readability. "
+      }
+    ]
+  },
+  {
+    "number": 1777,
+    "title": "How to define and use global exceptions\uff1f",
+    "created_at": "2020-07-23T01:34:33Z",
+    "closed_at": "2023-02-28T01:12:23Z",
+    "labels": [
+      "question",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/1777",
+    "body": "\r\n\r\n```Python\r\nimport uvicorn\r\nfrom fastapi import FastAPI\r\nfrom flask import Request\r\nfrom fastapi.responses import JSONResponse\r\nfrom Api.api import api_router\r\n\r\n\r\nclass UnicornException(Exception):\r\n    def __init__(self, name: str):\r\n        self.name = name\r\n\r\n\r\napp = FastAPI()\r\n\r\n\r\n@app.exception_handler(UnicornException)\r\nasync def unicorn_exception_handler(request: Request, exc: UnicornException):\r\n    return JSONResponse(\r\n        status_code=418,\r\n        content={\"message\": f\"Oops! {exc.name} did something. There goes a rainbow...\"},\r\n    )\r\n\r\n\r\napp.include_router(api_router, prefix=\"/api/v1\")\r\n\r\nif __name__ == \"__main__\":\r\n    uvicorn.run(\"Start:app\", host=\"0.0.0.0\", port=8080, log_level=\"info\")\r\n\r\n```\r\n```python3\r\nfrom fastapi import APIRouter\r\n\r\nfrom Api import webApi\r\n\r\napi_router = APIRouter()\r\napi_router.include_router(webApi.router, tags=[\"webApi\"])\r\n\r\n```\r\n```python3\r\nfrom fastapi import APIRouter\r\n\r\nfrom Start import UnicornException\r\nfrom WebInit import test\r\nfrom allmain.StartInit import stop_all_containers, get_ssh_public_key, request_yml_data\r\nfrom bean.YmalBean import Yml\r\n\r\nrouter = APIRouter()\r\n\r\n\r\n@router.get(\"/1\")\r\ndef read_root():\r\n    # StartInit.get_ssh_public_key()\r\n    raise UnicornException(name=\"asdasd\")\r\n```\r\n```bash\r\nTraceback (most recent call last):\r\n  File \"/home/k/PycharmProjects/auto/Start.py\", line 5, in <module>\r\n    from Api.api import api_router\r\n  File \"/home/k/PycharmProjects/auto/Api/api.py\", line 3, in <module>\r\n    from Api import webApi\r\n  File \"/home/k/PycharmProjects/auto/Api/webApi.py\", line 3, in <module>\r\n    from Start import UnicornException\r\n  File \"/home/k/PycharmProjects/auto/Start.py\", line 5, in <module>\r\n    from Api.api import api_router\r\nImportError: cannot import name 'api_router'\r\n\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/1777/comments",
+    "author": "lnsane",
+    "comments": [
+      {
+        "user": "MacMacky",
+        "created_at": "2020-07-23T09:00:39Z",
+        "body": "You're having a __Circular Import__ problem. I suggest you do this.\r\n\r\n__Start.py__ - under root folder\r\n```py\r\nimport uvicorn\r\nfrom fastapi import FastAPI\r\nfrom flask import Request\r\nfrom fastapi.responses import JSONResponse\r\nfrom Api.api import api_router\r\nfrom exceptions import main # or from exceptions.main import UnicornException\r\n\r\napp = FastAPI()\r\n\r\n@app.exception_handler(main.UnicornException)\r\nasync def unicorn_exception_handler(request: Request, exc: main.UnicornException):\r\n    return JSONResponse(\r\n        status_code=418,\r\n        content={\r\n            \"message\": f\"Oops! {exc.name} did something. There goes a rainbow...\"},\r\n    )\r\n\r\n\r\napp.include_router(api_router, prefix=\"/api/v1\")\r\n\r\nif __name__ == \"__main__\":\r\n    uvicorn.run(\"Start:app\", host=\"0.0.0.0\", port=8080, log_level=\"info\")\r\n```\r\n\r\n__Api/api.py__\r\n```py\r\nfrom fastapi import APIRouter\r\n\r\nfrom Api import webApi\r\n\r\napi_router = APIRouter()\r\napi_router.include_router(webApi.router, tags=[\"webApi\"])\r\n```\r\n\r\n__Api/webApi.py__\r\n```py\r\nfrom fastapi import APIRouter\r\nfrom exceptions import main # or from exceptions.main import UnicornException\r\n\r\nrouter = APIRouter()\r\n\r\n@router.get(\"/1\")\r\ndef read_root():\r\n    raise main.UnicornException(name=\"Error\")\r\n```\r\n\r\n__exceptions/main.py__\r\n```py\r\n\r\nclass UnicornException(Exception):\r\n    def __init__(self, name: str):\r\n        self.name = name\r\n\r\n\r\nclass AnotherException(Exception):\r\n    def __init__(self, message: str, status: int):\r\n        self.message = message\r\n        self.status = status\r\n```\r\n\r\n"
+      }
+    ]
+  },
+  {
+    "number": 1712,
+    "title": "ResponseModel does not force model",
+    "created_at": "2020-07-14T19:12:30Z",
+    "closed_at": "2023-02-28T01:10:45Z",
+    "labels": [
+      "question",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/1712",
+    "body": "Is there a way to force the the response to be equal the response_model?\r\n\r\n```\r\nclass Item(BaseModel):\r\n    id: int\r\n    shortcut: str\r\n    name: str\r\n\r\n@app.get(\"/items/{item_id}\", response_model=Item)\r\nasync def get_all_items(item_id: int):\r\n    \"\"\"Return all assocations.\"\"\"\r\n    item = {\"name\": \"name\", \"size\": \"size\"}\r\n    return JSONResponse(status_code=status.HTTP_200_OK, content=item)\r\n```\r\n\r\nI would expect, that the response failed cause it is not aligned with the model. Any advice?",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/1712/comments",
+    "author": "datenwort",
+    "comments": [
+      {
+        "user": "Kludex",
+        "created_at": "2020-07-14T20:25:17Z",
+        "body": "You should not return a `JSONResponse` instance if you want FastAPI to handle your models. \r\nRemember that `get` is a decorator which already uses `JSONResponse` (to be honest is not a `JSONResponse` but is a parent or child class if I remember correctly). How we handle it in FastAPI:\r\n```\r\nclass Item(BaseModel):\r\n    id: int\r\n    shortcut: str\r\n    name: str\r\n\r\n@app.get(\"/items/{item_id}\", response_model=Item)\r\nasync def get_all_items(item_id: int):\r\n    \"\"\"Return all assocations.\"\"\"\r\n    item = {\"name\": \"name\", \"size\": \"size\"}\r\n    return item\r\n```\r\nBut this will raise an error. Can you see why? \r\n\r\n**SPOILER ALERT!!!**\r\nBecause you have the field `shortcut` and `id` are required ones!!! How do we solve it? There are several ways, I'll show you the simplest for me:\r\n```\r\nclass Item(BaseModel):\r\n    id: Optional[int]\r\n    shortcut: Optional[str]\r\n    name: str\r\n\r\n@app.get(\"/items/{item_id}\", response_model=Item)\r\nasync def get_all_items(item_id: int):\r\n    \"\"\"Return all assocations.\"\"\"\r\n    item = {\"name\": \"name\", \"size\": \"size\"}\r\n    return item\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 936,
+    "title": "TypeError: __call__() missing 1 required positional argument: 'send'",
+    "created_at": "2020-01-31T15:43:16Z",
+    "closed_at": "2023-02-28T10:50:47Z",
+    "labels": [
+      "question",
+      "answered",
+      "reviewed",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/936",
+    "body": "### Describe the bug\r\n\r\nGetting the following error:\r\n```error\r\nERROR:waitress:Exception while serving /\r\nTraceback (most recent call last):\r\n  File \"/usr/local/lib/python3.7/dist-packages/waitress/channel.py\", line 356, in service\r\n    task.service()\r\n  File \"/usr/local/lib/python3.7/dist-packages/waitress/task.py\", line 172, in service\r\n    self.execute()\r\n  File \"/usr/local/lib/python3.7/dist-packages/waitress/task.py\", line 440, in execute\r\n    app_iter = self.channel.server.application(environ, start_response)\r\nTypeError: __call__() missing 1 required positional argument: 'send'\r\n```\r\n\r\n### To Reproduce\r\n\r\n```Python\r\nimport waitress\r\nfrom fastapi import FastAPI\r\n\r\napp = FastAPI()\r\n\r\n@app.get(\"/move/{direction_char}\")\r\ndef read_root(direction_char: str):\r\n    return {\"DirectionChar\": direction_char}\r\n\r\nwaitress.serve(app)\r\n```\r\n### Expected behavior\r\n\r\nExpected a JSON response along the lines of {\"DirectionChar\": \"A\"}\r\n\r\n### Environment\r\n\r\n- OS: Debian 10\r\n- FastAPI Version: 0.47.1\r\n\r\n- Python version: 3.7.3",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/936/comments",
+    "author": "Technerder",
+    "comments": [
+      {
+        "user": "phy25",
+        "created_at": "2020-01-31T16:54:04Z",
+        "body": "fastapi only supports ASGI, not WSGI."
+      }
+    ]
+  },
+  {
+    "number": 883,
+    "title": "Holding on to a websocket",
+    "created_at": "2020-01-17T20:34:29Z",
+    "closed_at": "2023-02-28T11:13:25Z",
+    "labels": [
+      "question",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/883",
+    "body": "### First check\r\n\r\n* [V] I used the GitHub search to find a similar issue and didn't find it.\r\n* [V] I searched the FastAPI documentation, with the integrated search.\r\n* [V] I already searched in Google \"How to X in FastAPI\" and didn't find any information.\r\n\r\n### Description\r\nI have an MQTT client receiving messages from an external server. \r\nI want to forward each received message to my client using a websocket.\r\nTo do that, I want my client to first connect to a FastAPI websocket and every time a message comes in from the MQTT server, I want to `sent_text` on the websocket.\r\n\r\nI tried something like the following, but couldn't get it to work. What am I missing?\r\n\r\n```python\r\nclient_websocket = None \r\n\r\n@app.websocket(\"/ws\")\r\nasync def websocket_endpoint(websocket: WebSocket):\r\n    await websocket.accept()\r\n    global client_websocket\r\n    client_websocket = websocket\r\n\r\nasync def on_mqtt_message(msg):\r\n    await client_websocket.sent_text(msg)\r\n```\r\n\r\nThis raises the following error: `RuntimeError: Unexpected ASGI message 'websocket.send', after sending 'websocket.close'.`\r\n\r\nFrom the error I understand that the websocket is closed once `websocket_endpoint` exits. Is there a way to keep the websocket open, and emit messages to it from other contexts?\r\n\r\nThe websocket examples in the doc all use `while True` to read data from the websocket and then respond, but in my case I have an extrenal system trigerring events which should create websocket messages.\r\n\r\nI'd appreciate some help in understanding how to properly work with websockets in FastAPI (which is absolutely awesome, BTW).\r\n\r\nThanks!",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/883/comments",
+    "author": "MatanRubin",
+    "comments": [
+      {
+        "user": "Dustyposa",
+        "created_at": "2020-01-18T03:51:08Z",
+        "body": "You expected multiple client use the one `socket`?"
+      },
+      {
+        "user": "michaelyaakoby",
+        "created_at": "2020-01-18T16:10:43Z",
+        "body": "You can probably use an async queue so your MQTT client will push messages to the queue and the WS server will get from the queue and send them to the WS client.\r\n```python\r\nfrom asyncio import Queue\r\n\r\nqueue: Queue = None\r\n\r\n@app.websocket(\"/ws\")\r\nasync def websocket_endpoint(websocket: WebSocket):\r\n    await websocket.accept()\r\n    global queue\r\n    queue = Queue()\r\n    while True:\r\n        msg = await queue.get()\r\n        await websocket.send_text({\"message\": msg})\r\n\r\n\r\nasync def on_mqtt_message(msg):\r\n    if queue:\r\n      await queue.put(msg)\r\n```\r\nNote that the queue must be using the same event-loop as the WS, one way of doing it is to initialize the queue in the same function where you accept the WS.\r\nAlso, assuming you want the WS client to receive all the MQTT messages, you should use a queue per WS."
+      }
+    ]
+  },
+  {
+    "number": 874,
+    "title": "Can I directly call another route from a route?",
+    "created_at": "2020-01-16T13:38:38Z",
+    "closed_at": "2023-02-28T11:13:08Z",
+    "labels": [
+      "question",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/874",
+    "body": "### First check\r\n\r\n* [ x ] I used the GitHub search to find a similar issue and didn't find it.\r\n* [ x ] I searched the FastAPI documentation, with the integrated search.\r\n* [ x ] I already searched in Google \"How to X in FastAPI\" and didn't find any information.\r\n\r\n### Description\r\n\r\nIs it possible to call another route by using all usual FastAPI functionality?\r\n\r\nExample:\r\n```\r\n@router.get(\"/something\")\r\nasync def get_something(\r\n    something_id: int = Query(\r\n        1,\r\n        description=\"Some description\"\r\n    ),\r\n    full: bool = Query(\r\n        False,\r\n        description=\"Some description\"\r\n    )\r\n):\r\n    # ... do some database queries or whatever\r\n    return {\"something_id\": something_id, \"full\": full}\r\n\r\n@router.get(\"/two_somethings\")\r\nasync def get_two_somethings(\r\n    something_id_1: int = Query(\r\n        1,\r\n        description=\"Some description\"\r\n    ),\r\n    something_id_2: int = Query(\r\n        2,\r\n        description=\"Some description\"\r\n    ),\r\n):\r\n    one = await get_something(something_id_1)\r\n    two = await get_something(something_id_2)\r\n    return {\"one\": one, \"two\": two}\r\n```\r\n\r\nIf I query `/something?something_id=1234`, the boolean `full` is properly filled. If I call `/two_somethings?something_id_1=1234$something_id_2=2345`, the `full` argument in the function `get_something` is not resolved and has its unprocessed default value of a Query object.\r\n\r\nIf requesting above `/two_somethings`, the print would say\r\n\r\n    {'something_id': 1, 'full': Query(default=False, description='Some description', extra={})}\r\n\r\nThis is a constructed problem, but I stumbled upon it and wondered. A solution is certainly to create a separate non-route function that does the business logic of `get_something` and call that one in `get_two_somethings`, but then I lose the nice input and output checking of the individual `get_something` calls. Is there a solution?\r\n",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/874/comments",
+    "author": "sschiessl-bcp",
+    "comments": [
+      {
+        "user": "dmontagu",
+        "created_at": "2020-01-21T01:58:51Z",
+        "body": "You can call the route functions directly, but if you do so, you lose the dependency injection. In particular, if the functions have default values of a type like `Query(...)` or `Depends(dependency_func)`, you *have* to provide values, as the \"defaults\" are not actually valid, and are not substituted based on the request unless called by FastAPI.\r\n\r\nAs you noted, the easiest way to accomplish this might be to separate the shared business logic into a reusable function.\r\n\r\n-----\r\n\r\nThere are other patterns you could use, such as a class-based dependency, that *might* enable you to refactor the code in a way you find more reusable, but it would probably require a larger refactor than would be ideal. But right now I'm not sure there is currently a good way to accomplish the pattern you would like to use here directly.\r\n\r\n(It's not an unreasonable request, but I'm not sure how much complexity would need to be added to the dependency injection logic to make it possible. My guess is it would be more than it's probably worth, sadly.)"
+      }
+    ]
+  },
+  {
+    "number": 663,
+    "title": "Endpoint Must be available over WSS.",
+    "created_at": "2019-10-28T18:10:50Z",
+    "closed_at": "2023-02-28T11:33:00Z",
+    "labels": [
+      "question",
+      "answered",
+      "reviewed",
+      "question-migrate"
+    ],
+    "url": "https://github.com/fastapi/fastapi/issues/663",
+    "body": "...",
+    "comments_url": "https://api.github.com/repos/fastapi/fastapi/issues/663/comments",
+    "author": "ballon3",
+    "comments": [
+      {
+        "user": "euri10",
+        "created_at": "2019-10-29T05:37:26Z",
+        "body": "The formatting doesn't make it easy but it seems you have ws:// on your script "
+      }
+    ]
+  }
+]

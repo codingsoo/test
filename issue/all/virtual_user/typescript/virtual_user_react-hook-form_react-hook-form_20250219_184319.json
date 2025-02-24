@@ -1,0 +1,174 @@
+[
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/4083",
+    "source": {
+      "issue_number": 4083
+    },
+    "initial_question": {
+      "title": "FormProvider custom props",
+      "body": "**Is your feature request related to a problem? Please describe.**\r\nI am trying to migrate a project from V5 to V6, but the the typescript typings limit the way we used react hook forms before. We were able to add custom props to the FormContext (now renamed to FormProvider) and get those with useFormContext. Sadly, I think because of stricter typings, this is not possibly any more.\r\n\r\n```\r\n<FormProvider {...methods} fields={fields}></FormProvider>\r\n\r\nconst { formState, fields } = useFormContext();\r\n```\r\n\r\n**Describe the solution you'd like**\r\nI would like to know if this was unsupported behaviour in V5 and I should rewrite this usage or if the typings are to strict now.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Custom data must be accessible within child components",
+      "Solution must be TypeScript type-safe",
+      "Implementation must follow React best practices",
+      "Must maintain compatibility with react-hook-form's core functionality"
+    ],
+    "created_at": "2021-02-02T01:54:34Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/1481",
+    "source": {
+      "issue_number": 1481
+    },
+    "initial_question": {
+      "title": "Problems with setValue()",
+      "body": "**Describe the bug**\r\nsetValue doesn't set the array values properly in \"react-hook-form\": \"^5.5.3\",\r\n\r\n**To Reproduce**\r\nA lot of versions react-hook-form were released in last couple of days, so I don't know if this is some version specific, but after updating it doesn't work as it was day before.\r\nIf I try to submit invalid form, errors are displayed properly, but when I select any department (data from <DepartmentEmployeesPicker /> is passed correctly), it clears the error, but I cannot submit because there are no data set for this array. I also tried to use clearError, but that doesn't work also.\r\n\r\n`setValue('departments', data.departments, true);`\r\n\r\n**Expected behavior**\r\nIt should update array of values.\r\n\r\n```\r\nconst schema = yup.object().shape({\r\n\tdepartments: yup\r\n\t\t.array()\r\n\t\t.ensure()\r\n\t\t.min(1, 'At least 1 department selected is required')\r\n});\r\n\r\nconst { control, register, formState, handleSubmit, errors, clearError, setError, getValues, setValue } = useForm({\r\n\tdefaultValues: model,\r\n\tvalidationSchema: schema,\r\n\tsubmitFocusError: true,\r\n});\r\n\r\nregister({ name: 'departments' });\r\nregister({ name: 'employees' });\r\n\r\n<DepartmentEmployeesPicker\r\n\tcheckedDepartments={model.departments}\r\n\tcheckedEmployees={model.employees}\r\n\thasError={errors && errors.departments}\r\n\tonChange={data => {\r\n\t\tsetValue('departments', data.departments, true);\r\n\t\tsetValue('employees', data.employees);\r\n\t}}\r\n/>\r\n```\r\n\r\n**Desktop (please complete the following information):**\r\n - OS: Windows 10\r\n - Browser Chrome\r\n - Version 80.0.3987.163 (Official Build) (64-bit)\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Minimum array length validation must function correctly"
+    ],
+    "created_at": "2020-04-23T11:50:53Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/1282",
+    "source": {
+      "issue_number": 1282
+    },
+    "initial_question": {
+      "title": "Password and Confirm Password field validation using validationSchema",
+      "body": "@bluebill1049 Can you show an example of password and confirm-password using validationSchema?\r\n\r\nI am doing my validation like this:\r\n```\r\nconst validationSchema = yup.object().shape({\r\n    newPassword: yup.string()\r\n      .required('New Password is required'),\r\n    confirmPassword: yup.string()\r\n      .required('Confirm Password is required')\r\n      .oneOf([yup.ref('password'), null], 'Passwords does not match'),\r\n  });\r\n```\r\nFor this scenario, please fire validations **onChange** or **onBlur**.\r\n\r\nAt first sight, everything looks fine. But if you follow this order, then you can see problems:\r\n1. Input \"abcde\" in newPassword field.\r\n2. Input \"abcdf\" in confirmPassword field. (It will throw error: Passwords does not match)\r\n3. Change newPassword to \"abcdf\"\r\n\r\nActual result: confirmPassword will still have errors.\r\nExpected result from user perspective: confirmPassword should not have any error as of now.\r\n\r\nCan you please check it?"
+    },
+    "satisfaction_conditions": [
+      "Password fields must validate for matching values in real-time",
+      "Both password fields must be required fields",
+      "Changes in one password field must trigger re-validation of related fields",
+      "Validation must occur on field interaction events"
+    ],
+    "created_at": "2020-03-27T06:37:20Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/999",
+    "source": {
+      "issue_number": 999
+    },
+    "initial_question": {
+      "title": "How to handle server responses not related to any field?",
+      "body": "Hi! \r\n\r\nIs there a proper way to retrieve an error from server (general error, not related to a field) on submission and then show it to users, using the library?\r\n\r\nExample: login form with only email and password fields:\r\n\r\nform is submitted, but some network error happens on server. I would like to, elegantly, do something like setError(\"server\", \"Oh oh! Something went wrong. Please try again later.\")\r\n\r\nor maybe an \"status\" object on FormContext, which the user itself could manage. Would this bring performance issues? \r\n\r\nIf possible it could be  type safe too. \r\n\r\nwith:\r\nuseForm<FormValues,FormStatus>()\r\n\r\nJust asking, as I don't understand if this implementation would bring unnecessary re-renders, which is one of the biggest pro's of this library. Thanks!"
+    },
+    "satisfaction_conditions": [
+      "Error messages from server/network errors must be displayable to users",
+      "Error state must be clearable/resettable",
+      "Error handling must work with form submission flow"
+    ],
+    "created_at": "2020-02-09T14:38:41Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/905",
+    "source": {
+      "issue_number": 905
+    },
+    "initial_question": {
+      "title": "How to pass regex rules to `pattern` as variable",
+      "body": "What is the correct way to pass regex value as variable in the pattern?\r\n\r\n`ref={register({\r\n                              required: \"This field is required\",\r\n                              pattern: {\r\n                                value: /`${item.regex}`/,\r\n                                message: `${item.errorMessage}`\r\n                              }\r\n                            })}`\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Dynamic regex pattern is successfully created from variable input",
+      "Pattern validation works with the dynamically created regex",
+      "Error message is correctly interpolated from variable",
+      "Integration with form registration system remains functional"
+    ],
+    "created_at": "2020-01-24T23:15:20Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/813",
+    "source": {
+      "issue_number": 813
+    },
+    "initial_question": {
+      "title": "getting handleSubmit from useFormContext hooks",
+      "body": "**Describe the bug**\r\nHi\r\nFirst thanks for your wonderful works.\r\nAfter trying useFormContext hooks, i'm not able to use handleSubmit function in a sub component\r\nIn fact, I have a FormSubmit component responsible of getting the submit function from the context (using useFormContext hook)\r\nIt seems that handleSubmit is never executed.\r\n\r\n\r\n```\r\n//Form component\r\ntype FormProps = {\r\n  validationSchema?: any;\r\n};\r\nconst Form: React.FC<FormProps> = ({ children, validationSchema }) => {\r\n  const formMethods = useForm({\r\n    validationSchema: validationSchema || {}\r\n  });\r\n\r\n  return <FormContext {...formMethods}>{children}</FormContext>;\r\n};\r\nexport default Form;\r\n\r\n//SubmitComponent\r\ntype SubmitProps = {\r\n  onSubmit?: (data: any) => any;\r\n};\r\n\r\nconst Submit: React.FC<SubmitProps> = ({ onSubmit }) => {\r\n  const data = useFormContext(); // retrieve all hook methods\r\n  // console.log(data);\r\n  return (\r\n    <Button\r\n      onPress={(): any => {\r\n        data.handleSubmit(onSubmit);\r\n      }}\r\n    >\r\n      My label\r\n    </Button>\r\n  );\r\n};\r\nexport default Submit;\r\n\r\n//App\r\n     <Form validationSchema={signinSchema}>\r\n        <View>\r\n          <InputText\r\n            name=\"firstName\"\r\n            label=\"First name\"\r\n          />\r\n        </View>\r\n        <View>\r\n          <InputText\r\n            name=\"lastName\"\r\n            label=\"Last name\"\r\n          />\r\n        </View>\r\n        <Submit onSubmit={(data: any): any => console.log(data)} />\r\n      </Form>\r\n\r\n```\r\nDo you have any ideas why my function handleSubmit I get from hooks does not executes the \"onSubmit\" callback\r\n\r\nAgain, thanks!\r\n"
+    },
+    "satisfaction_conditions": [
+      "Form context data is properly passed between parent and child components"
+    ],
+    "created_at": "2020-01-11T01:20:52Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/812",
+    "source": {
+      "issue_number": 812
+    },
+    "initial_question": {
+      "title": "Possible bug",
+      "body": "When I use setValue to set initial values to the form it sets the touched to true for that field. \r\n\r\nTherefore the dirty flag goes to true.\r\n\r\nI may be wrong, but I think when we want to use setValue in the code, witch does not mean user interaction, we want the form to remain untouched and not dirty.\r\n\r\nMaybe we could send in a flag to say I want the form to be dirty or not via setValue:\r\n\r\nsetValue('field' , 10, validate = true, setTouched=false) : something like that."
+    },
+    "satisfaction_conditions": [
+      "Form field value is updated without affecting dirty state",
+      "Form field remains untouched after value assignment",
+      "Initial value assignment is distinguishable from user input"
+    ],
+    "created_at": "2020-01-10T21:01:48Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/665",
+    "source": {
+      "issue_number": 665
+    },
+    "initial_question": {
+      "title": "setState set default values",
+      "body": "When I set another state on my form component it will set all field to default value, cuz they come from my component props .\r\n\r\n```javascript\r\n  const { handleSubmit, register, errors } = useForm({\r\n    defaultValues: {\r\n      title: props.address.title,\r\n      phone: props.address.phone,\r\n      address: props.address.address,\r\n    },\r\n  });\r\n  const [location, setLocation] = useState({});\r\n```\r\n\r\n**Desktop (please complete the following information):**\r\n - Device: :Laptop\r\n - OS: windows\r\n - Browser chrome\r\n - Version  last\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Default values from props are properly initialized in the form"
+    ],
+    "created_at": "2019-12-14T06:47:49Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/239",
+    "source": {
+      "issue_number": 239
+    },
+    "initial_question": {
+      "title": "Validating Zero",
+      "body": "## Required validation triggers if my select returns number 0.\r\n\r\nSetting custom validation rules don't trigger when using setValue if I pass it number 0\r\n\r\n```\r\nregister(\r\n            {\r\n                name: 'myProp'\r\n            },\r\n            {\r\n                 required: 'whoops'\r\n             }\r\n        );\r\n```\r\n\r\nThis triggers if `setValue('myProp', 0, true);`\r\n\r\nAdditionally\r\n\r\n```\r\nregister(\r\n            {\r\n                name: 'myProp'\r\n            },\r\n            {\r\n                 required: 'whoops',\r\n                 validate: (id: number) => {\r\n                       return (id > -1 && id !== 999) || 'whoops';\r\n                  }\r\n             }\r\n        );\r\n```\r\n\r\n The validate function isn't even called if I use `setValue('myProp', 0, true);`\r\n\r\nI would expect the validate function to run every time there is an update.\r\nAlso, how should 0 values be used? Selects might legitimately return the number 0. \r\n\r\nThe ideal solution would be a property which allows 0 as valid?\r\n\r\nA quick fix is to cast everything as strings :(\r\n\r\nAny help is appreciated :)\r\n"
+    },
+    "satisfaction_conditions": [
+      "Validation must properly handle numeric zero as a valid input value",
+      "Form validation must correctly process both string and numeric input types",
+      "Validation rules must allow distinguishing between unset/empty state and zero value"
+    ],
+    "created_at": "2019-08-20T11:01:08Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/189",
+    "source": {
+      "issue_number": 189
+    },
+    "initial_question": {
+      "title": "How to get checkbox checked status not value?",
+      "body": "It seems like when using checkboxes it defaults to giving you the `e.target.value` rather than `e.target.checked`. How can I get the checked status rather than the value?\r\n\r\nThanks in advance."
+    },
+    "satisfaction_conditions": [
+      "Solution must handle both value and checked attributes consistently"
+    ],
+    "created_at": "2019-08-06T11:50:48Z"
+  },
+  {
+    "id": "https://github.com/react-hook-form/react-hook-form/issues/79",
+    "source": {
+      "issue_number": 79
+    },
+    "initial_question": {
+      "title": "Form validation does not work without submit button",
+      "body": "I have form which should submit data when all fields are filled without any error and submit button is not needed in this case, but validation does not work without submit button. Can validation work without submit button?\r\n \"version\": \"3.11.0\""
+    },
+    "satisfaction_conditions": [
+      "Form validation triggers without a submit button",
+      "Form data submission occurs when validation passes",
+      "Alternative trigger element functions as submission initiator",
+      "Form validation rules remain enforced"
+    ],
+    "created_at": "2019-06-13T17:23:19Z"
+  }
+]

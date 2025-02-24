@@ -1,0 +1,99 @@
+[
+  {
+    "id": "https://github.com/dotnet/machinelearning/issues/5270",
+    "source": {
+      "issue_number": 5270
+    },
+    "initial_question": {
+      "title": "CreateEnumerable from key column",
+      "body": "### System information\r\n\r\n- **OS version/distro**: Windows 10\r\n- **.NET Version (eg., dotnet --info)**: 4.7\r\n\r\n### Issue\r\n\r\n- **What did you do?**\r\nTrying to create Enumerable from IDataView which contains Column with Type Key<UInt32, 0-1059>, into a uint type.\r\n- **What happened?**\r\nEncountered error:\r\n\"Can't bind the IDataView column 'ImpressionIdKey' of type 'Key<UInt32, 0-1059>' to field or property 'ImpressionIdKey' of type 'System.UInt32'.\"\r\n- **What did you expect?**\r\nI want to be able to export key value in its uint format as enumerable\r\n\r\n### Source code / logs\r\n\r\n```\r\n        var a = mlContext.Data.CreateEnumerable<ProcessedData>(\r\n            colSelTrainingData, reuseRowObject: false);\r\n\r\n...\r\n\r\n        private class ProcessedData\r\n        {\r\n            public float[] Feature { get; set; }\r\n\r\n            public float BackProClick { get; set; }\r\n\r\n            public uint ImpressionIdKey { get; set; }\r\n        }\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "IDataView column containing Key<UInt32> type data can be converted to uint type in output enumerable"
+    ],
+    "created_at": "2020-07-01T00:11:10Z"
+  },
+  {
+    "id": "https://github.com/dotnet/machinelearning/issues/3155",
+    "source": {
+      "issue_number": 3155
+    },
+    "initial_question": {
+      "title": "Beginner: 'Schema mismatch for label column '': expected R4, got Key<U4>' exception thrown.",
+      "body": "- **Windows 10**:\r\n\r\n\r\n\r\nTrying to create my first regression in ML.NET\r\nI get an exception thrown:\r\nSchema mismatch for label column '': expected R4, got Key<U4>\r\nI was expecting to get \r\n\"Predicted 6 + 3 is: 9\"\r\nprinted to the console.\r\n\r\nI wrote a python script to create training data with 3 columns :\r\nfirst, second, result.\r\nfirst and second are random values.\r\nresult is first+second.\r\n\r\nI expect the machine to get first and second and predict the result. \r\n\r\nnumbers.cvs:\r\n```\r\n35,74,109\r\n69,36,105\r\n75,3,78\r\n19,44,63\r\n65,93,158\r\n40,15,55\r\n2,67,69\r\n27,63,90 ... X1000 times\r\n```\r\nCode that matters:\r\n```\r\n\r\n    public class NumberData\r\n    {\r\n        [LoadColumn(0)]\r\n        public float first;\r\n        [LoadColumn(1)]\r\n        public float second;\r\n        [LoadColumn(2)]\r\n        public float result;\r\n    }\r\n    public class NumberPrediction\r\n    {\r\n        [ColumnName(\"PredictedNumber\")]\r\n        public float PredictedNumber;\r\n    }\r\n.\r\n.\r\n.\r\nusing Microsoft.Data.DataView;\r\nusing Microsoft.ML;\r\nusing Microsoft.ML.Data;\r\n.\r\n.\r\n.\r\nMLContext mlContext = new MLContext();          \r\nIDataView trainingDataView = \r\nmlContext.Data.LoadFromTextFile<NumberData>(\r\n\"numbers.csv\",',',false);\r\nConsole.WriteLine(\"Loaded Data\");\r\nvar trainingPipeline =\r\nmlContext.Transforms.Conversion.MapValueToKey(nameof(NumberData.result))\r\n.Append(mlContext.Transforms.Concatenate(\r\nDefaultColumnNames.Features,\r\nnameof(NumberData.first),\r\nnameof(NumberData.second)))\r\n.Append(mlContext.Regression.Trainers.StochasticDualCoordinateAscent(\r\nlabelColumnName: \"result\",\r\nfeatureColumnName: DefaultColumnNames.Features))\r\n.Append(mlContext.Transforms.Conversion.MapKeyToValue(\"PredictedNumber\"));\r\nConsole.WriteLine(\"Created Trainer\");\r\nvar model = trainingPipeline.Fit(trainingDataView);//**RELEVANT** exception thrown here\r\nConsole.WriteLine(\"Trained The Model\");\r\nvar prediction =\r\nmodel.CreatePredictionEngine<NumberData, NumberPrediction>(mlContext).Predict(\r\nnew NumberData()\r\n{\r\nfirst = 6f,\r\nsecond = 3f,\r\nresult = 0// To be predicted\r\n});\r\nConsole.WriteLine($\"Predicted 6 + 3 is: {prediction.PredictedNumber}\");\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Data schema matches expected data types for regression",
+      "Training pipeline successfully processes numeric input data",
+      "Prediction output is accessible through correct column name",
+      "Console displays predicted result in expected format"
+    ],
+    "created_at": "2019-04-01T19:04:29Z"
+  },
+  {
+    "id": "https://github.com/dotnet/machinelearning/issues/2068",
+    "source": {
+      "issue_number": 2068
+    },
+    "initial_question": {
+      "title": "Word embedding output dimensions",
+      "body": "### System information\r\n\r\n- **OS version/distro**: windows 64bit 10.0.17134\r\n- **.NET Version (eg., dotnet --info)**: 2.1.502\r\n\r\n### Issue\r\nI am having trouble understanding the output of the WordEmbeddings function. Using a model with 50 dimensionality output, I would expect the embedding dimensions to match that output in some way. It only just multiplies the expected output dimension by 3.\r\n\r\nI have checked the model files, and they have the correct output for each word for each model.\r\n\r\n- **What did you do?** \r\nCreated wordEmbedding using several different preprocessed models. Both default and downloaded elsewhere\r\n- **What happened?**\r\nFor GloVe50D the output dimensions were 150.\r\nFor FastTextWikipedia300D the output was 900\r\n- **What did you expect?**\r\nI expected the output to match the embedding size in the models.\r\nFor GloVe50D to output dimensions 50 * input size, or [inputsize][50].\r\nFor FastTextWikipedia300D to output dimensions 300 * input size, or [inputsize][300].\r\n\r\n### Source code / logs\r\n\r\nPlease paste or attach the code or logs or traces that would be helpful to diagnose the issue you are reporting.\r\n\r\nThis code illustrates my issue. I would assume the output to be of variable size, but all outputs have dimensionality of 150, which I have trouble grasping. I have tried forcing the output to a variable vector output but it changes nothing.\r\n\r\nWhat worries me most, is what happens, when the input is a single word sentence, as I can not fathom or figure out what the extra 100 values are.\r\n\r\n```\r\n\r\nusing System;\r\nusing System.Linq;\r\nusing Microsoft.ML;\r\nusing Microsoft.ML.Runtime.Api;\r\nusing Microsoft.ML.Runtime.Data;\r\nusing Microsoft.ML.StaticPipe;\r\nusing Microsoft.ML.Transforms.Text;\r\n\r\nnamespace ConsoleApp1\r\n{\r\n    class DataEntry\r\n    {\r\n        public DataEntry(string message, int label)\r\n        {\r\n            Message = message;\r\n            Label = label;\r\n        }\r\n        public string Message { get; set; }\r\n        public int Label { get; set; }\r\n    }\r\n\r\n    class ModelOutput\r\n    {\r\n        public int Label;\r\n        public float[] Embedding;\r\n    }\r\n\r\n    class Program\r\n    {\r\n        private static MLContext mLContext = new MLContext();\r\n        private static PredictionFunction<DataEntry, ModelOutput> wordEmbedder;\r\n\r\n        static void Main()\r\n        {\r\n            var dataEntries = new[]\r\n            {\r\n                \"I am a horse\",\r\n                \"cow\",\r\n                \"The cat is norse\",\r\n                \"Don't ask me how\",\r\n                \"This is a sentence that is very long, and should have a different dimension than the other ones?\"\r\n            };\r\n            var labels = dataEntries.Select((_, i) => i).ToArray();\r\n\r\n            TokenizeData(dataEntries, labels, out  var data);\r\n            \r\n            Console.WriteLine($\"{data.Length} {data[0].Length}\");\r\n            foreach (var d in data)\r\n            {\r\n                Console.WriteLine($\"{d.Length}\");\r\n            }\r\n\r\n            Console.Read();\r\n        }\r\n        \r\n\r\n        private static void TokenizeData(string[] dataEntries, int[] labels, out double[][] dataVectors)\r\n        {\r\n            var dataEnum = dataEntries.Select((s, i) => new DataEntry(s, labels[i])).ToArray();\r\n            var reader = mLContext.CreateDataView(dataEnum).AssertStatic(\r\n                mLContext, c =>\r\n                (\r\n                    Message: c.Text.Scalar,\r\n                    Label: c.I4.Scalar));\r\n\r\n            // Inspect the message texts that are read from the file.\r\n            var pipeline = reader.MakeNewEstimator()\r\n                    .Append(r => (\r\n                        LabelMid: r.Label,\r\n                        Embedding: r.Message\r\n                            .NormalizeText()\r\n                            .TokenizeText()\r\n                            .RemoveStopwords()\r\n                            .WordEmbeddings(\r\n                                WordEmbeddingsExtractingTransformer\r\n                                    .PretrainedModelKind\r\n                                    .GloVe50D)\r\n                    ))\r\n                ;\r\n\r\n            var modelFit = pipeline.Fit(reader);\r\n\r\n            wordEmbedder = modelFit.AsDynamic.MakePredictionFunction<DataEntry, ModelOutput>(mLContext);\r\n\r\n            dataVectors = dataEntries.Select((s, i) => NameToTfVector(s, labels[i])).ToArray();\r\n        }\r\n        \r\n        private static double[] SentenceFromWordEmbedding(ModelOutput embedding)\r\n        {\r\n            return embedding.Embedding.Select(f => (double) f).ToArray();\r\n        }\r\n\r\n        private static double[] NameToTfVector(string inputText, int label)\r\n        {\r\n            return SentenceFromWordEmbedding(wordEmbedder.Predict(new DataEntry(inputText, label)));\r\n        }\r\n    }\r\n}\r\n```\r\nOutput:\r\n`5 150\r\n150\r\n150\r\n150\r\n150\r\n150`"
+    },
+    "satisfaction_conditions": [
+      "Output dimensionality must be 3x the model's base dimension size",
+      "Embedding output must be consistent regardless of input text length",
+      "Embedding must capture meaningful semantic information beyond simple averages",
+      "Output must handle out-of-vocabulary words gracefully",
+      "Vector components must represent interpretable semantic features"
+    ],
+    "created_at": "2019-01-08T07:33:46Z"
+  },
+  {
+    "id": "https://github.com/dotnet/machinelearning/issues/915",
+    "source": {
+      "issue_number": 915
+    },
+    "initial_question": {
+      "title": "Trying to left-outer join two datasets using a PK/FK",
+      "body": "Is there any way to manipulate the input data in order to join two distinct datasets using a primary key/foreign key?  Is the expectation that the input from the TextLoader is always partially pre-processed?"
+    },
+    "satisfaction_conditions": [
+      "Data must be pre-joined before loading into ML.NET",
+      "Input data must be in a single consolidated view format",
+      "Relational operations must be handled externally"
+    ],
+    "created_at": "2018-09-14T17:15:37Z"
+  },
+  {
+    "id": "https://github.com/dotnet/machinelearning/issues/164",
+    "source": {
+      "issue_number": 164
+    },
+    "initial_question": {
+      "title": "VectorType attribute with dynamic dimension",
+      "body": "The `VectorType` attribute can be added to an array-valued field when the length of the array is known at compile time, e.g.,\r\n```\r\n        public class Data\r\n        {\r\n            [ColumnName(\"Features\")]\r\n            [VectorType(2)]\r\n            public float[] Features;\r\n\r\n            [ColumnName(\"Label\")]\r\n            public bool Label;\r\n        }\r\n```\r\n\r\nHowever, what if the length of the array is only known at run time?\r\n\r\nFor example, given `IEnumerable<Data> data` where the length of the `Features` array is given by `int numFeatures`, I need to be able to pass `numFeatures` to `CollectionDataSource.Create(data)` somehow, and remove the static `2` argument to the `VectorType` attribute on the `Features` field."
+    },
+    "satisfaction_conditions": [
+      "Vector dimensions must be configurable at runtime",
+      "Schema definition must support variable-length feature vectors",
+      "Data pipeline must maintain type safety and schema consistency",
+      "Solution must work with existing ML.NET pipeline components",
+      "Vector size information must be preserved across pipeline stages"
+    ],
+    "created_at": "2018-05-15T22:41:23Z"
+  },
+  {
+    "id": "https://github.com/dotnet/machinelearning/issues/53",
+    "source": {
+      "issue_number": 53
+    },
+    "initial_question": {
+      "title": "Simple example using House Pricing Scenario",
+      "body": "This is the first time I've looked into machine learning but I have a use case I'd like to test with it.\r\n\r\nTo get started I've created a simple example from the house pricing scenario which somewhat closely matches my use case but the results I'm getting are not at all close to what I expected. The data I'm providing is simply linear in terms of just the `SqftLiving` input parameter to the `Price` where `Price = SqftLiving * 100`. The `SqftLot` is held constant for training and prediction so it should be a non-factor.\r\n\r\nI'm just trying to predict the Price when the `SqftLiving` is 1500 which with the linear model created by the provided data should make it about $150,000.\r\n\r\nHowever, the results I get vary wildly from the negative to the postive 10's of millions every time I run the program which is unexpected. Could someone look into this simple example and let me know what if anything I'm doing is causing these poor results?\r\n\r\n```c#\r\nclass Program\r\n{\r\n    static void Main(string[] args)\r\n    {\r\n        var filePath = \"C://Temp/kc_house_data.csv\";\r\n\r\n        File.WriteAllText(filePath, @\"100000,1000,8000\r\n200000,2000,8000\r\n400000,4000,8000\");\r\n\r\n        var pipeline = new LearningPipeline\r\n        {\r\n            new TextLoader<HousePriceData>(filePath, separator: \",\"),\r\n            new ColumnConcatenator(\"Features\", \"SqftLiving\", \"SqftLot\"),\r\n            new StochasticDualCoordinateAscentRegressor()\r\n        };\r\n\r\n        var model = pipeline.Train<HousePriceData, HousePricePrediction>();\r\n\r\n        var prediction = model.Predict(new HousePriceData { SqftLiving = 1500, SqftLot = 8000 });\r\n\r\n        Console.WriteLine(prediction.Price);\r\n        Console.ReadLine();\r\n    }\r\n}\r\n\r\npublic class HousePriceData\r\n{\r\n    [Column(ordinal: \"0\", name: \"Label\")]\r\n    public float Price;\r\n\r\n    [Column(ordinal: \"1\")]\r\n    public float SqftLiving;\r\n\r\n    [Column(ordinal: \"2\")]\r\n    public float SqftLot;\r\n}\r\n\r\npublic class HousePricePrediction\r\n{\r\n    [ColumnName(\"Score\")]\r\n    public float Price;\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Training data represents the pattern to be learned"
+    ],
+    "created_at": "2018-05-07T20:00:50Z"
+  }
+]

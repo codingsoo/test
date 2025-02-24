@@ -1,0 +1,305 @@
+[
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/2574",
+    "source": {
+      "issue_number": 2574
+    },
+    "initial_question": {
+      "title": "Why using `slice.call(obj)` when `_.isArray(obj)` is true?",
+      "body": "In `_.toArray`:\n\n```\nif (_.isArray(obj)) return slice.call(obj);\n```\n\nWhy using `slice.call(obj)` when `_.isArray(obj)` is true?\nWhy not just return obj ? I don't understand, please tell me :)\n"
+    },
+    "satisfaction_conditions": [
+      "The returned array must be a new, independent copy of the original array",
+      "The returned array must contain all the same elements as the original array in the same order",
+      "The operation must work on any valid array input"
+    ],
+    "created_at": "2016-07-30T13:31:49Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/2551",
+    "source": {
+      "issue_number": 2551
+    },
+    "initial_question": {
+      "title": "_.isObject for functions is true?",
+      "body": "Hey,\n\nwhy the fudge is `_.isObject(function() {}) === true`? This makes no sense. If function is an object, array should be one as well, otherwise it's pretty inconsistent. To check, whether it's a function or not they should use `_.isFunction`.\n\nCan someone explain this to me?\n\nCheers\n"
+    },
+    "satisfaction_conditions": [
+      "Explanation must clarify why functions are considered objects in JavaScript",
+      "Response must address the perceived inconsistency between functions and arrays",
+      "Answer should demonstrate or explain object-like properties of functions",
+      "Explanation must be consistent with JavaScript's type system behavior"
+    ],
+    "created_at": "2016-06-22T11:36:25Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/2378",
+    "source": {
+      "issue_number": 2378
+    },
+    "initial_question": {
+      "title": "Checkmarx Issue - Divide by Zero",
+      "body": "Hello,\n\nWe are using underscorejs in our application and we ran Checkmarx against it. It returned a security issue with the minified script:\n\n| # | Issue | Code in question |\n| --- | --- | --- |\n| 1 | Divide by zero | var e, u, i = 1 / 0, |\n| 2 | Divide by zero | o = 1 / 0; |\n| 3 | Divide by zero | (o > u |\n| 4 | Divide by zero | var e, u, i = -1 / 0, |\n| 5 | Divide by zero | o = -1 / 0 |\n| 6 | Divide by zero | (u > o |\n| 7 | Divide by zero | return x(n, t, 1 / 0) |\n\nNote that this is in the minified version - the actual source code makes use of Infinity instead of dividing by zero.\n\nWe just wish to check if this is a valid issue or a false positive.\n"
+    },
+    "satisfaction_conditions": [
+      "Division by zero operations must be handled safely without causing application crashes",
+      "Mathematical operations must produce mathematically consistent results",
+      "Security scanning tool alerts must be properly evaluated for validity",
+      "Code behavior must be equivalent between minified and unminified versions"
+    ],
+    "created_at": "2015-12-09T16:11:02Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/2304",
+    "source": {
+      "issue_number": 2304
+    },
+    "initial_question": {
+      "title": "_.isNumber( NaN ) == true",
+      "body": "Why `_.isNumber( NaN ) == true` ?\n"
+    },
+    "satisfaction_conditions": [
+      "Explanation must clarify why NaN is considered a number type",
+      "Response must distinguish between type checking and value validation",
+      "Alternative methods for number validation must be provided",
+      "Answer must provide context through similar examples"
+    ],
+    "created_at": "2015-09-23T00:44:09Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/2225",
+    "source": {
+      "issue_number": 2225
+    },
+    "initial_question": {
+      "title": "_.has({}, []) should return true",
+      "body": "`_.has({}, [])` and `_.has({})` should technically return true, because the object does have nothing?\n"
+    },
+    "satisfaction_conditions": [
+      "Function correctly handles array input as second parameter",
+      "Function behavior aligns with documented parameter types",
+      "Function returns boolean value",
+      "Empty object handling is clearly defined",
+      "Function maintains distinction between empty array and undefined parameters"
+    ],
+    "created_at": "2015-07-01T03:19:20Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/2186",
+    "source": {
+      "issue_number": 2186
+    },
+    "initial_question": {
+      "title": "How to sortBy by second level (subkey) of JSON object?",
+      "body": "I have an example JSON array I would like to sort. However, I would like to sort by attributes.Country (a second level) rather than a first level like label.\n\n``` javascript\n[\n   {\n      \"label\":\"Ha Dae-sung\",\n      \"id\":\"268\",\n      \"attributes\":{\n         \"Country\":\"South Korea\"\n      }\n   },\n   {\n      \"label\":\"Maxi Pereira\",\n      \"id\":\"486\",\n      \"attributes\":{\n         \"Country\":\"Uruguay\"\n      }\n   },\n   {\n      \"label\":\"Manabu Saito\",\n      \"id\":\"441\",\n      \"attributes\":{\n         \"Country\":\"Japan\"\n      }\n   }\n]\n```\n\nI can sort just fine on the first level using _.sortBy. For instance, to sort by just the label.\n\n``` javascript\nsearched = _.sortBy(searched, \"label\"); \n```\n\nHowever, I want to get a sorted array by Country within attributes. How would I set up a second level sort?\n"
+    },
+    "satisfaction_conditions": [
+      "Array must be sorted by the 'Country' value nested within the 'attributes' object",
+      "Original data structure must be preserved while changing only the order of elements",
+      "Sort operation must handle all array elements consistently",
+      "Sort result must be deterministic for the same input data"
+    ],
+    "created_at": "2015-05-23T17:21:05Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/2040",
+    "source": {
+      "issue_number": 2040
+    },
+    "initial_question": {
+      "title": "not to be bounded to window by default",
+      "body": "Hi all,\n\nIn my scenario where one of my client has different version of Underscore and my library is using different version of underscore.\n\nWe ended up overriding our window._\n\nIs there a way to source underscore and not to be bounded to window. Instead bind to the reference provided.\n\nKind regards,\nPhani.\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple versions of Underscore must be able to coexist without conflict",
+      "Each Underscore instance must be independently accessible via unique references",
+      "Global window._ binding must be optional/controllable"
+    ],
+    "created_at": "2015-02-09T12:39:06Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/1648",
+    "source": {
+      "issue_number": 1648
+    },
+    "initial_question": {
+      "title": "_.isEqual on \"[object HTMLCanvasElement]\" elements with different content",
+      "body": "With two canvas of the same size and same properties, but different contents (and different results from \"toDataURL()\"), _.isEqual returns true.\n\nI'm not sure what should be the expected result in this case. Maybe it's a bug, maybe it should lead to a warning in the documentation.\n"
+    },
+    "satisfaction_conditions": [
+      "Canvas elements with different content must be identified as unequal",
+      "Comparison must handle DOM elements safely without browser crashes",
+      "Comparison must work within nested object structures",
+      "Canvas comparison must use content-aware equality check",
+      "Solution must avoid global scope pollution"
+    ],
+    "created_at": "2014-05-22T09:50:59Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/1129",
+    "source": {
+      "issue_number": 1129
+    },
+    "initial_question": {
+      "title": "Why used \"concat.apply\" in _.pick and _.omit",
+      "body": " I found following code in _.pick and _.omit when I review the code\n\n``` javascript\n    var keys = concat.apply(ArrayProto, slice.call(arguments, 1));\n```\n\nI don't know why we have to `concat` the `slice.call(arguments, 1)`, since we already got a new array by `slice.call(arguments, 1)`, even there's only empty array, it will no affect on the code below.\n\nseems the code can be shorten as following, any ideas?\n\n``` javascript\n\n  _.pick = function(obj) {\n    var copy = {};\n    each(slice.call(arguments, 1), function(key) {\n      if (key in obj) copy[key] = obj[key];\n    });\n    return copy;\n  };\n\n   // Return a copy of the object without the blacklisted properties.\n  _.omit = function(obj) {\n    var copy = {};\n    var keys = slice.call(arguments, 1);\n    for (var key in obj) {\n      if (!_.contains(keys, key)) copy[key] = obj[key];\n    }\n    return copy;\n  };\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Array arguments must be properly flattened into a single-level array",
+      "All arguments after the first argument must be processed",
+      "Original object properties must remain unmodified"
+    ],
+    "created_at": "2013-05-25T09:14:15Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/1009",
+    "source": {
+      "issue_number": 1009
+    },
+    "initial_question": {
+      "title": "_.wrap doesn't support wrapping function with argument",
+      "body": "Today while writing code using underscore and backbone i had to wrap some functions. I saw following example on underscorejs.org\n\nvar hello = function(name) { return \"hello: \" + name; };\nhello = _.wrap(hello, function(func) {\n  return \"before, \" + func(\"moe\") + \", after\";\n});\nhello();\n=> 'before, hello: moe, after'\n\non the second last line \nwhat if the function call is like \nhello(\"umar\");\nI means to say that arguments are coming from outside.\n"
+    },
+    "satisfaction_conditions": [
+      "Function wrapper must preserve original function's argument handling capability",
+      "Wrapped function must execute with the provided arguments",
+      "Wrapper must maintain the ability to add pre/post processing",
+      "Wrapper must preserve the execution context (this binding)",
+      "Wrapper must return the modified result"
+    ],
+    "created_at": "2013-03-09T04:47:02Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/641",
+    "source": {
+      "issue_number": 641
+    },
+    "initial_question": {
+      "title": "Why is _._ defined?",
+      "body": "For underscore.1.3.3, why is _._ defined?\n\n```\nif (typeof exports !== 'undefined') {\n    if (typeof module !== 'undefined' && module.exports) {\n        exports = module.exports = _;\n    }\n    exports._ = _;\n} else {\n    root['_'] = _;\n}\n```\n\nShouldn't `exports = module.exports = _;` be `exports = module.exports;`?\n"
+    },
+    "satisfaction_conditions": [
+      "Library must be accessible through both standard and non-standard CommonJS import patterns",
+      "Library must maintain consistent functionality regardless of import method",
+      "Library must be properly exposed in non-CommonJS environments",
+      "Export mechanism must preserve the original library object without modification"
+    ],
+    "created_at": "2012-06-13T20:30:06Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/634",
+    "source": {
+      "issue_number": 634
+    },
+    "initial_question": {
+      "title": "Strange behavior with _.range function",
+      "body": "Some example:\n_.range(4) or _range(0, 4) or  _.range(\"4\")  produce [0, 1, 2, 3]  - OK\n_.range(\"0\", 4) or _range(\"0\", \"4\") produce [\"0\", \"01\", \"011\", \"0111\"] I was expected [0, 1, 2, 3]\n\nfrom the above examples I've conclude that star parameter is not parse as stop parameter \n\nI tested in  iceweasel 10.0.4 / Debian 6.5 with Underscore.js 1.3.3\n"
+    },
+    "satisfaction_conditions": [
+      "_.range() must produce expected numeric sequences when given numeric inputs"
+    ],
+    "created_at": "2012-06-08T14:44:06Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/461",
+    "source": {
+      "issue_number": 461
+    },
+    "initial_question": {
+      "title": "difference() behaviour change between 1.1.7 and 1.3.1",
+      "body": "In 1.1.7, difference() seems to identify differences between objects:\n\n```\n_.difference({a: \"b\", c: \"d\", e: \"f\"}, {a: \"b\"})\n[\"d\", \"f\"]\n```\n\nIn 1.3.1, difference() fails to identify differences.  Perhaps it's comparing reference equality rather than value equality now?\n\n```\n_.difference({a: \"b\", c: \"d\", e: \"f\"}, {a: \"b\"})\n[\"b\", \"d\", \"f\"]\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Function adheres to documented array-only behavior",
+      "Function clearly communicates input requirements"
+    ],
+    "created_at": "2012-02-06T05:50:53Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/181",
+    "source": {
+      "issue_number": 181
+    },
+    "initial_question": {
+      "title": "Alternative to <%= and %>",
+      "body": "I would like to use Underscore.js templates within a JSP, but cannot figure out a way to prevent JSP from processing the <%= and %>.\n"
+    },
+    "satisfaction_conditions": [
+      "Template syntax must not conflict with JSP processing",
+      "Template interpolation must remain functional",
+      "Template configuration must be customizable",
+      "Template output must match expected content"
+    ],
+    "created_at": "2011-04-24T16:46:47Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/88",
+    "source": {
+      "issue_number": 88
+    },
+    "initial_question": {
+      "title": "Extend nested objects?",
+      "body": "say i have:\n    var a = {\"foo\": { \"bar\":\"baz\" }}\n    var b = {\"foo\": { \"alice\":\"bob\" }}\n    var c = _.extend(a, b) // gives me {\"foo\": { \"alice\":\"bob\" }}\n\nWhat's the best way to make:\n    c = {\"foo\": { \"bar\":\"baz\", \"alice\":\"bob\" }}\n"
+    },
+    "satisfaction_conditions": [
+      "Nested objects must be merged recursively rather than replaced",
+      "Original properties must be preserved when not explicitly overridden",
+      "New properties must be added to existing nested objects",
+      "The operation must maintain the original object structure",
+      "The solution must work with configuration data objects"
+    ],
+    "created_at": "2010-12-29T22:57:24Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/85",
+    "source": {
+      "issue_number": 85
+    },
+    "initial_question": {
+      "title": "Uniq/unique returns undefined on an empty array in WebKit on OS X",
+      "body": "Since, Underscore is influenced by Ruby, I figured that unique-ing an empty array would just return an empty array.\n\nIn Ruby 1.8.7:\n\n[].uniq\n=> []\n\nOf course the uniq! method does return a nil on an empty array, but it's a destructive method and Underscore doesn't really have those.\n\nRuby 1.8.7:\n\n[].uniq!\n=> nil\n\nIs undefined the correct output when calling uniq on an empty array or should it just return itself or an empty array?\n"
+    },
+    "satisfaction_conditions": [
+      "Empty array input must return an empty array",
+      "Function must not return undefined for empty array input",
+      "Function behavior should be consistent with array transformation operations"
+    ],
+    "created_at": "2010-12-22T04:05:59Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/84",
+    "source": {
+      "issue_number": 84
+    },
+    "initial_question": {
+      "title": "uniq/unique doesn't seem to work in Webkit (Chrome/Safari) on OS X",
+      "body": "I'm using version 1.1.3 and here is a sample from the console:\na\n[1, 2, 1, 3, 1, 4]\na[0]\n1\na[2]\n1\na[0] === a[2]\ntrue\n_.uniq(a);\n[1, 2, 1, 3, 1, 4]\n\nYou'll notice that a[0] and a[2] are equal according to the \"threequals\" operator and according to the documentation, there should only be one \"1\" after unique-ing the array \"a\".\n\nIs there something that I'm doing wrong or is this a bug?\n"
+    },
+    "satisfaction_conditions": [
+      "Array deduplication function must return an array with only unique values",
+      "Library conflicts must be resolved",
+      "Array.reduce() method must function according to ECMAScript 5 specifications",
+      "Original array must remain unmodified unless explicitly mutated",
+      "Library versions must be compatible with each other"
+    ],
+    "created_at": "2010-12-22T03:59:27Z"
+  },
+  {
+    "id": "https://github.com/jashkenas/underscore/issues/26",
+    "source": {
+      "issue_number": 26
+    },
+    "initial_question": {
+      "title": "Install underscore in npm?",
+      "body": "I was creating a new npm package that depends on underscore.js and was wondering if I should list underscore as a dependency, in which case it will need to be installed into npm, or if I should include it in my package?  I see there is a package.json in the root so it seems to me that it might be good to publish it to npm, I didn't see it in the npm list yet.  \n\nThanks,\n\nJohn\n\n(Wanted to label this with a question but can't seem to get the label control to work.)\n"
+    },
+    "satisfaction_conditions": [
+      "Package dependency is properly declared and accessible",
+      "Underscore.js functionality is available after installation",
+      "Package can be required/imported without path issues",
+      "No namespace conflicts occur in the runtime environment",
+      "Package version is tracked and manageable"
+    ],
+    "created_at": "2010-06-14T19:39:03Z"
+  }
+]

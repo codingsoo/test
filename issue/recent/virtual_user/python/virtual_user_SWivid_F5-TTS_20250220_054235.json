@@ -1,0 +1,97 @@
+[
+  {
+    "id": "https://github.com/SWivid/F5-TTS/issues/630",
+    "source": {
+      "issue_number": 630
+    },
+    "initial_question": {
+      "title": "Checkpoint saving differences",
+      "body": "### Checks\r\n\r\n- [X] This template is only for question, not feature requests or bug reports.\r\n- [X] I have thoroughly reviewed the project documentation and read the related paper(s).\r\n- [X] I have searched for existing issues, including closed ones, no similar questions.\r\n- [X] I confirm that I am using English to submit this report in order to facilitate communication.\r\n\r\n### Question details\r\n\r\nWhen having `grad_accumulation_steps` set to a different value than `1`, the checkpoint saving is a bit unexpected:\r\n\r\nIn `trainer.py` for setting `save_per_updates`:\r\n\r\n```python\r\nif global_step % (self.save_per_updates * self.grad_accumulation_steps) == 0:\r\n    self.save_checkpoint(global_step)\r\n```\r\n\r\nfor setting `last_per_steps`:\r\n\r\n```python\r\nif global_step % self.last_per_steps == 0:\r\n    self.save_checkpoint(global_step, last=True)\r\n```\r\n\r\nConsequently, for my global batch-size of `19200*8` the value of `save_per_updates` needs to be divided by `8` to be comparable to the setting of `last_per_steps` and the overall variable `global_step` shown via `tqdm`.\r\n\r\nIs this intended ?"
+    },
+    "satisfaction_conditions": [
+      "Checkpoint saving behavior correctly accounts for gradient accumulation steps",
+      "Different saving intervals (save_per_updates vs last_per_steps) maintain consistent and predictable behavior",
+      "Global step counting remains accurate with gradient accumulation",
+      "Checkpoint saving frequency scales appropriately with batch size adjustments"
+    ],
+    "created_at": "2024-12-15T09:30:49Z"
+  },
+  {
+    "id": "https://github.com/SWivid/F5-TTS/issues/546",
+    "source": {
+      "issue_number": 546
+    },
+    "initial_question": {
+      "title": "Add functionality to the Transcription section",
+      "body": "### Checks\n\n- [X] This template is only for feature request.\n- [X] I have thoroughly reviewed the project documentation but couldn't find any relevant information that meets my needs.\n- [X] I have searched for existing issues, including closed ones, and found not discussion yet.\n- [X] I confirm that I am using English to submit this report in order to facilitate communication.\n\n### 1. Is this request related to a challenge you're experiencing? Tell us your story.\n\nI can't upload a large volume of audio files in the \"Transcription data\" section to create a dataset through the audio file upload window, everything freezes. My file size is 20 GB\n\n### 2. What is your suggested solution?\n\nCan you add a window in \"Gradio\" in the \"Transcription data\" section where I can specify the path to the folder where the audio files are located, this will eliminate the freeze and make it possible to upload a large volume of files to create a dataset.\r\n\r\nThank you\n\n### 3. Additional context or comments\n\n_No response_\n\n### 4. Can you help us with this feature?\n\n- [ ] I am interested in contributing to this feature."
+    },
+    "satisfaction_conditions": [
+      "Large audio file processing must not freeze the interface",
+      "User must be able to process multiple audio files as a batch",
+      "Audio files must be successfully imported into the transcription dataset",
+      "The solution must be accessible through the transcription data interface"
+    ],
+    "created_at": "2024-11-28T04:53:46Z"
+  },
+  {
+    "id": "https://github.com/SWivid/F5-TTS/pull/359",
+    "source": {
+      "issue_number": 359
+    },
+    "initial_question": {
+      "title": "small update gradio finetune",
+      "body": "@SWivid just small fix stuff \r\nso now when audio stereo always get duraction mono and resample\r\nafter train take case stereo to mono and resample\r\nand just fix error speling the bf16"
+    },
+    "satisfaction_conditions": [
+      "Audio duration calculation must work correctly for both stereo and mono files",
+      "Audio processing must handle stereo to mono conversion appropriately",
+      "Duration calculation must not perform unnecessary resampling",
+      "Sample rate must be correctly used in duration calculations"
+    ],
+    "created_at": "2024-11-01T09:23:40Z"
+  },
+  {
+    "id": "https://github.com/SWivid/F5-TTS/issues/197",
+    "source": {
+      "issue_number": 197
+    },
+    "initial_question": {
+      "title": "Minimal GPU Memory Requirements for Running the Model??",
+      "body": "I would like to know:\r\n\r\nWhat is the minimal GPU memory requirement for running this model smoothly?\r\nIs there a recommended batch size or other configurations (like precision or memory optimizations) I should use to reduce memory usage?\r\ni managed to change batch_size of trainer.py script, utils_infer.py still encountering cuda oom!! can you tell me the minimal requirements of GPU mmeory??"
+    },
+    "satisfaction_conditions": [
+      "Unnecessary model components are not loaded"
+    ],
+    "created_at": "2024-10-21T07:10:33Z"
+  },
+  {
+    "id": "https://github.com/SWivid/F5-TTS/issues/192",
+    "source": {
+      "issue_number": 192
+    },
+    "initial_question": {
+      "title": "RuntimeError: Input type (c10::Half) and bias type (float) should be the same",
+      "body": "I just started getting this error with the latest build:\r\n```\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/ttspod/speech/f5.py\", line 214, in infer_batch\r\n    generated_wave = self.vocos.decode(generated_mel_spec.cpu())\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/torch/utils/_contextlib.py\", line 116, in decorate_context\r\n    return func(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/vocos/pretrained.py\", line 112, in decode\r\n    x = self.backbone(features_input, **kwargs)\r\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1553, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1562, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/vocos/models.py\", line 79, in forward\r\n    x = self.embed(x)\r\n        ^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1553, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py\", line 1562, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/torch/nn/modules/conv.py\", line 308, in forward\r\n    return self._conv_forward(input, self.weight, self.bias)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"/home/adam/ttspod/.venv/lib/python3.11/site-packages/torch/nn/modules/conv.py\", line 304, in _conv_forward\r\n    return F.conv1d(input, weight, bias, self.stride,\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nRuntimeError: Input type (c10::Half) and bias type (float) should be the same\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Data type consistency between input tensor and model bias must be maintained",
+      "Model must successfully process the input data without type mismatch errors",
+      "Generated output must maintain correct numerical precision for the intended operation"
+    ],
+    "created_at": "2024-10-21T01:57:10Z"
+  },
+  {
+    "id": "https://github.com/SWivid/F5-TTS/issues/190",
+    "source": {
+      "issue_number": 190
+    },
+    "initial_question": {
+      "title": "Broken on MPS",
+      "body": "Not sure what happened, but looks like the app is broken on Macs at the moment.\r\n\r\nJust did a fresh install and the app itself runs, but the resulting audio is empty.\r\n\r\nAlso I am not sure if the logs are useful but pasting just in case:\r\n\r\n```\r\n/Users/x/pinokio/api/e2-f5-tts.git/app/env/lib/python3.10/site-packages/transformers/models/whisper/generation_whisper.py:496: FutureWarning: The input name `inputs` is deprecated. Please make sure to use `input_features` instead.\r\n  warnings.warn(\r\nYou have passed task=transcribe, but also have set `forced_decoder_ids` to [[1, None], [2, 50360]] which creates a conflict. `forced_decoder_ids` will be ignored in favor of task=transcribe.\r\n\r\nPassing a tuple of `past_key_values` is deprecated and will be removed in Transformers v4.43.0. You should pass an instance of `EncoderDecoderCache` instead, e.g. `past_key_values=EncoderDecoderCache.from_legacy_cache(past_key_values)`.\r\nThe attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.\r\ngen_text 0 Reference text will be automatically transcribed with Whisper if not provided. For best results, keep your reference clips short\r\nBuilding prefix dict from the default dictionary ...\r\nLoading model from cache /Users/x/pinokio/cache/TMPDIR/jieba.cache\r\nLoading model cost 0.426 seconds.\r\nPrefix dict has been built successfully.\r\n/Users/x/pinokio/api/e2-f5-tts.git/app/env/lib/python3.10/site-packages/gradio/processing_utils.py:574: UserWarning: Trying to convert audio automatically from float32 to 16-bit int format.\r\n  warnings.warn(warning.format(data.dtype))\r\n/Users/x/pinokio/api/e2-f5-tts.git/app/env/lib/python3.10/site-packages/gradio/processing_utils.py:577: RuntimeWarning: invalid value encountered in cast\r\n  data = data.astype(np.int16)\r\n```\r\n\r\nI am not completely sure but I don't remember seeing this many warning messages previously."
+    },
+    "satisfaction_conditions": [
+      "Memory/GPU resource usage remains within reasonable limits"
+    ],
+    "created_at": "2024-10-20T19:29:57Z"
+  }
+]

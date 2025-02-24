@@ -1,0 +1,147 @@
+[
+  {
+    "number": 1458,
+    "title": "async.auto & the curious case of try ... catch",
+    "created_at": "2017-07-26T20:08:39Z",
+    "closed_at": "2017-07-26T21:23:22Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/caolan/async/issues/1458",
+    "body": "<!--\r\nThis template is for bug reports. If you are reporting a bug, please continue on. If you are here for another reason (such as a feature request, change, or question) you can disregard this template\r\n-->\r\n\r\n**What version of async are you using?**\r\nv2.5.0\r\n**Which environment did the issue occur in (Node version/browser version)**\r\nv6.10.3\r\n**What did you do? Please include a minimal reproducable case illustrating issue.**\r\n```javascript\r\nasync.auto({\r\n  returnOne: (callback) => callback(null, 1),\r\n  tryCatch: [\"returnOne\", (results, callback) => {\r\n    try {\r\n      assert(results.returnOne === 1);\r\n      return callback(null);\r\n    } catch (err) {\r\n      console.log(`Caught an error: ${err.message}`);\r\n      return callback(err);\r\n    }\r\n  }],\r\n}, (err, results) => {\r\n  assert(results.returnOne !== 1);\r\n  console.log(`All Done!`);\r\n});\r\n```\r\n**What did you expect to happen?**\r\nThe assert inside the final aync.auto callback fails and throws an error which is not caught and stops the Node.js process. In my real world example of this, we are testing a block of code within Mocha, which handles the error and reports that the test failed with information about the assertion that caused the failure.\r\n\r\n**What was the actual result?**\r\nTry / Catch from the previous auto step catches the error and calls the tryCatch callback a second time, resulting in a different error:\r\n```\r\nasync/dist/async.js:903\r\n        if (fn === null) throw new Error(\"Callback was already called.\");\r\n                         ^\r\nError: Callback was already called.\r\n```",
+    "comments_url": "https://api.github.com/repos/caolan/async/issues/1458/comments",
+    "author": "trvra",
+    "comments": [
+      {
+        "user": "aearly",
+        "created_at": "2017-07-26T21:06:02Z",
+        "body": "```js\r\ntry {\r\n  //...\r\n  return callback(null, result)\r\n} catch (e) {\r\n  //..\r\n  return callback(e)\r\n}\r\n```\r\n\r\nIs a huge anti-pattern because if something throws later in the callback chain (e.g. your assert), it will be caught in the `try` block, causing a double callback in the `catch`.  Correct way:\r\n\r\n```js\r\nlet err, result\r\ntry {\r\n  result = doSomething()\r\n} catch (e) {\r\n  err = e\r\n}\r\ncallback(err, result)\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1431,
+    "title": "Final callback not executed!!",
+    "created_at": "2017-06-08T12:44:22Z",
+    "closed_at": "2017-06-08T16:54:58Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/caolan/async/issues/1431",
+    "body": "\r\nVersion: 2.4.1\r\n\r\nEnvironment: Browser\r\n\r\n**What did you do? Please include a minimal reproducable case illustrating issue.**\r\n```ts\r\nasync.each(seriesArray, (series1: SeriesConfig) => {\r\n                    this.dataStore.series[series1.name] = this.setSerieData(series1);               \r\n            }, (error?: Error) => {\r\n                if(error) console.error(error.message);\r\n                this.setState({ dataStore: this.dataStore, isLoaded: true });\r\n            });\r\n```\r\nThe final callback is not executed!\r\n``` ts\r\n           (error?: Error) => {\r\n                // tslint:disable-next-line no-console\r\n                if(error) console.error(error.message);\r\n                this.setState({ dataStore: this.dataStore, isLoaded: true });\r\n            });\r\n```\r\n\r\n**What did you expect to happen?**\r\nI expected the state to be updated with new dataStore\r\n**What was the actual result?**\r\nThe final callback is never executed",
+    "comments_url": "https://api.github.com/repos/caolan/async/issues/1431/comments",
+    "author": "djkwagala",
+    "comments": [
+      {
+        "user": "aearly",
+        "created_at": "2017-06-08T16:44:01Z",
+        "body": "You're missing a callback in your iteratee function."
+      }
+    ]
+  },
+  {
+    "number": 1323,
+    "title": "First callback of two nested Async.map() doesn't work",
+    "created_at": "2016-11-13T10:00:13Z",
+    "closed_at": "2016-11-14T06:56:51Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/caolan/async/issues/1323",
+    "body": "I have used two Async methods as below in my class so I need to pass the result inside `ASync.map` to `Async.mapValues` but it doesn't work.\r\n```javascript\r\n  request_async (testCase, bodies, method, url, cb) {    \r\n    Async.map(bodies, (item, request_cb) => {\r\n      if(item.values !== undefined ) {\r\n        const _this = this\r\n        const data = {\r\n          method: method,\r\n          uri: url,\r\n          formData: item.values,\r\n          jar: this.jar\r\n        }\r\n        Request(data, (err, response, body) => {\r\n          this.tests_count--\r\n          if (err)\r\n            throw(err)\r\n          const _this = this\r\n          testCase.compare(response.statusCode, body, item, url, function(message) {\r\n            console.log(message)\r\n            if (!message)\r\n              console.log(null, message)\r\n            else {\r\n              request_cb(message)\r\n              if (_this.first_error) {\r\n                request_cb(message, false)\r\n              }\r\n              else {\r\n                _this.errors.push(message)\r\n                request_cb(false)\r\n              }\r\n            }\r\n          })\r\n        });       \r\n      }\r\n    }, (err, result) => {\r\n      console.log('Parent callback', cb)\r\n      cb(false, result)\r\n    })\r\n  }\r\n  make_bodies_async (testCase, method, uri) {\r\n    Async.mapValues(this.schemas, (item, key, cb) => {\r\n      let schemas\r\n      if (item.query)\r\n        schemas = Joi.describe(item.query)\r\n      else\r\n        schemas = Joi.describe(item.payload)\r\n\r\n      const bodies = testCase.make_bodies(schemas, item.defaults, key)\r\n      const parts   = _.split(key, '/')\r\n      const method  = parts[0].toUpperCase()\r\n      const url     = this.baseUrl + '/' + _.join(parts.slice(1),'/')\r\n\r\n      this.request_async(testCase, bodies, method, url, cb)\r\n\r\n    }, (err, result) => {\r\n      //console.logs won't work\r\n      console.log('bodies async')\r\n      console.log(err, result)\r\n    })\r\n  }\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/caolan/async/issues/1323/comments",
+    "author": "saeidalidadi",
+    "comments": [
+      {
+        "user": "megawac",
+        "created_at": "2016-11-14T03:17:13Z",
+        "body": "> result inside ASync.map to Async.mapValues but it doesn't work\n\nThat's not very specific and not helping me give advice\n\nOne thing I notice\n\n``` js\nelse {\n      _this.errors.push(message)\n      request_cb(false)\n}\n```\n\nthis doesn't work `request_cb(false)` doens't get registered as an error. Consider `request_cb(error_msg)`\n"
+      },
+      {
+        "user": "hargasinski",
+        "created_at": "2016-11-14T05:02:10Z",
+        "body": "In addition to what @megawac said, just something to consider. You have:\n\n``` js\nif(item.values !== undefined ) {\n    // your function\n}\n```\n\nbut you never handle the `item.values === undefined` case (or have code to call `request_cb` in that case). `map` will never invoke it's final callback (the one where you log `Parent callback`) if one of the iterations never calls it's callback (in this case `request_cb`). Could that be what's causing the issue here?\n"
+      }
+    ]
+  },
+  {
+    "number": 1305,
+    "title": "Pass parameters to called function in async.retry",
+    "created_at": "2016-10-14T11:21:19Z",
+    "closed_at": "2016-10-14T22:12:52Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/caolan/async/issues/1305",
+    "body": "I am trying to pass parameters to the function that retry calls but i get \n\n**Error: Invalid arguments for async.retry**\n\nMy code:\n\n``` js\n\n    async.waterfall([\n        async.apply(queryGenerator.generateQuery, user),\n      **//  async.retry(5, async.apply(googleOperations.reportingRequest, user)),\n        async.retry(5, googleOperations.reportingRequest(user)),**\n        googleOperations.parseGoogleResponse,\n        async.apply(slackOperations.postMessage, user.slack.token, '#general')\n    ]\n```\n\nI tried both but none works. Any clue?\n",
+    "comments_url": "https://api.github.com/repos/caolan/async/issues/1305/comments",
+    "author": "mKontakis",
+    "comments": [
+      {
+        "user": "aearly",
+        "created_at": "2016-10-14T17:56:35Z",
+        "body": "Looks like you want `retryable` instead of `retry`.  The commented-out line should work otherwise.\n"
+      }
+    ]
+  },
+  {
+    "number": 878,
+    "title": "forEachOf is not implemented ?",
+    "created_at": "2015-08-09T11:04:45Z",
+    "closed_at": "2015-08-16T19:35:31Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/caolan/async/issues/878",
+    "body": "Hello.\nthe docs of async shows the function forEachOf\nit seems that this function doesn't exist in async.\n\nany ideas ?\n",
+    "comments_url": "https://api.github.com/repos/caolan/async/issues/878/comments",
+    "author": "kfirufk",
+    "comments": [
+      {
+        "user": "aearly",
+        "created_at": "2015-08-09T22:10:56Z",
+        "body": "What version are you using?  It was added after v 1.0\n"
+      }
+    ]
+  },
+  {
+    "number": 757,
+    "title": "iterator counter issue",
+    "created_at": "2015-05-19T09:10:32Z",
+    "closed_at": "2015-05-20T23:05:32Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/caolan/async/issues/757",
+    "body": "any idea how to solve the following issue?\n\nvar index = 1;\nvar parallel = [];\n\nfor(i=0; i < 3; i++){\n\n  parallel.push(function(callback){\n        console.log(index); -> here should give me 1, 2, 3, but it give me only 3 instead. Any idea?\n   }); \n\nindex++;\n}\n\nasync.parallel(parallel, callback);\n",
+    "comments_url": "https://api.github.com/repos/caolan/async/issues/757/comments",
+    "author": "martingg88",
+    "comments": [
+      {
+        "user": "aearly",
+        "created_at": "2015-05-19T16:22:05Z",
+        "body": "It's a common closure scope problem caused by defining functions in loops.  The `index` variable is shared by all the parallel functions.\n\nYou'll have to capture it:\n\n```\nfor(i=0; i < 3; i++){\n  (function (index) \n    parallel.push(function(callback){\n      console.log(index);\n    });\n\n  }(i));\n}\n```\n\nor do something else:\n\n```\nvar parallel = _.range(3).map(function (index) {\n  return function (callback) {\n    console.log(index);\n  }\n});\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 698,
+    "title": "check if last item in list?",
+    "created_at": "2015-01-11T09:26:57Z",
+    "closed_at": "2015-05-19T19:19:14Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/caolan/async/issues/698",
+    "body": "Is there a way with `async.each` to know inside the callback if you're processing the last item in the list or not?\n",
+    "comments_url": "https://api.github.com/repos/caolan/async/issues/698/comments",
+    "author": "ralyodio",
+    "comments": [
+      {
+        "user": "aearly",
+        "created_at": "2015-01-12T00:50:53Z",
+        "body": "Not unless you keep track of it yourself.\n"
+      }
+    ]
+  }
+]

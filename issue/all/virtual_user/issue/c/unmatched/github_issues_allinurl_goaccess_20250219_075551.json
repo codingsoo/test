@@ -1,0 +1,591 @@
+[
+  {
+    "number": 2540,
+    "title": "Rewind persisted db to remove corrupted entries",
+    "created_at": "2023-07-31T05:44:33Z",
+    "closed_at": "2023-08-02T05:12:08Z",
+    "labels": [
+      "question",
+      "log-processing",
+      "on-disk"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/2540",
+    "body": "I managed to run my background analytics job twice at the same time and now I have a bunch of data for \"hits\" that appears to be double counted (there is an obvious segment of the chart where the \"hits\" line is twice the height of before and after). I was wondering if it's possible for me to rewind the persisted database to some date so I can re-run goaccess over the original logfiles to reprocess that data? Thanks so much!",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/2540/comments",
+    "author": "chr15m",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2023-08-01T15:12:49Z",
+        "body": "Unfortunately you can't rewind the database. All the data gets aggregated as it's inserted. Do you still have the logs available?"
+      }
+    ]
+  },
+  {
+    "number": 2501,
+    "title": "Gandi.net - simplehosting - parsing access.log",
+    "created_at": "2023-04-13T10:33:32Z",
+    "closed_at": "2023-04-14T08:00:58Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/2501",
+    "body": "Hello, I'm using the simplehosting solution from gandi.net.\r\nI'm in trouble because they use a custom template for access.log : \r\n```LogFormat \"%V %a %l %u %t (%T s) \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-agent}i\\\"\" vhost_paas```\r\neg : \r\n`domain.fr 43.130.00.000 - - [12/Apr/2023:15:07:52 +0000] (0 s) \"GET /files/ HTTP/1.1\" 404 196 \"binance.com\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36\"`\r\n\r\nSo I tried\r\n`goaccess /Volumes/XX/access.log --log-format=\"%V %a %l %u %t (%T s) \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"\" vhost_paas --datetime-format=%d/%b/%Y:%H:%M:%S %z`\r\nthat give me `Token '[10/Apr/2023:06:59:08' doesn't match specifier '%t` I tried many options with --date and --time from previous issues without success.\r\n\r\nI'm on a mac, using french locale and installed goaccess with brew.\r\n\r\nThanks in advance.",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/2501/comments",
+    "author": "RolandTi",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2023-04-13T22:40:40Z",
+        "body": "Please try:\r\n\r\n    goaccess access.log --log-format='%v %h %^[%d:%t %^] (%T %^) \"%r\" %s %b \"%R\" \"%u\"' --date-format=%d/%b/%Y --time-format=%T\r\n\r\nYou may need to use:\r\n\r\n    LC_TIME=\"en_US.UTF-8\" goaccess log --log-format='%v %h %^[%d:%t %^] (%T %^) \"%r\" %s %b \"%R\" \"%u\"' --date-format=%d/%b/%Y --time-format=%T"
+      }
+    ]
+  },
+  {
+    "number": 2415,
+    "title": "Token '09/Jan/2001' doesn't match specifier '%d'",
+    "created_at": "2022-11-10T16:34:36Z",
+    "closed_at": "2022-11-10T16:44:28Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/2415",
+    "body": "Hi,\r\n\r\nDate format is `%d/%b/%Y` and still getting error `Token '09/Jan/2001' doesn't match specifier '%d'`\r\n\r\nAny suggestions what should be the right full log format with dates and times? \ud83e\udd14 \r\n\r\nI'm running app with defaults `goaccess access.log` and then choosing `NCSA Combined Log Format` with defaults:\r\n- `log format` - `%h %^[%d:%t %^] \"%r\" %s %b \"%R\" \"%u\"`\r\n- `date format` - `%d/%b/%Y`\r\n- `time format` - `%H:%M:%S`\r\n\r\nSample log lines:\r\n\r\n```\r\n10.0.0.0 - - [09/Jan/2001:00:07:51 +0000] \"GET /endpoint HTTP/1.1\" 418 0 \"-\" \"User-agent\"\r\n10.0.0.0 - - [09/Jan/2001:00:08:02 +0000] \"GET /endpoint HTTP/1.1\" 418 0 \"-\" \"User-agent\"\r\n```\r\n\r\nLooks like Combined Log Format, but the `%h %^[%d:%t %^] \"%r\" %s %b \"%R\" \"%u\"` doesn't work \ud83d\ude1e \r\n\r\nAny suggestions? \ud83d\ude4f ",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/2415/comments",
+    "author": "flashlabs",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2022-11-10T16:40:13Z",
+        "body": "Usually this is due to conflicts between your log and your locale. i.e., log has English dates (e.g., Feb/Apr/Oct) while machine has a different locale. Please try running goaccess as:\r\n\r\n    LANG=\"en_US.UTF-8\" bash -c 'goaccess access.log --log-format=COMBINED'\r\n\r\nOr\r\n\r\n    LC_TIME=\"en_US.UTF-8\" goaccess access.log --log-format=COMBINED"
+      }
+    ]
+  },
+  {
+    "number": 1981,
+    "title": "How to make \"Encryption Settings\" panel work\uff1f",
+    "created_at": "2020-12-19T15:38:18Z",
+    "closed_at": "2020-12-19T23:48:10Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1981",
+    "body": "In goaccess manual page, there have an \"Encryption Settings\" panel, it said: this panel shows the SSL/TLS protocol used along the Cipher Suites. This panel is not enabled unless %K is given within the log-format variable.\r\n\r\nbut I don't know how to add %K\uff0cplease help, I want to check TLS & ciphers (%K & %k)\r\n\r\nI'm using ubuntu 20.10, goaccess 1.4.3, nginx 1.19.5\r\n\r\nI make goaccess as service, and use real-time-html, everything is work\r\n\r\n```\r\nroot@ubuntu:/etc/nginx# service goaccess status\r\n\u25cf goaccess.service - Goaccess Web log report.\r\n     Loaded: loaded (/etc/systemd/system/goaccess.service; enabled; vendor preset: enabled)\r\n     Active: active (running) since Sat 2020-12-19 23:20:32 HKT; 14min ago\r\n   Main PID: 302423 (goaccessreport)\r\n      Tasks: 4 (limit: 971)\r\n     CGroup: /system.slice/goaccess.service\r\n             \u251c\u2500302423 /bin/bash /usr/local/bin/goaccessreport\r\n             \u2514\u2500302425 /usr/local/bin/goaccess /var/log/nginx/access.log - -o /var/www/html/index.html --ws-url=wss://xxx.xxx.com --ssl-cert=/etc/cert>\r\n\r\nDec 19 23:20:32 ubuntu systemd[1]: Started Goaccess Web log report..\r\n```\r\n\r\n I just want to add %K & %k, make \"Encryption Settings\" panel work, here is the goaccess.service\r\n\r\n```\r\n[Unit]\r\nDescription=Goaccess Web log report.\r\nAfter=network.target\r\nStartLimitIntervalSec=0\r\n\r\n[Service]\r\nType=simple\r\nUser=root\r\nGroup=root\r\nRestart=always\r\nRestartSec=1800\r\nExecStart=/usr/local/bin/goaccessreport\r\nStandardInput=tty\r\nStandardOutput=tty\r\nStandardError=tty\r\nTTYPath=/dev/tty7\r\n\r\n[Install]\r\nWantedBy=multi-user.target\r\n```\r\n\r\n/usr/local/bin/goaccessreport :\r\n\r\n```\r\n#!/bin/bash\r\nzcat -f /var/log/nginx/*access.log.* | /usr/local/bin/goaccess /var/log/nginx/*access.log - -o /var/www/html/index.html --ws-url=wss://xxx.xxx.com --ssl-cert=/etc/cert/ecc384.crt --ssl-key=/etc/cert/ecc384.key --log-format=COMBINED --real-time-html\r\n```\r\n\r\nhere is my nginx.conf log setting:\r\n\r\n```\r\nlog_format proxy '$proxy_protocol_addr - $remote_user [$time_local] '\r\n                     '$ssl_protocol/$ssl_cipher '\r\n                     '\"$request\" $status $body_bytes_sent '\r\n                     '\"$http_referer\" \"$http_user_agent\"';\r\n```\r\n\r\nand here is the real log in /var/log/nginx/access.log\r\n\r\n```\r\n111.224.7.4 - - [19/Dec/2020:23:10:18 +0800] TLSv1.2/ECDHE-ECDSA-AES128-GCM-SHA256 \"GET /1 HTTP/1.1\" 404 188 \"-\" \"Mozilla/4.054101423 Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)\"\r\n```\r\n\r\nIn my case, how to make \"Encryption settings\" panel work?\r\n\r\nSorry, I'm stupid, I really don't understand the manual page \"CUSTOM LOG/DATE FORMAT\" section.\r\n\r\nthanks for help first.",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1981/comments",
+    "author": "cwyin7788",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2020-12-19T19:13:32Z",
+        "body": "This should do it:\r\n\r\n    goaccess access.log --log-format='%h %^[%d:%t %^] %K/%k \"%r\" %s %b \"%R\" \"%u\"' --date-format=%d/%b/%Y --time-format=%T"
+      }
+    ]
+  },
+  {
+    "number": 1912,
+    "title": "date format using Russian localization crash",
+    "created_at": "2020-09-08T12:55:05Z",
+    "closed_at": "2020-09-09T05:48:21Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1912",
+    "body": "Hello All!\r\nI use your wonderful analyzer, I like it very much.\r\nEverything works fine in the default locale (English). One has only to change the locale to Russian (I love Russian, I'm from Russia), the demon stops running. I am using the default config file. My operating FreeBSD hostname 12.1-RELEASE-p9 FreeBSD 12.1-RELEASE-p9 GENERIC amd64.\r\nUsually I switch the login class with the command pw user mod user -L russian.\r\nMy goaccess.conf\r\n###\r\ntime-format% H:% M:% S\r\ndate-format% d /% b /% Y\r\nlog-format% v:% ^% h% ^ [% d:% t% ^] \"% r\"% s% b \"% R\" \"% u\"\r\nlog-format COMBINED\r\nconfig-dialog false\r\nhl-header true\r\nhtml-report-title\r\njson-pretty-print false\r\nno-color false\r\nno-column-names false\r\nno-csv-summary false\r\nno-progress false\r\nno-tab-scroll false\r\nwith-mouse false\r\nlog-file /var/log/nginx/access.log\r\nagent-list false\r\nwith-output-resolver false\r\nhttp-method yes\r\nhttp-protocol yes\r\noutput /usr/local/www/index.html\r\nno-query-string false\r\nno-term-resolver false\r\n444-as-404 false\r\n4xx-to-unique-count false\r\nall-static-files false\r\ndouble-decode false\r\nignore-crawlers false\r\ncrawlers-only false\r\nignore-panel REFERRERS\r\nignore-panel KEYPHRASES\r\nreal-os true\r\nstatic-file .css\r\nstatic-file .js\r\nstatic-file .jpg\r\nstatic-file .png\r\nstatic-file .gif\r\nstatic-file .ico\r\nstatic-file .jpeg\r\nstatic-file .pdf\r\nstatic-file .csv\r\nstatic-file .mpeg\r\nstatic-file .mpg\r\nstatic-file .swf\r\nstatic-file .woff\r\nstatic-file .woff2\r\nstatic-file .xls\r\nstatic-file .xlsx\r\nstatic-file .doc\r\nstatic-file .docx\r\nstatic-file .ppt\r\nstatic-file .pptx\r\nstatic-file .txt\r\nstatic-file .zip\r\nstatic-file .ogg\r\nstatic-file .mp3\r\nstatic-file .mp4\r\nstatic-file .exe\r\nstatic-file .iso\r\nstatic-file .gz\r\nstatic-file .rar\r\nstatic-file .svg\r\nstatic-file .bmp\r\nstatic-file .tar\r\nstatic-file .tgz\r\nstatic-file .tiff\r\nstatic-file .tif\r\nstatic-file .ttf\r\nstatic-file .flv\r\ngeoip-database /usr/local/share/GeoIP/GeoLiteCity.dat\r\n###\r\npw user mod root -L default\r\n/ usr / local / bin / goaccess -p /usr/local/etc/goaccess/goaccess.conf --no-progress\r\n/var/log/nginx/access.log\r\nEverything is OK\r\nIf I change the class pw user mod root -L russian\r\n / usr / local / bin / goaccess -p /usr/local/etc/goaccess/goaccess.conf --no-progress\r\n/var/log/nginx/access.log\r\nParsed 1 lines producing the following errors:\r\nToken '01 / Sep / 2020 'doesn't match specifier'% d '\r\nFormat Errors - Verify your log / date / time format",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1912/comments",
+    "author": "partnumber",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2020-09-08T15:17:28Z",
+        "body": "It sounds like you are changing the date/time format upon setting it to Russian. I'd make sure not to change the date/time locale. You could always try checking the output of `date` in your terminal after switching to Russian. Feel free to post the output."
+      }
+    ]
+  },
+  {
+    "number": 1836,
+    "title": "Error occured at src/parser.c - read_log. But only when run from cron. And yes, I'm using absolute paths.",
+    "created_at": "2020-07-05T10:06:58Z",
+    "closed_at": "2020-07-11T17:37:07Z",
+    "labels": [
+      "question",
+      "cron"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1836",
+    "body": "Hi,\r\nI know this looks like the 50 identical issues I've googled so far, but I have no idea why this doesn't work. The point is, it works when invoked in shell, but doesn't when run from cron. The cron is root-owned, so there should be no permission issues. I use absolute paths, so ENV variables shouldn't be an issue either.\r\n\r\nThis is the problematic line:\r\n```\r\nzcat /var/log/nginx/access.log.*.gz | goaccess /var/log/nginx/access.log{,.1} - -q --log-format=COMBINED -o /var/www/html/foo/bar/report.html >/dev/null\r\n```\r\n\r\nIt works in shell, but not in cron.\r\n\r\n```\r\nParsing... [0] [0/s]\r\nGoAccess - version 1.2 - Jun 19 2017 12:55:29\r\nConfig file: /etc/goaccess.conf\r\n\r\nFatal error has occurred\r\nError occured at: src/parser.c - read_log - 2669\r\nUnable to open the specified log file. No such file or directory\r\n```\r\n\r\nThis looks like I misspecified the log paths, but when I paste the command into shell, everything works. I thought it was going to be `$PATH` issue, but I specify absolute paths everywhere. And both `zcat` and `goaccess` are in cron `$PATH` already.\r\n\r\nAny ideas?",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1836/comments",
+    "author": "SoptikHa2",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2020-07-08T21:23:56Z",
+        "body": "Can you please try without expanding multiple logs?\r\n\r\n    zcat /var/log/nginx/access.log.*.gz | goaccess /var/log/nginx/access.log - -q --log-format=COMBINED -o /var/www/html/foo/bar/report.html\r\n\r\nand  \r\n\r\n     goaccess /var/log/nginx/access.log - -q --log-format=COMBINED -o /var/www/html/foo/bar/report.html\r\n"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2020-07-13T21:55:53Z",
+        "body": "Glad that solved the issue. Yeah my best guess is that the cron doesn't expand it due to a tty. You can probably run a scripts instead of running goaccess directly.\r\n\r\nClosing this. Feel free to reopen it if needed."
+      }
+    ]
+  },
+  {
+    "number": 1655,
+    "title": "Unknown browser behind apache reverse proxy",
+    "created_at": "2020-01-18T12:16:00Z",
+    "closed_at": "2020-01-21T19:23:32Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1655",
+    "body": "Hi,\r\n\r\nmy webserver is behind an apache reverse proxy. Therefore my apache LogFormat looks like this:\r\n`LogFormat \"%a %l %u %t \\\"%r\\\" %>s %O \\\"%{Referer}i\\\" \\\"%{User-Agent}i\\\"\" proxy`\r\n\r\nOutput:\r\n`192.168.99.1 - - [18/Jan/2020:13:37:36 +0100] \"GET /favicon.ico HTTP/1.1\" 301 232 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0\"`\r\n\r\nIf i choose the \"Common Log Format (CLF)\" in goaccesss.conf, it does work, but shows 100% unknown browsers.\r\nI tried a few other strings without success.\r\n\r\nWhat would be the correct logformat in goaccess.conf?",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1655/comments",
+    "author": "ghost",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2020-01-21T01:54:36Z",
+        "body": "Looks like the COMBINED format. Please try passing\r\n\r\n    goaccess access.log --log-format=COMBINED\r\n\r\nOtherwise, feel free to post a few lines from your access log and I can take a look. Thanks"
+      }
+    ]
+  },
+  {
+    "number": 1445,
+    "title": "No Such File or Directory",
+    "created_at": "2019-05-02T12:10:21Z",
+    "closed_at": "2019-05-02T19:56:41Z",
+    "labels": [
+      "question",
+      "log-processing",
+      "command-line options"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1445",
+    "body": "\t$ goaccess -p /usr/local/etc/goaccess/goaccess.conf mylog.log-20190502 ~/desktop/alpha.html\r\n\r\n\tGoAccess - version 1.3 - Apr 29 2019 17:12:23\r\n\tConfig file: /usr/local/etc/goaccess/goaccess.conf\r\n\r\n\tFatal error has occurred\r\n\tError occurred at: src/parser.c - read_log - 2728\r\n\tUnable to open the specified log file. No such file or directory\r\n\r\n\t$ ll\r\n\t-rwxr-xr-x   1 rich  admin    21K Oct 15  2018 mylog.log-20181003\r\n\t-rwxr-xr-x@  1 rich  admin   1.1M May  2 07:59 mylog.log-20190502\r\n\r\nFor some reason, the log file cannot be opened.  It's there (last line) and it's copied and pasted so I'm not overlooking it.  \r\n\r\nAnything I should try?  ",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1445/comments",
+    "author": "daBee",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2019-05-02T14:38:59Z",
+        "body": "Please specify the output flag. e.g.,\r\n\r\n    $ goaccess -p /usr/local/etc/goaccess/goaccess.conf mylog.log-20190502 -o ~/desktop/alpha.html\r\n"
+      }
+    ]
+  },
+  {
+    "number": 1255,
+    "title": "Do not get goaccess to work with my log file",
+    "created_at": "2018-10-04T05:59:45Z",
+    "closed_at": "2018-10-09T17:02:12Z",
+    "labels": [
+      "question",
+      "log/date/time format",
+      "log-processing"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1255",
+    "body": "Hi, I went through all kind of issues, but I am not able to get the default vcombined to work\r\n\r\nTHis is an example of a line:\r\n\r\ntestma.mantagifts.com:443 ip-217-105-39-28.ip.prioritytelecom.net - mantasalesapp [04/Oct/2018:07:53:48 +0200] \"POST /sales_app/backups/backup.php HTTP/1.1\" 200 427 \"-\" \"Appcelerator Titanium/7.4.0 (iPad/12.0; iOS; en_US;)\"\r\n\r\nThis is my command:\r\n> goaccess /var/log/apache2/access_ssl_testma.mantagifts.com.log --log-format=VCOMBINED\r\n\r\n..\r\nToken 'ip-217-105-39-28.ip.prioritytelecom.net' doesn't match specifier '%h'\r\n..\r\nFormat Errors - Verify your log/date/time format\r\n\r\nI have tried multiple thinkgs (custom log, time etc),but nothing seem to work. Can you help me with this?\r\nThanks\r\n",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1255/comments",
+    "author": "Jurnjuistdit",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2018-10-05T14:06:38Z",
+        "body": "You need a valid IPv4/6. GoAccess doesn't parse the hostname as it's not completely unique. You will need to strip it out from your log and replace it with a valid IP, or skip resolving the IP."
+      }
+    ]
+  },
+  {
+    "number": 1189,
+    "title": "UniqueID from Apache",
+    "created_at": "2018-08-05T17:35:40Z",
+    "closed_at": "2018-08-06T14:04:32Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1189",
+    "body": "Hi @allinurl , Thank you for GoAccess. \r\n\r\nIn our context, we use the Apache unique ID on our logs:\r\n\r\n    %{UNIQUE_ID}e %h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-Agent}i\\\"\r\n\r\nWhich produces an output as such: \r\n\r\n    W05TOAAhHiEXJHDTpZ1psQAAACc 165.227.40.119 - - [17/Jul/2018:20:36:08 +0000] \"HEAD /games/turtles.php HTTP/1.1\" 200 - \"-\" \"Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130331 Firefox/21.0\"\r\n\r\nI tried editing the log format options within GoAccess but it still not happy with the unique id \r\n(Token 'W05TOAAhHiEXJHDTpZ1psQAAACc' doesn't match specified).\r\n\r\nPlease, is it possible to convince GoAccess to like our logs ? \r\n\r\nThanks in advance for your time, appreciated.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1189/comments",
+    "author": "domainoverflow",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2018-08-06T11:52:14Z",
+        "body": "Please try this, it should work:\r\n\r\n    goaccess access.log --log-format='%v %h %^[%d:%t %^] \"%r\" %s %b \"%R\" \"%u\"' --date-format=%d/%b/%Y --time-format=%T"
+      }
+    ]
+  },
+  {
+    "number": 1181,
+    "title": "Help with guicorn log format",
+    "created_at": "2018-07-21T23:34:09Z",
+    "closed_at": "2018-07-22T00:07:18Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1181",
+    "body": "Hey, \r\n\r\nI've been trying to write a custom log-format for the access log. Got something working, but the numbers in the report don't add up, so I'm guessing I've done something wrong. \r\n\r\nA line from the log:\r\n\r\n`\r\n[2018-07-21 20:00:30] [INFO    ] [gunicorn.access:24588] GET /page/1 HTTP/1.1 - 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36' 200 - 0.055556 127.0.0.1\r\n`\r\n\r\nIn addition to chrome I've also used curl.\r\n\r\nWhat I've been running:\r\n\r\n`\r\ncat webui.log | grep gunicorn.access | goaccess --log-format='[%d %t] [%^] [%^] %^ %r %H - %u %s - %L %h' --date-format=%Y-%m-%d --time-format=%H:%M:%S -  -o ~/Desktop/report2.html\r\n`\r\n\r\nI've got 1000 lines for testing with \r\n924 lines of status 200\r\n32 lines of status 500\r\n44 lines of status 404\r\n\r\n76 lines with failed (500 and 404) \r\n\r\nreport2.html \r\nsays 922 good requests, 78 failed. \r\n\r\nAll browsers are listed as Unknown or Other. The 404 section is empty. OS is unknown. \r\n\r\nHTTP status codes: \r\n912 2xx\r\n8 5xx\r\n404 not listed. \r\n\r\nWhat can I do to get all the data parsed?\r\n",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1181/comments",
+    "author": "dave9191",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2018-07-21T23:43:04Z",
+        "body": "Give this a shot:\r\n\r\n    goaccess access.log --log-format=\"[%d %t] [%^] [%v] %m %U %H %^ '%u' %s %^ %T %h\" --date-format=%Y-%m-%d --time-format=%T"
+      }
+    ]
+  },
+  {
+    "number": 1173,
+    "title": "No valid hits on custom log",
+    "created_at": "2018-07-08T19:50:10Z",
+    "closed_at": "2018-07-14T09:55:18Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1173",
+    "body": "here's my log format:\r\n\r\n`05:28:25.644 /folder/file.php - \"hostname.com\" - 127.0.0.1 GET 418`\r\n\r\nI run with a `-c` option and configure the following log format:\r\n\r\n`%~ %U %~ %~ %~ %~ %m %b`\r\n\r\nI get \"no valid hits\". I also get \"please specify date format\" but I have no date in my log... So I just set it to %d (because it does not let me continue without one)\r\n\r\nAlso, THERE'S NO CONFIG FILE. I searched my whole hard drive.\r\n\r\nPS. running on windows ubuntu-subsystem, installed via `apt-get install goaccess`",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1173/comments",
+    "author": "alex-jitbit",
+    "comments": [
+      {
+        "user": "alex-jitbit",
+        "created_at": "2018-07-09T15:17:37Z",
+        "body": "created a `~/.goaccessrc` file with the following content - still not working, prompts me for log format, and \"no valid hits\" again\r\n\r\n```\r\nlog-format %^ %U %q %^ %^ %^ %m %b\r\ndate-format %d/%b/%Y\r\n```"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2018-07-12T14:20:40Z",
+        "body": "You need a valid date and time in order for the parser to properly read the log."
+      },
+      {
+        "user": "alex-jitbit",
+        "created_at": "2018-07-13T20:34:05Z",
+        "body": "Still not working. \"No valid hits\"\r\n\r\n`2018-07-12 12:25:25.091 /folder/file.js v=6767-22501 \"hostname.com\" \"173.00.0.0\" 162.0.0.0 GET 3719`\r\n\r\n`%d %^ %U %q %^ %^ %h %m %b`\r\n\r\ndate format `%Y-%m-%d`\r\n\r\nPS. Also, why does it keep prompting me for format even if I have created a ~/.goaccess file?"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2018-07-14T03:45:12Z",
+        "body": "This should do it:\r\n\r\n    goaccess access.log --log-format='%d %t.%^ %U %q \"%v\" \"%h\" %^ %m %b' --date-format=%Y-%m-%d --time-format=%T\r\n\r\nIt should be `~/.goaccessrc` Please build from development, it should address this issue you mentioned above. Otherwise, feel free to  specify it as `-p ~/.goaccessrc`"
+      },
+      {
+        "user": "alex-jitbit",
+        "created_at": "2018-07-14T07:57:43Z",
+        "body": "It gives me `Unknown option '--'`.\r\n\r\n"
+      }
+    ]
+  },
+  {
+    "number": 1047,
+    "title": "goaccess not working with cron and not showing full log",
+    "created_at": "2018-03-15T21:09:20Z",
+    "closed_at": "2018-03-15T22:30:59Z",
+    "labels": [
+      "question",
+      "other",
+      "cron"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1047",
+    "body": "hello, I can manually run GoAccess just fine with the command\r\n`sudo goaccess -f /var/log/nginx/access.log -a > /var/www/logs/report.html`\r\n\r\nbut when trying to run the same command in cron I just get an empty output. \r\n`PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\r\n0 * * * * sudo goaccess -f /var/log/nginx/access.log -a > /var/www/logs/report.html`\r\n\r\nit also seems that the log file goes way further back than GoAccess actually shows, I'd really appreciate it if someone could help :)",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1047/comments",
+    "author": "AndreasJacobsen",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2018-03-15T21:13:36Z",
+        "body": "You probably want to add it to root's crontab instead.\r\n\r\n    sudo crontab -e\r\n\r\nand then try adding:\r\n\r\n    goaccess /var/log/nginx/access.log -a -o /var/www/logs/report.html\r\n\r\nOtherwise you could write a bash script with goaccess on it and run the script from the cron. Let me know if that solves the issue."
+      }
+    ]
+  },
+  {
+    "number": 1010,
+    "title": "Logback log format trouble with Date/Time",
+    "created_at": "2018-02-12T18:57:02Z",
+    "closed_at": "2018-02-12T19:15:31Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/1010",
+    "body": "I have tried many, many combinations but cannot get goaccess to parse my log file. Apparently, it has to do with the data/time format the log has. Could you shed some light on this? Thanks.\r\n\r\nI modified the goacc ess configuration file such that there are only a few uncommented sections:\r\n\r\n```\r\ntime-format %H:%M:%S\r\ndate-format %b %d\r\nlog-format %d %T %v %p %c{0} - %q - %X{username} : %X{company}\r\n\r\n```\r\nI get the errors\r\n\r\n```\r\nIPv4/6 is required.\r\nFormat Errors - Verify your log/date/time format\r\n\r\n```\r\nThe Logback pattern\r\n\r\n    %d{MMM dd HH:mm:ss} %p %c{0} - %m - %X{username} : %X{company}\r\n\r\nSample log line\r\n\r\n    Feb 12 15:29:29 LAPTOP-MHM31I0V INFO ComboDescriptionCell - ComboBox is going to be showed with 154 items. Current selection is -1  - Francisco Sepulveda  : Great Plains Stainless Company\r\n\r\nBroken down\r\n\r\n```\r\n**_(%d)_** Feb 12 15:29:29 \r\n**_(%p)_** LAPTOP-MHM31I0V \r\n**_(%c{0})_** INFO \r\n**_(%m)_** ComboDescriptionCell - ComboBox is going to be showed with 154 items. Current selection is -1 \r\n_(- %X{username})_ - Francisco Sepulveda \r\n**_(: %X{company})_** : Great Plains Stainless Company\r\n```",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/1010/comments",
+    "author": "othenos",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2018-02-12T19:02:29Z",
+        "body": "It looks like your log is not from a web server (access log). GoAccess is a web log analysis tool so in your case, goaccess won't be of much help."
+      }
+    ]
+  },
+  {
+    "number": 990,
+    "title": "--daemonize option does not work",
+    "created_at": "2018-01-12T10:54:07Z",
+    "closed_at": "2018-01-12T17:33:01Z",
+    "labels": [
+      "question",
+      "html report"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/990",
+    "body": "centos:\r\n\r\nthis work: \r\n```\r\ngoaccess access.log -o /usr/local/ieternal/nH-frontend/goacces-out/website/real-time.html --real-time-html \r\n```\r\nthis do not work (--daemonize), aslo no out put:\r\n\r\n```\r\ngoaccess access.log -o /usr/local/ieternal/nH-frontend/goacces-out/website/real-time.html --real-time-html --daemonize\r\n```",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/990/comments",
+    "author": "ccqgithub",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2018-01-12T15:15:38Z",
+        "body": "Please try using full paths in every command line option. e.g.,\r\n\r\n    goaccess /var/log/nginx/access.log -o /usr/local/ieternal/nH-frontend/goacces-out/website/real-time.html --real-time-html --daemonize"
+      }
+    ]
+  },
+  {
+    "number": 954,
+    "title": "Unable to open",
+    "created_at": "2017-11-26T07:47:10Z",
+    "closed_at": "2017-11-26T16:50:05Z",
+    "labels": [
+      "question",
+      "html report"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/954",
+    "body": "Hi,\r\nI've this issue when i try to create a report.\r\n\r\ngoaccess -f /home/websitename/logs/access_log -a -o  --log-format=COMBINED /home/websitename/htdocs/report.html --real-time-html\r\nParsing... [0] [0/s]\r\nGoAccess - version 1.2 - Oct 29 2017 18:03:51\r\nConfig file: /usr/local/etc/goaccess.conf\r\n\r\nFatal error has occurred\r\nError occured at: src/parser.c - read_log - 2669\r\nUnable to open the specified log file. No such file or directory\r\n\r\nFew lines of my log\r\nxx.xx.xx.xx - - [27/Sep/2017:11:24:52 +0200] \"GET /robots.txt HTTP/1.1\" 404 208\r\nxx.xx.xx.xx - - [27/Sep/2017:11:24:53 +0200] \"GET / HTTP/1.1\" 302 -\r\n\r\nThanks",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/954/comments",
+    "author": "ikaroweb",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2017-11-26T14:23:42Z",
+        "body": "You need to specify the name of the output log after -o, e.g.,\r\n\r\n    goaccess /home/websitename/logs/access_log -a -o /home/websitename/htdocs/report.html --log-format=COMBINED --real-time-html"
+      },
+      {
+        "user": "ikaroweb",
+        "created_at": "2017-11-26T15:00:24Z",
+        "body": "Parsed 10 lines producing the following errors:\r\n\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\nToken for '%b' specifier is NULL.\r\n\r\nFormat Errors - Verify your log/date/time format\r\n"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2017-11-26T15:55:53Z",
+        "body": "Please use the common log format instead of combined.\r\n\r\n    goaccess /home/websitename/logs/access_log -a -o /home/websitename/htdocs/report.html --log-format=COMMON --real-time-html"
+      }
+    ]
+  },
+  {
+    "number": 806,
+    "title": "Log format matching problem",
+    "created_at": "2017-06-13T09:54:14Z",
+    "closed_at": "2017-06-14T01:28:57Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/806",
+    "body": "```\r\n20170608130017 222.94.248.183 xfzdl2.haowanyou.com /PalaceM2_cn_cn/S180039901/HttpRoot/1.2.2/31.pkg?17060807 236388 120 2 206 NULL 54 \"NULL\" \"0-\" GET HTTP/1.1 hit\r\n20170608130157 \t117.169.78.10 xfzdl2.haowanyou.com /PalaceM2_cn_cn/S180049901/HttpRoot/1.2.6/2.pkg?17060807 770998 1465 1046 206 NULL 75 \"NULL\" \"0-\" GET HTTP/1.1 hit\r\n```\r\n\r\n`goaccess -f qcloudcdn.log --log-format='%d%t %h %v %U %b %~ %~ %s %R %T \"%u\" \"%~\" %H %~' --date-format='%Y%m%d' --time-format='%H%M%S' -d -a > test.html`\r\n\r\n\r\n**I use this order to analyze the generated html, no content, please help to see if it is wrong, Tks**\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/806/comments",
+    "author": "hulao6",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2017-06-13T12:15:05Z",
+        "body": "This should do it:\r\n\r\n    goaccess access.log --log-format='%x %h %v %U %b %^ %^ %s %R %L \"%u\" %^ %m %H %^' --date-format=%Y%m%d%H%M%S --time-format=%Y%m%d%H%M%S"
+      }
+    ]
+  },
+  {
+    "number": 798,
+    "title": "formatting issue with goaccess and customized haproxy",
+    "created_at": "2017-06-07T17:19:55Z",
+    "closed_at": "2017-06-07T18:49:40Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/798",
+    "body": "Format below is customized and I'm getting some issues trying to read it. Any suggestions ?\r\nSample:\r\n\r\n    Apr 16 03:30:01 localhost haproxy[9830]: [9830] [1492313401.408] 6/6/6/0/2/0/0 0/0/0/3/3 ---- 10.64.57.13:47226 10.64.57.11:80 10.67.28.21:9090 xpress - - \"POST /1.0/apps/asdfasdf/inbox/users/SBBSBB/channels/NorthSouth HTTP/1.1\" 200 apisvr:stgapi01 - {8.123.123.123|sng.example.com} - req_size=391 resp_size=341\r\n\r\nRunning with thef following:\r\n\r\n    goaccess --date-format='%d/%b/%Y' --time-format='%H:%M:%S' -q --log-format='%^  %^ %^:%^:%^ %^ %^[%^]: [%^] [%^] %^/%^/%^/%^/%^/%^/%^ %^/%^/%^/%^/%^ %^ %^:%^ %^:%^ %^:%^ %^ %^ %^ \"%r\" %s %^:%^ %^ {%h|%^} %^ %^ %^' -f haproxy.log\r\n\r\nAny help would be greatly appreciated.",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/798/comments",
+    "author": "tsauce",
+    "comments": [
+      {
+        "user": "tsauce",
+        "created_at": "2017-06-07T17:20:24Z",
+        "body": "When i run that command i see:\r\n\r\nA valid date is required."
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2017-06-07T18:47:15Z",
+        "body": "Please try this, it should do the job:\r\n\r\n    goaccess access.log --log-format='%^[ %^[ %^[%x.%^] %^\"%r\" %s %^ %^{%h|%v} %^=%b %^' --date-format=%s --time-format=%s"
+      }
+    ]
+  },
+  {
+    "number": 796,
+    "title": "Unable to parse log v0.9.4 - Nothing valid to process.",
+    "created_at": "2017-06-05T15:32:24Z",
+    "closed_at": "2017-06-05T15:57:33Z",
+    "labels": [
+      "question",
+      "log/date/time format"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/796",
+    "body": "When im trying to parse the file with html file, im getting this error.\r\n\r\n```\r\nParsing... [1,949] [0/s]\r\nGoAccess - version 0.9.4 - Feb  7 2016 10:13:30\r\nConfig file: /etc/goaccess.conf\r\n\r\nFatal error has occurred\r\nError occured at: src/goaccess.c - main - 1033\r\nNothing valid to process.\r\n\r\n```\r\n\r\nAny help please ? \r\n\r\n\r\nThank you ",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/796/comments",
+    "author": "K0ZL1K",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2017-06-05T15:34:51Z",
+        "body": "Looks like you have an invalid log/date/time format. I'd recommend upgrading to the latest version, v1.2 - it will display the reason why is unable to process the log."
+      }
+    ]
+  },
+  {
+    "number": 680,
+    "title": "Pipe log to GoAccess not working in cronjob without hyphen",
+    "created_at": "2017-03-07T15:24:19Z",
+    "closed_at": "2017-03-07T15:51:38Z",
+    "labels": [
+      "question",
+      "log-processing"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/680",
+    "body": "**In Cronjob:**\r\nIn version 1.1.1 the following call worked in cronjob:\r\n`zgrep -h '\\[07/Mar/2017' /var/log/apache2/access.log.gz |  goaccess --no-progress -q > /path/to/file.html`\r\n\r\nIn version 1.2 this call works only when I insert a hyphen to goaccess:\r\n`zgrep -h '\\[07/Mar/2017' /var/log/apache2/access.log.gz |  goaccess - --no-progress -q > /path/to/file.html`\r\nIf the hyphen is not used, I get the help output (goaccess without args)\r\n\r\n**Terminal**\r\nIn bash terminal both variants work well\r\n\r\nThanks",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/680/comments",
+    "author": "spy1986",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2017-03-07T15:30:57Z",
+        "body": "Thanks for reporting this. The hyphen is now required in v1.2 if used from the cron. This fixes #647."
+      }
+    ]
+  },
+  {
+    "number": 470,
+    "title": "Error parsing log (wrong hostname)",
+    "created_at": "2016-07-12T13:21:26Z",
+    "closed_at": "2016-07-12T15:02:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/470",
+    "body": "Hello. \nI have a problem with the goaccess. While parsing, I get the message:\n\n```\nGoAccess - version 1.0.2 - Jul 11 2016 10:36:18\nConfig file: /usr/local/etc/goaccess.conf\n\nFatal error has occurred\nError occured at: src/goaccess.c - main - 1230\nNothing valid to process. Verify your date/time/log format.\n```\n\nI determined that the problem is this entry\n`ec2-54-206-80-6.ap-southeast-2.compute.amazonaws.com - - [11/Jul/2016:20:36:22 +0200] \"GET / HTTP/1.1\" 200 2282 \"\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\"`\n\nWhen `ec2-54-206-80-6.ap-southeast-2.compute.amazonaws.com` change to a different host address GoAccess working properly.\nAny ideas?\n",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/470/comments",
+    "author": "pawelrosada",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2016-07-12T14:02:28Z",
+        "body": "Hello,\n\nGoAccess requires a valid IPv4/6 for the `%h` specifier. If you are resolving the ip upon logging the request, then you would need to leave the IP as it is and set goaccess to resolve it instead.\n"
+      },
+      {
+        "user": "pawelrosada",
+        "created_at": "2016-07-12T14:17:07Z",
+        "body": "I do not understand what I must do to parse this log :/ Such options should I use ?\n-a? Or I think bad?\n"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2016-07-12T14:20:54Z",
+        "body": "If your log doesn't have a valid IPv4/6, then you can't parse it with goaccess. \n\nIf you want to parse it with goaccess, you will need to disable hostname lookups in your web server config options (assuming that's the case).\n"
+      },
+      {
+        "user": "cmaas",
+        "created_at": "2017-05-30T07:44:52Z",
+        "body": "@allinurl\r\n> If you want to parse it with goaccess, you will need to disable hostname lookups in your web server config options (assuming that's the case).\r\n\r\nThat is extremely unfortunate for German users. By privacy law, most German hosters disable logging of the IP address and just log a hostname given by the ISP, for example `p5XDA2268.dip0.t-ipconnect.de`. It might be silly, but a German webhoster is basically not allowed to log the actual IP address of website visitors.\r\n\r\nAny chance to make GoAccess' `%h` match a non-IP hostname in the future?"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2017-05-30T11:40:33Z",
+        "body": "@cmaas Interesting. Before I make some changes, do you know what's displayed in the log when unable to resolve the IP? I'm curious about this so goaccess can associate somehow the client with a date/time and the user agent."
+      },
+      {
+        "user": "cmaas",
+        "created_at": "2017-05-30T11:55:23Z",
+        "body": "@allinurl From what I see in my logs: It seems to default to IPv4 addresses apparently, if there's no hostname. I also looked into this a bit more. It's not at easy as I thought it was. Logging the hostname instead of the IP is one way to semi-anonymize visitors. But apparently, many services just set parts of the IP to 0, like so `46.124.0.0`. This makes identification of unique visitors probably difficult or almost impossible.\r\n\r\nThe question would be: Say, there's only a hostname, why does GoAccess require an actual IP address instead of just a string?"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2017-06-04T17:40:07Z",
+        "body": "Was looking at this, and I think it would be safe to have some option such as `--permissive-clients`which would allow a string as client instead of a valid IP. \r\n\r\nThere's no reason as to why goaccess uses an IP other than to identify unique visitors. Though, if we add this `--permissive-clients` option, then it's possible that some of the unique counts won't be as accurate since two clients can be on the same range, e.g., 46.124.0.0 = 46.124.12.12, 46.124.10.3."
+      },
+      {
+        "user": "maltris",
+        "created_at": "2024-05-15T17:47:35Z",
+        "body": "@allinurl I was searching to parse logs that have no IP information at all. And while there could be a workaround to just add any valid ip to the logs, that feature would be actually really cool to have. "
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2024-05-15T23:12:50Z",
+        "body": "@maltris, could you please share what your log looks like? I'm curious to see."
+      }
+    ]
+  },
+  {
+    "number": 404,
+    "title": "Logformat - Apache - ELB",
+    "created_at": "2016-04-22T01:35:51Z",
+    "closed_at": "2016-04-22T02:26:57Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/404",
+    "body": "Hi there,\n\nI'd like to inquire, I'm facing this issue to generate the output, \"Nothing valid to process\".\nI have done some tweaks on the format but nothing works. Could you please advise?\n\n```\nLogformat \"\\\"%t\\\",\\\"%{X-Forwarded-For}i\\\",\\\"%r\\\",\\\"%b\\\",\\\"%T\\\",\\\"%>s\\\",\\\"%{Referer}i\\\",\\\"%{User-Agent}i\\\",\\\"%h\\\",\\\"%l\\\"\" LogCustom\n```\n",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/404/comments",
+    "author": "Asshad",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2016-04-22T01:50:03Z",
+        "body": "Could you please post a few lines from your access log?Thanks.\n"
+      },
+      {
+        "user": "Asshad",
+        "created_at": "2016-04-22T02:00:00Z",
+        "body": "Thanks for your reply.\nSure, please refer to the those lines. Thanks in advance.\n\nHTTP/1.1\",\"753\",\"0\",\"200\",\"-\",\"Amazon CloudFront\",\"172.18.211.77\",\"-\"\n\n```\n\"[09/Apr/2016:03:34:58 +0000]\",\"202.74.105.71, 54.640.147.42\",\"GET /wp-content/uploads/2015/11/sfit_fitdialysis2211_py_2-e1448115793203-190x140.jpg HTTP/1.1\",\"-\",\"0\",\"304\",\"-\",\"Amazon CloudFront\",\"172.18.212.88\",\"-\"\n\"[09/Apr/2016:03:34:59 +0000]\",\"203.117.19.195, 54.240.148.89\",\"GET /wp-content/uploads/2015/10/str2_shariljihadistR_ma_1_FORONLINE-100x80.jpg HTTP/1.1\",\"-\",\"0\",\"304\",\"-\",\"Amazon CloudFront\",\"172.18.212.88\",\"-\"\n\"[09/Apr/2016:03:34:57 +0000]\",\"66.249.64.182, 54.240.144.76\",\"GET /entertainment/movies/movie-news/2015/12/16/tedd-chan-keeps-things-fresh-in-whos-your-daddy/ HTTP/1.1\",\"21012\",\"2\",\"200\",\"-\",\"Amazon CloudFront\",\"172.18.212.142\",\"-\"\n```\n"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2016-04-22T02:09:07Z",
+        "body": "The following should work. \n\n```\nlog-format \"[%d:%t %^]\",\"%h,%^\",\"%r\",\"%b\",\"%T\",\"%s\",\"%R\",\"%u\"%^\ndate-format %d/%b/%Y\ntime-format %H:%M:%S\n```\n\nLet me know how it goes.\n"
+      },
+      {
+        "user": "Asshad",
+        "created_at": "2016-04-22T02:17:44Z",
+        "body": "Hi, just tried your suggestion, processing for a few seconds then prompt the same out again.\n\n```\n$ goaccess --log-format=\"[%d:%t %^]\",\"%h,%^\",\"%r\",\"%b\",\"%T\",\"%s\",\"%R\",\"%u\"%^ --date-format=%d/%b/%Y --time-format=%H:%M:%S -f ~/Desktop/www.serverlist.com-access_log-20160409\n\nFatal error has occurred\nError occured at: src/goaccess.c - main - 1033\nNothing valid to process.\n```\n"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2016-04-22T02:21:24Z",
+        "body": "Please use single quotes within the log-format\n\n```\n$ goaccess --log-format='\"[%d:%t %^]\",\"%h,%^\",\"%r\",\"%b\",\"%T\",\"%s\",\"%R\",\"%u\"%^'\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 199,
+    "title": "Pipe leads to fatal error",
+    "created_at": "2014-12-25T17:53:00Z",
+    "closed_at": "2014-12-25T18:33:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/allinurl/goaccess/issues/199",
+    "body": "If I use a pipe for input, I get an error, while with -f the same log file works fine:\n\n---8<---\nmagnum@vmgentoo ~/src/goaccess-0.8.5 $ cat access_log | ./goaccess \n\nGoAccess - version 0.8.5 - Dec 25 2014 18:05:03\n\nFatal error has occurred\nError occured at: parser.c - parse_log - 1120\nNo date format was found on your conf file.\n\nmagnum@vmgentoo ~/src/goaccess-0.8.5 $ ./goaccess -f access_log \nmagnum@vmgentoo ~/src/goaccess-0.8.5 $\n---8<---\n\nThis is of course an example where a pipe isn't useful, but it show's that the pipe is the only difference.\n",
+    "comments_url": "https://api.github.com/repos/allinurl/goaccess/issues/199/comments",
+    "author": "cmrcx",
+    "comments": [
+      {
+        "user": "allinurl",
+        "created_at": "2014-12-25T17:56:28Z",
+        "body": "Since stdin is used for the pipe, there's no config dialog prompt to specify the date and log format. So you need to specify the correct date and log format in your config file before using goaccess through a pipe.\n"
+      },
+      {
+        "user": "allinurl",
+        "created_at": "2014-12-26T02:10:50Z",
+        "body": "Older versions could only read the standard Apache log/date format. This changed when the custom log/date format feature was introduced.\n"
+      }
+    ]
+  }
+]

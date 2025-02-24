@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/barvian/number-flow/issues/85",
+    "source": {
+      "issue_number": 85
+    },
+    "initial_question": {
+      "title": "Unable to install React 19 due to react-dom dependency",
+      "body": "### NumberFlow version\r\n\r\n@number-flow/react@0.4.2\r\n\r\n### Framework version\r\n\r\nreact@19\r\n\r\n### Describe the bug and the steps to reproduce it\r\n\r\nHello. I'm receiving a dependency error when trying to upgrade react from 18 to 19.\r\n\r\n```\r\nnpm error node_modules/react-dom\r\nnpm error   peer react-dom@\"^18\" from @number-flow/react@0.4.2\r\nnpm error   node_modules/@number-flow/react\r\nnpm error     @number-flow/react@\"^0.4.2\" from the root project\r\nnpm error\r\n```\r\n\r\nWould greatly appreciate if we can bump the version.\r\n\r\n### Minimal reproduction (greatly appreciated)\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Package dependency constraints allow React 19 installation",
+      "@number-flow/react package is compatible with React 19"
+    ],
+    "created_at": "2024-12-15T05:39:17Z"
+  }
+]

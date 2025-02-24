@@ -1,0 +1,418 @@
+[
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/4863",
+    "source": {
+      "issue_number": 4863
+    },
+    "initial_question": {
+      "title": "Closing a massive performance gap on 4xV100 vs 4xA100",
+      "body": "I am training a seq2seq model with the `translation` task and I noticed massive performance discrepancy depending on where I train it. I have access to 4x32GB V100 GPUs and 4x80GB A100 GPUs. Basically, the V100s outperform A100s from epochs 3 onwards. I ran two identical configs on both and these are the training and validation logs for the first 5 epochs (the discrepancies get larger and larger over time):\r\n\r\n```\r\nA100:\r\n2022-11-13 23:31:37 | INFO | valid | epoch 001 | valid on 'valid' subset | loss 6.329 | nll_loss 5.056 | ppl 33.26 | wps 70888.8 | wpb 16761.7 | bsz 1666.7 | num_updates 1134\r\n2022-11-14 01:41:24 | INFO | valid | epoch 002 | valid on 'valid' subset | loss 5.773 | nll_loss 4.445 | ppl 21.78 | wps 67359.6 | wpb 16761.7 | bsz 1666.7 | num_updates 2274 | best_loss 5.773\r\n2022-11-14 03:51:35 | INFO | valid | epoch 003 | valid on 'valid' subset | loss 5.655 | nll_loss 4.32 | ppl 19.98 | wps 68505.8 | wpb 16761.7 | bsz 1666.7 | num_updates 3415 | best_loss 5.655\r\n2022-11-14 06:01:08 | INFO | valid | epoch 004 | valid on 'valid' subset | loss 5.597 | nll_loss 4.258 | ppl 19.13 | wps 66829.6 | wpb 16761.7 | bsz 1666.7 | num_updates 4555 | best_loss 5.597\r\n2022-11-14 08:10:29 | INFO | valid | epoch 005 | valid on 'valid' subset | loss 5.526 | nll_loss 4.176 | ppl 18.08 | wps 65220.1 | wpb 16761.7 | bsz 1666.7 | num_updates 5695 | best_loss 5.526\r\nV100:\r\n2022-11-09 12:53:05 | INFO | valid | epoch 001 | valid on 'valid' subset | loss 6.345 | nll_loss 5.055 | ppl 33.23 | wps 46087.1 | wpb 16761.7 | bsz 1666.7 | num_updates 1134\r\n2022-11-09 15:59:28 | INFO | valid | epoch 002 | valid on 'valid' subset | loss 5.786 | nll_loss 4.449 | ppl 21.84 | wps 44076.7 | wpb 16761.7 | bsz 1666.7 | num_updates 2274 | best_loss 5.786\r\n2022-11-09 19:05:16 | INFO | valid | epoch 003 | valid on 'valid' subset | loss 5.549 | nll_loss 4.187 | ppl 18.22 | wps 44535.1 | wpb 16761.7 | bsz 1666.7 | num_updates 3415 | best_loss 5.549\r\n2022-11-09 22:11:50 | INFO | valid | epoch 004 | valid on 'valid' subset | loss 5.475 | nll_loss 4.103 | ppl 17.19 | wps 46866.6 | wpb 16761.7 | bsz 1666.7 | num_updates 4555 | best_loss 5.475\r\n2022-11-10 01:17:39 | INFO | valid | epoch 005 | valid on 'valid' subset | loss 5.387 | nll_loss 4.014 | ppl 16.15 | wps 45486.7 | wpb 16761.7 | bsz 1666.7 | num_updates 5695 | best_loss 5.387```\r\n\r\nA100:\r\n2022-11-13 23:32:02 | INFO | train | epoch 001 | loss 7.531 | nll_loss 6.505 | ppl 90.8 | wps 81361.4 | ups 0.15 | wpb 554217 | bsz 56777.6 | num_updates 1134 | lr 0.0002835 | gnorm 1.176 | clip 2.4 | loss_scale 1 | train_wall 6925 | gb_free 67.1 | wall 7884\r\n2022-11-14 01:41:48 | INFO | train | epoch 002 | loss 6.007 | nll_loss 4.75 | ppl 26.91 | wps 81171.9 | ups 0.15 | wpb 554381 | bsz 56793.4 | num_updates 2274 | lr 0.0005685 | gnorm 0.445 | clip 0 | loss_scale 0.5 | train_wall 6923 | gb_free 67.3 | wall 15669\r\n2022-11-14 03:51:59 | INFO | train | epoch 003 | loss 5.701 | nll_loss 4.409 | ppl 21.24 | wps 80983.5 | ups 0.15 | wpb 554388 | bsz 56768.1 | num_updates 3415 | lr 0.00085375 | gnorm 0.347 | clip 0 | loss_scale 0.5 | train_wall 6933 | gb_free 64.3 | wall 23480\r\n2022-11-14 06:01:33 | INFO | train | epoch 004 | loss 5.589 | nll_loss 4.283 | ppl 19.47 | wps 81290.6 | ups 0.15 | wpb 554364 | bsz 56787.5 | num_updates 4555 | lr 0.0009371 | gnorm 0.345 | clip 0 | loss_scale 1 | train_wall 6964 | gb_free 66.8 | wall 31255\r\n2022-11-14 08:10:53 | INFO | train | epoch 005 | loss 5.525 | nll_loss 4.212 | ppl 18.54 | wps 81436.1 | ups 0.15 | wpb 554346 | bsz 56770.4 | num_updates 5695 | lr 0.000838075 | gnorm 0.326 | clip 0 | loss_scale 0.5 | train_wall 6878 | gb_free 65.3 | wall 39015\r\nV100:\r\n2022-11-09 12:53:51 | INFO | train | epoch 001 | loss 7.533 | nll_loss 6.506 | ppl 90.92 | wps 56458.9 | ups 0.1 | wpb 554265 | bsz 56783.9 | num_updates 1134 | lr 0.0002835 | gnorm 1.175 | clip 2.5 | loss_scale 1 | train_wall 10190 | gb_free 19.6 | wall 11366\r\n2022-11-09 16:00:14 | INFO | train | epoch 002 | loss 6.006 | nll_loss 4.749 | ppl 26.88 | wps 56505.9 | ups 0.1 | wpb 554291 | bsz 56778.7 | num_updates 2274 | lr 0.0005685 | gnorm 0.448 | clip 0.1 | loss_scale 0.5 | train_wall 10170 | gb_free 19.8 | wall 22549\r\n2022-11-09 19:06:01 | INFO | train | epoch 003 | loss 5.7 | nll_loss 4.408 | ppl 21.23 | wps 56750.5 | ups 0.1 | wpb 554454 | bsz 56778.3 | num_updates 3415 | lr 0.00085375 | gnorm 0.349 | clip 0 | loss_scale 1 | train_wall 10139 | gb_free 16.8 | wall 33696\r\n2022-11-09 22:12:37 | INFO | train | epoch 004 | loss 5.587 | nll_loss 4.28 | ppl 19.43 | wps 56447.8 | ups 0.1 | wpb 554364 | bsz 56787.5 | num_updates 4555 | lr 0.0009371 | gnorm 0.35 | clip 0 | loss_scale 1 | train_wall 10203 | gb_free 19.4 | wall 44892\r\n2022-11-10 01:18:24 | INFO | train | epoch 005 | loss 5.517 | nll_loss 4.203 | ppl 18.42 | wps 56692.7 | ups 0.1 | wpb 554361 | bsz 56774.3 | num_updates 5695 | lr 0.000838075 | gnorm 0.327 | clip 0 | loss_scale 0.5 | train_wall 10164 | gb_free 17.9 | wall 56039\r\n```\r\n\r\nThe training performance gap also becomes larger over time (at epoch 20 it's 0.3 loss points).\r\n   \r\n   I run training with\r\n   \r\n   ```CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train $setting \\\r\n    --memory-efficient-fp16 \\\r\n    --wandb-project $model \\\r\n    --log-interval 10 \\\r\n    --max-update 1000000 --patience 5 \\ \r\n    --task translation --arch transformer_wmt_en_de_big \\\r\n    --share-all-embeddings \\\r\n    --optimizer adam --adam-betas '(0.9, 0.98)' \\\r\n    --lr-scheduler inverse_sqrt --warmup-updates 4000 \\\r\n    --label-smoothing 0.1 --criterion label_smoothed_cross_entropy \\\r\n    --dropout 0.3 --weight-decay 0.0 \\\r\n    --save-dir ${ckpt} --no-epoch-checkpoints \\\r\n    --max-tokens 21288 --update-freq 16 --lr 0.001 \\\r\n    --ddp-backend=$backend --clip-norm 5.0 \\\r\n    --seed 1\r\n```\r\n   \r\n   \r\nMy environment:\r\n - fairseq Version (e.g., 1.0 or main): 0.12.2\r\n - PyTorch Version (e.g., 1.0):\r\n   - A100: 1.12 (py3.10_cuda11.3_cudnn8.3.2_0 from channel pytorch)\r\n   - V100: 1.12 (installed with pip)\r\n - OS (e.g., Linux): CentOS 7\r\n - How you installed fairseq (`pip`, source): source\r\n - Build command you used (if compiling from source): `pip install --editable fairseq`\r\n - Python version: 3.10\r\n - CUDA/cuDNN version:\r\n   - A100: 1.12 (cuda 11.3)\r\n   - V100: unk\r\n   \r\nI might be wrong but with identical setups the two nodes should perform *very* similarly. Is there any way I could close this performance gap? Could it be the pytorch environment issue? (The A100s had very specific cuda needs, hence the non-standard install)."
+    },
+    "satisfaction_conditions": [
+      "Model performance on A100 GPUs matches or closely approximates V100 GPU performance in terms of loss metrics",
+      "GPU hardware capabilities are properly utilized by the software stack",
+      "Training metrics remain stable and consistent across epochs",
+      "Training speed (words per second) reflects hardware capabilities"
+    ],
+    "created_at": "2022-11-14T09:59:38Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/4587",
+    "source": {
+      "issue_number": 4587
+    },
+    "initial_question": {
+      "title": "[LanguagePairDataset]: Simplest way of loading embedding vectors as input (Encoder)?",
+      "body": "#### What is your question?\r\nI'm experimenting with loading **embedding vectors** into an Encoder in the \"transformer\" architecture. My inputs would look like this:\r\n`batch_size x embedding_dim x padded_input_length`\r\n\r\nand my outputs would be standard TranslationTask outputs:\r\n`batch_size x padded_input_length`\r\n\r\nWhile the outputs are tokens, the inputs are already encoded embeddings (hence the extra dimension).\r\n\r\nI'm fairly confident in modifying the `LanguagePairDataset` class to accept this input. However, I'm not sure how to change `load_langpair_dataset` within `fairseq/tasks/translation.py` to load numerical data of shape, as some helper functions used here (such as `load_indexed_dataset` within `fairseq/data/data_utils.py` presuppose token data and the use of a dictionary (which I will not need for the Encoder). \r\n\r\nWhat would be a minimal example/best way of going about loading this type of input? Perhaps the answer lies in using the `dataset_impl` argument?\r\n\r\nCould I get some pointers? :)\r\n\r\n#### Code\r\n\r\nI'm happy to share any snippets of what I have so far if needed.\r\n\r\nI'm using fairseq 0.12.2, installed with `pip install --editable ./` on Python 3.10.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Dataset must maintain compatibility with standard translation task outputs (batch_size x padded_input_length)",
+      "Data loading implementation must work with the LanguagePairDataset class structure"
+    ],
+    "created_at": "2022-07-18T12:56:04Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/4186",
+    "source": {
+      "issue_number": 4186
+    },
+    "initial_question": {
+      "title": "speech_to_text's example might have a typo",
+      "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\nAm I misusing script or do we have a typo?\r\n\r\n#### Code\r\n```python3\r\npython fairseq/examples/speech_to_text/prep_librispeech_data.py\r\n```\r\n \r\ncreates an error:\r\n```python3\r\nTraceback (most recent call last):\r\n  File \"prep_librispeech_data.py\", line 14, in <module>\r\n    from examples.speech_to_text.data_utils import (\r\nModuleNotFoundError: No module named 'examples'\r\n```\r\n#### What have you tried?\r\nchanging source code to:\r\n\r\n```python3\r\nfrom data_utils import (\r\n    create_zip,\r\n    extract_fbank_features,\r\n    gen_config_yaml,\r\n    gen_vocab,\r\n    get_zip_manifest,\r\n    save_df_to_tsv,\r\n)\r\n```\r\nseems to work then...\r\n#### What's your environment?\r\n\r\n - fairseq Version 0.10.2\r\n - PyTorch Version 1.10.2+cu113\r\n - OS Debian GNU/Linux 11 (bullseye)\r\n - How you installed fairseq (`pip`, source): clone source, pip install path/to/fairseq\r\n - Python version: 3.7.11\r\n - CUDA/cuDNN version: cu113\r\n - GPU models and configuration: RTX 3050 TI\r\n"
+    },
+    "satisfaction_conditions": [
+      "Python must be able to locate and import the required modules",
+      "Script execution completes without ModuleNotFoundError",
+      "Solution maintains compatibility with existing fairseq installation"
+    ],
+    "created_at": "2022-02-06T08:31:02Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/3927",
+    "source": {
+      "issue_number": 3927
+    },
+    "initial_question": {
+      "title": "How to restore the checkpoint in wav2vec (fairseq-hydra-train))",
+      "body": "## \u2753 Questions and Help\r\n\r\n### Before asking:\r\n1. search the issues.\r\n2. search the docs.\r\n\r\n<!-- If you still can't find what you need: -->\r\n\r\n#### What is your question?\r\n\r\nHi, I want to restore the checkpoint to continue the training processing. \r\nHowever, I can't find the parser (--restore_file) in the fairseq-hydra-train. It only can be found in the fairseq-train.\r\nHow to restore the checkpoint on wav2vec (fairseq-hydra-train))?\r\n\r\nThank you.\r\n\r\n\r\n#### Code\r\n\r\n<!-- Please paste a code snippet if your question requires it! -->\r\n\r\n#### What have you tried?\r\n\r\n#### What's your environment?\r\n\r\n - fairseq Version (e.g., 1.0 or main):\r\n - PyTorch Version (e.g., 1.0) 1.9\r\n - OS (e.g., Linux): Linux\r\n - How you installed fairseq (`pip`, source): source\r\n - Build command you used (if compiling from source):\r\n - Python version: 3.7\r\n - CUDA/cuDNN version: 11.0\r\n - GPU models and configuration: Nviaia-V100\r\n - Any other relevant information:\r\n"
+    },
+    "satisfaction_conditions": [
+      "Checkpoint restoration functionality is accessible through configuration parameters",
+      "Solution works within fairseq-hydra-train framework",
+      "Checkpoint path can be specified during training initialization"
+    ],
+    "created_at": "2021-10-04T07:39:59Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/3831",
+    "source": {
+      "issue_number": 3831
+    },
+    "initial_question": {
+      "title": "Wav2vec CTC fine tuning model error",
+      "body": "## \u2753 Questions and Help\r\nHi everyone, I am going to do fine-tuning my custom dataset using the `wav2vec_small_960h.pt`.\r\n\r\n<!-- If you still can't find what you need: -->\r\nHowever, I got an error which details as below:\r\n`\r\n-- Process 0 terminated with the following error:\r\nTraceback (most recent call last):\r\n  File \"/home/ubuntu/.conda/envs/fairseq/lib/python3.6/site-packages/torch/multiprocessing/spawn.py\", line 59, in _wrap\r\n    fn(i, *args)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/distributed/utils.py\", line 328, in distributed_main\r\n    main(cfg, **kwargs)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq_cli/train.py\", line 97, in main\r\n    model = task.build_model(cfg.model)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/tasks/audio_finetuning.py\", line 190, in build_model\r\n    model = super().build_model(model_cfg)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/tasks/audio_pretraining.py\", line 198, in build_model\r\n    model = super().build_model(model_cfg)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/tasks/fairseq_task.py\", line 320, in build_model\r\n    model = models.build_model(cfg, self)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/models/__init__.py\", line 107, in build_model\r\n    return model.build_model(cfg, task)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/models/wav2vec/wav2vec2_asr.py\", line 176, in build_model\r\n    w2v_encoder = Wav2VecEncoder(cfg, len(task.target_dictionary))\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/models/wav2vec/wav2vec2_asr.py\", line 356, in __init__\r\n    model = task.build_model(w2v_args.model)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/tasks/audio_pretraining.py\", line 198, in build_model\r\n    model = super().build_model(model_cfg)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/tasks/fairseq_task.py\", line 320, in build_model\r\n    model = models.build_model(cfg, self)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/models/__init__.py\", line 107, in build_model\r\n    return model.build_model(cfg, task)\r\n  File \"/home/ubuntu/manhlt/fairseq/fairseq/models/wav2vec/wav2vec2_asr.py\", line 176, in build_model\r\n    w2v_encoder = Wav2VecEncoder(cfg, len(task.target_dictionary))\r\nTypeError: object of type 'NoneType' has no len()\r\n`\r\n#### Code\r\nhere is my running script:\r\n`\r\nfairseq-hydra-train task.data=/home/ubuntu/manhlt/phoST-ASR/format_dataset/phost-fairseq-test/ \\\r\n                    model.w2v_path=/home/ubuntu/wav2vec_small_960h.pt \\\r\n                    --config-dir config/finetuning \\\r\n                    --config-name base_100h\r\n`\r\nI already have these files in the data folder:\r\n- dict.ltr.txt\r\n- train.ltr\r\n- train.wrd\r\n- valid.ltr\r\n- valid.wrd\r\n- train.tsv\r\n- valid.tsv\r\n- lexicon.txt\r\n<!-- Please paste a code snippet if your question requires it! -->   \r\n\r\n#### What's your environment?\r\n\r\n - fairseq Version : 1.0.0a0+6f847c8\r\n - PyTorch Version: 1.9\r\n - OS linux: Ubuntu 18.04\r\n - How you installed fairseq (`pip`, source): from source\r\n - Build command you used (if compiling from source):\r\n - Python version:\r\n - CUDA/cuDNN version: Cuda 11.0\r\n - GPU models and configuration: NVIDIA V100\r\n - Any other relevant information:\r\n"
+    },
+    "satisfaction_conditions": [
+      "The data directory structure must contain all required files in the expected format"
+    ],
+    "created_at": "2021-08-29T04:03:26Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/3394",
+    "source": {
+      "issue_number": 3394
+    },
+    "initial_question": {
+      "title": "Relation of Wav2vec2.0 \"max-sample-size\" and audio time",
+      "body": "## \u2753 Questions and Help\r\n\r\n### Before asking:   \r\n1. search the issues.   \r\n2. search the docs.    \r\n\r\n<!-- If you still can't find what you need: -->\r\n\r\n#### What is your question?\r\n\r\nI want to know the relation of Wav2vec2.0 \"max-sample-size\" and audio time. For example, when I set the \"max_sample_size=320000\", what is the duration of wav audios(16000Hz) ?\r\n\r\n#### Code\r\n\r\n<!-- Please paste a code snippet if your question requires it! -->   \r\n\r\n#### What have you tried?\r\n\r\n#### What's your environment?\r\n\r\n - fairseq Version (e.g., 1.0 or master):\r\n - PyTorch Version (e.g., 1.0)\r\n - OS (e.g., Linux):\r\n - How you installed fairseq (`pip`, source):\r\n - Build command you used (if compiling from source):\r\n - Python version:\r\n - CUDA/cuDNN version:\r\n - GPU models and configuration:\r\n - Any other relevant information:\r\n"
+    },
+    "satisfaction_conditions": [
+      "The relationship between max_sample_size and audio duration must be correctly calculated using the sample rate",
+      "The calculation must account for the audio's sampling rate (Hz) as the divisor",
+      "The result must be expressed in a meaningful time unit (e.g., seconds)",
+      "The solution must clarify the maximum allowed audio duration for the given parameters"
+    ],
+    "created_at": "2021-03-25T02:29:51Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/3342",
+    "source": {
+      "issue_number": 3342
+    },
+    "initial_question": {
+      "title": "Wav2Vec 2.0 pretraining limited by CPU even on large machine",
+      "body": "I'm running wav2vec 2.0 pretraining on a DGX A100  and I seem to be CPU-limited which is a bit surprising given the amount of CPU resources the machine has. The GPUSs seem to be working at barely 50%. When I lower the GPU count to four I get basically the same updates / time unit but with higher GPU load per GPU.\r\n\r\nI have tried running with and without `+optimization.update_freq='[x]'` parameter with somewhat similar result. The CPU load is lower without it, bit GPU utilization is about the same.\r\n\r\nAny thoughts?\r\n\r\n**Setup**:\r\nNVIDIA DGX A100\r\n8 x A100 GPU\r\n2 x 64 core / 128 thread CPU\r\n1TB RAM\r\nUbuntu 20.04\r\nCode runs inside NVIDIA NGC container"
+    },
+    "satisfaction_conditions": [
+      "GPU utilization must increase significantly from the initial ~50% level",
+      "CPU utilization must decrease from 100% to a more balanced level",
+      "Solution must work with multi-GPU setups on high-performance hardware"
+    ],
+    "created_at": "2021-03-11T13:47:51Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/3265",
+    "source": {
+      "issue_number": 3265
+    },
+    "initial_question": {
+      "title": "Preprocessing: help with parameter",
+      "body": "I'm training a couple of transformer for some translation tasks to make a research, but I'm not sure if the fairseq-preprocess command does what I want to. Specifically, I'm wondering about the parameter --tokenizer and --bpe.\r\n\r\nWhen we specify these, like --tokenizer moses, is the preprocessing going to tokenize, or we are just telling to the script that the data was already tokenized using the one indicated? I'm wondering the same for the parameter --bpe.\r\n\r\nOn top of that, do we need to give these two parameters again to the fairseq-train command right? \r\n\r\nI know it's probably a silly question, but I would like some clarification, as the documentation is a bit vague. \r\n"
+    },
+    "satisfaction_conditions": [
+      "Data must be tokenized and BPE-encoded before running fairseq-preprocess",
+      "--tokenizer and --bpe parameters should not be used with fairseq-preprocess",
+      "--tokenizer and --bpe parameters should not be used with fairseq-train",
+      "Preprocessing workflow must handle tokenization and BPE separately from fairseq commands"
+    ],
+    "created_at": "2021-02-22T12:31:09Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/3238",
+    "source": {
+      "issue_number": 3238
+    },
+    "initial_question": {
+      "title": "Speech Translation -> prep_covost_data.py",
+      "body": "## \u2753 Questions and Help\r\n#### What is your question?\r\n\r\nIs this step needed for flac and mp3 files loaded by torchaudio.load() [sox backend] and default args ? \r\n\r\n#### Code \r\n`_waveform = waveform * (2 ** 15)  # Kaldi compliance: 16-bit signed integers`\r\n `_waveform = _waveform.squeeze().numpy()`\r\n\r\n#### What's your environment?\r\n- PyTorch 1.7.1\r\n- torchaudio 0.7.2 "
+    },
+    "satisfaction_conditions": [
+      "Audio data must be scaled to match Kaldi's expected input range of [-2^15, 2^15]",
+      "Data format consistency must be maintained across audio file types (FLAC, MP3)",
+      "Output must be compatible with torchaudio.compliance.kaldi functions"
+    ],
+    "created_at": "2021-02-12T02:48:26Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2731",
+    "source": {
+      "issue_number": 2731
+    },
+    "initial_question": {
+      "title": "OOM when fine-tune BART for summarization",
+      "body": "\r\n#### What is your question?\r\n\r\nWith my GPU 1080Ti with 12GB memory, it keeps having errors OOM until I decrease the max_tokens to 64. However, it has another error below:\r\n\"AssertionError: sentence at index 2512 of size 101 exceeds max_tokens limit of 64!\"\r\nSo is it possible to fine-tune bart with 12GB memory?  I wonder it cannot have great performance in 64 tokens even if it can run successfully.\r\n\r\n#### What's your environment?\r\n\r\n - fairseq Version (e.g., 1.0 or master):\r\n - PyTorch Version (e.g., 1.0)\r\n - OS (e.g., Linux):cent os7\r\n - How you installed fairseq (`pip`, source):\r\n - Build command you used (if compiling from source):\r\n - Python version:\r\n - CUDA/cuDNN version:\r\n - GPU models and configuration:\r\n - Any other relevant information:\r\n"
+    },
+    "satisfaction_conditions": [
+      "Model training must execute without out-of-memory errors",
+      "Input text sequences must be processed without truncation errors",
+      "Training must accommodate reasonable sequence lengths for summarization",
+      "Solution must work within specified hardware constraints"
+    ],
+    "created_at": "2020-10-14T13:23:18Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2593",
+    "source": {
+      "issue_number": 2593
+    },
+    "initial_question": {
+      "title": "Inconsistent Sacrebleu score using ./scripts/sacrebleu.sh and score.py",
+      "body": "## \u2753 Questions and Help\r\n\r\n### Before asking:   \r\n1. search the issues.   \r\n2. search the docs.    \r\n\r\n<!-- If you still can't find what you need: -->\r\n\r\n#### What is your question?\r\nHi! I want to check if I use sacrebleu in the right way.\r\n\r\n#### Code\r\nGenerate ``vanilla.output.detok.txt`` : \r\n``python generate.py ./data-bin/wmt14_en_de --path checkpoints_wmt14en2de_vanilla_transformer/checkpoint_best.pt --batch-size 512 --beam 5  --remove-bpe > vanilla.output.detok.txt``\r\n\r\nThen run \r\n``bash ./scripts/sacrebleu.sh wmt14/full en de vanilla.output.detok.txt\r\n``. \r\nThe output is \r\n``BLEU+case.mixed+lang.en-de+numrefs.1+smooth.exp+test.wmt14/full+tok.13a+version.1.4.12 = 26.1 57.3/31.8/19.8/12.9 (BP = 1.000 ratio = 1.039 hyp_len = 65117 ref_len = 62688)\r\n``\r\n\r\nBut when I use ``score.py``: \r\nGenerate ``vanilla.output.detok.sys``, ``vanilla.output.detok.sys``: \r\n``grep ^H vanilla.output.detok.txt | cut -f3- > vanilla.output.detok.sys``\r\n``grep ^T vanilla.output.detok.txt | cut -f2- > vanilla.output.detok.ref``\r\n\r\n1) without ``sacrebleu``:  \r\n``python score.py --sys vanilla.output.detok.sys --ref vanilla.output.detok.ref``\r\noutput:\r\n``\r\nNamespace(ignore_case=False, order=4, ref='vanilla.output.detok.ref', sacrebleu=False, sentence_bleu=False, sys='vanilla.output.detok.sys')\r\nBLEU4 = 26.72, 58.1/32.5/20.3/13.3 (BP=1.000, ratio=1.031, syslen=66486, reflen=64506)\r\n``\r\n2) with ``sacrebleu``: \r\n``python score.py --sys vanilla.output.detok.sys --ref vanilla.output.detok.ref --sacrebleu``\r\noutput: \r\n``\r\nNamespace(ignore_case=False, order=4, ref='vanilla.output.detok.ref', sacrebleu=True, sentence_bleu=False, sys='vanilla.output.detok.sys')\r\nWARNING:root:That's 100 lines that end in a tokenized period ('.')\r\nWARNING:root:It looks like you forgot to detokenize your test data, which may hurt your score.\r\nWARNING:root:If you insist your data is detokenized, or don't care, you can suppress this message with '--force'.\r\n<sacrebleu.metrics.bleu.BLEUScore object at 0x7fbbbc1ebcd0>\r\n``. I checked the output in this object, it is ``27.36``.\r\n\r\nSo did I use these commands correctly? Thank you.\r\n\r\n\r\n<!-- Please paste a code snippet if your question requires it! -->   \r\n\r\n#### What have you tried?\r\n\r\n#### What's your environment?\r\n\r\n - fairseq Version (e.g., 1.0 or master): 0.9\r\n - PyTorch Version (e.g., 1.0): \r\n - OS (e.g., Linux):\r\n - How you installed fairseq (`pip`, source):\r\n - Build command you used (if compiling from source):\r\n - Python version:\r\n - CUDA/cuDNN version:\r\n - GPU models and configuration:\r\n - Any other relevant information:\r\n"
+    },
+    "satisfaction_conditions": [
+      "Output format must preserve both system outputs and references correctly"
+    ],
+    "created_at": "2020-09-09T07:01:15Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2558",
+    "source": {
+      "issue_number": 2558
+    },
+    "initial_question": {
+      "title": "Dataset not found even though all files are present",
+      "body": "Hi all!\r\nI was training a seq2seq model for a specific task (In same language) however I am getting this error:-\r\n```\r\nNamespace(activation_fn='gelu', adaptive_softmax_cutoff=None, adaptive_softmax_dropout=0, arch='bart_large', attention_dropout=0.0, best_checkpoint_metric='loss', bpe=None, bucket_cap_mb=25, clip_norm=0.1, cpu=False, criterion='cross_entropy', cross_self_attention=False, curriculum=0, data='/content/drive/My Drive/HashPro/preprocessed', dataset_impl=None, ddp_backend='c10d', decoder_attention_heads=16, decoder_embed_dim=1024, decoder_embed_path=None, decoder_ffn_embed_dim=4096, decoder_input_dim=1024, decoder_layerdrop=0, decoder_layers=12, decoder_layers_to_keep=None, decoder_learned_pos=True, decoder_normalize_before=False, decoder_output_dim=1024, device_id=0, disable_validation=False, distributed_backend='nccl', distributed_init_method=None, distributed_no_spawn=False, distributed_port=-1, distributed_rank=0, distributed_world_size=1, dropout=0.2, empty_cache_freq=0, encoder_attention_heads=16, encoder_embed_dim=1024, encoder_embed_path=None, encoder_ffn_embed_dim=4096, encoder_layerdrop=0, encoder_layers=12, encoder_layers_to_keep=None, encoder_learned_pos=True, encoder_normalize_before=False, fast_stat_sync=False, find_unused_parameters=False, fix_batches_to_gpus=False, fixed_validation_seed=None, force_anneal=None, fp16=True, fp16_init_scale=128, fp16_scale_tolerance=0.0, fp16_scale_window=None, keep_interval_updates=-1, keep_last_epochs=-1, layer_wise_attention=False, layernorm_embedding=True, lazy_load=False, left_pad_source='True', left_pad_target='False', load_alignments=False, log_format=None, log_interval=1000, lr=[0.02], lr_scheduler='fixed', lr_shrink=0.1, max_epoch=0, max_sentences=8, max_sentences_valid=8, max_source_positions=1024, max_target_positions=1024, max_tokens=None, max_tokens_valid=None, max_update=0, maximize_best_checkpoint_metric=False, memory_efficient_fp16=False, min_loss_scale=0.0001, min_lr=-1, momentum=0.0, no_cross_attention=False, no_epoch_checkpoints=False, no_last_checkpoints=False, no_progress_bar=False, no_save=False, no_save_optimizer_state=False, no_scale_embedding=True, no_token_positional_embeddings=False, num_workers=1, optimizer='sgd', optimizer_overrides='{}', pooler_activation_fn='tanh', pooler_dropout=0.0, raw_text=False, relu_dropout=0.0, required_batch_size_multiple=8, reset_dataloader=False, reset_lr_scheduler=False, reset_meters=False, reset_optimizer=False, restore_file='checkpoint_last.pt', save_dir='/content/drive/My Drive/HashPro/Checkpoints/', save_interval=1, save_interval_updates=0, seed=1, sentence_avg=False, share_all_embeddings=True, share_decoder_input_output_embed=True, skip_invalid_size_inputs_valid_test=False, source_lang=None, target_lang=None, task='translation', tensorboard_logdir='', threshold_loss_scale=None, tokenizer=None, train_subset='train', truncate_source=False, update_freq=[1], upsample_primary=1, use_bmuf=False, user_dir=None, valid_subset='valid', validate_interval=1, warmup_updates=0, weight_decay=0.0)\r\n| [input] dictionary: 21936 types\r\n| [output] dictionary: 9216 types\r\n\r\nTraceback (most recent call last):\r\n  File \"/usr/local/bin/fairseq-train\", line 8, in <module>\r\n    sys.exit(cli_main())\r\n  File \"/usr/local/lib/python3.6/dist-packages/fairseq_cli/train.py\", line 333, in cli_main\r\n    main(args)\r\n  File \"/usr/local/lib/python3.6/dist-packages/fairseq_cli/train.py\", line 48, in main\r\n    task.load_dataset(valid_sub_split, combine=False, epoch=0)\r\n  File \"/usr/local/lib/python3.6/dist-packages/fairseq/tasks/translation.py\", line 219, in load_dataset\r\n    truncate_source=self.args.truncate_source,\r\n  File \"/usr/local/lib/python3.6/dist-packages/fairseq/tasks/translation.py\", line 52, in load_langpair_dataset\r\n    raise FileNotFoundError('Dataset not found: {} ({})'.format(split, data_path))\r\nFileNotFoundError: Dataset not found: valid (/content/drive/My Drive/HashPro/preprocessed)\r\n```\r\nIt does report finding the dictionaries, but apparently the dataset is not found. Here are the dataset files :-\r\n> dict.input.txt\r\n> dict.output.txt\r\n> hashpro_hashes.bpe.input\r\n> hashpro_hashes.bpe.output\r\n> preprocess.log\r\n> train.input-output.input.bin\r\n> train.input-output.input.idx\r\n> train.input-output.output.bin\r\n> train.input-output.output.idx\r\n\r\nSince all the files are included, and the path seems to be correct (since it can load up the dictionaries) I don't understand why such a problem is occurring. This is the training command I am using to train the whole model-\r\n\r\n`%%bash`\r\n`fairseq-train '/content/drive/My Drive/HashPro/preprocessed' --max-sentences 8 --fp16 --lr 0.02 --clip-norm 0.1 --optimizer sgd --dropout 0.2 --arch bart_large --save-dir /content/drive/'My Drive'/HashPro/Checkpoints/`\r\n\r\nI am using TPU which has been initialized in the standard way shown in Colab examples. Apparently there have been some changes in the implementations - I can no longer put the `--tpu` flag or `--bf16`. Has the support been disabled for debugging or is there a problem with the way I have installed FairSeq?\r\n "
+    },
+    "satisfaction_conditions": [
+      "Data directory path must be accessible with correct permissions"
+    ],
+    "created_at": "2020-09-02T16:09:11Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2538",
+    "source": {
+      "issue_number": 2538
+    },
+    "initial_question": {
+      "title": "(wav2vec 2.0)Can you provide detailed hyperparameters for finetune?",
+      "body": "You guys have done a great job, can you provide detailed hyperparameters for 10h finetune in wav2vec 2.0. I don\u2019t know how to adjust the hyperparameters for 10min, 1h and 10h datasets. Thanks a lot."
+    },
+    "satisfaction_conditions": [
+      "Masking parameters are correctly scaled based on dataset size",
+      "Training schedule follows correct proportional splits",
+      "Max updates value is appropriate for dataset size",
+      "Masking probabilities are calculated using correct base values"
+    ],
+    "created_at": "2020-08-29T11:28:37Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2535",
+    "source": {
+      "issue_number": 2535
+    },
+    "initial_question": {
+      "title": "how to generate output using generate.py without shuffling?",
+      "body": "@myleott I am trying to use the mBART generative interface to generated output in the Hindi language (from English). I fine-tuning the model with English-Hindi parallel dataset and results are good.\r\n\r\nFor my ongoing work, what I want is: \"can we generate the Hindi output such that the order of sentences should not be change after generation? (i.e., English sentence order and generated Hindi sentence order should be same, there should not be any shuffling)\" How can we achieve the same? Waiting for your response. Thank you!"
+    },
+    "satisfaction_conditions": [
+      "Generated Hindi translations maintain the same sentence order as input English text",
+      "Output generation process is deterministic for sentence order"
+    ],
+    "created_at": "2020-08-29T03:52:49Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2285",
+    "source": {
+      "issue_number": 2285
+    },
+    "initial_question": {
+      "title": "libcudart.so.10.1: cannot open shared object file: No such file or directory",
+      "body": "I just upgraded CUDA version from 10.1 to 10.2 since apex installation keeps encounter bugs for no reason. But I cannot figure out where torch.hub.load calling for libcudart.so.10.1 and raising the bug. Any insight to reinstall or build dependencies is appreciated. \r\n#### Code\r\n\r\nimport torch\r\n\r\ntorch.hub.list('pytorch/fairseq')  # [..., 'lightconv.glu.wmt17.zh-en', ... ]\r\n\r\nzh2en = torch.hub.load('pytorch/fairseq', 'lightconv.glu.wmt17.zh-en', tokenizer='moses', bpe='subword_nmt')\r\n\r\nassert isinstance(zh2en.models[0], fairseq.models.lightconv.LightConvModel)\r\n\r\nzh2en.translate('\u4f60\u597d \u4e16\u754c')\r\n\r\n#### What have you tried?\r\nnvcc --version\r\n10.2\r\ntorch.version.cuda\r\n10.2\r\n#### What's your environment?\r\n - fairseq Version (master):\r\n - PyTorch Version (1.5.1)\r\n - OS (Linux):\r\n - Python version: 3.6\r\n - CUDA/cuDNN version:10.2"
+    },
+    "satisfaction_conditions": [
+      "Basic PyTorch CUDA operations function correctly"
+    ],
+    "created_at": "2020-06-30T00:22:20Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2269",
+    "source": {
+      "issue_number": 2269
+    },
+    "initial_question": {
+      "title": "How can I feed a binarized class label file to BART training?",
+      "body": "Is there any way that I can feed a label file to the training mechanism, Farrelly with source and target files."
+    },
+    "satisfaction_conditions": [
+      "Label information must be incorporated into the input sequence in a distinguishable format",
+      "Label encoding must be compatible with BART's tokenization process",
+      "Labels must be uniquely identifiable within the text sequence"
+    ],
+    "created_at": "2020-06-25T04:09:30Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2240",
+    "source": {
+      "issue_number": 2240
+    },
+    "initial_question": {
+      "title": "How to set batch size when fine-tunning BART?",
+      "body": "#### What is your question?\r\nWhen I fine-tune BART.large on my server, OOM issue occurs. So I intend to reduce batch_size to enable training. So I would like to know how to set batch size when fine-tunning BART. Thanks!!\r\n#### What's your environment?\r\n\r\n - fairseq Version (0.7.2)\r\n - PyTorch Version (1.5.0)\r\n - OS (Linux):\r\n - How you installed fairseq: pip\r\n - Python version: 3.7\r\n - CUDA/cuDNN version: 10.1\r\n - GPU models and configuration:"
+    },
+    "satisfaction_conditions": [
+      "Memory usage must be reduced enough to prevent Out-of-Memory (OOM) errors",
+      "Batch processing parameters must be adjustable",
+      "Solution must be compatible with BART's dynamic batching system"
+    ],
+    "created_at": "2020-06-14T14:20:55Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2201",
+    "source": {
+      "issue_number": 2201
+    },
+    "initial_question": {
+      "title": "What do the metrics wps, ups and wpb mean in the training logger ?",
+      "body": "In the following dictionary from the training log output:\r\n\r\n<pre>{&quot;epoch&quot;: 27, &quot;update&quot;: 26.267, &quot;loss&quot;: &quot;8.206&quot;, &quot;nll_loss&quot;: &quot;7.049&quot;, &quot;ppl&quot;: &quot;132.47&quot;, &quot;wps&quot;: &quot;1195.4&quot;, &quot;ups&quot;: &quot;1.62&quot;, &quot;wpb&quot;: &quot;738.1&quot;, &quot;bsz&quot;: &quot;46.4&quot;, &quot;num_updates&quot;: &quot;33700&quot;, &quot;lr&quot;: &quot;0.00017226&quot;, &quot;gnorm&quot;: &quot;1.833&quot;, &quot;clip&quot;: &quot;1&quot;, &quot;train_wall&quot;: &quot;61&quot;, &quot;wall&quot;: &quot;30542&quot;}</pre>\r\n\r\nI assume the following from looking at the code and other issues:\r\n**bsz** = batch size \r\n**gnorm** = L2 norm of the gradients\r\n**clip** = gradient clipping threshold\r\n**train_wall** = time taken for one training step\r\n**wall** = total time spent training, validating, saving checkpoints (so far)\r\n**wps** = ?\r\n**ups** = ?\r\n**wpb** = ?\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "All three metrics abbreviations (wps, ups, wpb) must be clearly defined",
+      "The metrics definitions must be consistent with the training log context",
+      "The metrics must be quantifiable measurements",
+      "The definitions must relate to training performance monitoring"
+    ],
+    "created_at": "2020-06-01T17:13:17Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2126",
+    "source": {
+      "issue_number": 2126
+    },
+    "initial_question": {
+      "title": "why should i binarize the source and target for the Translation task in Fairseq?",
+      "body": "## \u2753 Questions and Help\r\n\r\n### Before asking:   \r\nwhy should i binarize the source and target for the Translation task in Fairseq?  can i use the raw sentence? if so,  how should i do it\r\n\r\nthank you!\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Data preprocessing method must be successfully configured",
+      "Data format must be consistently specified across preprocessing and training steps",
+      "Data processing method must maintain all necessary information for translation"
+    ],
+    "created_at": "2020-05-13T10:04:30Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2015",
+    "source": {
+      "issue_number": 2015
+    },
+    "initial_question": {
+      "title": "How to save model output from fairseq-generate?",
+      "body": "I just follow the tutorial and stuck on this command:\r\n```\r\nfairseq-generate data-bin/iwslt14.tokenized.de-en \\\r\n    --path checkpoints/fconv/checkpoint_best.pt \\\r\n    --batch-size 128 --beam 5\r\n```\r\nHow can I save model output on test part of my data? I spent a solid amount of time, but didn't find the answer. I found `--results-path` argument, but for some reason, it doesn't work for me and save data in a strange format, like `H- ...`.  Is there just to save the model output (predictions) on particular data?\r\nSorry, if this question is obvious, but I didn't find anything in docs."
+    },
+    "satisfaction_conditions": [
+      "Model predictions must be successfully saved to a persistent storage format",
+      "Output must be in a readable and parseable format",
+      "Output must contain the model's predictions for the test data",
+      "Solution must work with fairseq-generate command output",
+      "Output must be accessible regardless of console font capabilities"
+    ],
+    "created_at": "2020-04-14T21:18:38Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/2004",
+    "source": {
+      "issue_number": 2004
+    },
+    "initial_question": {
+      "title": "Explanation of Extra Embeddings after generation from Dict",
+      "body": "### What is your question?\r\n\r\nHi! I am trying to extract word embeddings and do some analysis on a transformer model I trained. Compared to the srcdict used to generate the emeddings the 'encoder.embed_tokens.weight' seems to have 4 more tokens. Can someone confirm if these extra or special tokens are at the end, beginning or somewhere else. Also, is the order of the srcdict maintained when initializing the embedding matrix.\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "The location of special tokens in the embedding matrix must be specified",
+      "The preservation of dictionary order must be addressed"
+    ],
+    "created_at": "2020-04-13T02:44:27Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/1764",
+    "source": {
+      "issue_number": 1764
+    },
+    "initial_question": {
+      "title": "Batch size of wiki103 model",
+      "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\n\r\nI have a few questions related to the Wiki103 pretrained model and the provided training script.\r\n\r\n1)  In the training script code you have \r\n\r\n> --max-tokens 3072  --tokens-per-sample 3072\r\n\r\nHowever in the paper, you state that \r\n> For WIKITEXT-103 we partition the training data into blocks of 512 contiguous tokens\r\n\r\nI'm wondering where/how this is happening given the provided training example or if the training example does not match the paper?  In general, I am confused about how batch size is determined in the fairseq framework.  Running the below code with the wiki103 comandline args provided gives src_tokens with size [1, 3072].  \r\n\r\n2)  For multiple gpus, are  --max-tokens   --tokens-per-sample per gpu or do they get split across gpus?\r\n\r\n3)  Loading the the model, the saved args have the arch as 'transformer_lm_gbw' and not 'transformer_lm_wiki103'.  Why is this?\r\n\r\n\r\n#### Code\r\n```    \r\n        reg_task = LanguageModelingTask.setup_task(args)\r\n        reg_task.load_dataset(split)\r\n        reg_iter = reg_task.get_batch_iterator(reg_task.datasets[split], max_tokens=args.max_tokens,\r\n                                               max_sentences=args.max_sentences,\r\n                                               max_positions=args.max_target_positions)\r\n        reg_e_iter = reg_iter.next_epoch_itr(shuffle=True)\r\n\r\n        for sample in reg_e_iter:\r\n            print(sample, sample['id'].shape, 'id shape')\r\n            print(sample['net_input']['src_tokens'].shape)\r\n```\r\n\r\n\r\n#### What's your environment?\r\n\r\n - fairseq Version (e.g., 1.0 or master): 0.9\r\n - PyTorch Version (e.g., 1.0)  1.4\r\n - OS (e.g., Linux): Linux\r\n - How you installed fairseq (`pip`, source): pip\r\n - Build command you used (if compiling from source):\r\n - Python version: 3.6\r\n - CUDA/cuDNN version: 10.1\r\n - GPU models and configuration:  TitanX and others\r\n - Any other relevant information:\r\n"
+    },
+    "satisfaction_conditions": [
+      "Training data block size matches documented specifications",
+      "Token handling across multiple GPUs is clearly defined",
+      "Model architecture parameters are correctly interpreted regardless of arch name"
+    ],
+    "created_at": "2020-03-02T17:03:50Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/1741",
+    "source": {
+      "issue_number": 1741
+    },
+    "initial_question": {
+      "title": "Should sentences be split for the (masked) language modeling task?",
+      "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\n\r\nIn the `wikitext` dataset suggested in the language modeling task (and used as well by the RoBERTa example), sentences are not split into different lines. Instead, in this dataset, newlines denote a new paragraph (and double new line denotes change of document, as mandated by the \"language modeling format\" mentioned in the docs).\r\n\r\nMy question is: is sentence splitting something that we should consider when training our own language models? In the case of BERT, it is obvious that it is a hard requirement (for the NSP objective), while in the case of BART, I'm not sure because there are no examples of training BART from scratch, but I think that it's necessary because of the sentence permutation. In the case of RoBERTa, it is not a requirement, and it doesn't appear in the example, but is it something that would be beneficial? Did you use it when building your models? So far, I haven't found any mention of this in the original articles or fairseq's documentation.\r\n\r\nIn summary: even if sentence splitting (into newlines) is not required for RoBERTa, is it something that would be beneficial? Did you do it? In the case of BART, it is a hard requirement, right?\r\n\r\nMany thanks in advance.\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Clear document boundaries must be maintained in the training data",
+      "Text segmentation must be appropriate for the model architecture",
+      "Training data format must be consistent within each data source",
+      "Document breaks must be explicitly marked"
+    ],
+    "created_at": "2020-02-24T10:42:32Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/1705",
+    "source": {
+      "issue_number": 1705
+    },
+    "initial_question": {
+      "title": "Help with --sampling-topp hyperparameter ?",
+      "body": "I tried experimenting with --sampling-topp hyperparamter\r\npython interactive.py test/ --path checkpoints/models_anv/checkpoint_best.pt  --source-lang en --target-lang hi --nbest 5 --sampling --sampling-topp 0.1\r\npython interactive.py test/ --path checkpoints/models_anv/checkpoint_best.pt  --source-lang en --target-lang hi --nbest 5 --sampling --sampling-topp 0.9\r\n\r\nI am not able to understand the outputs. When I use p = 0.1, all of my 5 best outputs are same with\r\nH-0     -1.0333465788368796\r\n\r\nWhen I use p = 0.9 , I get different outputs but the max score is \r\nH-0     -1.2899561307704726\r\nwhich is poorer than p = 0.1 and also beam search output\r\n\r\nCan anyone tell me where I am missing with the fundamentals of topp sampling(nucleus sampling) ?\r\nAnd what excatly this means in the documentation:\r\n\"\"sample from the smallest set whose cumulative probability mass exceeds p for next words\"\""
+    },
+    "satisfaction_conditions": [
+      "Sampling behavior correctly reflects the specified probability threshold",
+      "Lower top-p values result in more deterministic output",
+      "Higher top-p values result in more diverse output",
+      "Score values reflect sampling probability distribution"
+    ],
+    "created_at": "2020-02-14T07:46:09Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/1520",
+    "source": {
+      "issue_number": 1520
+    },
+    "initial_question": {
+      "title": "UnicodeEncodeError: 'ascii' codec can't encode character '\\xe4' in position 8: ordinal not in range(128)",
+      "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\nwhen I run the following code\uff0cI have faced the error.\r\n\r\n\u201cfairseq-generate data-bin3/iwslt14.tokenized.de-en --path checkpoints2/transformer_iwslt_de_en/checkpoint_best.pt --batch-size 128 --beam 5 --remove-bpe\r\n\u201d\r\nTraceback (most recent call last):\r\n  File \"/usr/local/python3/bin/fairseq-generate\", line 8, in <module>\r\n    sys.exit(cli_main())\r\n  File \"/usr/local/python3/lib/python3.6/site-packages/fairseq_cli/generate.py\", line 203, in cli_main\r\n    main(args)\r\n  File \"/usr/local/python3/lib/python3.6/site-packages/fairseq_cli/generate.py\", line 135, in main\r\n    print('S-{}\\t{}'.format(sample_id, src_str))\r\nUnicodeEncodeError: 'ascii' codec can't encode character '\\xe4' in position 8: ordinal not in range(128)\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Program must correctly handle non-ASCII Unicode characters in output",
+      "Python environment must be configured for UTF-8 text encoding",
+      "Command execution completes without UnicodeEncodeError"
+    ],
+    "created_at": "2019-12-18T07:31:23Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/fairseq/issues/4684",
+    "source": {
+      "issue_number": 4684
+    },
+    "initial_question": {
+      "title": "Unshuffles test set during generation ",
+      "body": "Hi, \r\n\r\nHow do we keep the test set sentence order during generation? Is there a flag we can pass to the generation to keep the test set sequence untouched? This is very important for my work. I would like to request the new feature. \r\n\r\nThanks! "
+    },
+    "satisfaction_conditions": [
+      "Original test set sequence order must be recoverable",
+      "Generated outputs must maintain correspondence with inputs",
+      "Solution must work within system's automatic length-based sorting",
+      "Output must preserve sufficient ordering metadata"
+    ],
+    "created_at": "2022-08-31T21:41:59Z"
+  }
+]

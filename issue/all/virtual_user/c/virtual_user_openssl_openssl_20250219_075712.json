@@ -1,0 +1,83 @@
+[
+  {
+    "id": "https://github.com/openssl/openssl/issues/25569",
+    "source": {
+      "issue_number": 25569
+    },
+    "initial_question": {
+      "title": "OpenSSL Initialization Failure Due to Manually Mapped DLLs Not Recognized by GetModuleHandleExA",
+      "body": "Say we stop using `LoadLibraryA` instead we create its equivalent for security purposes, the module we map windows wont be aware of it, for OpenSSL modules, when we map it, and attempt to initialize OpenSSL, its failing to robustly initialize on that Context, the reason exaclty becouse of `ossl_init_load_crypto_nodelete`, who returns false inside Crypto Initialize routine, becouse of the fact that WinApi `GetModuleHandleExA` is not aware of the manually mapped modules, how to approach this problem? notice that appart from that, when redirecting to another legit module, and forcing the function to return true, everything initialize as expected and OpenSSL works as normal (Sanity Tested Extensively).\r\nVersion 1.1.1w\r\nto reproduce the issue simply use any dll manual mapper and simply call `OPENSSL_init_crypto`"
+    },
+    "satisfaction_conditions": [
+      "OpenSSL initialization must complete successfully",
+      "Library pinning behavior must be properly handled",
+      "Library must remain functional after initialization",
+      "Solution must work with manually mapped libraries",
+      "Security requirements for manual mapping must be preserved"
+    ],
+    "created_at": "2024-09-29T21:58:05Z"
+  },
+  {
+    "id": "https://github.com/openssl/openssl/issues/20073",
+    "source": {
+      "issue_number": 20073
+    },
+    "initial_question": {
+      "title": "AES-256 and 192 produce garbage output with -engine padlock (VIA Padlock)",
+      "body": "OpenSSL fail to properly encrypt or decrypt AES-192 and AES-256 data (tested CTR and CBC modes), producing garbage output, without any errors, when using VIA Padlock hardware accelerator on VIA Eden Esther CPU.\r\n128 key size modes return correct results.\r\n\r\nTested on OpenSSL 1.1.1n, 1.1.1s, 3.0.7\r\n\r\nWithout `-engine padlock`:\r\n\r\n```\r\n$ echo 12345678 | openssl enc -aes-256-ctr -e -nosalt -K 8d06b54b75a39a2ec1147871b4cdcb589525cde68034d39439183feedcf5e79a -iv 84eb471441a65cf6a27b3d6976728227 | hexdump -C\r\n00000000  67 5b 8d ba 61 e2 07 84  79                       |g[..a...y|\r\n\r\n$ echo -ne \"\\x67\\x5b\\x8d\\xba\\x61\\xe2\\x07\\x84\\x79\" | openssl enc -aes-256-ctr -d -nosalt -K 8d06b54b75a39a2ec1147871b4cdcb589525cde68034d39439183feedcf5e79a -iv 84eb471441a65cf6a27b3d6976728227 | hexdump -C\r\n00000000  31 32 33 34 35 36 37 38  0a                       |12345678.|\r\n```\r\n\r\nWith `-engine padlock`:\r\n\r\n```\r\n# Encryption WITH engine padlock\r\n$ echo 12345678 | openssl enc -aes-256-ctr -e -nosalt -K 8d06b54b75a39a2ec1147871b4cdcb589525cde68034d39439183feedcf5e79a -iv 84eb471441a65cf6a27b3d6976728227 -engine padlock | hexdump -C\r\nengine \"padlock\" set.\r\n00000000  79 86 a0 04 c7 c6 9f 36  80                       |y......6.|\r\n\r\n# Decrypting result produced by engine padlock (garbage) WITH engine padlock\r\n$ echo -ne \"\\x79\\x86\\xa0\\x04\\xc7\\xc6\\x9f\\x36\\x80\" | openssl enc -aes-256-ctr -d -nosalt -K 8d06b54b75a39a2ec1147871b4cdcb589525cde68034d39439183feedcf5e79a -iv 84eb471441a65cf6a27b3d6976728227 -engine padlock | hexdump -C\r\nengine \"padlock\" set.\r\n00000000  31 32 33 34 35 36 37 38  0a                       |12345678.|\r\n\r\n# Decrypting result produced by engine padlock (garbage) WITHOUT engine padlock\r\n$ echo -ne \"\\x79\\x86\\xa0\\x04\\xc7\\xc6\\x9f\\x36\\x80\" | openssl enc -aes-256-ctr -d -nosalt -K 8d06b54b75a39a2ec1147871b4cdcb589525cde68034d39439183feedcf5e79a -iv 84eb471441a65cf6a27b3d6976728227 | hexdump -C\r\n00000000  2f ef 1e 8a 93 12 af 8a  f3                       |/........|\r\n\r\n# Decrypting result produced WITHOUT engine padlock (proper AES) WITH engine padlock\r\n$ echo -ne \"\\x67\\x5b\\x8d\\xba\\x61\\xe2\\x07\\x84\\x79\" | openssl enc -aes-256-ctr -d -nosalt -K 8d06b54b75a39a2ec1147871b4cdcb589525cde68034d39439183feedcf5e79a -iv 84eb471441a65cf6a27b3d6976728227 -engine padlock | hexdump -C\r\nengine \"padlock\" set.\r\n00000000  2f ef 1e 8a 93 12 af 8a  f3                       |/........|"
+    },
+    "satisfaction_conditions": [
+      "AES-256 and AES-192 encryption/decryption operations produce consistent results with and without the VIA Padlock engine",
+      "Encrypted data can be correctly decrypted back to the original input",
+      "Key byte ordering is handled correctly for the hardware implementation",
+      "Solution works with both constant-time and non-constant-time AES implementations"
+    ],
+    "created_at": "2023-01-18T12:35:26Z"
+  },
+  {
+    "id": "https://github.com/openssl/openssl/issues/19014",
+    "source": {
+      "issue_number": 19014
+    },
+    "initial_question": {
+      "title": "Options `-ssl3`,, `-no_ssl3`, `-no_tls1`, `-no_tls1_1`, `-no_tls1_2`, `-no_tls1_3`,  not recognised",
+      "body": "_release:_ openssl-3.0.5\r\n\r\n_manual reference:_\r\n```\r\n$ man 'OPENSSL(1ossl)'\r\n(...)\r\n       -ssl3, -tls1, -tls1_1, -tls1_2, -tls1_3, -no_ssl3, -no_tls1, -no_tls1_1, -no_tls1_2, -no_tls1_3\r\n           These options require or disable the use of the specified SSL or TLS protocols. (...)\r\n```\r\nHello. options `-ssl3`,, `-no_ssl3`, `-no_tls1`, `-no_tls1_1`, `-no_tls1_2`, `-no_tls1_3`,  not recognised; illustration:\r\n```\r\n$ openssl ciphers -ssl3\r\nlist: Use -help for summary.\r\n```\r\nAs opposed, other options are recognised; illustration:\r\n```\r\n$ openssl ciphers -tls1_3 | sed 's/:/\\n/g' | head -1\r\nTLS_AES_256_GCM_SHA384\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Build configuration status is discoverable",
+      "Command-specific help provides accurate option information",
+      "Disabled features are clearly indicated"
+    ],
+    "created_at": "2022-08-17T08:58:13Z"
+  },
+  {
+    "id": "https://github.com/openssl/openssl/issues/10060",
+    "source": {
+      "issue_number": 10060
+    },
+    "initial_question": {
+      "title": "Consistent formatting of I<a:b> in manpages",
+      "body": "Many of our commands take a key/value pair -- host:port, opt:value, etc.\r\n\r\nThe proper formatting of this is apparently ```I<first>:I<second>```\r\n\r\nWhile fixing those, should we also standardize on the terminology?  I see ```opt:value``` ```hostname:port``` ```paramset:X``` etc.  (Most of these you will not see until #10022 is merged)."
+    },
+    "satisfaction_conditions": [
+      "Literal characters (like ':') use bold formatting",
+      "Variable/replaceable content uses italic formatting"
+    ],
+    "created_at": "2019-09-30T16:51:47Z"
+  },
+  {
+    "id": "https://github.com/openssl/openssl/issues/8394",
+    "source": {
+      "issue_number": 8394
+    },
+    "initial_question": {
+      "title": "const mismatch between ",
+      "body": "The PKCS8_pkey_get0_attrs function returns const STACK_OF(X509_ATTRIBUTE) and there is no non-const variant of this function.\r\nThe X509at_get0_data_by_OBJ accepts STACK_OF(X509_ATTRIBUTE)\r\n"
+    },
+    "satisfaction_conditions": [
+      "Existing function behavior must remain unchanged",
+      "Solution must not require changes to PKCS8_pkey_get0_attrs return type"
+    ],
+    "created_at": "2019-03-04T13:21:26Z"
+  }
+]

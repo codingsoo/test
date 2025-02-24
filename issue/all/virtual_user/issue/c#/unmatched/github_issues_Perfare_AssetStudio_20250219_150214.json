@@ -1,0 +1,22 @@
+[
+  {
+    "number": 612,
+    "title": "0.15\u7248\u672c\u7684\u600e\u4e48\u8fd0\u884c",
+    "created_at": "2020-09-15T14:43:04Z",
+    "closed_at": "2020-12-13T17:33:40Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Perfare/AssetStudio/issues/612",
+    "body": "\u628ax64\u6587\u4ef6\u5939\u91cc\u7684\u6587\u4ef6\u4e22\u5230\u8f6f\u4ef6\u6839\u76ee\u5f55\u4e0b\u4e5f\u4e0d\u80fd\u8fd0\u884c\uff0c\u800c0.14\u7248\u672c\u7684\u5c31\u80fd\u7528",
+    "comments_url": "https://api.github.com/repos/Perfare/AssetStudio/issues/612/comments",
+    "author": "IrisSundew",
+    "comments": [
+      {
+        "user": "Perfare",
+        "created_at": "2020-12-13T17:33:40Z",
+        "body": "\u4e0d\u9700\u8981\u79fb\u52a8\u4efb\u4f55\u6587\u4ef6\uff0c\u76f4\u63a5\u5168\u90e8\u89e3\u538b\uff0c\u786e\u4fdd\u7535\u8111\u5df2\u5b89\u88c5.NET Framework 4.7.2\uff0c\u6700\u597d\u4f7f\u7528win10\u8fd0\u884c"
+      }
+    ]
+  }
+]

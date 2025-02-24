@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/Viren070/AIOStreams/issues/16",
+    "source": {
+      "issue_number": 16
+    },
+    "initial_question": {
+      "title": "Many deprecated packages used",
+      "body": "`npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.\nnpm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported\nnpm warn deprecated rollup-plugin-inject@3.0.2: This package has been deprecated and is no longer maintained. Please use @rollup/plugin-inject.\nnpm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead\n\nadded 547 packages, and audited 557 packages in 46s\n\n146 packages are looking for funding\n  run `npm fund` for details\n\n2 critical severity vulnerabilities\n\nSome issues need review, and may require choosing\na different dependency.\n\nRun `npm audit` for details.`"
+    },
+    "satisfaction_conditions": [
+      "Package dependencies successfully install despite warnings",
+      "Application remains functional with deprecated dependencies",
+      "Security vulnerabilities are acknowledged",
+      "Package installation process completes without fatal errors"
+    ],
+    "created_at": "2025-01-16T12:00:58Z"
+  }
+]

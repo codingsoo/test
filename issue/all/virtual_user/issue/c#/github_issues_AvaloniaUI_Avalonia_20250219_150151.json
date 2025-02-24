@@ -1,0 +1,197 @@
+[
+  {
+    "number": 14901,
+    "title": "textbox height has no effect when sets value below 30",
+    "created_at": "2024-03-10T07:23:47Z",
+    "closed_at": "2024-03-10T09:30:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/AvaloniaUI/Avalonia/issues/14901",
+    "body": "### Describe the bug\n\nwhen i tried to changed the textbox's height to a value less than 30, i didn't see any changes.\r\nbut if i sets it to a bigger value , the  height of textbox changed.\n\n### To Reproduce\n\n\t<TextBox Height=\"20\" FontSize=\"12\" Width=\"199\"></TextBox>\n\n### Expected behavior\n\n_No response_\n\n### Avalonia version\n\n11.0.10\n\n### OS\n\nWindows\n\n### Additional context\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/AvaloniaUI/Avalonia/issues/14901/comments",
+    "author": "buskysnow",
+    "comments": [
+      {
+        "user": "timunie",
+        "created_at": "2024-03-10T09:30:08Z",
+        "body": "Set MinHeight as well to a lower value. Some controls have min sizeses. "
+      },
+      {
+        "user": "buskysnow",
+        "created_at": "2024-03-11T02:31:26Z",
+        "body": "> Set MinHeight as well to a lower value. Some controls have min sizeses.\r\n\r\n\r\n\r\n> Set MinHeight as well to a lower value. Some controls have min sizeses.\r\n\r\nthanks for your reply. that solved my problem . it works well now.\r\nbut the Combo Box control has the same problem. and set MinHeight to it has no effect too.\r\nso what i should do?"
+      }
+    ]
+  },
+  {
+    "number": 14034,
+    "title": "Dynamically add a usercontrol to a grid, the control didn't show!",
+    "created_at": "2023-12-25T17:39:20Z",
+    "closed_at": "2023-12-25T17:46:14Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/AvaloniaUI/Avalonia/issues/14034",
+    "body": "this is my usercontrol :\r\n    public class TestControl : TextBox\r\n    {\r\n    }\r\n\r\ni added the control to the grid, it didn't appear!\r\ncodes:\r\nvar ctl = new TestControl();\r\nGrid.SetRow(ctl,0);\r\nGrid.SetColumn(ctl,0);\r\n\r\nbut if i use textbox,and it appeares in the grid;\r\nvar ctl = new TextBox();\r\nGrid.SetRow(ctl,0);\r\nGrid.SetColumn(ctl,0);\r\n\r\nis this a bug?\r\n\r\navalonia 11.0.6, .net8\r\n",
+    "comments_url": "https://api.github.com/repos/AvaloniaUI/Avalonia/issues/14034/comments",
+    "author": "VeGoPeng",
+    "comments": [
+      {
+        "user": "timunie",
+        "created_at": "2023-12-25T17:45:57Z",
+        "body": "It's not a bug. You're most likely missing the needed StyleInclude . If it should look like a TextBox you can also override the StyleKey on your UserControl. \n\n> Note: If you're unsure it's a bug you can also open a Q&A discussion first."
+      },
+      {
+        "user": "timunie",
+        "created_at": "2023-12-25T17:57:07Z",
+        "body": "Avalonia.Sampels > RatingControl for custom style. \n\nStyleKeyOverride I have not at hand, sorry. Check intellisense pls"
+      },
+      {
+        "user": "VeGoPeng",
+        "created_at": "2023-12-25T17:57:21Z",
+        "body": "> > It's not a bug. You're most likely missing the needed StyleInclude . If it should look like a TextBox you can also override the StyleKey on your UserControl.\r\n> > > Note: If you're unsure it's a bug you can also open a Q&A discussion first.\r\n> \r\n> Thanks. And any sample codes?\r\n\r\ni got it! thank you very much!\r\npublic class TestControl : TextBox\r\n{\r\nprotected override Type StyleKeyOverride => typeof(TextBox);\r\n}"
+      }
+    ]
+  },
+  {
+    "number": 3199,
+    "title": "ComboBox.SelectedItem only returns the typename and not the selected Value When using a Datatemplate",
+    "created_at": "2019-11-01T23:08:19Z",
+    "closed_at": "2019-11-03T17:58:19Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/AvaloniaUI/Avalonia/issues/3199",
+    "body": "I have a combobox configured like so\r\n\r\n```\r\n      <ComboBox SelectedItem=\"{Binding SelectedModule, Mode=OneWayToSource}\" Grid.Column=\"0\" BorderBrush=\"Black\" Grid.Row=\"2\" Height=\"25\" Margin=\"5\" Items=\"{Binding SubCommands}\">\r\n        <ComboBox.ItemTemplate>\r\n          <DataTemplate>\r\n            <TextBlock Text=\"{Binding DisplayName}\" ToolTip.Tip=\"{Binding Description}\"/>\r\n          </DataTemplate>\r\n        </ComboBox.ItemTemplate>\r\n      </ComboBox>\r\n```\r\nAnd the viewmodel is \r\n```\r\n        public string SelectedModule\r\n        {\r\n            get => selectedModule;\r\n            private set\r\n            {\r\n                var res = value;\r\n                this.RaiseAndSetIfChanged(ref selectedModule, value);\r\n            }\r\n        }\r\n```\r\nI am getting back the typename of the Items property instead of the value of the textblock text. How can I get that WPF mentions DisplayMemberName but that doesn't seem to exist in Avalonia.\r\n\r\nI also tried \r\n`SelectionBoxItem=\"{Binding SelectedModule, Mode=OneWayToSource}\" `\r\nbut that didn't work either ",
+    "comments_url": "https://api.github.com/repos/AvaloniaUI/Avalonia/issues/3199/comments",
+    "author": "ajmcateer",
+    "comments": [
+      {
+        "user": "Gillibald",
+        "created_at": "2019-11-02T05:36:51Z",
+        "body": "This is the expected behavior and matches what the Wpf version does. As you noted we are missing the DisplayMemberPath feature and the SelectedValue property. This needs to be added. For now you could use a converter. "
+      },
+      {
+        "user": "grokys",
+        "created_at": "2019-11-02T20:02:43Z",
+        "body": "How is `SubCommands` defined in the view model?"
+      },
+      {
+        "user": "ajmcateer",
+        "created_at": "2019-11-03T00:20:50Z",
+        "body": "Hi @grokys @Gillibald,\r\n\r\nIt is defined like\r\n```\r\npublic class SubCommandModel : CommandModelBase\r\n    {\r\n        public List<DiagnosticTestModel> DiagnosticTests { get; set; }\r\n        public SubCommandModel()\r\n        {\r\n            DiagnosticTests = new List<DiagnosticTestModel>();\r\n        }\r\n    }\r\n```\r\nand commandbase is\r\n```\r\n    public class CommandModelBase\r\n    {\r\n        public string Description { get; set; }\r\n        public string DisplayName { get; set; }\r\n        public string CommandName { get; set; }\r\n    }\r\n```\r\nIt displays fine just returns \"Cedar.Model.SubCommand\" as a string"
+      },
+      {
+        "user": "grokys",
+        "created_at": "2019-11-03T05:49:22Z",
+        "body": "Thanks... Now I'm a bit confused ;)\r\n\r\nWhen you say:\r\n\r\n> I am getting back the typename of the Items property instead of the value of the textblock text. \r\n\r\nWhat do you mean by \"I'm getting back\"? You mean the type name is assigned to `SelectedModule`? `SelectedModule` is a `string` so Avalonia is having to somehow convert `SubCommandModel` to a string, for which it uses `ToString()`. If you've not overridden `ToString`, then it will just return the name of the type, which is what you're seeing.\r\n\r\nAre you porting WPF code which uses `DisplayMemberName`? As you've seen we don't have this property in Avalonia, so a direct port isn't going to be possible. Or are you writing new code?\r\n\r\nCan you not just change `public string SelectedModule` to `public SubCommandModel SelectedModule` in your view model?"
+      }
+    ]
+  },
+  {
+    "number": 3162,
+    "title": "KeyGesture not having empty ctor on 0.9 ",
+    "created_at": "2019-10-25T20:47:40Z",
+    "closed_at": "2019-10-28T11:02:50Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/AvaloniaUI/Avalonia/issues/3162",
+    "body": "Hey,\r\n\r\nTrying out 0.9 preview 4 and noticed KeyGesture doesn't have empty ctor, is there any reason for it?\r\nSince I can no longer serialize it\r\n\r\nThanks",
+    "comments_url": "https://api.github.com/repos/AvaloniaUI/Avalonia/issues/3162/comments",
+    "author": "adirh3",
+    "comments": [
+      {
+        "user": "Gillibald",
+        "created_at": "2019-10-25T20:50:44Z",
+        "body": "Calling `ToString()` and `Parse(string s)` should work for you. "
+      },
+      {
+        "user": "MarchingCube",
+        "created_at": "2019-10-26T09:22:19Z",
+        "body": "`KeyGesture` is now immutable, all setters have been removed so only constructors that allow to construct a valid object were kept. This is in line with WPF API as well."
+      }
+    ]
+  },
+  {
+    "number": 2554,
+    "title": "IMarkupExtension",
+    "created_at": "2019-05-20T15:41:04Z",
+    "closed_at": "2023-02-01T19:23:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/AvaloniaUI/Avalonia/issues/2554",
+    "body": "Can I suggest that Avalonia supports IMarkupExtension (as well as MarkupExtension from Portable.Xaml.Markup)?\r\n\r\nAt the moment you can't create a markup extension that has bindable properties as you can't inherit from both MarkupExtension and AvaloniaObject. By implementing an interface version of MarkupExtension you could have bindable properties which would be extremely useful.\r\n\r\n`public interface IMarkupExtension\r\n{\r\n    object ProvideValue(IServiceProvider serviceProvider);\r\n}\r\n`\r\n",
+    "comments_url": "https://api.github.com/repos/AvaloniaUI/Avalonia/issues/2554/comments",
+    "author": "aguahombre",
+    "comments": [
+      {
+        "user": "kekekeks",
+        "created_at": "2019-05-20T16:00:04Z",
+        "body": "Update to nightly builds. XamlIl uses duck typing and just tries to find ProvideValue by a signature in the following order:\r\n\r\n```\r\nT ProvideTypedValue();\r\nT ProvideTypedValue(IServiceProvider provider);\r\nT ProvideValue();\r\nT ProvideValue(IServiceProvider provider);\r\nobject ProvideValue();\r\nobject ProvideValue(IServiceProvider provider);\r\n```\r\n\r\nwhere T is some type that is not a `System.Object`."
+      },
+      {
+        "user": "aguahombre",
+        "created_at": "2019-05-20T16:34:54Z",
+        "body": "OK, so if I understand you correctly, custom markup extensions don't need to be derived from MarkupExtension; just define a ProvideValue method.\r\nThat would solve the problem.\r\nI will give it a go. "
+      }
+    ]
+  },
+  {
+    "number": 1677,
+    "title": "How to get Containers right after setting ItemsControl.Items",
+    "created_at": "2018-06-13T04:56:07Z",
+    "closed_at": "2021-01-20T18:03:14Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/AvaloniaUI/Avalonia/issues/1677",
+    "body": "When I set ItemsControl.Items= someList, it seems that ItemContainerGenerator generates the containers asynchronously. What is the best way to wait for complete materialization, so I can access the containers?\r\nRight now I'm using Materialized event, and have to check ItemContainerGenerator.Containers.Count to make all item has been materialized. This seems less than ideal, is there a better way to do this?",
+    "comments_url": "https://api.github.com/repos/AvaloniaUI/Avalonia/issues/1677/comments",
+    "author": "tedypranolo",
+    "comments": [
+      {
+        "user": "grokys",
+        "created_at": "2018-06-23T16:15:58Z",
+        "body": "Hi @tedypranolo,\r\n\r\nIt might be helpful to know your use-case for this - why are you needing to access the containers? There is no better way currently that doing what you say, partly because the items may be virtualized and so containers may _never_ be created for all items.\r\n\r\nAgain, knowing your use case might help us suggest a different approach or add an API for what you're trying to do.\r\n\r\n"
+      },
+      {
+        "user": "tedypranolo",
+        "created_at": "2018-06-26T03:11:14Z",
+        "body": "I was generating checkboxes based on a collection and trying to set their IsChecked. I guess I should have created a proper ViewModel and bind to the IsChecked property. Thank you for the clarification."
+      }
+    ]
+  },
+  {
+    "number": 275,
+    "title": "Accessing list or collection of containers using ItemsContainerGenerater",
+    "created_at": "2015-10-15T17:32:16Z",
+    "closed_at": "2015-10-15T21:52:33Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/AvaloniaUI/Avalonia/issues/275",
+    "body": "With WPF I could iterate through containers using the following:\n\n`itemsControl.ItemContainerGenerator.Items.Count`\n\nHowever I do not see a way to iterate with our current implementation.\n\nMaybe I am just missing something?\n",
+    "comments_url": "https://api.github.com/repos/AvaloniaUI/Avalonia/issues/275/comments",
+    "author": "ghost",
+    "comments": [
+      {
+        "user": "grokys",
+        "created_at": "2015-10-15T21:04:39Z",
+        "body": "Does `IItemContainerGenerator.Containers` not work?\n\nI renamed it from that in WPF because `Items` is ambiguous between the items and the containers.\n"
+      },
+      {
+        "user": "ghost",
+        "created_at": "2015-10-15T21:39:41Z",
+        "body": "Actually it appears with my build `IItemContainerGenerator.Containers` is not available. \n"
+      },
+      {
+        "user": "ghost",
+        "created_at": "2015-10-15T21:52:33Z",
+        "body": "`IItemContainerGenerator.Containers` Was added in Alpha2. This resolved my question.\n"
+      }
+    ]
+  }
+]

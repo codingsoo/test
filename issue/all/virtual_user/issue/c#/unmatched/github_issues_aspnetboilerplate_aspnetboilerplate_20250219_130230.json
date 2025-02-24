@@ -1,0 +1,132 @@
+[
+  {
+    "number": 5251,
+    "title": "Automapper with EntityChangeSet not working",
+    "created_at": "2020-01-23T15:51:50Z",
+    "closed_at": "2020-01-24T01:09:06Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/aspnetboilerplate/aspnetboilerplate/issues/5251",
+    "body": "@acjh I am creating service to show data referent info save on EntityChangeSet, EntityChange, EntityPropertyChange. When I try to map this information with Dto that I created, not working. \r\nLogs:\r\n\r\nERROR 2020-01-23 12:06:03,538 [11   ] Mvc.ExceptionHandling.AbpExceptionFilter - Error mapping types.\r\n\r\n```\r\nMapping types:\r\nList`1 -> List`1\r\nSystem.Collections.Generic.List`1[[Abp.EntityHistory.EntityChangeSet, Abp, Version=5.1.0.0, Culture=neutral, PublicKeyToken=null]] -> System.Collections.Generic.List`1[[cgsa.toolkit.Auditing.Dto.EntityChangeSetDto, cgsa.toolkit.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]\r\nAutoMapper.AutoMapperMappingException: Error mapping types.\r\n\r\nMapping types:\r\nList`1 -> List`1\r\nSystem.Collections.Generic.List`1[[Abp.EntityHistory.EntityChangeSet, Abp, Version=5.1.0.0, Culture=neutral, PublicKeyToken=null]] -> System.Collections.Generic.List`1[[cgsa.toolkit.Auditing.Dto.EntityChangeSetDto, cgsa.toolkit.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]\r\n ---> AutoMapper.AutoMapperMappingException: Missing type map configuration or unsupported mapping.\r\n\r\nMapping types:\r\nEntityChangeSet -> EntityChangeSetDto\r\nAbp.EntityHistory.EntityChangeSet -> cgsa.toolkit.Auditing.Dto.EntityChangeSetDto\r\n   at lambda_method(Closure , EntityChangeSet , EntityChangeSetDto , ResolutionContext )\r\n   at lambda_method(Closure , List`1 , List`1 , ResolutionContext )\r\n   --- End of inner exception stack trace ---\r\n   at lambda_method(Closure , List`1 , List`1 , ResolutionContext )\r\n   at lambda_method(Closure , Object , Object , ResolutionContext )\r\n   at Abp.AutoMapper.AutoMapperObjectMapper.Map[TDestination](Object source)\r\n   at cgsa.toolkit.Auditing.AuditingAppService.GetAllChangeSet(PagedChangeSetResultRequestDto input) in C:\\Users\\yaniel\\Desktop\\CG_Development\\Projects\\BackendSolution\\CGSA3.0\\aspnet-core\\src\\cgsa.toolkit.Application\\Auditing\\AuditingAppService.cs:line 38\r\n   at lambda_method(Closure , Object )\r\n   at Microsoft.Extensions.Internal.ObjectMethodExecutorAwaitable.Awaiter.GetResult()\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextExceptionFilterAsync>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)\r\n``` \r\n\r\nMy DTo for EntityChangeSet is:\r\n\r\n[AutoMapTo(typeof(EntityChangeSet))]\r\n```\r\n    public class EntityChangeSetDto : EntityDto<long>\r\n    {\r\n        public string BrowserInfo { get; set; }\r\n        \r\n        public string ClientIpAddress { get; set; }\r\n        \r\n        public string ClientName { get; set; }\r\n        \r\n        public string ExtensionData { get; set; }\r\n        \r\n        public string Reason { get; set; }\r\n\r\n    }\r\n```\r\n\r\nThis is my method in service:\r\n\r\n```\r\npublic async Task<ListResultDto<EntityChangeSetDto>> GetAllChangeSet(PagedChangeSetResultRequestDto input)\r\n        {\r\n            var changeSets = await _entityChangeSetRepository.GetAll()\r\n                 .WhereIf(input.userId > 0, t => t.UserId == input.userId)\r\n                 .OrderByDescending(t => t.CreationTime)\r\n                 .ToListAsync();\r\n\r\n            return new ListResultDto<EntityChangeSetDto>(\r\n                ObjectMapper.Map<List<EntityChangeSetDto>>(changeSets)\r\n            );\r\n        }\r\n```\r\n\r\nCan you help me, please!!!",
+    "comments_url": "https://api.github.com/repos/aspnetboilerplate/aspnetboilerplate/issues/5251/comments",
+    "author": "yanielbf",
+    "comments": [
+      {
+        "user": "acjh",
+        "created_at": "2020-01-23T16:00:23Z",
+        "body": "`[AutoMapTo(typeof(EntityChangeSet))]` ->\r\n`[AutoMapFrom(typeof(EntityChangeSet))]`"
+      }
+    ]
+  },
+  {
+    "number": 2427,
+    "title": "Not able to See Tenants in the side menu",
+    "created_at": "2017-08-23T06:01:47Z",
+    "closed_at": "2017-08-23T06:09:48Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/aspnetboilerplate/aspnetboilerplate/issues/2427",
+    "body": "Hi,\r\n\r\nI have successfully created a ABP modulezero from the website and was able to run . I'm using asp.net core version with multiple pages. After logging in as Default Tenant , with admin/123qwe( the default user credentials) I'm not able to see the Tentants link in the Left Menu. Is there something , I missed out . Please let me know what shall I do . \r\nThanks in advance.",
+    "comments_url": "https://api.github.com/repos/aspnetboilerplate/aspnetboilerplate/issues/2427/comments",
+    "author": "JoCodes",
+    "comments": [
+      {
+        "user": "hikalkan",
+        "created_at": "2017-08-23T06:06:27Z",
+        "body": "A tenant can not manage other tenants. You should login as host (by entering empty string for tenant name)."
+      },
+      {
+        "user": "JoCodes",
+        "created_at": "2017-08-23T06:08:40Z",
+        "body": "Means current name should be empty instead of the Default one?"
+      }
+    ]
+  },
+  {
+    "number": 1707,
+    "title": "in application service can not get AbpSession.UserId value with AbTriggerAsync",
+    "created_at": "2016-12-28T16:50:38Z",
+    "closed_at": "2016-12-29T07:56:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/aspnetboilerplate/aspnetboilerplate/issues/1707",
+    "body": "english is bad,hope you can understand.\r\nin application service, i use EventBus.TriggerAsync() to trigger a event, in handler,i inject  IApplicationService  to execute some insert operation,but in this application service,can not get userId, and  the creatorUserId is null in table. use no async no problem.\r\n",
+    "comments_url": "https://api.github.com/repos/aspnetboilerplate/aspnetboilerplate/issues/1707/comments",
+    "author": "dm-Andy",
+    "comments": [
+      {
+        "user": "hikalkan",
+        "created_at": "2016-12-28T19:21:34Z",
+        "body": "If you are triggering is asynchronously from a synchronous method, then it will probably executed after your request complete. So, you can not access to UserId of current user.\r\nIf you are using it inside an async method, use with await.\r\nOtherwise, always use Trigger, not TriggerAsync."
+      }
+    ]
+  },
+  {
+    "number": 984,
+    "title": "Multiple Tenants Issue",
+    "created_at": "2016-04-14T15:47:45Z",
+    "closed_at": "2016-04-15T06:58:45Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/aspnetboilerplate/aspnetboilerplate/issues/984",
+    "body": "Thank you for your great project at first.\nI have a SPA with Zero, multiple tenants is enabled, when I login to host and a tenant with same one IE 11 browser, the application works as host always.\nAny action in tenant application works as host, there is no tenant id in the audit log records.\nAfter I logout from host, then the tenant works well, the tenant id is recorded in log table.\nWhat's wrong?\nThank you.\n",
+    "comments_url": "https://api.github.com/repos/aspnetboilerplate/aspnetboilerplate/issues/984/comments",
+    "author": "fiting",
+    "comments": [
+      {
+        "user": "hikalkan",
+        "created_at": "2016-04-15T06:46:04Z",
+        "body": "You can not login twice in same browser. Login as host in one browser and login as tenant in a different browser window (not tab) since same browser tabs share same cookies and login info is stored in cookies.\n"
+      },
+      {
+        "user": "fiting",
+        "created_at": "2016-04-15T06:57:24Z",
+        "body": "Thank you. But it works using Chrome, same browser different tab.\n"
+      }
+    ]
+  },
+  {
+    "number": 889,
+    "title": "Swagger error",
+    "created_at": "2016-02-22T08:01:05Z",
+    "closed_at": "2016-02-23T04:41:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/aspnetboilerplate/aspnetboilerplate/issues/889",
+    "body": "I've this issue when try to open /swagger:\n`500 : {\"message\":\"An error has occurred.\",\"exceptionMessage\":\"Not supported by Swagger 2.0: Multiple operations with path 'api/AbpServiceProxies' and method 'GET'. See the config setting - \\\"ResolveConflictingActions\\\" for a potential workaround\",\"exceptionType\":\"System.NotSupportedException\"`\n\nIn my API module I don't call swagger beacuse if I try I cacth an exception that say me the path already exists.  \n`Configuration.Modules.AbpWebApi().HttpConfiguration\n                .EnableSwagger(c =>\n                {\n                    c.SingleApiVersion(\"v1\", \"myApp.WebApi\");\n                    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());\n                })\n                .EnableSwaggerUi();`\n",
+    "comments_url": "https://api.github.com/repos/aspnetboilerplate/aspnetboilerplate/issues/889/comments",
+    "author": "andmattia",
+    "comments": [
+      {
+        "user": "hikalkan",
+        "created_at": "2016-02-22T19:56:10Z",
+        "body": "Where are you calling this code? In AspNet Zero, we are calling it in Initialize method of WebApi project.\n\nNote that; When you install Swagger, it also includes a configuration class and calls it from Startup file. Remove this configuration file and it's usage.\n"
+      }
+    ]
+  },
+  {
+    "number": 374,
+    "title": "How to create a new service attribute",
+    "created_at": "2015-03-04T19:18:45Z",
+    "closed_at": "2015-03-04T20:01:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/aspnetboilerplate/aspnetboilerplate/issues/374",
+    "body": "I would like to create a new attribute that I can add to my service methods, similar to how you have AbpAuthorize.\n\nWhen I add my attribute to my service methods, I need to ensure that users have a WorkspaceId in their claims.\n\nI have modeled my RequireWorkspaceIdAttribute based on your AbpAuthorizeAttribute and created the following files:\n- IRequireWorkspaceIdAttribute\n- RequireWorkspaceIdAttribute\n- RequireWorkspaceIdAttributeHelper\n- RequireWorkspaceIdInterceptor\n\nI have also created a registrar with the following:\n\n```\n    private static void Kernel_ComponentRegistered(string key, Castle.MicroKernel.IHandler handler)\n    {\n        if (typeof(IApplicationService).IsAssignableFrom(handler.ComponentModel.Implementation))\n        {\n            handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(RequireWorkspaceIdInterceptor))); \n        }\n    }\n```\n\nWhich I am calling from MyApplicationModule : AbpModule in my Services.\n\nThe Kernel_ComponentRegistered is getting called, but my if-statement never evaluates to true, so when I call my service method, the attribute never fires.\n\nI think my problem is with registering the interceptor.\n\nAny advice would be greatly appreciated.\n",
+    "comments_url": "https://api.github.com/repos/aspnetboilerplate/aspnetboilerplate/issues/374/comments",
+    "author": "ballistic",
+    "comments": [
+      {
+        "user": "hikalkan",
+        "created_at": "2015-03-04T19:46:27Z",
+        "body": "You should register to ComponentRegistered event in the PreInitialize of your module. Can you chare your module?\n"
+      }
+    ]
+  }
+]

@@ -1,0 +1,77 @@
+[
+  {
+    "number": 1194,
+    "title": "What is the best way to use MudCheckBox with bind value and CheckedChanged call back ?",
+    "created_at": "2021-03-15T11:03:03Z",
+    "closed_at": "2021-03-16T21:26:19Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/MudBlazor/MudBlazor/issues/1194",
+    "body": "I wan't to be able to bind the checkbox from data received from the server and if the user changes this , I was to call an api to update the data in server using an API call.\r\n\r\nI tried  the below and i get the below error\r\n` <MudCheckBox Checked=\"item.Checked\" CheckedChanged=\"@(e=>UpdateCheckStatus(e,cat.CategoryId,item))\">@item.Name</MudCheckBox>`\r\n\r\nCS0411\tThe type arguments for method 'TypeInference.CreateMudCheckBox_1<T>(RenderTreeBuilder, int, int, T, int, EventCallback<T>, int, RenderFragment)' cannot be inferred from the usage. Try specifying the type arguments explicitly.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/MudBlazor/MudBlazor/issues/1194/comments",
+    "author": "kijoyin",
+    "comments": [
+      {
+        "user": "porkopek",
+        "created_at": "2021-03-15T17:23:51Z",
+        "body": "Add `T=\"bool\"` to the MudCheckBox"
+      }
+    ]
+  },
+  {
+    "number": 548,
+    "title": "Binding Date Picker ",
+    "created_at": "2021-01-12T23:22:42Z",
+    "closed_at": "2021-01-13T15:06:51Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/MudBlazor/MudBlazor/issues/548",
+    "body": "I have been trying to bind mudblazor datepicker to a DateTime property using Date.\r\n\r\n```\r\n<MudDatePicker Label=\"Start Date\" Date=\"@StartDate\" />\r\n<MudTextField Label=\"SelectedDate\" @bind-Value=\"@StartDate\" />\r\n<MudText Typo=\"Typo.h3\">Selected Date is: @StartDate</MudText>\r\n\r\n@code\r\n    {\r\n        public DateTime StartDate { get; set; }\r\n        public string DateString { get; set; }\r\n    }\r\n```\r\nI have tried this code on try Mudblazor site and in visual studio. The code will update the Date Picker and my Text output when writing a valid date and leaving the text field, this is normal behavior. However, I want to change the Text based on my selection of Date picker. I have tried binding to date and value. both don't reflect the selection I have made.\r\n\r\nI have checked the documentation on the site and there is nothing on how to handle binding beyond what I am doing.\r\n\r\nAm I missing something or this is a bug? for now I am marking this as a Question it is very likely that I am missing something obvious.\r\nPlease help.",
+    "comments_url": "https://api.github.com/repos/MudBlazor/MudBlazor/issues/548/comments",
+    "author": "SuliemanMansouri",
+    "comments": [
+      {
+        "user": "henon",
+        "created_at": "2021-01-13T06:44:13Z",
+        "body": "I am pretty sure your issue is that you are trying to bind `DateTime` to parameter Date which is of type `DateTime?`. In the new docs there will be a notice about this because it is a common pitfall."
+      },
+      {
+        "user": "SuliemanMansouri",
+        "created_at": "2021-01-13T10:48:40Z",
+        "body": "I have tried a nullable DateTime in the code bellow still doesn't work. not in the tryBlazor site, or in VS2019.\r\nHere is a sample of what I am trying to do.\r\nWhen picking a date in the date picker the date should show in both text field and text. \r\n```\r\n<MudDatePicker Label=\"Start Date\" Date=\"@StartDate\" />\r\n<MudTextField Label=\"SelectedDate\" @bind-Value=\"@StartDate\" />\r\n<MudText Typo=\"Typo.h3\">Selected Date is: @StartDate</MudText>\r\n\r\n@code\r\n    {\r\n        public DateTime? StartDate { get; set; }\r\n    }\r\n```"
+      },
+      {
+        "user": "henon",
+        "created_at": "2021-01-13T11:24:25Z",
+        "body": "You need a two-way binding, how else should the DatePicker be able to update your variable? \r\n\r\n`<MudDatePicker Label=\"Start Date\" @bind-Date=\"StartDate\" />`"
+      }
+    ]
+  },
+  {
+    "number": 240,
+    "title": "MudSwitch error when updating from 1.1.5-net5 -> 1.2.0-net5",
+    "created_at": "2020-12-08T12:05:05Z",
+    "closed_at": "2020-12-08T12:23:47Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/MudBlazor/MudBlazor/issues/240",
+    "body": "The line of code below worked in 1.1.5-net, but doesn't in 1.2.0-net5. Note: Perhaps I'm using MudSwitch wrong, I don't know.\r\n\r\n**In MainLayout.razor (_in MudAppBar_):**\r\n`<MudSwitch Color=\"Color.Inherit\" CheckedChanged=\"(() => currentTheme = (currentTheme == defaultTheme) ? darkTheme : defaultTheme)\" Class=\"ma-0\" />`\r\n\r\n**Error:**\r\nSeverity\tCode\tDescription\tProject\tFile\tLine\tSuppression State\r\nError\tCS0411\tThe type arguments for method 'TypeInference.CreateMudSwitch_0<T>(RenderTreeBuilder, int, int, EventCallback<T>)' cannot be inferred from the usage. Try specifying the type arguments explicitly.\tMediatheek.Client\tD:\\Repos\\MediatheekNext\\Mediatheek\\Client\\obj\\Debug\\net5.0\\Razor\\Shared\\MainLayout.razor.g.cs\t224\tActive\r\n",
+    "comments_url": "https://api.github.com/repos/MudBlazor/MudBlazor/issues/240/comments",
+    "author": "JeepNL",
+    "comments": [
+      {
+        "user": "henon",
+        "created_at": "2020-12-08T12:06:48Z",
+        "body": "yes, that is because we made MudSwitch  and MudCheckBox generic types. Please add T=\"bool\" to your MudSwitch"
+      },
+      {
+        "user": "henon",
+        "created_at": "2020-12-08T12:09:39Z",
+        "body": "the upside of this change is that a MudSwitch now can be bound to `bool`, `bool?`, `int`, `int?` and `string`. Had you bound it to a boolean variable it would have been inferred without a compilation error. We knew about this potential breaking change, that's why we bumped the minor version. See #206"
+      }
+    ]
+  }
+]

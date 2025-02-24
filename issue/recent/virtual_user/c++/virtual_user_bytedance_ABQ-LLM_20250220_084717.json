@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/bytedance/ABQ-LLM/issues/4",
+    "source": {
+      "issue_number": 4
+    },
+    "initial_question": {
+      "title": "2bit Packing logic post Bit Balance Strategy",
+      "body": "I want some more understanding on how to pack the 2 bit weights after using bit balance strategy. \r\n\r\nWhile running blockwise quantization we have increased our range from 4 to 5 and values to {-2,-1,0,1,2}. After running the ABQ LLM for 2 bit, I will be having float weights which are good to quantize to 2 bits, but the problem here is with the packing logic. \r\n1.  How to represent the above range using 2 bits and pack them ?\r\n2.  If we use default 2 bit quantization, won't I lose the benefit of bit balance strategy ?"
+    },
+    "satisfaction_conditions": [
+      "The solution must maintain acceleration capabilities"
+    ],
+    "created_at": "2024-09-10T03:38:21Z"
+  }
+]

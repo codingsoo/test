@@ -1,0 +1,327 @@
+[
+  {
+    "number": 3849,
+    "title": "Something went wrong installing the \"sharp\" module (libhdf5)",
+    "created_at": "2023-11-10T14:47:18Z",
+    "closed_at": "2023-11-10T15:47:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/3849",
+    "body": "There seems to be issue when trying to run a project that has 'sharp' module, npm install was fine, but it is when I run my project this blows up:\r\n\r\n```\r\nError: \r\nSomething went wrong installing the \"sharp\" module\r\n\r\ndlopen(/Users/me/myproj/node_modules/sharp/build/Release/sharp-darwin-arm64v8.node, 0x0001): Library not loaded: /opt/homebrew/opt/hdf5/lib/libhdf5.200.dylib\r\n  Referenced from: <34EC9DD4-F027-30F1-ABD4-70161DA46595> /opt/homebrew/Cellar/libmatio/1.5.23/lib/libmatio.11.dylib\r\n  Reason: tried: '/opt/homebrew/opt/hdf5/lib/libhdf5.200.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/hdf5/lib/libhdf5.200.dylib' (no such file), '/opt/homebrew/opt/hdf5/lib/libhdf5.200.dylib' (no such file), '/usr/local/lib/libhdf5.200.dylib' (no such file), '/usr/lib/libhdf5.200.dylib' (no such file, not in dyld cache), '/opt/homebrew/Cellar/hdf5/1.14.2/lib/libhdf5.200.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/Cellar/hdf5/1.14.2/lib/libhdf5.200.dylib' (no such file), '/opt/homebrew/Cellar/hdf5/1.14.2/lib/libhdf5.200.dylib' (no such file), '/usr/local/lib/libhdf5.200.dylib' (no such file), '/usr/lib/libhdf5.200.dylib' (no such file, not in dyld cache)\r\n  ```\r\n  \r\n  It is complaining about not finding libhdf5.200, I've checked the folder, and I can see I have the following one (newer one?!):\r\n  \r\n  ```\r\nlibhdf5.310.dylib\r\n  ```\r\n\r\n\r\nI am running M1 macbook, node v18.18.0, npmjs 10.1.0,\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/3849/comments",
+    "author": "chr4ss12",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2023-11-10T15:13:34Z",
+        "body": "This looks like a local Homebrew misconfiguration, please try running `brew update && brew upgrade`"
+      }
+    ]
+  },
+  {
+    "number": 2973,
+    "title": "Sharp get crash when run on docker with node:12-alpine",
+    "created_at": "2021-11-15T11:44:47Z",
+    "closed_at": "2021-11-15T14:09:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/2973",
+    "body": "\r\nI'm using the sharp version 0.26.3 to resize my images, when I run my application on local (using Windows 11), it working fine but when I deploy the code to server using docker with node:12-alpine image, my application crash when sharp resize uploaded image without any exception.\r\nI was tried to set cache to false or set cache to  sharp.cache({ memory: 0, files: 0, items: 0 }) but nothing helpful.\r\nMy size image code\r\n const image = await sharp(`${destPath}/${fileName}`)\r\n              .resize({ height })\r\n              .toFormat('jpeg')\r\n              .toFile(localStoragePath);",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/2973/comments",
+    "author": "sonnguyenjom",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2021-11-15T11:49:27Z",
+        "body": "This is probably #2570, please can you upgrade to the latest version."
+      }
+    ]
+  },
+  {
+    "number": 2698,
+    "title": "Error: extract_area: bad extract area if display not main display in Windows",
+    "created_at": "2021-05-06T16:06:54Z",
+    "closed_at": "2021-05-07T14:24:22Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/2698",
+    "body": "Hello. \r\n\r\n**Issue**: On a windows machine, when I am working with 2 displays, when I try to `extract` and then save `toBuffer` on a display which is not the main display, I get the following error: `Error: extract_area: bad extract area` . However, the same code works perfectly fine if I make that display as my main display.\r\n\r\n**Expected Behavior**: I want to be able to `extract` and save `toBuffer` on a display which is not the main display.\r\n\r\n**Sample Code**\r\n\r\n```\r\n    let bounds = { x: 2496, y: 25, width: 968, height: 702 }\r\n    const cropped = await sharp(screenshotImg);\r\n    const metadata = await cropped.metadata();\r\n    const height = Math.min(metadata.height,bounds.height);\r\n    const width = Math.min(metadata.width, bounds.width);\r\n    const left = Math.max(0, bounds.x);\r\n    const top = Math.max(0, bounds.y);\r\n    const result = cropped.extract({ left: left, top: top, width, height });\r\n    const bufferResult = await result.toBuffer();  // This line gives Error: extract_area: bad extract area\r\n    return sharp(bufferResult, { height, width, channels: 3 });\r\n```\r\nI checked that the extraction bounds are within the limits of the image that I am trying to extract from. \r\n\r\nAny help is appreciated. Please let me know if you require more info. Thanks",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/2698/comments",
+    "author": "samarth-bola",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2021-05-06T17:38:18Z",
+        "body": "Please can you provide a sample input image that fails in this manner. Based on the sample code provided it should be at least 3464x727 in dimensions."
+      },
+      {
+        "user": "samarth-bola",
+        "created_at": "2021-05-06T18:13:14Z",
+        "body": "> Please can you provide a sample input image that fails in this manner. Based on the sample code provided it should be at least 3464x727 in dimensions.\r\n\r\nThe input image is the screenshot of the display screen (resolution: 1200x1920) in .png format. So the dimensions of the input image is 1200x1920. That would be the same if its the main display or the secondary display. "
+      },
+      {
+        "user": "lovell",
+        "created_at": "2021-05-06T18:38:25Z",
+        "body": "> I checked that the extraction bounds are within the limits of the image that I am trying to extract from.\r\n\r\nThe value of `left` in the code above will be 2496, which is already out of bounds for a 1200px wide image.\r\n\r\nPerhaps you could provide a sample repo with code and images that allows someone else to reproduce this."
+      },
+      {
+        "user": "samarth-bola",
+        "created_at": "2021-05-07T14:24:22Z",
+        "body": "> > I checked that the extraction bounds are within the limits of the image that I am trying to extract from.\r\n> \r\n> The value of `left` in the code above will be 2496, which is already out of bounds for a 1200px wide image.\r\n> \r\n> Perhaps you could provide a sample repo with code and images that allows someone else to reproduce this.\r\n\r\nThe value of `left` was definitely the issue. It was out of bounds which was giving the error in the first place. Thanks a bunch for pointing it out."
+      }
+    ]
+  },
+  {
+    "number": 2392,
+    "title": "await does not work?",
+    "created_at": "2020-10-02T00:45:11Z",
+    "closed_at": "2020-10-02T16:02:17Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/2392",
+    "body": "My code:\r\n\r\n```\r\nconst fs = require('fs');\r\nconst sharp = require('sharp');\r\n\r\nconst src = '/tmp/input.jpg';\r\nconst dst = '/tmp/output.jpg';\r\n\r\n(async () => {\r\n    await sharp(src).resize(100, 100).toFile(dst);\r\n    await fs.chmod(dst, 0o666);\r\n})();\r\n\r\n```\r\nI have got an error:\r\n`exception: Error: ENOENT: no such file or directory, chmod '/tmp/output.jpg'`\r\n\r\nIt looks like chmod runs before the sharp has been done its job.\r\n\r\nAny ideas?",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/2392/comments",
+    "author": "m00nk",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2020-10-02T08:47:42Z",
+        "body": "Hi, `fs.chmod` does not return a Promise, so this might be the cause. Perhaps add a try/catch block around each use of `await`?"
+      },
+      {
+        "user": "m00nk",
+        "created_at": "2020-10-02T11:26:10Z",
+        "body": "I have tried this:\r\n\r\n```\r\n(async () => {\r\n    await sharp(src).resize(100, 100).toFile(dst);\r\n    await fs.promises.chmod(dst, 0o666);\r\n})();\r\n```\r\n\r\nand had the same result - chmod runs before the output file has been created."
+      },
+      {
+        "user": "lovell",
+        "created_at": "2020-10-02T11:42:58Z",
+        "body": "Please can you provide complete information about the versions, platform, OS etc. involved."
+      },
+      {
+        "user": "m00nk",
+        "created_at": "2020-10-02T12:39:44Z",
+        "body": "Linux Mint (Ubuntu), Node 12.18, sharp 0.26.0"
+      },
+      {
+        "user": "lovell",
+        "created_at": "2020-10-02T12:59:06Z",
+        "body": "Thanks, I cannot reproduce this. Is there anything unusual about the /tmp filesystem on this machine? Does using a non-tmp path work? What happened when you added the separate try/catch blocks around each use of await?"
+      },
+      {
+        "user": "m00nk",
+        "created_at": "2020-10-02T14:03:02Z",
+        "body": "I have found very strange behavior. The code:\r\n\r\n```js\r\nconsole.log('START');\r\n\r\nconst proc = sharp(srcImg);\r\n// some other code is here\r\nproc\r\n\t.toFile(dstImg)\r\n\t.then(info => { console.log('INFO', info);})\r\n\t.catch(err => { console.log('ERR', err);});\r\n\r\ntry{\r\n\tawait proc;\r\n\tconsole.log('DONE PROC');\r\n}\r\ncatch(e){ console.log('EXCEPTION', e); }\r\n\r\nconsole.log('FINISHED');\r\n```\r\n\r\nI have got:\r\n```\r\nSTART\r\nDONE PROC\r\nFINISHED\r\nINFO {\r\n   format: 'jpeg',\r\n   width: 250,\r\n   height: 90,\r\n   channels: 3,\r\n   premultiplied: false,\r\n   size: 8098\r\n }\r\n```\r\n\r\nSo last console.log runs before the image has been created. But if I use \"the chain\" like:\r\n\r\n```js\r\nconst proc = sharp(srcImg)\r\n\t.toFile(dstImg)\r\n\t.then(info => {\tconsole.log('INFO', info);\t})\r\n\t.catch(err => {\tconsole.log('ERR', err);\t});\r\n```\r\ninstead of\r\n```js\r\nconst proc = sharp(srcImg);\r\nproc.toFile(dstImg)\r\n\t.then(info => { console.log('INFO', info);})\r\n\t.catch(err => { console.log('ERR', err);});\r\n```\r\nI have got:\r\n\r\n```\r\nSTART\r\nINFO {\r\n   format: 'jpeg',\r\n   width: 250,\r\n   height: 90,\r\n   channels: 3,\r\n   premultiplied: false,\r\n   size: 8098\r\n}\r\nDONE PROC\r\nFINISHED\r\n```\r\n\r\nIn this way all works right - last console.log runs AFTER the image has been created.\r\n\r\nCan you explain this behaviour? I am not very good in JS, so maybe I do something wrong, but in my opinion that behoviour is very odd. \r\n\r\nThank you.\r\n\r\nPS.\r\nAll code above placed inside async function. "
+      },
+      {
+        "user": "lovell",
+        "created_at": "2020-10-02T14:12:50Z",
+        "body": "Your code is mixing up Promise chains and await/try/catch notation.\r\n\r\nThe call to `toFile()` returns a Promise, so that's what you must `await`, e.g. `await proc.toFile(dstImg)`\r\n\r\nYou can't await a sharp instance itself, so e.g. `await proc` is incorrect (it resolves straight away)."
+      }
+    ]
+  },
+  {
+    "number": 2278,
+    "title": "base64\u7f16\u7801\u5b57\u7b26\u4e32\u4e0d\u6b63\u786e\u7684\u65f6\u5019\uff0ctry/catch\u6ca1\u6709\u6355\u83b7\u5230error",
+    "created_at": "2020-07-03T08:55:37Z",
+    "closed_at": "2020-07-04T11:00:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/2278",
+    "body": "\u5ba2\u6237\u7aef\r\nlet buff = fs.readFileSync(fileName)\r\nlet base64Str = buff.toString('base64')\r\nbase64Str = base64Str.substring(0, base64Str.length - 100) \uff08base64Str.length > 100)\r\n\r\n\u670d\u52a1\u7aef\r\ntry {\r\n  let buffer = Buffer.from(base64Str, 'base64')\r\n  let img = sharp(buffer)\r\n  await img.metadata()\r\n  sharp(buffer).resize(width, height)\r\n} catch (error) {\r\n  \r\n}\r\n\r\n\u6709\u8f93\u51fa\r\nUncaught Error: VipsJpeg: Premature end of JPEG file\r\nVipsJpeg: out of order read at line 1008\r\n\r\n\u4f46\u662f\u6211\u6ca1\u6709\u5728catch\u91cc\u9762\u6355\u83b7\u5230error\uff0c\u8bf7\u95ee\u4e0b\u662f\u4ec0\u4e48\u539f\u56e0\uff1f",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/2278/comments",
+    "author": "tangna",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2020-07-03T13:05:41Z",
+        "body": "Does the following change, to `await` a call to `toBuffer`, ensure the error is caught?\r\n```diff\r\n- sharp(buffer).resize(width, height)\r\n+ await sharp(buffer).resize(width, height).toBuffer()\r\n```\r\nIf not, please provide a complete, standalone code sample and image that allows someone else to reproduce this problem."
+      },
+      {
+        "user": "lovell",
+        "created_at": "2020-07-03T20:42:35Z",
+        "body": "The use of Stream-based output means you can no longer \"catch\" errors, instead you'll need to listen for the error event.\r\n```diff\r\n- sharp(buffer).resize(width, height)\r\n+ sharp(buffer).resize(width, height).on('error', err => { ... })\r\n```\r\n\r\n(This is a Node.js concept rather than being specific to sharp.)"
+      }
+    ]
+  },
+  {
+    "number": 2163,
+    "title": "Conversion some time leading to blur on images",
+    "created_at": "2020-04-13T19:19:03Z",
+    "closed_at": "2020-04-14T05:52:38Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/2163",
+    "body": "TLDR; Using blur filter randomly blurs the images which are not to be blurred.\r\nI am converting images into 5 resolutions and blurring the lowest resolution on i.e. 200px wid only. but some how some random images gets blurred. Using blur is high priority to reduce images size. Calling convert image function using calbackify.\r\n`\r\nvar WebpOptions = {\r\n    reductionEffort: 4,\r\n    quality: 70,\r\n}\r\n\r\nvar JpegOptions = {\r\n    quantisationTable: 8,\r\n    quality: 60,\r\n    trellisQuantisation: true,\r\n    overshootDeringing: true,\r\n    chromaSubsampling: '4:2:0'\r\n}\r\nasync function convertImage(Map) {\r\n\r\n    var promises = [];\r\n    var logs = [];\r\n\r\n    if (typeof (Map) !== 'object')\r\n        throw Error(`Given Map ${Map} data is not in the form of an object`);\r\n\r\n    for (let [key, value] of Object.entries(Map)) {\r\n\r\n        var files = fs.readdirSync(key);\r\n\r\n        for (let i = 0; i < files.length; i++) {\r\n            let ls = fs.lstatSync(`${key}${files[i]}`)\r\n            if (ls.isFile())\r\n                files[i] = {\r\n                    name: files[i],\r\n                    path: `${key}${files[i]}`,\r\n                    size: ls.size\r\n                };\r\n            else\r\n                files[i] = null;\r\n        }\r\n\r\n        for (var i = 0; i < files.length; i++) {\r\n            if (files[i] === null)\r\n                continue;\r\n            var filename = path.basename(files[i].name).split('.');\r\n            filename[0] = filename[0].replace(/ /g, '_');\r\n\r\n            var res = [2000, 1000, 800, 600, 100];\r\n\r\n            for (let j = 0; j < res.length; j++) {\r\n                let target = path.resolve(`${value}${res[j]}/`);\r\n                if (!fs.existsSync(target)) {\r\n                    console.log(`MKDIR ${target}`);\r\n                    fs.mkdirSync(target, { recursive: true });\r\n                }\r\n            }\r\n\r\n            var Image = sharp(files[i].path).resize(res[0]);\r\n            \r\n            var pipeline = Image.clone().webp(WebpOptions)\r\n\r\n            for (let j = 0; j < res.length; j++) {\r\n                let target = `${value}${res[j]}/${filename[0]}.webp`;\r\n                if (res[j] == 100) {\r\n\r\n                    let rendition = pipeline;\r\n                    let size = res[j]\r\n                    promises.push(blurImage(rendition, size, target))\r\n                }\r\n                else {\r\n\r\n                    let rendition = pipeline;\r\n                    let size = res[j]\r\n                    promises.push(fineImage(rendition, size, target))\r\n\r\n                }\r\n            }\r\n\r\n            pipeline = Image.clone().jpeg(JpegOptions)\r\n\r\n            for (let j = 0; j < res.length; j++) {\r\n                let target = `${value}${res[j]}/${filename[0]}.jpg`;\r\n                if (res[j] == 100) {\r\n\r\n                    let rendition = pipeline;\r\n                    let size = res[j]\r\n                    promises.push(blurImage(rendition, size, target))\r\n                }\r\n                else {\r\n\r\n                    let rendition = pipeline;\r\n                    let size = res[j]\r\n                    promises.push(fineImage(rendition, size, target))\r\n\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    function fineImage(rendition, size, target) {\r\n        return rendition\r\n            .clone()\r\n            .metadata()\r\n            .then(metadata => rendition\r\n                .resize(size, null, { fastShrinkOnLoad: false })\r\n                .toFile(target)\r\n                .then(info => { return { info, target, metadata, shape : 'fine' }; }))\r\n            .catch(err => console.log(err));\r\n    }\r\n\r\n    function blurImage(rendition, size, target) {\r\n        return rendition\r\n            .clone()\r\n            .metadata()\r\n            .then(metadata => rendition\r\n                .resize(size, null, { kernel: sharp.kernel.cubic, fastShrinkOnLoad: true })\r\n                .blur(20)\r\n                .toFile(target)\r\n                .then(info => { return { info, target, metadata, shape : 'blur' }; }))\r\n            .catch(err => console.log(err));\r\n    }\r\n\r\n    return await Promise.all(promises)\r\n        .then((values) => {\r\n            values.forEach((value) => console.log(value.target+ ' ' + value.shape))\r\n            return differenceTime(Benchmark)\r\n        });\r\n}\r\n`\r\n\r\nSystem:\r\n    OS: Linux 5.3 Ubuntu 18.04.4 LTS (Bionic Beaver)\r\n    CPU: (4) x64 Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz\r\n    Memory: 6.45 GB / 15.48 GB\r\n    Container: Yes\r\n    Shell: 4.4.20 - /bin/bash\r\n  Binaries:\r\n    Node: 12.16.1 - ~/.nvm/versions/node/v12.16.1/bin/node\r\n    npm: 6.14.4 - ~/.nvm/versions/node/v12.16.1/bin/npm\r\n\r\nSome random webp and Jpg Images are coming blurred. If you use blur filter. If you dont use blur filter all images are fine.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/2163/comments",
+    "author": "navanshu",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2020-04-13T20:02:14Z",
+        "body": "Hi, there's a race condition in this code. The `rendition` object passed to the `blurImage` function is modified asynchronously.\r\n\r\n```diff\r\nfunction blurImage(rendition, size, target) {\r\n    return rendition\r\n        .clone()\r\n        .metadata()\r\n        .then(metadata => rendition\r\n+           .clone()\r\n            .resize(size, null, { kernel: sharp.kernel.cubic, fastShrinkOnLoad: true })\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1808,
+    "title": "Error: Input buffer contains unsupported image format on composite",
+    "created_at": "2019-07-25T22:40:57Z",
+    "closed_at": "2019-07-31T15:17:00Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/1808",
+    "body": "Hi\r\nI have created a function which gets an image buffer(jpeg, png...).\r\nIt should resize images and depending from options also make them circle.\r\nThe code is working on my local machine.\r\nIt's also working on the server without circle block, but getting following error on the server for circle images:\r\n` Error: Input buffer contains unsupported image format `\r\nCan you please help me? Is it happening because of some packages versions difference?\r\n\r\n```\r\nconst sharp = require('sharp');\r\n\r\nmodule.exports = async function (image, options) {\r\n    let img = sharp(image);\r\n    const imgInfo = await img.metadata();\r\n    let format = options.format || imgInfo.format;\r\n\r\n    if (options.circle) {\r\n        const circle = new Buffer(\r\n            `<svg style=\"background-color: white\">\r\n                <circle cy=\"${options.height / 2}\" cx=\"${options.width / 2}\" r=\"${options.width / 2}\" />\r\n            </svg>`\r\n        );\r\n\r\n        format = 'png';\r\n        img.composite([{ input: circle, blend: 'dest-in' }]);\r\n    }\r\n\r\n    switch (format) {\r\n        case 'png':\r\n            img = img.png({ quality: options.quality || 100 });\r\n            break;\r\n        default:\r\n            img = img.jpeg({ quality: options.quality || 100 });\r\n    }\r\n\r\n    return img\r\n        .resize(options.width, options.height)\r\n        .toBuffer();\r\n};\r\n```",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/1808/comments",
+    "author": "susannaHayrapetyan",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2019-07-26T08:36:25Z",
+        "body": "The output of `console.log(sharp.format)` will tell you which image formats are supported at runtime.\r\n\r\nIf you're using the prebuilt binaries these include librsvg. If you're relying on a globally-installed libvips this may be different."
+      }
+    ]
+  },
+  {
+    "number": 1765,
+    "title": "toFile() does not warn if folder does not exist",
+    "created_at": "2019-06-25T07:43:24Z",
+    "closed_at": "2019-06-25T09:41:12Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/1765",
+    "body": "What is the output of running `npx envinfo --binaries --languages --system --utilities`?\r\n  System:\r\n    OS: Linux 4.9 Alpine Linux undefined\r\n    CPU: (2) x64 Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz\r\n    Memory: 1.45 GB / 1.93 GB\r\n    Container: Yes\r\n    Shell: Unknown - /bin/ash\r\n  Binaries:\r\n    Node: 10.15.3 - /usr/bin/node\r\n    npm: 6.4.1 - /usr/bin/npm\r\n\r\nUsing latest gazf/alpine-sharp docker image.\r\n\r\n### What are the steps to reproduce?\r\n\r\nUse sharp().composite.toFile(file) where the file path is a directory that does not exist.\r\nThe file outputting fails, without error or warning.\r\n\r\n### What is the expected behaviour?\r\n\r\nI feel like I should have got some feedback that the output was failing because the folder did not exist.\r\n\r\n### Are you able to provide a standalone code sample, without other dependencies, that demonstrates this problem?\r\n\r\n```\r\nasync function compositeDiff(file, width) {\r\n  var margin = 10;\r\n  sharp(diffDir + file)\r\n      .extend({\r\n        top: 0,\r\n        bottom: 0,\r\n        left: 0,\r\n        right: ((width + margin) * 2)\r\n      })\r\n      .composite([\r\n          {\r\n            input: referenceDir + resizedDir + file,\r\n            left: width + margin,\r\n            top: 0\r\n          },\r\n          {\r\n            input: testDir + resizedDir + file,\r\n            left: (width + margin) * 2,\r\n            top: 0\r\n          },\r\n      ])\r\n      .toFile(comparisonDir + file)\r\n}\r\n```\r\n\r\nCalling this function in a script that is called from a docker-compose command using the gazf/alpine-sharp image produces no error or warning output, but outputs no file.\r\nInserting a mkdir at the start of the function fixes the problem of no file being outputted.\r\n",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/1765/comments",
+    "author": "jonathanjfshaw",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2019-06-25T07:52:09Z",
+        "body": "Hi, I see the following error when attempting to write to a non-existent directory via `toFile()`:\r\n```\r\nError: vips__file_open_write: unable to open file \"does-not-exist/output.jpg\" for writing\r\nunix error: No such file or directory\r\n```\r\nPerhaps some error handling is required in the code that calls the `compositeDiff()` function shown in this example? In addition, you're not returning the promise chain - try the following:\r\n\r\n```diff\r\n-  sharp(diffDir + file)\r\n+  return sharp(diffDir + file)\r\n```\r\nor \r\n```diff\r\n-  sharp(diffDir + file)\r\n+  await sharp(diffDir + file)\r\n```\r\n\r\nPlease see #639 #874 #1052"
+      }
+    ]
+  },
+  {
+    "number": 1604,
+    "title": "Error: Input file is missing or of an unsupported image format on some requests",
+    "created_at": "2019-03-09T17:20:46Z",
+    "closed_at": "2019-03-11T11:21:54Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/1604",
+    "body": "Hello,\r\nThis code for image upload and compression works in most cases but some requests fail ((Number of fails increase in load testing) with error: 'Error: Input file is missing or of an unsupported image format'\r\n\r\nI checked the path whenever this error appears. The file really exists and is usable. Also this error does not appear for all requests. The exception occurs when I give the temp file path (saved to disk via streams to reduce memory footprint) to sharp.\r\n\r\n```\r\n'use strict';\r\n\r\nconst fs = require('fs');\r\nconst fsx = require('fs-extra');\r\nconst path = require('path');\r\nconst sharp = require('sharp');\r\nconst Config = require('../config/image');\r\nconst Rand = require('../utils/random');\r\nconst TAG = '\\services\\image';\r\nfunction readImageStream(buffer, owner, tempFileName){\r\n\tconst tempFilepath = Config.UPLOAD_PATH+'tmp\\\\'+owner+'\\\\'+tempFileName;\r\n\treturn new Promise(function(resolve, reject){\r\n\t\t//const readStream = fs.createReadStream(buffer);\r\n\t\tconst readStream = buffer;\r\n\t\tconst writeStream = fs.createWriteStream(tempFilepath);\r\n\t\tlet output;\r\n\t\treadStream.on('data', function(chunk){\r\n\t\t\twriteStream.write(chunk, {flags: 'a', encoding:null, mode:0o666});\r\n\t\t});\r\n\t\treadStream.on('end', function(){\r\n\t\t\tconst path = writeStream.path;\r\n\t\t\twriteStream.end();\r\n\t\t\tresolve(path);\r\n\t\t});\r\n\t\treadStream.on('error', function(err){\r\n\t\t\tconsole.log(\"Error in reading image stream \" + TAG, err);\r\n\t\t\treject(err);\r\n\t\t});\r\n\t});\r\n}\r\n\r\nfunction checkImageDimensions(owner, filename){\r\n\tconst path = Config.UPLOAD_PATH + \"tmp\\\\\"+ owner + \"\\\\\" + filename;\r\n\treturn new Promise(function(resolve, reject){\r\n\t\t\r\n\t\tsharp(path)\r\n\t\t\t.metadata()\r\n\t\t\t.then(function(info){\r\n\t\t\t\tif(info.width < 100 || info.height <100 || \r\n\t\t\t      (info.width / info.height < 0.5) ||\r\n\t\t\t\t  (info.height / info.width < 0.5)){\r\n\t\t\t\t\t\treject('Bad image size');\r\n\t\t}\r\n\t\telse{\r\n\t\t\tresolve();\r\n\t\t}\r\n\t\t})\r\n\t\t.catch(function(err){\r\n\t\t\tconsole.log(\"Error in image size check \" + TAG, err);\r\n\t\t\treject(err);\r\n\t\t})\r\n\t}); \r\n}\r\n\r\nexports.Save = async function(owner, buffer){\r\n\tconst tempDir = Config.UPLOAD_PATH+\"tmp\\\\\"+owner;\r\n\tconst tempFileName1 = Rand.UUID() + Config.EXTENSION; //Creates UUID for filename\r\n\tconst tempFileName2 = Rand.UUID() + Config.EXTENSION;\r\n\tconst tempPath = tempDir + \"\\\\\"+tempFileName1;\r\n\tconst ensureDirExists = await fsx.ensureDir(Config.UPLOAD_PATH+ \"tmp\\\\\"+owner);\r\n\t//await checkMaxTempSize(owner);\r\n\tawait readImageStream(buffer, owner, tempFileName1);\r\n\tawait checkImageDimensions(owner, tempFileName1);\r\n\ttry{\r\n\t\tawait sharp(tempPath)\r\n\t\t\t\t\t.resize(800, 494, {\r\n\t\t\t\t\t\t\t\t\t\tkernel: sharp.kernel.nearest,\r\n\t\t\t\t\t\t\t\t\t\tfit: 'contain',\r\n\t\t\t\t\t\t\t\t\t\tbackground: { r: 255, g: 255, b: 255}\r\n\t\t\t\t\t\t\t\t\t}).toFile(Config.UPLOAD_PATH+ \"tmp\\\\\"+owner+ \"\\\\\" + tempFileName2, {quality:80});\r\n\t\t\t\treturn {\r\n\t\t\t\t\t\tfilename: tempFileName2\r\n\t\t\t\t};\r\n\t}\r\n\tcatch(err){\r\n\t\tconsole.log(\"Error in image compression \" + TAG, err);\r\n\t\treturn err;\r\n\t}\r\n} \r\n```",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/1604/comments",
+    "author": "danialkhansari",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2019-03-09T20:18:38Z",
+        "body": "Hi, there's a race condition in the following section of your code, unrelated to sharp:\r\n```javascript\r\nreadStream.on('end', function(){\r\n\tconst path = writeStream.path;\r\n\twriteStream.end();\r\n\tresolve(path);\r\n});\r\n```\r\nThe call to `writeStream.end()` is not synchronous so `resolve` could occur before `writeStream` has finished writing to and closing the underlying file descriptor.\r\n\r\nInstead listen for the `close` event on `writeStream` before resolving."
+      },
+      {
+        "user": "gergo0720",
+        "created_at": "2019-03-09T23:31:23Z",
+        "body": "Hi, I've experienced the same issue. In some cases it works properly, but it often happens to get the error mentioned above. I've tried to check the details of a \"working\" image and a \"non-working\" image. The only difference is the file-type. For not working images we have:\r\n\r\nFile Type: JPEG image data, **JFIF standard 1.02**\r\n\r\nMy current settings to resize is:\r\n\r\n`sharp(filePath)\r\n\t\t\t.withMetadata()\r\n\t\t\t.resize(200, 200, {\r\n\t\t\t\twithoutEnlargement: true\r\n\t\t\t})\r\n\t\t\t.png()\r\n\t\t\t.toFile(newFilePath);`\r\n\r\nI am using the latest version, but also tried an earlier one (0.20.5). The result was the same.\r\n\r\nI hope we can figure this out, and thanks in advance."
+      },
+      {
+        "user": "lovell",
+        "created_at": "2019-03-09T23:41:14Z",
+        "body": "@gergo0720 Please open a new issue with a standalone code sample and example input image that consistently fails."
+      }
+    ]
+  },
+  {
+    "number": 994,
+    "title": "Silent crash when calling sharp without arguments",
+    "created_at": "2017-10-17T17:58:01Z",
+    "closed_at": "2017-10-17T20:06:25Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/994",
+    "body": "Minimal test case:\r\n\r\n```js\r\nconst sharp = require('sharp')\r\nconst main = async () => {\r\n  const image = sharp()\r\n  const info = await image.metadata()\r\n  console.log('done')\r\n}\r\n\r\nmain()\r\n```\r\n\r\nThe process simply exits with status 0.  There is no error message, and 'done' is never logged to the console.",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/994/comments",
+    "author": "whmountains",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2017-10-17T18:16:31Z",
+        "body": "Hello, the parameter-less constructor is for Stream-based input.\r\n\r\n> \"JPEG, PNG, WebP, GIF, SVG, TIFF or raw pixel image data can be streamed into the object when not present.\" \r\n\r\nIn your example, this might look like the following:\r\n```diff\r\n  const image = sharp()\r\n+ readableSteam.pipe(image)\r\n  const info = await image.metadata()\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 453,
+    "title": "Library not loaded: /usr/local/opt/orc/lib/liborc-0.4.0.dylib",
+    "created_at": "2016-06-05T05:15:27Z",
+    "closed_at": "2016-06-05T10:58:21Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/453",
+    "body": "Unable to run the module due to an error of `Library not loaded: /usr/local/opt/orc/lib/liborc-0.4.0.dylib`.\n\nI used `brew install homebrew/science/vips` to install all dependancies. Everything was installed correctly (after around 10 minutes), yet the module still fails to run.\n\nAny idea on how to fix this?\n",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/453/comments",
+    "author": "zilions",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2016-06-05T09:11:13Z",
+        "body": "Hello, this looks like #323. Please can you try:\n\n``` sh\nbrew update && brew upgrade\nbrew unlink orc && brew link orc\n```\n"
+      },
+      {
+        "user": "tiendq",
+        "created_at": "2016-08-12T03:43:02Z",
+        "body": "@lovell I got the same error yesterday on my OSX and your trick worked, thanks :)\n\nError ==========================\n\n1): Library not loaded: /usr/local/opt/libpng/lib/libpng16.16.dylib\n  Referenced from: /usr/local/opt/vips/lib/libvips-cpp.42.dylib\n  Reason: Incompatible library version: libvips-cpp.42.dylib requires version 40.0.0 or later, but libpng16.16.dylib provides version 38.0.0\n"
+      }
+    ]
+  },
+  {
+    "number": 422,
+    "title": "Can't install sharp v0.12.2 with node 6",
+    "created_at": "2016-04-30T16:53:53Z",
+    "closed_at": "2016-04-30T17:37:55Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/422",
+    "body": "Error shown when I tried to install:\n\nnpm ERR! Darwin 15.4.0\nnpm ERR! argv \"/usr/local/bin/node\" \"/usr/local/bin/npm\" \"install\"\nnpm ERR! node v6.0.0\nnpm ERR! npm  v3.8.6\nnpm ERR! code ELIFECYCLE\n\nnpm ERR! sharp@0.12.2 install: `node-gyp rebuild`\nnpm ERR! Exit status 1\nnpm ERR! \nnpm ERR! Failed at the sharp@0.12.2 install script 'node-gyp rebuild'.\nnpm ERR! Make sure you have the latest version of node.js and npm instal\n",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/422/comments",
+    "author": "MichaelBuen",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2016-04-30T16:58:54Z",
+        "body": "Please can you try with v0.14.1, the latest version.\n"
+      }
+    ]
+  },
+  {
+    "number": 389,
+    "title": "incompatible library version",
+    "created_at": "2016-04-01T04:33:42Z",
+    "closed_at": "2016-04-01T10:13:45Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/lovell/sharp/issues/389",
+    "body": "I got this error when i tried to run.\n\n\"Reason: Incompatible library version: libvips-cpp.42.dylib requires version 38.0.0 or later, but libpng16.16.dylib provides version 35.0.0\"\n",
+    "comments_url": "https://api.github.com/repos/lovell/sharp/issues/389/comments",
+    "author": "SuThaw",
+    "comments": [
+      {
+        "user": "lovell",
+        "created_at": "2016-04-01T08:00:23Z",
+        "body": "Hello, running `brew update && brew upgrade` and/or `brew unlink libpng && brew link libpng` might help. See #323 too.\n"
+      }
+    ]
+  }
+]

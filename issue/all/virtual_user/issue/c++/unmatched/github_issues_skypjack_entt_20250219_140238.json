@@ -1,0 +1,54 @@
+[
+  {
+    "number": 1181,
+    "title": "Runtime Eror with groups",
+    "created_at": "2024-10-05T16:50:43Z",
+    "closed_at": "2024-10-12T17:02:24Z",
+    "labels": [
+      "question",
+      "solved"
+    ],
+    "url": "https://github.com/skypjack/entt/issues/1181",
+    "body": "I get this runtime error: \r\n```Assertion failed: ((std::all_of(groups.cbegin(), groups.cend(), [](const auto &data) { return !(data.second->owned(type_id<Owned>().hash()) || ...); })) && (\"Conflicting groups\")), file ...file/path/to/source...\\entt\\entity/registry.hpp, line 1105```\r\n\r\ncode:\r\n```EntityManager::GetWorld().group<MeshInstance>(entt::get<Transform>).size()```\r\nEntityManager::GetWorld() basically returns the registry",
+    "comments_url": "https://api.github.com/repos/skypjack/entt/issues/1181/comments",
+    "author": "MineStorm999",
+    "comments": [
+      {
+        "user": "skypjack",
+        "created_at": "2024-10-07T10:23:01Z",
+        "body": "Groups cannot share ownership of a same type. In this case, you're violating their rules. You have another group somewhere taking ownership of `MeshInstance`. Thus, the assert."
+      },
+      {
+        "user": "MineStorm999",
+        "created_at": "2024-10-07T11:58:35Z",
+        "body": "Ok is it the same with Views?"
+      },
+      {
+        "user": "skypjack",
+        "created_at": "2024-10-07T12:46:28Z",
+        "body": "No, they don't _own_ anything."
+      }
+    ]
+  },
+  {
+    "number": 999,
+    "title": "meta_any::invoke dose not change a instance which is passed as reference.",
+    "created_at": "2023-03-22T14:29:07Z",
+    "closed_at": "2023-03-22T14:47:55Z",
+    "labels": [
+      "question",
+      "solved"
+    ],
+    "url": "https://github.com/skypjack/entt/issues/999",
+    "body": "### Environment\r\n- entt : v3.11.1\r\n- visual studio 2022 : Version17.4.5\r\n\r\n### Issue\r\nI called meta_any::invoke with a function which receive a reference parameter and modify it.\r\n\r\nI read issue #460, so I used std::ref.\r\n\r\nBut the caller's instance value was not changed.\r\n\r\nMy code is as follow.\r\n\r\n``` cpp\r\nstruct Position\r\n{\r\n\tdouble x, y, z;\r\n\r\n\tvoid get(double& tmp)\r\n\t{\r\n\t\ttmp = x;\r\n\t}\r\n};\r\n\r\nBOOST_AUTO_TEST_CASE(Test)\r\n{\r\n\tusing entt::operator\"\"_hs;\r\n\r\n\tentt::meta<::Position>()\r\n\t\t.type(entt::type_id<::Position>().hash())\r\n\t\t.func<&::Position::get>(\"get\"_hs);\r\n\r\n\t::Position data{ 1.0, 2.0, 3.0 };\r\n\tauto any = entt::resolve(entt::type_id<Position>()).from_void(&data);\r\n\r\n\tdouble value;\r\n\tany.invoke(\"get\"_hs, std::ref(value));\r\n\r\n\tBOOST_TEST(value == data.x);\r\n}\r\n```\r\n\r\nIn addition, I executed the code in 460 with a slight modification.\r\nResults were similar.\r\n\r\n``` cpp\r\nBOOST_AUTO_TEST_CASE(MutateByRef)\r\n{\r\n\tusing entt::operator\"\"_hs;\r\n\r\n\tentt::meta<get_last_hour_data>().type(\"/getLastHourData\"_hs).template base<Base>().\r\n\t\ttemplate func<&get_last_hour_data::exec>(\"exec\"_hs).\r\n\t\ttemplate ctor<&get_last_hour_data::create>();\r\n\tauto type = entt::resolve(\"/getLastHourData\"_hs);\r\n\tassert(type);\r\n\r\n\tauto func = type.func(\"exec\"_hs);\r\n\tassert(func);\r\n\r\n\tauto any = type.construct(std::string{});\r\n\tassert(any);\r\n\r\n\tstd::string s;\r\n\tauto any_2 = func.invoke(any, std::ref(s));\r\n\tassert(any_2);\r\n\tBOOST_TEST(\".\" == s);\r\n}\r\n\r\nBOOST_AUTO_TEST_CASE(MutateBySharedPtrRef)\r\n{\r\n\tusing entt::operator\"\"_hs;\r\n\r\n\tentt::meta<get_last_hour_data>().template func<&get_last_hour_data::exec_ptr>(\"exec_ptr\"_hs);\r\n\r\n\tauto type = entt::resolve(\"/getLastHourData\"_hs);\r\n\tassert(type);\r\n\r\n\r\n\tauto func = type.func(\"exec_ptr\"_hs);\r\n\tassert(func);\r\n\r\n\tauto any = type.construct(std::string{});\r\n\tassert(any);\r\n\r\n\tauto s = std::make_shared<std::string>();\r\n\tauto any_2 = func.invoke(any, std::ref(s));\r\n\tassert(any_2);\r\n\tBOOST_TEST(\".\" == *s);\r\n}\r\n```\r\n\r\nThank you for your help in advance.",
+    "comments_url": "https://api.github.com/repos/skypjack/entt/issues/999/comments",
+    "author": "tetrisplusplus",
+    "comments": [
+      {
+        "user": "Green-Sky",
+        "created_at": "2023-03-22T14:34:50Z",
+        "body": "you can use `entt::forward_as_meta(value)` instead of `std::ref(value)`"
+      }
+    ]
+  }
+]

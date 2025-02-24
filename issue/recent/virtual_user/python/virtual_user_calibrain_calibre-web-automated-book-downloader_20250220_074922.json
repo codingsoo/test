@@ -1,0 +1,49 @@
+[
+  {
+    "id": "https://github.com/calibrain/calibre-web-automated-book-downloader/issues/76",
+    "source": {
+      "issue_number": 76
+    },
+    "initial_question": {
+      "title": "DOCKER_MODS= on arm64 image?",
+      "body": "is the DOCKER_MODS=calibre still needed? i saw a commit that removed it but seems to be for amd64 only?\n\nI'm running on arm64 rock-5b board "
+    },
+    "satisfaction_conditions": [
+      "Container functionality works without DOCKER_MODS=calibre setting",
+      "PDF ingestion and conversion functions correctly",
+      "Solution works on ARM64 architecture",
+      "Required functionality is integrated directly in the container"
+    ],
+    "created_at": "2025-02-04T20:49:18Z"
+  },
+  {
+    "id": "https://github.com/calibrain/calibre-web-automated-book-downloader/issues/35",
+    "source": {
+      "issue_number": 35
+    },
+    "initial_question": {
+      "title": "Improve Mobile Usability, pan right in results to see the buttons",
+      "body": "I know designing for mobile is probably a huge can of worms.  But there are times when using my phone is more convenient, and when I try to use it I can initiate a search which is great.  But the results are usually unusable, since I cannot fully pan over to the right where the buttons are.  If even that one piece could somehow be fixed when using the mobile, being able to click detail/download or fully read the results, that would be great."
+    },
+    "satisfaction_conditions": [
+      "Mobile users can access all UI elements in search results",
+      "Horizontal scrolling/panning functionality works correctly on mobile devices",
+      "Interactive elements (buttons) are clickable on mobile devices"
+    ],
+    "created_at": "2025-01-04T15:29:51Z"
+  },
+  {
+    "id": "https://github.com/calibrain/calibre-web-automated-book-downloader/issues/12",
+    "source": {
+      "issue_number": 12
+    },
+    "initial_question": {
+      "title": "Best approach to change ports?",
+      "body": "Wondering best approach to remap ports for both the main app and the cloudflare proxy?  Tried using the ENV variables, that didn't work (still used 8084 and 8000), tried remapping ports directly and that seemed to work but couldn't connect to the Cloudflare proxy w/localhost or got errors using an IP instead (connection refused).  \r\n\r\nGuessing I'm just doing something incorrect, but would see shifting ports as a pretty big need for many."
+    },
+    "satisfaction_conditions": [
+      "Port conflicts with other services are avoided"
+    ],
+    "created_at": "2024-12-19T20:12:20Z"
+  }
+]

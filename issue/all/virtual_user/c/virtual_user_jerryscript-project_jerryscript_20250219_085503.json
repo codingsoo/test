@@ -1,0 +1,139 @@
+[
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/4798",
+    "source": {
+      "issue_number": 4798
+    },
+    "initial_question": {
+      "title": "Using the JerryScript Parser to make other tooling",
+      "body": "Hello!\r\n\r\nI was looking at ESBuild and other alternatives to Webpack and Rollup that are not written in JS themselves and wondered if it was possible to utilize the JerryScript parser?\r\n\r\nLooking at the `jerry-core/parser` files, it seems that it would be possible to. But the \"public\" headers in `/include` don't seem to mention the parser at all (or I just overlooked it, quite possible).\r\n\r\nWhat function would I be going for to just parse JS into an AST and then walk or possibly re-write it? For instance, to re-write imports, or to append other functions and alike.\r\n\r\nThanks and kind regards,\r\nIngwie"
+    },
+    "satisfaction_conditions": [
+      "Clarify JerryScript's parsing capabilities",
+      "Explain JerryScript's actual parsing behavior",
+      "Identify relevant parser components"
+    ],
+    "created_at": "2021-10-21T10:40:41Z"
+  },
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/4263",
+    "source": {
+      "issue_number": 4263
+    },
+    "initial_question": {
+      "title": "jerry-script snapshot documentation doesn't explain how to generate snapshot for function (-f)",
+      "body": "I spend some time trying to understand how to use `jerry-generate` to generate bycode for functions and not scripts \r\n(jerry_generate_function_snapshot vs jerry_generate_snapshot)\r\n\r\nthe jerry-generate --help is not really helpful:\r\n```\r\n./jerry-snapshot --help                                                       jerryscript/git/master !\r\n./jerry-snapshot [-h] [COMMAND]\r\n\r\n  -h, --help            print this help and exit\r\n  COMMAND               specify the command\r\n\r\nAvailable commands:\r\n  generate\r\n  litdump\r\n  merge\r\n\r\nPassing -h or --help after a command displays its help.\r\n```\r\n\r\nTo figure I need to use: \r\n`./jerry-snapshot generate ./function.js -f _function`\r\n\r\nI think the `-f` option is explained nowhere in the doc, I figured it from the code.\r\n\r\n###### JerryScript revision\r\nmaster: 0ffe1665\r\n"
+    },
+    "satisfaction_conditions": [
+      "Documentation for function snapshot generation must be accessible through the CLI help system",
+      "The help documentation must explicitly explain the function snapshot generation option (-f/--generate-function-snapshot)",
+      "Help documentation must show the correct command syntax and parameter requirements",
+      "Help information must be available at the appropriate command level hierarchy"
+    ],
+    "created_at": "2020-10-01T14:45:01Z"
+  },
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/4058",
+    "source": {
+      "issue_number": 4058
+    },
+    "initial_question": {
+      "title": "Question: How to handle Date object in native C?",
+      "body": "Hi, I'm having hard time to figure out how to get the Date.year, month, date in the native C code. Also having hard time to figure out how to return a Date object from native to javascript. Thanks\r\n\r\nJavascript\r\n```javascript\r\nlet date = native_driver_gui_calendar.setTodayDate(new Date(2020, 6, 10));\r\n```\r\n\r\nNative C\r\n```C\r\nstatic jerry_value_t function_native_driver_gui_calendar_setTodayDate(const jerry_value_t func_value, /**< function object */\r\n                                 const jerry_value_t this_value, /**< this arg */\r\n                                 const jerry_value_t args[],    /**< function arguments */\r\n                                 const jerry_length_t args_cnt)  /**< number of function arguments */\r\n{\r\n  //How to get the year, month, date of a Date object?\r\n  //The following code returns all zero\r\n  printf(\"Year:%d Month:%d Day:%d\\n\", ecma_date_year_from_time(args[0]), ecma_date_month_from_time(args[0]), ecma_date_date_from_time(args[0]));\r\n\r\n //How to return \"new Date(2020, 0,0)\" value to the javascript?\r\n  return jerry_create_date();\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Successfully extract date components (year, month, day) from JavaScript Date object in C code",
+      "Maintain data type compatibility between JavaScript Date objects and C code",
+      "Produce accurate date calculations without loss of precision"
+    ],
+    "created_at": "2020-07-26T00:41:31Z"
+  },
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/3144",
+    "source": {
+      "issue_number": 3144
+    },
+    "initial_question": {
+      "title": "Help with getting name of registered jerry_external_handler_t name, please.",
+      "body": "How to get information from const **jerry_value_t function_object** and **const jerry_value_t function_this** in code like below. I need to get the name of called external handler (some_handler) inside this handler, is it possible? Not to provide by arguments[], but to get from  function_object for example.\r\nPlease help. And what is the structure of **function_object** and **function_this** to use them in a code.\r\n\r\n#include <stdio.h>\r\n#include \"jerryscript.h\"\r\n\r\nstatic jerry_value_t\r\nsome_handler (const jerry_value_t function_object,\r\n               const jerry_value_t function_this,\r\n               const jerry_value_t arguments[],\r\n               const jerry_length_t arguments_count)\r\n{\r\n\t\r\n  return jerry_create_undefined ();\r\n}\r\n\r\nint\r\nmain (void)\r\n{\r\n  const jerry_char_t script[] = \"call_handler('First arg');\";\r\n  const jerry_length_t script_size = sizeof (script) - 1;\r\n\r\n  jerry_init (JERRY_INIT_EMPTY);\r\n\r\n  {\r\n    jerry_value_t global_object = jerry_get_global_object ();\r\n    jerry_value_t property_name_print = jerry_create_string ((const jerry_char_t *) \"call_handler\");\r\n    jerry_value_t property_value_func = jerry_create_external_function (print_handler);\r\n    jerry_value_t set_result = jerry_set_property (global_object, property_name_print, property_value_func);\r\n\r\n    jerry_release_value (set_result);\r\n    jerry_release_value (property_value_func);\r\n    jerry_release_value (property_name_print);\r\n    jerry_release_value (global_object);\r\n  }\r\n\r\n  jerry_value_t parsed_code = jerry_parse (NULL, 0, script, script_size, JERRY_PARSE_NO_OPTS);\r\n\r\n  if (!jerry_value_is_error (parsed_code))\r\n  {\r\n    jerry_value_t ret_value = jerry_run (parsed_code);\r\n    jerry_release_value (ret_value);\r\n  }\r\n  jerry_release_value (parsed_code);\r\n  jerry_cleanup ();\r\n  return 0;\r\n}\r\n\r\nThanks a lot!"
+    },
+    "satisfaction_conditions": [
+      "External function handler must be able to access its own name during execution",
+      "Function name information must persist between function creation and execution",
+      "Handler name retrieval must work within JerryScript's memory management system",
+      "Name retrieval must work for functions called from JavaScript context",
+      "Solution must work with JerryScript's external function mechanism"
+    ],
+    "created_at": "2019-09-21T18:06:46Z"
+  },
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/1884",
+    "source": {
+      "issue_number": 1884
+    },
+    "initial_question": {
+      "title": "Is it possible to store the JS program in bytecode as a const in ROM?",
+      "body": "Hi, \r\nI'm working on a project which need a Javascript engine as a replacement of configuration file.\r\nSince the SRAM on my board is really limited, while there are still a some ROM, I am wondering if I could port only the vm part to my firmware and cut out the parser part. In this way, I could cut down the ROM space of parser part and save the SRAM that was used to save bytecode.\r\n\r\nSo, it's basically two questions:\r\n1. Is it possible to port VM only?\r\n2. Is it possible to store bytecode as a const?\r\n"
+    },
+    "satisfaction_conditions": [
+      "JavaScript bytecode must be executable from ROM storage",
+      "Memory footprint must be reduced compared to full JavaScript engine",
+      "Bytecode must be compatible between compilation and execution environments",
+      "System must maintain proper bytecode alignment",
+      "Engine configuration must support minimal required features"
+    ],
+    "created_at": "2017-06-07T23:20:54Z"
+  },
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/1319",
+    "source": {
+      "issue_number": 1319
+    },
+    "initial_question": {
+      "title": "how can i share a c variable to jerry readonly",
+      "body": "suppose I have a huge struct to export to javascript, but i don't want javascript to modify the value.\n\nseems now every value have to make a copy to vm, two copy in C and jerrry is a waste memory and it's hard to sync every value changed to jerry.\n"
+    },
+    "satisfaction_conditions": [
+      "JavaScript code can read but not modify C struct values directly",
+      "Memory efficiency is maintained without unnecessary data duplication",
+      "All struct members, including arrays, are accessible from JavaScript",
+      "Data consistency is maintained between C and JavaScript environments",
+      "Access methods are provided for both simple and complex data types"
+    ],
+    "created_at": "2016-09-05T03:01:23Z"
+  },
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/572",
+    "source": {
+      "issue_number": 572
+    },
+    "initial_question": {
+      "title": "error: control reaches end of non-void function",
+      "body": "Some functions like `lit_get_magic_string_utf8()` ends with \n\n```\n  JERRY_UNREACHABLE ();\n}\n```\n\nand does not return value. \nIn this case without `-Wno-return-type` mips compiler fails with an `error: control reaches end of non-void function`. Should I use this option `-Wno-return-type` or should I add something like this?\n\n```\n  JERRY_UNREACHABLE ();\n  return NULL; /* make compiler happy */\n}\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Compiler must not generate 'control reaches end of non-void function' error",
+      "Function execution must never actually reach the end of the function",
+      "Solution must preserve the semantic meaning of unreachable code",
+      "Compiler must recognize that the function will not continue execution"
+    ],
+    "created_at": "2015-08-13T22:06:58Z"
+  },
+  {
+    "id": "https://github.com/jerryscript-project/jerryscript/issues/180",
+    "source": {
+      "issue_number": 180
+    },
+    "initial_question": {
+      "title": "Faster debug version",
+      "body": "As  new eval has landed, one small problem is that debug version execution has became very slow.\nCan there be some level of checking so that it might be somewhat faster for debugging?\n"
+    },
+    "satisfaction_conditions": [
+      "Debug execution performance is improved compared to current state",
+      "Debug checks remain available when needed for thorough testing",
+      "Core functionality remains unchanged",
+      "Debug checks can be selectively enabled/disabled"
+    ],
+    "created_at": "2015-06-14T23:49:42Z"
+  }
+]

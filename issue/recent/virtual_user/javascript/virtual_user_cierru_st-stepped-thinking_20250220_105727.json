@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/cierru/st-stepped-thinking/issues/8",
+    "source": {
+      "issue_number": 8
+    },
+    "initial_question": {
+      "title": "A lot of reprocessing promt.",
+      "body": "hi\r\n\r\nFirst of all, I love your extension. I use local models (koboltcpp) and I noticed that after some time (5k tokens sometimes less) there is a lot of reprocessing (not so much when generating thoughts or plans, but afterwards).\r\n\r\nThere is a setting in your extension \"Number of included thoughts for a character:\" significantly increasing this number eliminates the processing problem. I don't quite understand how it works, why is the default value only \"2\"? When generating text (after generating thoughts and plans) is only the part of the previous conversation taken into account? (this would explain the reprocessing)"
+    },
+    "satisfaction_conditions": [
+      "Context management balances thought retention with model coherence",
+      "Character consistency is maintained",
+      "Context handling is configurable"
+    ],
+    "created_at": "2025-01-04T01:17:16Z"
+  }
+]

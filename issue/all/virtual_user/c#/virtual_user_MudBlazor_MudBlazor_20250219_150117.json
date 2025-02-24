@@ -1,0 +1,132 @@
+[
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/1637",
+    "source": {
+      "issue_number": 1637
+    },
+    "initial_question": {
+      "title": "DatePicker & TimePicker with DateTime Format",
+      "body": "Is there a possibility to use a DateTime Variable with an Date- and TimePicker or a combined variant.\r\n\r\nThe way ist to set the date and the time part within the same DateTime datatype.\r\nI've tried with picker callbacks and picker actions but not successfully.\r\n\r\nMaye anyone has an advice for me ?\r\n\r\n\r\nthx\r\n"
+    },
+    "satisfaction_conditions": [
+      "Successfully combine date and time components into a single DateTime value",
+      "Handle nullable DateTime values correctly",
+      "Preserve both date and time components in the final DateTime value",
+      "Create new DateTime instance rather than trying to modify existing one"
+    ],
+    "created_at": "2021-05-22T19:37:08Z"
+  },
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/1512",
+    "source": {
+      "issue_number": 1512
+    },
+    "initial_question": {
+      "title": "Center the Title in Appbar?",
+      "body": "Hey there,\r\n\r\nis there a way to center the Title in the Appbar?\r\n\r\nwhat i've tried:\r\n- attach Align=\"Align.Center\"  to the title\r\n- Style=\"text-align:center;\" to the appbar component\r\n\r\nThe Code:\r\n\r\n    <MudAppBar Elevation=\"1\" Color=\"Color.Dark\" Style=\"text-align:center;\">\r\n        <MudText Typo=\"Typo.h5\" Class=\"ml-3\" Align=\"Align.Center\">Checklist Export</MudText>\r\n        <MudAppBarSpacer />\r\n    </MudAppBar>\r\n\r\n\r\nThanks "
+    },
+    "satisfaction_conditions": [
+      "Title text appears horizontally centered within the AppBar component",
+      "Equal spacing exists on both sides of the title",
+      "AppBar maintains its standard functionality and appearance",
+      "Solution works within MudBlazor component framework"
+    ],
+    "created_at": "2021-05-06T13:46:47Z"
+  },
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/1305",
+    "source": {
+      "issue_number": 1305
+    },
+    "initial_question": {
+      "title": "How to setup a sticky footer with MudBlazor",
+      "body": "\r\nI have a requirement to setup a sticky footer while using MudBlazor. I tried creating one with MudContainer inside Footer.razor. then added it in MainLayout.razor below the MudMainContent element. I am missing how to specify it need to be hold in bottom of the page. Please help me ."
+    },
+    "satisfaction_conditions": [
+      "Main content is not obscured by fixed elements"
+    ],
+    "created_at": "2021-03-30T08:29:33Z"
+  },
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/1245",
+    "source": {
+      "issue_number": 1245
+    },
+    "initial_question": {
+      "title": "Why does button always make text all caps, and is there a way to stop it?",
+      "body": ""
+    },
+    "satisfaction_conditions": [
+      "Text capitalization behavior must be controllable",
+      "Solution must be reusable across multiple buttons",
+      "Must maintain compatibility with MudBlazor framework",
+      "Visual appearance matches desired text case"
+    ],
+    "created_at": "2021-03-20T10:26:20Z"
+  },
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/1112",
+    "source": {
+      "issue_number": 1112
+    },
+    "initial_question": {
+      "title": "Split drawer menu with some items on top and some of the bottom",
+      "body": "My goal is having a vertical menu in the left drawer where some items are listed at the top with a space below and some items located at the bottom edge of the drawer.\r\n\r\nWhen adding a drawer, the `<div>` wit class `mud-drawer-content` however has the size of its child components and does not expand to the full size of the drawer. Is there a way to have it grow to the total drawer height such that menu items can be positioned on the bottom drawer edge? Or what is the best way within the MudBlazor framework to achieve this?"
+    },
+    "satisfaction_conditions": [
+      "Drawer content must span full drawer height",
+      "Layout must maintain proper structure within MudBlazor framework"
+    ],
+    "created_at": "2021-03-07T12:03:04Z"
+  },
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/1035",
+    "source": {
+      "issue_number": 1035
+    },
+    "initial_question": {
+      "title": "AuthorizeView vs MudTable",
+      "body": "I have a code as follows:\r\n```\r\n        <MudTable Items=\"@_tournaments\">\r\n            <ToolBarContent>\r\n                <MudText Typo=\"Typo.h6\">Tournaments</MudText>\r\n                <MudToolBarSpacer />\r\n                <MudTextField @bind-Value=\"_searchString\" Placeholder=\"Search\" Adornment=\"Adornment.Start\" AdornmentIcon=\"@Icons.Material.Filled.Search\" IconSize=\"Size.Medium\" Class=\"mt-0\"></MudTextField>\r\n            </ToolBarContent>\r\n            <HeaderContent>\r\n                <MudTh>Title</MudTh>\r\n                <MudTh>Date</MudTh>\r\n                <MudTh>Kind</MudTh>\r\n                <MudTh>Actions</MudTh>\r\n            </HeaderContent>\r\n            <RowTemplate>\r\n                <MudTd DataLabel=\"Title\">@context.Title</MudTd>\r\n                <MudTd DataLabel=\"Date\">@context.Date</MudTd>\r\n                <MudTd DataLabel=\"Kind\">@context.Kind</MudTd>\r\n                <MudTd DataLabel=\"Action\">\r\n                    <MudTooltip Text=\"Tournament information\">\r\n                        @{\r\n                            var linkText = \"/tournaments/view/\" + @context.Id;\r\n                        }\r\n                        <MudFab Color=\"Color.Primary\" Icon=\"@Icons.Material.Filled.Info\" IconSize=\"Size.Small\" Size=\"Size.Small\" Link=\"@linkText\" />\r\n                    </MudTooltip>\r\n                    <AuthorizeView Roles=\"Administrator\">\r\n                        <MudTooltip Text=\"Edit tournament data\">\r\n                            <MudFab Color=\"Color.Primary\" Icon=\"@Icons.Material.Filled.Edit\" IconSize=\"Size.Small\" Size=\"Size.Small\" />\r\n                        </MudTooltip>\r\n                        <MudTooltip Text=\"Delete tournament\">\r\n                            <MudFab Color=\"Color.Primary\" Icon=\"@Icons.Material.Filled.Delete\" IconSize=\"Size.Small\" Size=\"Size.Small\" />\r\n                        </MudTooltip>\r\n                    </AuthorizeView>\r\n                </MudTd>\r\n            </RowTemplate>\r\n            <PagerContent>\r\n                <MudTablePager />\r\n            </PagerContent>\r\n        </MudTable>\r\n```\r\nAfter compilation I got following error:\r\n\r\n> The child content element 'ChildContent' of component 'AuthorizeView' uses the same parameter name ('context') as enclosing child content element 'RowTemplate' of component 'MudTable'. Specify the parameter name like: '<ChildContent Context=\"another_name\"> to resolve the ambiguit\t\r\n\r\nHow to workaround this error?"
+    },
+    "satisfaction_conditions": [
+      "Context parameter names must be unique across nested components",
+      "Table row data must remain accessible within the AuthorizeView component",
+      "Role-based authorization functionality must be preserved"
+    ],
+    "created_at": "2021-02-28T10:30:11Z"
+  },
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/620",
+    "source": {
+      "issue_number": 620
+    },
+    "initial_question": {
+      "title": "Default value when using MudSelect with enum",
+      "body": "I have an enum: `public enum Foo { None, One, Two }`\r\n\r\nI want to use that enum as the options for `MudSelect`, but I don't want to show `None` in the select when the user hasn't selected a value. I want the select to be empty so that the user is required to make a selection. Is there a way to accomplish this?\r\n\r\n```\r\n<MudSelect Label=\"Foo\" @bind-Value=\"ViewModel.Foo\" Variant=\"Variant.Outlined\">\r\n\t@foreach (Foo item in Enum.GetValues(typeof(Foo)))\r\n\t\t{\r\n\t\t<MudSelectItem Value=\"@item\">@item</MudSelectItem>\r\n\t\t}\r\n</MudSelect>\r\n```"
+    },
+    "satisfaction_conditions": [
+      "The select dropdown must be empty when no value is selected",
+      "The select component must support nullable enum values",
+      "All component type parameters must be consistent"
+    ],
+    "created_at": "2021-01-19T02:56:20Z"
+  },
+  {
+    "id": "https://github.com/MudBlazor/MudBlazor/issues/275",
+    "source": {
+      "issue_number": 275
+    },
+    "initial_question": {
+      "title": "How to set click events on a table row",
+      "body": "Hi,\r\n\r\nIs it currently possible to have a Click event on MudTable/RowTemplate? I have set hover=true so the whole row is highlighted as expected but can't see how to set a click event. The workaround I am using at the moment is to add a MudLink to a cell but that means the user needs to move the mouse over the link rather just selecting the row and clicking anywhere inside.\r\n\r\nIf this is not currently possible I think it could be a good enhancement.\r\n\r\nThanks for your good work.\r\n\r\nLuis"
+    },
+    "satisfaction_conditions": [
+      "Table row responds to click events anywhere within the row",
+      "Row click event provides access to the row's data",
+      "Click detection works independently of row selection state",
+      "Visual feedback indicates clickable rows",
+      "Click event handling integrates with the table component's API"
+    ],
+    "created_at": "2020-12-11T17:42:47Z"
+  }
+]

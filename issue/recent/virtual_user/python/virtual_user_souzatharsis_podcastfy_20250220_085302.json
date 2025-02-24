@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/souzatharsis/podcastfy/issues/234",
+    "source": {
+      "issue_number": 234
+    },
+    "initial_question": {
+      "title": "Audio generation fails",
+      "body": "No matter what I try I can't get the audio files to generate. I've tried all the different tts models but none of the work. I also don't see any files inside `./data/audio`. The script exits with the error below.\n\n```sh\nError merging audio files: Expecting value: line 1 column 1 (char 0)\nError converting text to speech: Expecting value: line 1 column 1 (char 0)\n2025-01-31 16:01:45,871 - __main__ - ERROR - An error occurred in the process_content function: Expecting value: line 1 column 1 (char 0)\nAn error occurred: Expecting value: line 1 column 1 (char 0)\n```\n\nWhen I check my OpenAI API usage, I can see that the TTS HD endpoint is being used, so it seems that something fails when trying to save the audio file(s).\n\nAlso, the `./data/audio` folder gets created correctly but I don't see the `temp_audio_dir` folder. Could this be the issue?\n\nRunning on Ubuntu inside a separate Python env.\n\nAny help is appreciated."
+    },
+    "satisfaction_conditions": [
+      "Audio file generation completes successfully",
+      "Audio processing dependencies are properly configured",
+      "No JSON parsing errors occur during audio processing",
+      "OpenAI TTS API calls complete successfully"
+    ],
+    "created_at": "2025-01-31T15:04:06Z"
+  }
+]

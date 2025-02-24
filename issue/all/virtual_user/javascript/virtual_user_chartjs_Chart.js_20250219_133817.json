@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/chartjs/Chart.js/issues/2431",
+    "source": {
+      "issue_number": 2431
+    },
+    "initial_question": {
+      "title": "Docs for adding mixed charts - Line and Bar",
+      "body": "I'm unable to find out the docs in version 2 of Charts.js. \nAny idea how to go about adding mixed charts ?  ( A line and bar graph in the same chart)\n"
+    },
+    "satisfaction_conditions": [
+      "Chart displays both line and bar visualizations simultaneously",
+      "All specified chart types render correctly",
+      "Chart type configuration is properly recognized by Charts.js v2",
+      "Dataset configurations maintain independent chart types"
+    ],
+    "created_at": "2016-05-02T11:32:18Z"
+  }
+]

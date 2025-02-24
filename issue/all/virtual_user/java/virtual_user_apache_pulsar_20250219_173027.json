@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/apache/pulsar/issues/3361",
+    "source": {
+      "issue_number": 3361
+    },
+    "initial_question": {
+      "title": "Kafka configure properties are not included subscription type and subscription mode",
+      "body": "I am trying to use the latest pulsar release to migrate current kafka client to pulsar and try to use the kafka pulsar wrapper.\r\n\r\nI am using non-persistent topic,\r\nin the kafka pulsar client config, Following is the default\r\n\"subscriptionTopicsMode\" : \"PERSISTENT\", \r\n \"subscriptionType\" : \"Failover\",\r\n\r\nIs there anyway to set subscriptionTopicsMode and subscriptionType through the kafka configuration properties map?"
+    },
+    "satisfaction_conditions": [
+      "Partition reassignment must occur when consumers fail",
+      "Multiple consumers must be able to process different partitions within the same consumer group",
+      "Migration path must preserve existing Kafka client functionality"
+    ],
+    "created_at": "2019-01-11T17:00:48Z"
+  }
+]

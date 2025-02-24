@@ -1,0 +1,52 @@
+[
+  {
+    "id": "https://github.com/wanghao9610/OV-DINO/issues/21",
+    "source": {
+      "issue_number": 21
+    },
+    "initial_question": {
+      "title": "\u8bad\u7ec3\u5f88\u6162",
+      "body": "finetune\u7684\u65f6\u5019\uff0c\u5f88\u6162\uff0c\u6709\u529e\u6cd5\u63d0\u9ad8\u901f\u5ea6\u5417\uff1f\u6211\u662f\u56fa\u5b9a\u51e0\u4e2a\u76ee\u6807\u7684\u68c0\u6d4b\uff0c\u662f\u4e0d\u662ftext\u7684\u7279\u5f81\u53ef\u4ee5\u9884\u5148\u751f\u6210\u597d\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Training speed must be improved compared to baseline",
+      "Text feature processing efficiency is optimized",
+      "Solution remains compatible with the existing model architecture"
+    ],
+    "created_at": "2024-08-15T09:12:08Z"
+  },
+  {
+    "id": "https://github.com/wanghao9610/OV-DINO/issues/13",
+    "source": {
+      "issue_number": 13
+    },
+    "initial_question": {
+      "title": "\u5fae\u8c03\u65f6\u7684\u8bad\u7ec3\u8fc7\u7a0b\u56fe",
+      "body": "\u60a8\u597d\uff0c\u60f3\u8bf7\u95ee\u4e00\u4e0b\u5728coco\u6570\u636e\u96c6\u4e0a\u5fae\u8c03\u65f6\uff0c\u6709\u6ca1\u6709\u652f\u6301\u67e5\u770b\u8bad\u7ec3\u8fc7\u7a0b\u7684\u53c2\u6570\uff08tensorboard\u7c7b\u4f3c\u7684\uff09\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Training visualization data is accessible",
+      "Real-time or near real-time monitoring capability exists",
+      "Training metrics visualization tool is properly configured",
+      "Required visualization dependencies are installed",
+      "Training process generates compatible logging data"
+    ],
+    "created_at": "2024-08-08T13:28:47Z"
+  },
+  {
+    "id": "https://github.com/wanghao9610/OV-DINO/issues/3",
+    "source": {
+      "issue_number": 3
+    },
+    "initial_question": {
+      "title": "how to take image feature as prompt ?",
+      "body": "use CLIP image encode is ok ?"
+    },
+    "satisfaction_conditions": [
+      "The system must correctly handle image-based prompts according to model capabilities",
+      "The solution must clearly communicate supported prompt types",
+      "The response must address the specific capability of using CLIP image encodings"
+    ],
+    "created_at": "2024-08-02T03:23:45Z"
+  }
+]

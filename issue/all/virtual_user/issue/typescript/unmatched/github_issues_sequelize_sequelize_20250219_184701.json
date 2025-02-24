@@ -1,0 +1,220 @@
+[
+  {
+    "number": 11018,
+    "title": "findOne adds \"ORDER BY\" internally breaking MSSQL",
+    "created_at": "2019-05-30T09:05:25Z",
+    "closed_at": "2020-06-08T09:06:41Z",
+    "labels": [
+      "question",
+      "dialect: mssql"
+    ],
+    "url": "https://github.com/sequelize/sequelize/issues/11018",
+    "body": "## What are you doing?\r\nTrying to get count of the whole table records while executing some other aggregate functions like \"max\", while there is no `group by` specified. \r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\n1. Define model:\r\n```js\r\nsequelize.define('item', {\r\n    id: {\r\n         type: DataTypes.STRING,\r\n         allowNull: false,\r\n         primaryKey: true\r\n    },\r\n    column_1: {\r\n        type: DataTypes.DATE,\r\n\tallowNull: true,\r\n    }\r\n});\r\n```\r\n2. Run the following\r\n```js\r\nconst result = await model.Item.findOne({\r\n    attributes: [\r\n        [db.sequelize.fn('max', db.sequelize.col('column_1')), 'max_column_1'],\r\n        [db.sequelize.fn('count', '1'), 'count']\r\n    ],\r\n});\r\n```\r\n\r\n3. See error\r\n```\r\nSequelizeDatabaseError: Column \"item.id\" is invalid in the ORDER BY clause because it is not contained in either an aggregate function or the GROUP BY clause.\r\n    at Query.formatError (/project-path/node_modules/sequelize/lib/dialects/mssql/query.js:309:12)\r\n    at Request.connection.lib.Request [as userCallback] (/project-path/node_modules/sequelize/lib/dialects/mssql/query.js:69:23)\r\n    at Request.callback (/project-path/node_modules/tedious/lib/request.js:37:27)\r\n    at Connection.endOfMessageMarkerReceived (/project-path/node_modules/tedious/lib/connection.js:2149:20)\r\n    at Connection.dispatchEvent (/project-path/node_modules/tedious/lib/connection.js:1172:36)\r\n    at Parser.tokenStreamParser.on (/project-path/node_modules/tedious/lib/connection.js:975:14)\r\n    at Parser.emit (events.js:193:13)\r\n    at Parser.parser.on.token (/project-path/node_modules/tedious/lib/token/token-stream-parser.js:27:14)\r\n    at Parser.emit (events.js:193:13)\r\n    at addChunk (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_readable.js:297:12)\r\n    at readableAddChunk (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_readable.js:279:11)\r\n    at Parser.Readable.push (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_readable.js:240:10)\r\n    at Parser.Transform.push (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_transform.js:139:32)\r\n    at Parser.afterTransform (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_transform.js:88:10)\r\n    at Parser._transform (/project-path/node_modules/tedious/lib/token/stream-parser.js:41:7)\r\n    at Parser.Transform._read (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_transform.js:177:10)\r\n    at Parser.Transform._write (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_transform.js:164:83)\r\n    at doWrite (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_writable.js:405:139)\r\n    at writeOrBuffer (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_writable.js:394:5)\r\n    at Parser.Writable.write (/project-path/node_modules/tedious/node_modules/readable-stream/lib/_stream_writable.js:303:11)\r\n    at Parser.addEndOfMessageMarker (/project-path/node_modules/tedious/lib/token/token-stream-parser.js:45:24)\r\n    at Connection.message (/project-path/node_modules/tedious/lib/connection.js:2138:32)\r\n```\r\n\r\n## What do you expect to happen?\r\n`SELECT max([column_1]) AS [max_column_1],count(1) AS [count] FROM [item] AS [item];`\r\n\r\n## What is actually happening?\r\n`SELECT max([column_1]) AS [max_column_1],count(1) AS [count] FROM [item] AS [item] ORDER BY [item].[id] OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;`\r\n\r\n## Environment\r\nDialect:\r\n- mssql\r\nDialect **tedious** version: 6.1.1\r\nDatabase version: Microsoft SQL Azure (RTM) - 12.0.2000.8 \r\nSequelize version: both v4 and v5\r\nNode Version: 11.15.0\r\nOS: Mac OS\r\n\r\nTested with latest release:\r\n- Yes, v5.8.7",
+    "comments_url": "https://api.github.com/repos/sequelize/sequelize/issues/11018/comments",
+    "author": "myleshk",
+    "comments": [
+      {
+        "user": "sushantdhiman",
+        "created_at": "2020-06-08T09:06:41Z",
+        "body": "This is how `findOne` works, it limits records by 1. Use `findAll`"
+      }
+    ]
+  },
+  {
+    "number": 10318,
+    "title": "TypeError: Cannot read property 'name' of undefined",
+    "created_at": "2019-01-04T09:18:12Z",
+    "closed_at": "2019-01-08T07:17:51Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/sequelize/sequelize/issues/10318",
+    "body": "when i want to join my model this exception was thrown, is anybody know how to solve this?\r\nthis is my code \r\n\r\n```js\r\nRiwayat.hasMany(Regis, {foreignKey: 'id_pasien_baru'})\r\nRegis.belongsTo(Riwayat, {foreignKey: 'id_pasien_baru'});\r\n\r\nRiwayat.findAll({\r\n    where:{id_pasien_baru:req.params.id},include:[Regis]\r\n  }).then(Riwayat => {\r\n    res.send(Riwayat)\r\n  })\r\n  .catch(err => {\r\n    res.send('error')\r\n  })\r\n```\r\n\r\n```\r\nTypeError: Cannot read property 'name' of undefined\r\n    at Function._validateIncludedElement (D:\\axon\\node_modules\\sequelize\\lib\\model.js:535:42)\r\n    at options.include.options.include.map.include (D:\\axon\\node_modules\\sequelize\\lib\\model.js:395:37)\r\n    at Array.map (<anonymous>)\r\n    at Function._validateIncludedElements (D:\\axon\\node_modules\\sequelize\\lib\\model.js:390:39)\r\n    at Promise.try.then.then (D:\\axon\\node_modules\\sequelize\\lib\\model.js:1570:14)\r\n    at tryCatcher (D:\\axon\\node_modules\\bluebird\\js\\release\\util.js:16:23)\r\n    at Promise._settlePromiseFromHandler (D:\\axon\\node_modules\\bluebird\\js\\release\\promise.js:512:31)\r\n    at Promise._settlePromise (D:\\axon\\node_modules\\bluebird\\js\\release\\promise.js:569:18)\r\n    at Promise._settlePromise0 (D:\\axon\\node_modules\\bluebird\\js\\release\\promise.js:614:10)\r\n    at Promise._settlePromises (D:\\axon\\node_modules\\bluebird\\js\\release\\promise.js:694:18)\r\n    at _drainQueueStep (D:\\axon\\node_modules\\bluebird\\js\\release\\async.js:138:12)\r\n    at _drainQueue (D:\\axon\\node_modules\\bluebird\\js\\release\\async.js:131:9)\r\n    at Async._drainQueues (D:\\axon\\node_modules\\bluebird\\js\\release\\async.js:147:5)\r\n    at Immediate.Async.drainQueues (D:\\axon\\node_modules\\bluebird\\js\\release\\async.js:17:14)\r\n    at runCallback (timers.js:810:20)\r\n    at tryOnImmediate (timers.js:768:5)\r\n    at processImmediate [as _immediateCallback] (timers.js:745:5)\r\n::1 - - [04/Jan/2019:09:12:11 +0000] \"GET /api/join/237 HTTP/1.1\" 200 5\r\n```",
+    "comments_url": "https://api.github.com/repos/sequelize/sequelize/issues/10318/comments",
+    "author": "deigratia",
+    "comments": [
+      {
+        "user": "mkaufmaner",
+        "created_at": "2019-01-05T20:12:28Z",
+        "body": "This error is thrown when the association does not exist.  First, make sure you are defining your associations properly.  Second, I would recommend passing the association object you want to include like so;\r\n```js\r\nRiwayat.hasMany(Regis, {\r\n\tas: 'Regi'\r\n\tforeignKey: 'id_pasien_baru'\r\n});\r\n\r\nRegis.belongsTo(Riwayat, {\r\n\tas: 'Riwayat',\r\n\tforeignKey: 'id_pasien_baru'\r\n});\r\n\r\nRiwayat.findAll({\r\n\tinclude: [\r\n\t\t{\r\n\t\t\tassociation: Riwayat.associations.Regi\r\n\t\t}\r\n\t],\r\n\twhere: {\r\n\t\tid_pasien_baru: req.params.id\r\n\t}\r\n}).then((riwayats) => {\r\n\tres.send(riwayats);\r\n}).catch(err => {\r\n\tres.send('error');\r\n});\r\n```"
+      },
+      {
+        "user": "deigratia",
+        "created_at": "2019-01-08T07:18:54Z",
+        "body": "> > This error is thrown when the association does not exist. First, make sure you are defining your associations properly. Second, I would recommend passing the association object you want to include like so;\r\n> > ```js\r\n> > Riwayat.hasMany(Regis, {\r\n> > \tas: 'Regi'\r\n> > \tforeignKey: 'id_pasien_baru'\r\n> > });\r\n> > \r\n> > Regis.belongsTo(Riwayat, {\r\n> > \tas: 'Riwayat',\r\n> > \tforeignKey: 'id_pasien_baru'\r\n> > });\r\n> > \r\n> > Riwayat.findAll({\r\n> > \tinclude: [\r\n> > \t\t{\r\n> > \t\t\tassociation: Riwayat.associations.Regi\r\n> > \t\t}\r\n> > \t],\r\n> > \twhere: {\r\n> > \t\tid_pasien_baru: req.params.id\r\n> > \t}\r\n> > }).then((riwayats) => {\r\n> > \tres.send(riwayats);\r\n> > }).catch(err => {\r\n> > \tres.send('error');\r\n> > });\r\n> > ```\r\n> \r\n>\r\n\r\nif join 3 where the association table is dropped?\r\n\r\n@mkaufmaner "
+      },
+      {
+        "user": "jerrywang1981",
+        "created_at": "2022-01-07T02:37:47Z",
+        "body": "another root cause could be Array.prototype.find was overwritten by other packages, e.g. the package 'collections' would overwrite Array.prototype.find and change the function signature. if you have same error message, and package 'collections', try to uninstall package 'collections' to see if it works. "
+      }
+    ]
+  },
+  {
+    "number": 6672,
+    "title": "how to call the custom sql function in attributes/where condition in sequelize",
+    "created_at": "2016-10-08T12:46:08Z",
+    "closed_at": "2016-10-09T10:44:47Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/sequelize/sequelize/issues/6672",
+    "body": "how to call custom sql function in Sequelize\n\nI tried like this \n\nits working \napp.get('/callservice',function () {\n    Sequelize.query('select fun_GetGalleryCount(1,1);',\n    {\n        type: Sequelize.QueryTypes.RAW\n    })\n    .then(function(results) {\n        console.log(JSON.stringify(results));\n    })\n})\n\nbut in attributes/where condition is not working like this: \n options.where=getcondition(req,Sequelize);\n     options.attributes=[\n           [Sequelize.query('select fun_GetGalleryCount(1,1);',\n                {\n                    type: Sequelize.QueryTypes.RAW\n                }),'ima']\n\n```\n    ];\n```\n\n  hp_property.findAndCountAll(options).then(function(result) {\n});\n\nerrror:\nPossibly unhandled TypeError: attr[0].indexOf is not a function\n\ni tried in another way like this \noptions.attributes=[\n           [Sequelize.query('select fun_GetGalleryCount(1,1);'),'image']\n  ];\n\nso please give the solution \n\n**Dialect:** mysql \n**Database version:** XXX\n",
+    "comments_url": "https://api.github.com/repos/sequelize/sequelize/issues/6672/comments",
+    "author": "SIMHACHALAM1001",
+    "comments": [
+      {
+        "user": "felixfbecker",
+        "created_at": "2016-10-08T13:08:09Z",
+        "body": "`query` will execute directly and return a promise. You are looking for `sequelize.fn` and `sequelize.literal`\n"
+      },
+      {
+        "user": "SIMHACHALAM1001",
+        "created_at": "2016-10-08T14:36:20Z",
+        "body": "options.attributes=[\n[Sequelize.literal('select fun_GetGalleryCount(1,1);'),'image']\n];\n\nalso getting the sam error\n"
+      },
+      {
+        "user": "miltonkowalewski",
+        "created_at": "2018-08-14T13:44:39Z",
+        "body": "With me this error only occurred when the model was not associated with the correct column name.\r\nLike:\r\nsequelize.define('Users', {\r\n      date: {\r\n\t\t\ttype: DataTypes.DATEONLY,\r\n\t\t\tallowNull: false,\r\n\t\t\tfield: DataTypes.DATEONLY // Wrong! Must be the column name in the database table\r\n\t\t}\r\n}, {\r\n\ttableName: 'REGISTER',\r\n});\r\n"
+      }
+    ]
+  },
+  {
+    "number": 3015,
+    "title": "ORDER BY applied incorrectly with nested includes",
+    "created_at": "2015-01-27T23:01:26Z",
+    "closed_at": "2015-01-28T19:14:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/sequelize/sequelize/issues/3015",
+    "body": "I'm trying to get the last few files like this:\n\n```\ndb.files.findAll(\n      {\n        where: {\n          id: id,\n          company_id: company_id,\n        },\n        include: [\n          {model: db.datasource, include: [db.job]}\n        ],\n        limit: 4,\n        order: 'created_at DESC'\n      }\n    )\n```\n\nIt generates a query like this:\n\n```\nSELECT \"filesToMap\".*, [... AS ...]\nFROM (SELECT \"files\".\"id\", [...COLUMNS... ]\n      FROM \"files\" AS \"files\" WHERE \"files\".\"company_id\"='1659' LIMIT 4) \n  AS \"files\" LEFT OUTER JOIN \"datasources\" AS \"datasource\" ON \"files\".\"datasource_id\" = \"datasource\".\"id\" \n  LEFT OUTER JOIN \"jobs\" AS \"datasource.jobs\" ON \"datasource\".\"id\" = \"datasource.jobs\".\"datasource_id\" \nORDER BY created_at DESC;\n```\n\nNotice the created_at is at the end, it should be after the LIMIT 4. I end up getting the first files rather than the last.\n",
+    "comments_url": "https://api.github.com/repos/sequelize/sequelize/issues/3015/comments",
+    "author": "marcus",
+    "comments": [
+      {
+        "user": "mickhansen",
+        "created_at": "2015-01-28T10:00:26Z",
+        "body": "Hi @marcus \n\nThis might be a bit confusing but the syntax you're using is for raw orders so we don't know where to place it.\n\nIf you use:\n\n``` js\norder: [\n  ['created_at', 'DESC']\n]\n```\n\nWe know that you mean `created_at` on the main table and it will be inside the subquery.\n"
+      },
+      {
+        "user": "mickhansen",
+        "created_at": "2015-01-28T19:14:13Z",
+        "body": "Yes but thats because `order: string` is use literally.\n"
+      }
+    ]
+  },
+  {
+    "number": 1718,
+    "title": "Where clause failed on second level nested include",
+    "created_at": "2014-05-07T08:50:59Z",
+    "closed_at": "2014-05-09T12:13:14Z",
+    "labels": [
+      "type: bug",
+      "question"
+    ],
+    "url": "https://github.com/sequelize/sequelize/issues/1718",
+    "body": "Following example:\n\n``` js\nvar co = require('co');\nvar Sequelize = require('sequelize');\n\nvar sequelize = new Sequelize('sequelize-test', 'root', '');\n\nvar Parent = sequelize.define('Parent', {});\nvar Child1 = sequelize.define('Child1', {});\nvar Child2 = sequelize.define('Child2', {});\n\nParent.hasMany(Child1);\nChild1.belongsTo(Parent);\n\nChild1.hasMany(Child2);\nChild2.belongsTo(Child1);\n\nco(function* () {\n    yield sequelize.sync({\n        force: true\n    });\n\n    var parent = yield Parent.create();\n    var child1 = yield Child1.create();\n    var child2 = yield Child2.create();\n\n    yield parent.addChild1(child1);\n    yield child1.addChild2(child2);\n\n    var result = yield Parent.find({\n        attributes: ['id'], // Added for better query readability\n        include: [\n            {\n                model: Child1,\n                attributes: ['id'],\n                include: [\n                    {\n                        model: Child2,\n                        attributes: ['id'],\n                        where: {\n                            id: child2.id\n                        }\n                    }\n                ]\n            }\n        ]\n    });\n\n    console.log(result);\n})();\n```\n\nWhich produces the following output:\n\n```\nExecuting (default): INSERT INTO `Parents` (`id`,`createdAt`,`updatedAt`) VALUES (DEFAULT,'2014-05-07 08:44:29','2014-05-07 08:44:29');\nExecuting (default): INSERT INTO `Child1s` (`id`,`createdAt`,`updatedAt`) VALUES (DEFAULT,'2014-05-07 08:44:29','2014-05-07 08:44:29');\nExecuting (default): INSERT INTO `Child2s` (`id`,`createdAt`,`updatedAt`) VALUES (DEFAULT,'2014-05-07 08:44:29','2014-05-07 08:44:29');\nExecuting (default): SELECT * FROM `Child1s` AS `Child1` WHERE (`Child1`.`ParentId`=1 AND `Child1`.`id`=1);\nExecuting (default): UPDATE `Child1s` SET `id`=1,`createdAt`='2014-05-07 08:44:29',`updatedAt`='2014-05-07 08:44:29',`ParentId`=1 WHERE `id`=1\nExecuting (default): SELECT * FROM `Child2s` AS `Child2` WHERE (`Child2`.`Child1Id`=1 AND `Child2`.`id`=1);\nExecuting (default): UPDATE `Child2s` SET `id`=1,`createdAt`='2014-05-07 08:44:29',`updatedAt`='2014-05-07 08:44:29',`Child1Id`=1 WHERE `id`=1\nExecuting (default): SELECT `Parent`.*, `Child1s`.`id` AS `Child1s.id`, `Child1s`.`id` AS `Child1s.id`, `Child1s.Child2s`.`id` AS `Child1s.Child2s.id`, `Child1s.Child2s`.`id` AS `Child1s.Child2s.id` FROM (SELECT `Parent`.`id` FROM `Parents` AS `Parent` WHERE (SELECT `Child1Id` FROM `Child2s` AS `Child1s.Child2s` WHERE `Child1s`.`id` = `Child1s.Child2s`.`Child1Id` LIMIT 1) IS NOT NULL LIMIT 1) AS `Parent` LEFT OUTER JOIN `Child1s` AS `Child1s` ON `Parent`.`id` = `Child1s`.`ParentId` INNER JOIN `Child2s` AS `Child1s.Child2s` ON `Child1s`.`id` = `Child1s.Child2s`.`Child1Id` AND `Child1s.Child2s`.`id`=1;\n/Users/mlegenhausen/dev/github/sequelize-test/node_modules/co/index.js:290\n    throw err;\n          ^\nError: ER_BAD_FIELD_ERROR: Unknown column 'Child1s.id' in 'where clause'\n    at Query.Sequence._packetToError (/Users/mlegenhausen/dev/github/sequelize-test/node_modules/mysql/lib/protocol/sequences/Sequence.js:30:14)\n    at Query.ErrorPacket (/Users/mlegenhausen/dev/github/sequelize-test/node_modules/mysql/lib/protocol/sequences/Query.js:82:18)\n    at Protocol._parsePacket (/Users/mlegenhausen/dev/github/sequelize-test/node_modules/mysql/lib/protocol/Protocol.js:205:24)\n    at Parser.write (/Users/mlegenhausen/dev/github/sequelize-test/node_modules/mysql/lib/protocol/Parser.js:62:12)\n    at Protocol.write (/Users/mlegenhausen/dev/github/sequelize-test/node_modules/mysql/lib/protocol/Protocol.js:37:16)\n    at Socket.<anonymous> (/Users/mlegenhausen/dev/github/sequelize-test/node_modules/mysql/lib/Connection.js:73:28)\n    at Socket.EventEmitter.emit (events.js:104:17)\n    at readableAddChunk (_stream_readable.js:156:16)\n    at Socket.Readable.push (_stream_readable.js:123:10)\n    at TCP.onread (net.js:520:20)\n```\n\nThe error occurs cause of the `where` clause of Child2. If I remove the clause it works.\n\nNote: I am using generators for better readability to start this use node 0.11.x with `--harmony` flag.\n",
+    "comments_url": "https://api.github.com/repos/sequelize/sequelize/issues/1718/comments",
+    "author": "mlegenhausen",
+    "comments": [
+      {
+        "user": "mickhansen",
+        "created_at": "2014-05-07T09:25:48Z",
+        "body": "The problem is the subquery, have you tested this against master? A fix was introduced in something similar to this.\n\nElse try adding required: true to child1, or required: false to both child1 and child2\n"
+      },
+      {
+        "user": "mlegenhausen",
+        "created_at": "2014-05-07T10:50:56Z",
+        "body": "Tested against master with same result as before.\n\nAdding `required:false` to  `child2` did the trick (with dev11 and master).\n"
+      },
+      {
+        "user": "mickhansen",
+        "created_at": "2014-05-07T10:52:01Z",
+        "body": "Yeah `required: false` will turn off the subquery since it doesn't need to be there anymore - I guess there's an issue with having a required :M child to a non required parent.\n"
+      },
+      {
+        "user": "Celadora",
+        "created_at": "2017-02-14T10:02:45Z",
+        "body": "This solves the problem of the query error, but if I use it the where clause no longer constrains the query. I need both. Is there any work around to this other than doing two separate queries?"
+      }
+    ]
+  },
+  {
+    "number": 1583,
+    "title": "Foreign key constrained defined in model schema does not work",
+    "created_at": "2014-04-02T08:54:46Z",
+    "closed_at": "2014-04-02T10:16:04Z",
+    "labels": [
+      "type: bug",
+      "question"
+    ],
+    "url": "https://github.com/sequelize/sequelize/issues/1583",
+    "body": "I have following code\n\n```\nvar Sequelize = require('sequelize');\n\nvar sequelize = new Sequelize('postgres://postgres:postgres@localhost:5432/skyhigh',{\n    dialect: 'postgres',\n    native: false,\n});\n\nvar Shelf = sequelize.define('Shelf', { \n});\n\nvar Book = sequelize.define('Book', {\n    ShelfId: {\n        type: Sequelize.INTEGER,\n        references: \"Shelf\",\n        referencesKey: \"id\",\n    }\n});\n\nShelf.hasMany(Book);\n\nsequelize.sync({ force: true });\n```\n\nand it throws this error:\n\n```\nevents.js:72\n        throw er; // Unhandled 'error' event\n              ^\nerror: relation \"Shelf\" does not exist\n    at Connection.parseE (/Users/alek/Desktop/seqbug/node_modules/pg/lib/connection.js:561:11)\n    at Connection.parseMessage (/Users/alek/Desktop/seqbug/node_modules/pg/lib/connection.js:390:17)\n    at null.<anonymous> (/Users/alek/Desktop/seqbug/node_modules/pg/lib/connection.js:92:20)\n    at Socket.EventEmitter.emit (events.js:95:17)\n    at Socket.<anonymous> (_stream_readable.js:746:14)\n    at Socket.EventEmitter.emit (events.js:92:17)\n    at emitReadable_ (_stream_readable.js:408:10)\n    at emitReadable (_stream_readable.js:404:5)\n    at readableAddChunk (_stream_readable.js:165:9)\n    at Socket.Readable.push (_stream_readable.js:127:10)\nseqbug$ \n```\n\nchanging `ShelfId` to any other key such `shelf_id` does not work.\n",
+    "comments_url": "https://api.github.com/repos/sequelize/sequelize/issues/1583/comments",
+    "author": "alekbarszczewski",
+    "comments": [
+      {
+        "user": "mickhansen",
+        "created_at": "2014-04-02T09:01:18Z",
+        "body": "Please turn on logging and show us what order the SQL statements are being run on.\nPlease also provide you Sequelize version, and please also verify that your bug persists against the latest version and the latest master.\n"
+      },
+      {
+        "user": "mickhansen",
+        "created_at": "2014-04-02T09:02:19Z",
+        "body": "Mind you in the latest master, hasMany will automatically create the foreign key reference, right @janmeier?\n"
+      },
+      {
+        "user": "janmeier",
+        "created_at": "2014-04-02T09:04:01Z",
+        "body": "Perhaps the name of the shelf table is being pluralized to shelfes / shelves (there have been problems with pluralization before due to the lingo lib).\n\nYou could provide the Shelf model instead of a string in references, that should give you the correct table name.\n\nAnd as mick mentioned, on master foreign key references are added automatically yes\n"
+      },
+      {
+        "user": "mickhansen",
+        "created_at": "2014-04-02T09:12:26Z",
+        "body": "@janmeier i suppose in the future it would be nice to be able to do something like `references: SomeModel.attributes.someAttribute`\n"
+      },
+      {
+        "user": "alekbarszczewski",
+        "created_at": "2014-04-02T09:32:10Z",
+        "body": "I tried it with `1.7.0` and `unstable` versions of sequelize. Here is SQL:\n\n```\nExecuting (default): DROP TABLE IF EXISTS \"Sites\" CASCADE;\nExecuting (default): CREATE TABLE IF NOT EXISTS \"Sites\" (\"id\"   SERIAL , \"createdAt\" TIMESTAMP WITH TIME ZONE NOT NULL, \"updatedAt\" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY (\"id\"));\nExecuting (default): DROP TABLE IF EXISTS \"Books\" CASCADE;\nExecuting (default): CREATE TABLE IF NOT EXISTS \"Books\" (\"id\"   SERIAL , \"SiteId\" INTEGER REFERENCES \"Site\" (\"id\"), \"createdAt\" TIMESTAMP WITH TIME ZONE NOT NULL, \"updatedAt\" TIMESTAMP WITH TIME ZONE NOT NULL, PRIMARY KEY (\"id\"));\n```\n1. It seems that foreign key ref is not pluralized (`Site` instead of `Sites`)\n2. If I don't use foreign key at model schema level and just use `Site.hasMany(Book)` then foreign key constraints are NOT created - I checked it and on Books table there is only one constraint `Book_pkey`.\n3. It would be cool if you would allow model schema to be created in this way:\n\n```\n{\n   prop1: { type: ... },\n   prop2: { type: ... },\n   hasMany: {\n      'OtherModel': { some_options },\n      'OtherModel2': { some_options },\n   },\n   hasOne: {\n       'OtherModel3': { some_options }\n   }\n```\n"
+      },
+      {
+        "user": "mickhansen",
+        "created_at": "2014-04-02T09:43:47Z",
+        "body": "\"If I don't use foreign key at model schema level and just use Site.hasMany(Book) then foreign key constraints are NOT created - I checked it and on Books table there is only one constraint Book_pkey.\" - No that's only on master, not in a release yet.\n\nYour SQL and the models you provided are not the same, one is Shelf one is Site? But in any case it appears you need to fix your `references` statement to point at the correct table.\n"
+      },
+      {
+        "user": "alekbarszczewski",
+        "created_at": "2014-04-02T09:47:26Z",
+        "body": "I changed  `Shelf` to `Site` to check if there is no problem with `Shelves/Shelfes`. \nWell if model names are pluralized automatically then references field also should be treated this way I think.\n"
+      },
+      {
+        "user": "mickhansen",
+        "created_at": "2014-04-02T09:58:40Z",
+        "body": "I disagree - Since you can also provide a tableName to a model.\nI do however agree that its not totally ideal, but you can atleast fix your issue for now. \n\nWe'll most likely provide more sugar for this type of thing later on. In the mean time you can either provide the correct string or use `freezeTableName: true`, in which case the tableName won't be pluralized.\n"
+      }
+    ]
+  },
+  {
+    "number": 1368,
+    "title": "Possible to define foreign key options via Associations ",
+    "created_at": "2014-02-10T05:08:36Z",
+    "closed_at": "2014-02-10T20:03:25Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/sequelize/sequelize/issues/1368",
+    "body": "When defining an association, is it possible to define options for the automatically created foreign key?\n\nFor example, \n\n```\nProject.hasMany(User, {allowNull: false}); \n```\n\nIf not, is the only way to accomplish this by defining the column via the model and then using the foreignkey option?\n",
+    "comments_url": "https://api.github.com/repos/sequelize/sequelize/issues/1368/comments",
+    "author": "fsosa",
+    "comments": [
+      {
+        "user": "mickhansen",
+        "created_at": "2014-02-10T05:45:56Z",
+        "body": "Without being total certain; Yes i believe the only way to have granular control over the foreign key column is to define it yourself.\n"
+      }
+    ]
+  }
+]

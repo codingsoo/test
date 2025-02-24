@@ -1,0 +1,778 @@
+[
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3366",
+    "source": {
+      "issue_number": 3366
+    },
+    "initial_question": {
+      "title": "Use alias to query parameter without setting the default value?",
+      "body": "Let's say, my API endpoint must implement a required parameter 'from' by contract. I cannot use 'from' directly, as it's one of the Python reserved words. So I use the alias feature:\r\n\r\n```\r\n@router.get('/test/')\r\nasync def get_test(from_: int = Query(0, alias='from')):\r\n\tpass\r\n```\r\n\r\nNow I can use 'from' parameter, but it becomes optional, as Query object requires the 'default' argument to be set. Any ideas how to get a query parameter aliased and required at the same time?"
+    },
+    "satisfaction_conditions": [
+      "Parameter 'from' must be accessible in the API endpoint despite being a Python reserved word",
+      "Parameter must be required (not optional) in API requests",
+      "Parameter aliasing must not affect the parameter's required status",
+      "API endpoint must accept the parameter as 'from' in incoming requests"
+    ],
+    "created_at": "2021-06-12T19:34:44Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3354",
+    "source": {
+      "issue_number": 3354
+    },
+    "initial_question": {
+      "title": "Weird `args` and `kwds` in path schema when using Generic subclass as dependency and using python 3.8",
+      "body": "### Problem\r\n\r\nHere is a minimal code to reproduce the problem:\r\n\r\n```Python\r\n# filename: main.py\r\nfrom typing import TypeVar, Generic\r\nfrom fastapi import FastAPI, Depends\r\n\r\nT = TypeVar(\"T\")\r\n\r\nclass Foo(Generic[T]):\r\n    pass\r\n\r\n\r\nclass Bar(Foo[int]):\r\n    pass\r\n\r\n\r\napp = FastAPI()\r\n\r\n\r\n@app.get(\"/\")\r\nasync def homepage(bar: Bar = Depends()):\r\n    pass\r\n```\r\n\r\nRun the above code with `uvicorn main:app`, with python 3.8, the generated path schema is:\r\n\r\n```json\r\n{\r\n  \"paths\": {\r\n    \"/\": {\r\n      \"get\": {\r\n        \"summary\": \"Homepage\",\r\n        \"operationId\": \"homepage__get\",\r\n        \"parameters\": [\r\n          {\r\n            \"required\": true,\r\n            \"schema\": {\r\n              \"title\": \"Args\"\r\n            },\r\n            \"name\": \"args\",\r\n            \"in\": \"query\"\r\n          },\r\n          {\r\n            \"required\": true,\r\n            \"schema\": {\r\n              \"title\": \"Kwds\"\r\n            },\r\n            \"name\": \"kwds\",\r\n            \"in\": \"query\"\r\n          }\r\n        ],\r\n        \"responses\": {\r\n          \"200\": {\r\n            \"description\": \"Successful Response\",\r\n            \"content\": {\r\n              \"application/json\": {\r\n                \"schema\": {\r\n                  \r\n                }\r\n              }\r\n            }\r\n          },\r\n          \"422\": {\r\n            \"description\": \"Validation Error\",\r\n            \"content\": {\r\n              \"application/json\": {\r\n                \"schema\": {\r\n                  \"$ref\": \"#/components/schemas/HTTPValidationError\"\r\n                }\r\n              }\r\n            }\r\n          }\r\n        }\r\n      }\r\n    }\r\n  },\r\n}\r\n```\r\n\r\nWhen using python 3.9, the path schema is:\r\n\r\n```json\r\n{\r\n  \"paths\": {\r\n    \"/\": {\r\n      \"get\": {\r\n        \"summary\": \"Homepage\",\r\n        \"operationId\": \"homepage__get\",\r\n        \"responses\": {\r\n          \"200\": {\r\n            \"description\": \"Successful Response\",\r\n            \"content\": {\r\n              \"application/json\": {\r\n                \"schema\": {\r\n                  \r\n                }\r\n              }\r\n            }\r\n          }\r\n        }\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nNote that, with python 3.9, the generated schema is expected, but with python 3.8, there are wired parameters `args` and `kwds`. \r\n\r\n\r\n### Environment\r\n\r\nPython 3.8 env:\r\n\r\n```sh\r\n$ uname\r\nDarwin\r\n\r\n$ python --version\r\nPython 3.8.2\r\n\r\n$ pip freeze\r\nasgiref==3.3.4\r\nclick==8.0.1\r\nfastapi==0.65.1\r\nh11==0.12.0\r\npydantic==1.8.2\r\nstarlette==0.14.2\r\ntyping-extensions==3.10.0.0\r\nuvicorn==0.14.0\r\n```\r\n\r\nPython 3.9 env:\r\n\r\n```sh\r\n$ uname\r\nDarwin\r\n\r\n$ python --version\r\nPython 3.9.0\r\n\r\n$ pip freeze\r\nasgiref==3.3.4\r\nclick==8.0.1\r\nfastapi==0.65.1\r\nh11==0.12.0\r\npydantic==1.8.2\r\nstarlette==0.14.2\r\ntyping-extensions==3.10.0.0\r\nuvicorn==0.14.0\r\n```\r\n\r\nI'm not familiar with internals of FastAPI's typing system, so I don't know how to dig further to figure out the cause. Can anyone help to solve the problem? \r\n"
+    },
+    "satisfaction_conditions": [
+      "Generated OpenAPI schema must not include unexpected 'args' and 'kwds' parameters",
+      "Solution must maintain consistent behavior between Python 3.8 and 3.9",
+      "Generic class inheritance functionality must be preserved",
+      "Class initialization parameters must be correctly reflected in the API schema"
+    ],
+    "created_at": "2021-06-10T03:30:36Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3341",
+    "source": {
+      "issue_number": 3341
+    },
+    "initial_question": {
+      "title": "Map multiple api endpoints to a single path operation function",
+      "body": "Is there a way to map multiple api endpoints to a single path operation function? For example, if I make a get request \"/get-employees\" or \"/employees\", can they both map to the same path operation function like below?\r\n\r\n### Example\r\n\r\n```Python\r\nfrom fastapi import FastAPI\r\n\r\napp = FastAPI()\r\n\r\n\r\n@app.get([\"/get-employees\", \"/employees\"])\r\ndef read_root():\r\n    return {\"Hello\": \"World\"}\r\n```\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple URL paths must route to the same handler function",
+      "All configured paths must respond to GET requests",
+      "All paths must return identical responses for the same input",
+      "Solution must be compatible with FastAPI's routing system"
+    ],
+    "created_at": "2021-06-07T10:05:13Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3321",
+    "source": {
+      "issue_number": 3321
+    },
+    "initial_question": {
+      "title": "Loading ML Models in Backgroud",
+      "body": "Hi, I've 3 deep learning models that I load when the application starts (by creating a global object) and it takes around 6-7 seconds to load completely. The problem is the endpoints do not start working until the models are loaded completely and in my Kubernetes, I cannot add a health check because it would give me connection failed.\r\n\r\nIs there a way to load the models in the background and make the health check endpoint working?\r\n\r\nThank you"
+    },
+    "satisfaction_conditions": [
+      "Application endpoints must become available after model loading completes",
+      "Kubernetes health checks must pass successfully",
+      "System must accommodate initial model loading time",
+      "Application startup sequence must be properly coordinated"
+    ],
+    "created_at": "2021-06-02T02:21:39Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3316",
+    "source": {
+      "issue_number": 3316
+    },
+    "initial_question": {
+      "title": "Does it make sense to use ThreadPoolExecutor in fastAPI",
+      "body": "Hi All,\r\n\r\nI have a super simple app that has only one endpoint. This endpoint loads data from a database and this is parallelised\r\nusing a ThreadPoolExecutor. For example:\r\n\r\n```\r\n@app.get('/load_from_db')\r\ndef load_from_db():\r\n    ....\r\n    with concurrent.futures.ThreadPoolExecutor() as executor:\r\n        for dataset in datasets:\r\n            executor.submit(dataset.load_from_database)\r\n    ....\r\n```\r\nNow I changed from Flask to FastAPI. I have declared my function as `def load_from_db` such that it is executed in a different thread-pool and does not block the main thread.\r\n\r\n**OUT-DATED**\r\nAs a result my service now is 10x slower than using Flasks? I tried to set max_workers=5 but did no really help. What is the reason?\r\n\r\n**EDIT:**\r\nI created again some thorough test cases and it turns out fastAPI is not slower for me. Let's change the question to:\r\n\r\n**Is it safe & does it make sense to use ThreadPoolExecutor in fastAPI?**\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Blocking operations are properly handled without impacting overall application responsiveness"
+    ],
+    "created_at": "2021-06-01T09:18:26Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3308",
+    "source": {
+      "issue_number": 3308
+    },
+    "initial_question": {
+      "title": "Map query parameters to custom function parameters",
+      "body": "Is there a way to map query parameters to custom function parameters? For example, if the request is\r\n **/items?query1=q1&query2=q2**, then can I define function parameters as shown below.\r\n\r\n```Python\r\nfrom fastapi import FastAPI\r\n\r\napp = FastAPI()\r\n\r\n@app.get(\"/items\")\r\ndef items(param1: str, param2: str):\r\n    return {\"Hello\": \"World\"}\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Query parameter names in URL must be mappable to different function parameter names",
+      "Function must receive query parameter values as typed arguments",
+      "Query parameter mapping must be explicitly defined in the route handler",
+      "Route handler must process requests to the specified endpoint with query parameters"
+    ],
+    "created_at": "2021-05-29T13:42:49Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3227",
+    "source": {
+      "issue_number": 3227
+    },
+    "initial_question": {
+      "title": "Get API path parameter single get method",
+      "body": "How to enable one single get method to work with below 2 cases\r\n@app.get('/users/{id}')\r\n\r\n1. If I use \"/users\" only then all the users should be listed\r\n2. If I use \"/users/1\" only user with id 1 should be displayed.\r\nCan this be achieved with one single get method?\r\n@app.get('/users/{id}')\r\n"
+    },
+    "satisfaction_conditions": [
+      "API must handle requests to /users path without parameters",
+      "API must handle requests to /users/{id} path with an ID parameter",
+      "API responses must return different data based on presence/absence of ID",
+      "API endpoints must be accessible via HTTP GET method"
+    ],
+    "created_at": "2021-05-14T19:13:18Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3201",
+    "source": {
+      "issue_number": 3201
+    },
+    "initial_question": {
+      "title": "Accessing the `app` in `Depends`",
+      "body": "I would like to access the `FastAPI` app in a `Depends` function, is there a way to do that?\r\nThe rationale here is that I would like to avoid global variables and use the `state` in `app`.\r\n\r\nExample usecase:\r\n```\r\ndef get_session(app: fastapi.FastAPI) -> Session:\r\n    [...]\r\n    access the app.state here\r\n    [...]\r\n\r\n@router.post(\"/init\")\r\ndef create(session: Session = Depends(get_session)):\r\n[...]\r\nuse the SQLAlchemy session\r\n[...]\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Access to FastAPI application state must be possible within dependency functions",
+      "Dependency injection pattern must be preserved",
+      "Solution must be testable"
+    ],
+    "created_at": "2021-05-10T07:08:01Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/3105",
+    "source": {
+      "issue_number": 3105
+    },
+    "initial_question": {
+      "title": "fastAPI requesting files with jQuery failed",
+      "body": "```Python\r\nfrom fastapi import FastAPI, File, UploadFile\r\nfrom typing import Optional, List\r\napp = FastAPI()\r\n\r\n@app.post('/verify')\r\ndef verify(vctks_dir_1: List[bytes] = File(...)):\r\n    print(vctks_dir_1)\r\n    return \"Received Successfully\"\r\n```\r\n\r\n```JS\r\nfunction jfpVerify(event){\r\n    //stop submit the form, we will post it manually.\r\n    event.preventDefault();\r\n\r\n    // disable submit\r\n    $(\"#submit\").attr(\"disabled\", true);\r\n\r\n    let form = $('#form_vctks_dir_1')[0];\r\n    let result = new FormData(form);\r\n    // request\r\n    $.ajax({\r\n        headers: {\r\n        Accept: \"application/json\"\r\n        },\r\n        type: \"POST\",\r\n        enctype: \"multipart/form-data\",\r\n        processData : false,\r\n        url: APIBaseURL + \"verify\",\r\n        data: result,\r\n        error: function(xhr, textStatus, errorThrown) {\r\n            console.log(errorThrown);\r\n            console.log(textStatus);\r\n        },\r\n        success: function(data, textStatus, xhr) {\r\n            let response = xhr.responseJSON;\r\n            console.log(response);\r\n            $('#log').val(response);\r\n        }\r\n    });\r\n}\r\n```\r\n\r\n```HTML\r\n<form id=\"form_vctks_dir_1\" enctype=\"multipart/form-data\">\r\n      <input name=\"vctks_dir_1\" id=\"vctks_dir_1\" type=\"file\" multiple>\r\n      <input type=\"submit\" value=\"submit\">\r\n</form>\r\n```\r\n\r\n### Description\r\n\r\n* I tried to upload file via jQuery method but failed (successful with form submit and other method).\r\n* The failed message is as below, it seems not receive the file I sent:\r\n{loc: [\"body\", \"vctks_dir_1\"], msg: \"field required\", type: \"value_error.missing\"}\r\n* I tried to search some example on Google but find nothing, I'd really appreaciate if you can help with it.\r\n\r\n### Environment\r\n* OS: macOS:\r\n* FastAPI Version: 0.63.0\r\n* Python version: 3.7\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Form submission prevents default behavior"
+    ],
+    "created_at": "2021-04-20T10:34:14Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2917",
+    "source": {
+      "issue_number": 2917
+    },
+    "initial_question": {
+      "title": "Is using Path() params in a Depends() ok?",
+      "body": "I want to validate a token based on what path is being accessed. I don't see anything similar in the documentation. Below is a simplified working example of the situation. My question is: Is this a valid usage, or is it abusing the fastapi API?\r\n\r\n```py\r\nfrom fastapi import Depends, FastAPI, Header, HTTPException, Path, status\r\n\r\napp = FastAPI()\r\n\r\nauth_table = {\"me\": \"whee43\", \"you\": \"whaa32\", \"Hermoine\": \"SPEW4life\"}\r\n\r\ndef user_validator(user: str = Path(...), x_token: str = Header(...)):\r\n    if user in auth_table and auth_table[user] == x_token:\r\n        return user\r\n    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)\r\n\r\n@app.get(\"/users/{user}\")\r\nasync def get_user(valid_user=Depends(user_validator)):\r\n    return {\"user\": valid_user}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Path parameter is accessible within dependency function",
+      "Authentication validation works based on path-specific criteria",
+      "Dependency injection integrates with FastAPI's routing system",
+      "Unauthorized access attempts are properly rejected",
+      "Valid requests return expected response"
+    ],
+    "created_at": "2021-03-08T18:45:08Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2795",
+    "source": {
+      "issue_number": 2795
+    },
+    "initial_question": {
+      "title": "Using app.dependency_overrides with parametrized depenencies",
+      "body": "Hi! \r\nI'm trying to test my FastAPI application and got into some trouble with `app.dependency_overrides`.\r\nI'm using parametrized dependencies and when I'm trying to add the dependency to the dependency_overrides dict and run my tests, the tests runs with the original dependency instead of the mock dependency I created.\r\nWhen I use regular function, it works fine. The problem occurs only with class dependencies.\r\nHere what I tried to do: \r\n```\r\nclass NameDependency:\r\n    def __init__(self, name: str):\r\n        self._name = name\r\n    def __call__(self) -> str:\r\n        return self._name\r\n\r\napp = FastAPI()\r\n\r\n@app.get('/')\r\nasync def hello(name: str = Depends(NameDependency('foo'))):\r\n    return {'message': f'hello {name}'}\r\n\r\nclient = TestClient(app)\r\napp.dependency_overrides[NameDependency] = Mock(return_value='bar')\r\n\r\ndef test_hello():\r\n    res = client.get('/')\r\n    assert res.json()['message'] == 'hello bar'\r\n```\r\nWhen I run this test, instead of passing, I get AssertionError hello foo == hello bar.\r\nI also tried the following alternatives:\r\n```\r\n# 1st alternative\r\napp.dependency_overrides[NameDependency('foo')] = Mock(return_value='bar')\r\n\r\n# 2nd alternative\r\napp.dependency_overrides[NameDependency] = Mock(return_value=Mock(return_value='bar'))\r\n```\r\nI've tried more but I could not find the correct way to do that. \r\nI think I'm missing something and I'll glad if someone can help me. I didn't find an example to this online and I didn't see this in the docs either. \r\n\r\nThanks for anyone that will help!"
+    },
+    "satisfaction_conditions": [
+      "Dependency class instances must be usable as dictionary keys",
+      "Overridden dependencies must correctly replace original dependencies during test execution",
+      "Dependency override behavior must work with parameterized class-based dependencies",
+      "Test assertions must be able to verify the overridden dependency value"
+    ],
+    "created_at": "2021-02-11T18:11:44Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2676",
+    "source": {
+      "issue_number": 2676
+    },
+    "initial_question": {
+      "title": "response code is 200 but response body is null",
+      "body": "my main.py is\r\nfrom fastapi import FastAPI, Request, Depends\r\nfrom pydantic import BaseModel\r\nimport models\r\nfrom sqlalchemy.orm import Session\r\nfrom database import SessionLocal, engine\r\nfrom models import product\r\n\r\n\r\n\r\n\r\napp=FastAPI()\r\n\r\nmodels.Base.metadata.create_all(bind=engine)\r\n\r\n\r\ndef get_db():\r\n    try:\r\n        db=SessionLocal()\r\n        yield db\r\n    finally:\r\n        db.close()\r\n\r\n@app.get('/')\r\ndef index():\r\n    pass\r\n\r\n\r\n@app.get('/products/{id}')\r\ndef get_product(id: int):\r\n    db=SessionLocal()\r\n    stock= db.query(models.product).filter(models.product.id == id).first()\r\n    return stock\r\n\r\n    # return pr.product_name ,pr.product_price,tenure,tenure*pr.product_price\r\n\r\n\r\nand database.py is \r\nfrom sqlalchemy import create_engine\r\nfrom sqlalchemy.ext.declarative import declarative_base\r\nfrom sqlalchemy.orm import sessionmaker\r\n\r\nSQLALCHEMY_DATABASE_URL = \"sqlite:///./product.db\"\r\n\r\n\r\nengine = create_engine(\r\n    SQLALCHEMY_DATABASE_URL, connect_args={\"check_same_thread\": False}\r\n)\r\nSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)\r\n\r\nBase = declarative_base()\r\n\r\nand models.py is \r\nfrom sqlalchemy import  Column, ForeignKey, Integer, String\r\n\r\nfrom database import Base\r\n\r\n\r\nclass product(Base):\r\n    __tablename__ = \"products\"\r\n\r\n    id = Column(Integer, primary_key=True, index=True)\r\n    product_name = Column(String, unique=True, index=True)\r\n    product_price= Column(Integer)\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Database session must be properly managed and accessible within the endpoint",
+      "Dependency injection pattern must be correctly implemented",
+      "Database connection must be properly closed after request completion"
+    ],
+    "created_at": "2021-01-19T15:51:10Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2294",
+    "source": {
+      "issue_number": 2294
+    },
+    "initial_question": {
+      "title": "How to access user credentials send through ajax call with OAuth2PasswordRequestForm",
+      "body": "Hi,\r\n\r\nI am creating a simple login form on the frontend and sending the username and password to my endpoint with ajax call like this:\r\n\r\n**Ajax call to endpoint:**\r\n```\r\n$.ajax({\r\n       type: 'POST',\r\n       url: '/api/token',\r\n       contentType: \"application/json\",\r\n       dataType: \"json\",\r\n       data: JSON.stringify( {\"username\": $(\"#username\").val(), \"password\": $(\"#password\").val()})\r\n});\r\n```\r\non the backend I want to receive the credentials and generate a token after successfully login the user like this:\r\n\r\n**My endpoint**\r\n\r\n```\r\n@app.post(\"/api/token\")\r\nasync def login(response: Response, credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):\r\n    user = views.authenticate(db, credentials.username, credentials.password)\r\n    if not user:\r\n        raise HTTPException(status_code=400, detail=\"Incorrect username or password\")\r\n    access_token = views.gen_token(user.username)\r\n    response.set_cookie(key=\"access_token\", value=f\"Bearer {access_token}\", httponly=True)\r\n    return\r\n```\r\n\r\nwith the above code I get error:  `422 Unprocessable Entity` so I replaced  `OAuth2PasswordRequestForm` with my custom pydantic model:\r\n\r\n**Login validator:**\r\n\r\n```\r\nclass LoginValidator(BaseModel):\r\n    username: str\r\n    password: str\r\n```\r\n\r\nNow it works but then this line: `response.set_cookie(key=\"access_token\", value=f\"Bearer {access_token}\", httponly=True)` does not set the cookie and hence the user cannot be logged in. \r\n\r\n**Edit:**\r\n\r\nOkay I saw this in docs:\r\n\r\n> The spec also states that the username and password must be sent as form data (so, no JSON here).\r\n\r\nso I modified ajax call to this:\r\n\r\n```\r\n$.ajax({\r\n       type: 'POST',\r\n       url: '/api/token',\r\n       data:{\"username\": $(\"#username\").val(), \"password\": $(\"#password\").val()}\r\n});\r\n```\r\n\r\nOkay now I don't get error by the cookie is still not set."
+    },
+    "satisfaction_conditions": [
+      "Authentication endpoint must successfully receive and process user credentials",
+      "Authentication token must be generated upon successful login",
+      "Authentication token must be properly stored as an HTTP-only cookie",
+      "API endpoint must return a valid HTTP response"
+    ],
+    "created_at": "2020-11-04T09:34:00Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2283",
+    "source": {
+      "issue_number": 2283
+    },
+    "initial_question": {
+      "title": "Mutliple OpenAPI Spec Endpoints on One App",
+      "body": "I am working on an application that has quite a large number of endpoints. I have been using tags to group sets of API however the APIs themselves are quite different so I was wondering if there is a way of hosting multiple OpenAPI endoints. \r\n\r\nE.g. \r\n\r\narea1 -> /area1/swagger\r\narea2 -> /area2/swagger"
+    },
+    "satisfaction_conditions": [
+      "Multiple distinct OpenAPI documentation endpoints are accessible at different URLs",
+      "API endpoints remain functionally grouped and separately documented",
+      "Each API group's documentation accurately reflects only its own endpoints",
+      "All API endpoints remain accessible under their intended paths",
+      "Valid OpenAPI/Swagger specification is generated for each group"
+    ],
+    "created_at": "2020-11-02T09:01:49Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2262",
+    "source": {
+      "issue_number": 2262
+    },
+    "initial_question": {
+      "title": "Automatically adding query parameter to each route in OpenAPI specification",
+      "body": "### Example\r\n\r\nHere is a small example of my use case, there is a legacy reason why this situation has occurred. Basically we are moving something that used to be a query parameter in all of our routes in a service to being automatically supplied in the header by the reverse proxy in front of the service. All of our routes used to have defined the `team` Query parameter but now this will be no longer used as it will be supplied in the header, I need the middleware to temporarily accept the header and the query parameter as a value as not all services will be updated at once:\r\n\r\n```Python\r\nfrom typing import Optional\r\n\r\nfrom fastapi import FastAPI, APIRouter, Query, HTTPException\r\nfrom starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint\r\nfrom starlette.requests import Request\r\nfrom starlette.types import ASGIApp\r\nfrom pydantic import BaseModel\r\nfrom uvicorn import run\r\n\r\nclass UserCreds(BaseModel):\r\n    team: Optional[str]\r\n\r\nclass MyAuthMiddleware(BaseHTTPMiddleware):\r\n    \"\"\"\r\n    Middleware to inject the attribute `creds` into the request state\r\n    \"\"\"\r\n\r\n    def __init__(self, app: ASGIApp):\r\n        super().__init__(app)\r\n\r\n    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):\r\n        query_param = request.query_params.get(\"team\")\r\n        header=request.headers.get(\"team\")\r\n        if query_param != header:\r\n            raise HTTPException(400, \"Query param and header don't align\")\r\n        request.state.creds = UserCreds(team=header)\r\n        response = await call_next(request)\r\n        return response\r\n\r\n\r\napp = FastAPI(title=\"Test App\")\r\napp.add_middleware(MyAuthMiddleware)\r\n\r\n\r\nrouter = APIRouter()\r\n\r\n@router.get(\"/items/\")\r\ndef get_items():\r\n    return \"Items\"\r\n\r\n# I'd like to not go through every route and keep this query parameter so it appears in OpenAPI docs\r\n# Because of the middleware the query parameter is always used\r\n@router.get(\"/things/\")\r\ndef get_things(team: Optional[str] = Query(None)):\r\n    return \"Things\"\r\n\r\napp.include_router(router)\r\n\r\nrun(app)\r\n```\r\n\r\n### Description\r\n\r\nEssentially what I am trying to do is make it so if a query parameter is used by the middleware then it should insert that query parameter into every route in the OpenAPI specification. I couldn't see anything in the docs that would achieve this. I know that even if I remove the query parameter in the route definition this code will still work but it would be nice if it appeared in the Swagger UI as well.\r\n\r\n### Environment\r\n\r\n* OS: Linux\r\n* FastAPI Version: 0.61.1\r\n* Python version: 3.8.5\r\n"
+    },
+    "satisfaction_conditions": [
+      "The 'team' parameter appears in the OpenAPI/Swagger UI documentation for all routes",
+      "The solution maintains existing middleware functionality while adding documentation",
+      "The solution does not require modifying individual route definitions"
+    ],
+    "created_at": "2020-10-29T11:20:10Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2250",
+    "source": {
+      "issue_number": 2250
+    },
+    "initial_question": {
+      "title": "Use `>=` instead of `==` for the black requierement in the dev-dependencies",
+      "body": "### What?\r\nThe title says it all. \r\n\r\n### Why?\r\nI'm using `fastapi[tests]` in my dev-dependencies, and would like to update to newer black versions as soon as they are released. Since fastapi uses `==` for black versions, that's not possible.\r\n\r\n### How?\r\nIt's very simple: #2249, I also included an update to the current 20.* version since it's been out for a while now, and ran it over `fastapi/`, `pending_tests/`, `scripts/`, and `tests/`."
+    },
+    "satisfaction_conditions": [
+      "Correct FastAPI package specification is used for the use case"
+    ],
+    "created_at": "2020-10-26T12:23:36Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2223",
+    "source": {
+      "issue_number": 2223
+    },
+    "initial_question": {
+      "title": "How to declare Multiple type for request body?",
+      "body": "```\r\nclass A:\r\nclass B:\r\nclass C:\r\n\r\n@app.put(\"/test\")\r\nasync def test(item: OptionalA]):\r\n    return item\r\n```\r\n\r\nI want to allow class A,B,C for test path.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "API endpoint must accept multiple different object types as input",
+      "Input type validation must work correctly for all allowed types",
+      "API documentation must reflect the multiple possible input types",
+      "Endpoint must successfully process and return data for any of the allowed input types"
+    ],
+    "created_at": "2020-10-22T09:18:39Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2133",
+    "source": {
+      "issue_number": 2133
+    },
+    "initial_question": {
+      "title": "Can't return dictionary as response when values are numpy arrays",
+      "body": "```Python\r\nfrom backend import Model\r\nfrom fastapi import FastAPI, File, Form, UploadFile\r\n\r\napp = FastAPI()\r\nmodel = Model()\r\n\r\n@app.get(\"/\")\r\ndef read_root():\r\n    return {\"Hello World\"}\r\n\r\n@app.post(\"/enroll\")\r\ndef enroll_user(uploadedfile: UploadFile = File(...), username: str = Form(...)):\r\n    model.enroll(uploadedfile.file, username)\r\n    return \"success\"\r\n\r\n@app.get(\"/db\")\r\ndef view_db():\r\n    return model._database\r\n```\r\n### Description\r\n- I receive an uploaded audio file and a username and pass them to `model.enroll` to generate an embedding for that file and store it in the dictionary `_database` as `{username: embedding}.\r\n- Embedding is of type numpy.ndarray and of shape (1, 512).\r\n- The problem arises when I try and hit the `/db` endpoint to view the `_database` variable, it works when the dictionary is still empty but when it is populated it throws back this error `ValueError: [ValueError('dictionary update sequence element #0 has length 512; 2 is required'), TypeError('vars() argument must have __dict__ attribute')]`.\r\n- The error seems to arise from `fastapi/encoders` line 139.\r\n- I tried populating the dictionary with all sorts of sequences and it worked just fine.\r\n- The expected return is {username: embedding}.\r\n\r\n### Environment\r\n- OS: Linux\r\n- FastAPI Version: 0.61.1\r\n- Python version: 3.8.2"
+    },
+    "satisfaction_conditions": [
+      "API endpoint must successfully return dictionary data containing numpy arrays",
+      "Returned data must maintain the original {username: embedding} structure",
+      "Data must be serializable for HTTP response",
+      "Original numerical values from numpy arrays must be preserved",
+      "Solution must handle non-empty database cases"
+    ],
+    "created_at": "2020-10-05T15:30:07Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2088",
+    "source": {
+      "issue_number": 2088
+    },
+    "initial_question": {
+      "title": "Merge Path + Query Parameters in BaseModel",
+      "body": "Hi all,\r\n\r\nI just started using fastapi and I'm struggling to understant how to use the BaseModel on both path + query parameters.\r\n\r\nmy endpoint:\r\n```\r\nrs = client.get(\"/data/a/b/c\")\r\n# possibly\r\nrs = client.get(\"/data/a/b/c?sort=true&page=1\")\r\n```\r\nOn the code below is there a way to make the item return all the optional values declared in the Model?\r\n```python\r\nclass Item(BaseModel):\r\n    sort: Optional[str] =  \"\"\r\n    page: Optional[int] = 1\r\n    per_page: Optional[int] = 20\r\n    search_term: Optional[str] = \"\"\r\n\r\n@app.get(\"/data/{l1}/{l2}/{l3}\")\r\ndef d_tree(\r\n           l1: str,\r\n           l2: str,\r\n           l3: str,\r\n           item: Optional[Item] = None):\r\n    print(l1, l2, l3) # l1 l2 l3 ok\r\n    print(item) # None\r\n```\r\n\r\nThis would throw:\r\n```python\r\n@app.get(\"/data/{l1}/{l2}/{l3}\")\r\ndef d_tree(*,\r\n           l1: str,\r\n           l2: str,\r\n           l3: str,\r\n           item: Item):\r\n#{'detail': [{'loc': ['body'], 'msg': 'field required', 'type': 'value_error.missing'}]}\r\n```\r\n\r\nI'm wondering if It's possible to get all my variables inside the Model like this:\r\n```python\r\nclass Item(BaseModel):\r\n    l1: str\r\n    l2: str\r\n    l3: str\r\n    sort: Optional[str] =  \"\"\r\n    page: Optional[int] = 1\r\n    per_page: Optional[int] = 20\r\n    search_term: Optional[str] = \"\"\r\n\r\n@app.get(\"/data/{l1}/{l2}/{l3}\")\r\ndef d_tree(item: Item):\r\n    toil.phead(item)\r\n\r\n    return []\r\n```\r\n\r\n### Result\r\n```\r\n{'detail': [{'loc': ['body'], 'msg': 'field required', 'type': 'value_error.missing'}]}\r\n```\r\n\r\n### Expect\r\n```\r\n{   \r\n    'l1': 'a',\r\n    'l2': 'b',\r\n    'l3': 'c',\r\n    'page': 1,\r\n    'per_page': 20,\r\n    'search_term': '',\r\n    'sort': ''\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Query parameters must be accessible within the endpoint handler function",
+      "Path parameters must be accessible within the endpoint handler function",
+      "Default values must be returned when optional parameters are not provided",
+      "Parameter types must be correctly parsed from the URL",
+      "The endpoint must handle both requests with and without query parameters"
+    ],
+    "created_at": "2020-09-24T15:26:15Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2045",
+    "source": {
+      "issue_number": 2045
+    },
+    "initial_question": {
+      "title": "can i hide some url in docs? somes like  /graphql",
+      "body": "quest easy ,see title . thanks."
+    },
+    "satisfaction_conditions": [
+      "Endpoint remains functional but is hidden from API documentation",
+      "Documentation visibility can be controlled per-endpoint",
+      "Solution works within the FastAPI framework"
+    ],
+    "created_at": "2020-09-14T09:30:44Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/2015",
+    "source": {
+      "issue_number": 2015
+    },
+    "initial_question": {
+      "title": "How can I change 'Bearer' prefix in OAuth2PasswordBearer",
+      "body": "I'm using OAuth2PasswordBearer scheme, the rest of my services has authorisation prefix 'JWT' instead of 'Bearer', how can I change it?"
+    },
+    "satisfaction_conditions": [
+      "Authorization header accepts 'JWT' prefix instead of 'Bearer'",
+      "Maintains compatibility with OAuth2PasswordBearer functionality",
+      "Returns appropriate 401 unauthorized response when authentication fails",
+      "Correctly extracts and returns the token value after the prefix"
+    ],
+    "created_at": "2020-09-05T13:21:40Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1929",
+    "source": {
+      "issue_number": 1929
+    },
+    "initial_question": {
+      "title": "Wrong route in FastAPi",
+      "body": "Hello I would like to know how to override the function that manages non-existing route, I can't find anything on the internet or I don't understand at all how to do it because I've tried everything I think.\r\n\r\nIf someone can help me to change the message \r\n{\r\n    \"detail\": \"Not Found\"\r\n}\r\n\r\nwhen you try to contact the server with a bad route or / and method\r\n\r\nThank you very much.\r\nBest regards,"
+    },
+    "satisfaction_conditions": [
+      "Custom error response is returned for non-existent routes",
+      "HTTP exception handling is properly integrated with the FastAPI framework",
+      "Response maintains valid JSON format"
+    ],
+    "created_at": "2020-08-20T12:25:17Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1772",
+    "source": {
+      "issue_number": 1772
+    },
+    "initial_question": {
+      "title": "mutipart/form-data not working on TestClient",
+      "body": "```python\r\nfrom fastapi import APIRouter, File, Form, UploadFile\r\n\r\nrouter = APIRouter()\r\n\r\n@router.post(\"/upload\", response_model=MyResponseModel, summary=\"user csv upload api\")\r\nasync def upload(\r\n    user_id: int = Form(..., example=1),\r\n    csv_file: UploadFile = File(...),\r\n):\r\n    \"\"\"\r\n    some code...\r\n    \"\"\"\r\n```\r\n\r\nI checked on swagger(/docs). It was successful.\r\n\r\n\r\nbut, failed in test code\r\n\r\n```python\r\nfrom myapp import app\r\n\r\nclass UploadTest(unittest.TestCase):\r\n    client = TestClient(app)\r\n\r\n    def test_upload(self):\r\n        with csv.open(\"rb\") as f:\r\n            filebody = f.read()\r\n        res = self.client.post(\r\n            \"/api/upload\",\r\n            data={\r\n                \"user_id\": 1\r\n            },\r\n            files={\r\n                \"csv_file\": (\"filename.csv\", filebody),\r\n            },\r\n            headers={\"Content-Type\": \"multipart/form-data\"})\r\n        self.assertEqual(status.HTTP_200_OK, res.status_code)\r\n        MyResponseModel.parse_obj(res.json()[\"data\"])\r\n```\r\n\r\n```\r\nError getting request body: can't concat NoneType to bytes\r\n{'detail': 'There was an error parsing the body'}\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "The test client successfully sends multipart/form-data requests",
+      "The content-type header is properly handled",
+      "The request includes both form data and file content correctly"
+    ],
+    "created_at": "2020-07-22T17:57:09Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1391",
+    "source": {
+      "issue_number": 1391
+    },
+    "initial_question": {
+      "title": "Testing: overwrite Depends(OAuth2)",
+      "body": "### Description\r\n\r\nIs it possible to overwrite a Depends by an external authentication provider inside a test?\r\n\r\nI have this function and would like to overwrite the Depends to allow the test client to call the function without authentication.\r\n```python\r\n@app.post(\"/\")\r\nasync def get_data(api_key: str = Depends(OAuth2AuthorizationCodeBearer(token_url))):\r\n    return \"authenticated\"\r\n```\r\n\r\nDo you know how to use `dependency_overrides` to allow requests without authentication?\r\n```python\r\napp.dependency_overrides[OAuth2AuthorizationCodeBearer.__call__] = True\r\nclient = TestClient(app)\r\nr = client.post(\"/\")\r\n```\r\n\r\nI appreciate any hints :-)\r\n"
+    },
+    "satisfaction_conditions": [
+      "Test requests bypass OAuth2 authentication while maintaining normal authentication in production",
+      "Dependency override successfully modifies the OAuth2 dependency behavior",
+      "Original dependency remains intact for non-test scenarios"
+    ],
+    "created_at": "2020-05-08T10:09:34Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1375",
+    "source": {
+      "issue_number": 1375
+    },
+    "initial_question": {
+      "title": "uri path variable question",
+      "body": "### First check\r\n\r\n* [ x ] I used the GitHub search to find a similar issue and didn't find it.\r\n* [ x ] I searched the FastAPI documentation, with the integrated search.\r\n* [ x ] I already searched in Google \"How to X in FastAPI\" and didn't find any information.\r\n\r\n### Description\r\n\r\n /cars and /cars/{uuid} use the same decorator/function\r\n\r\n\r\n### Additional context\r\n\r\nLooking to to see if there is a way to have /cars and /cars/{uuid} use the same decorator/function and not create duplicate code? Is there a way to register the URI with an optionial {uuid} in the path? I can't find anything in the docs on this, everything that I saw was about URI key/value pairs after the ? in the URI\r\n\r\n\r\nCurrent Way - That works\r\n-----------------------------------------\r\nclass Cars_Get(BaseModel):\r\n    uuid: UUID = Field(None, title=\"UUID\")\r\n    message: str\r\n\r\n@app.get(\"/cars\", response_model=List[Cars_Get])'\r\nasync def missedcall():\r\n\treturn [{\"uuid\": 'd50eae76-8e0e-11ea-bc55-0242ac130003', \"message\": \"all cars\"}]\r\n\r\n@app.get(\"/cars/{uuid}\", response_model=Cars_Get)\r\nasync def missedcall(uuid: UUID = None):\r\n\t    return {\"uuid\": uuid,\"message\": \"Single car\" }\r\n\r\n------------------------------------------------------------------------\r\nTried the following but get\r\n\r\nINFO:     *.*.*.74:43020 - \"GET /cars HTTP/1.1\" 404 Not Found\r\n\r\n\r\n@app.get(\"/cars/{uuid}\", response_model=Cars_Get)\r\nasync def missedcall(uuid: UUID = None):\r\n    if not uuid:\r\n\t    return [{\"uuid\": 'd50eae76-8e0e-11ea-bc55-0242ac130003', \"message\": \"all cars\"}]\r\n    else:\r\n\t    return {\"uuid\": uuid,\"message\": \"Single car\" }\r\n\r\n-----------------------------------------------------------------\r\nTried this way but I get a 307 Temporary Redirect, but it works. Not sure if it's really valid\r\n\r\n\r\nINFO:     73.22.78.74:42765 - \"GET /cars/ HTTP/1.1\" 307 Temporary Redirect\r\nINFO:     73.22.78.74:42765 - \"GET /cars HTTP/1.1\" 200 OK\r\n\r\nINFO:     73.22.78.74:42964 - \"GET /cars/d50eae76-8e0e-11ea-bc55-0242ac130003 HTTP/1.1\" 200 OK\r\n\r\nclass Cars_Get(BaseModel):\r\n    uuid: UUID = Field(None, title=\"UUID\")\r\n    message: str\r\n\r\n@app.get(\"/cars\", response_model=List[Cars_Get])\r\n@app.get(\"/cars/{uuid}\", response_model=Cars_Get)\r\nasync def missedcall(uuid: UUID = None):\r\n    if not uuid:\r\n\t    return [{\"uuid\": 'd50eae76-8e0e-11ea-bc55-0242ac130003', \"message\": \"all cars\"}]\r\n    else:\r\n\t    return {\"uuid\": uuid,\"message\": \"Single car\" }\r\n"
+    },
+    "satisfaction_conditions": [
+      "Single endpoint handles both /cars and /cars/{uuid} requests",
+      "Returns list response for base /cars route",
+      "Returns single item response for /cars/{uuid} route",
+      "Successfully handles optional UUID parameter",
+      "Maintains expected HTTP response codes"
+    ],
+    "created_at": "2020-05-04T17:31:57Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1371",
+    "source": {
+      "issue_number": 1371
+    },
+    "initial_question": {
+      "title": "APIRouter testing with TestClient always return assertion error 404",
+      "body": "### Description\r\n\r\nI'm about to create restapi and add testing files for each route. I'm using `APIRouter` for all my path operations, but when i create a test file, i always get assertion error 404. If i change the path operation using `FastAPI`, the test passed. Did i miss something maybe like specific configuration for testing path operations from `APIRouter` instance?\r\n\r\nHere is the example of my project structure:\r\n\r\n```\r\napp/\r\n|__routes/\r\n|____basic.py\r\n|__tests/\r\n|____test_basic.py\r\n|__server.py\r\n|__main.py\r\n```\r\n\r\n`basi.py`\r\n```\r\nfrom fastapi import APIRouter\r\n\r\nrouter = APIRouter()\r\n\r\n@router.get('/')\r\ndef read_root():\r\n    return {\"Hello\": \"World\"}\r\n```\r\n`main.py`\r\n```\r\nfrom fastapi import FastAPI\r\n\r\napp: FastAPI = FastAPI()\r\n```\r\n\r\n`server.py`\r\n```\r\nfrom app.main import app\r\nfrom app.routes.basic import router as basic_router\r\n[...]\r\nROUTERS = (basic.router,)\r\n\r\napp.include_router(ROUTERS[0], tags=[\"Basic\"])\r\n[...]\r\n\r\nif __name__ == \"__main__\":\r\n    import uvicorn\r\n\r\n    uvicorn.run(\"app.main:app\", host=getenv('APP_HOST'),\r\n                port=int(getenv('APP_PORT')), reload=True, log_level=\"debug\")\r\n```\r\n\r\n`test_basic.py`\r\n```\r\nfrom fastapi.testclient import TestClient\r\nfrom app.main import app\r\n\r\nclient = TestClient(app)\r\n\r\ndef test_read_root():\r\n    response = client.get(\"/\")\r\n\r\n    assert response.status_code == 200\r\n```\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Test client must be initialized with an application instance that has all routers registered",
+      "Application configuration used in tests must match the runtime configuration",
+      "HTTP requests to defined routes must return expected status codes"
+    ],
+    "created_at": "2020-05-04T04:48:36Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1328",
+    "source": {
+      "issue_number": 1328
+    },
+    "initial_question": {
+      "title": "Depends auto wraps with contextmanager which creates duplicate code",
+      "body": "### First check\r\n\r\n* [x] I used the GitHub search to find a similar issue and didn't find it.\r\n* [x] I searched the FastAPI documentation, with the integrated search.\r\n* [x] I already searched in Google \"How to X in FastAPI\" and didn't find any information.\r\n\r\n### Description\r\n\r\nI have a database pool with which I have to define two exact method except for the `@asynccontextmanager` decorator.\r\n```\r\nclass Pool:\r\n    async def get_con(self):\r\n        con = await self.pool.acquire()\r\n        try:\r\n            yield con\r\n        finally:\r\n            await self.pool.release(con)\r\n\r\n    @asynccontextmanager\r\n    async def __call__(self):\r\n        con = await self.pool.acquire()\r\n        try:\r\n            yield con\r\n        finally:\r\n            await self.pool.release(con)\r\n\r\npool = Pool()\r\n```\r\n\r\nOne is used in my internal code:\r\n```\r\nasync with pool() as con:\r\n    con.fetch()\r\n```\r\n\r\nAnd the other with the `Depends`:\r\n```\r\n@router.get(\"/item/{id}\")\r\nasync def get(id: UUID, db: Connection = Depends(pool.get_con)):\r\n```\r\n\r\n\r\nIn the documentation there is a line which states\r\n\r\n> But you don't have to use the decorators for FastAPI dependencies (and you shouldn't).\r\n\r\nIf you try:\r\n```\r\n@router.get(\"/item/{id}\")\r\nasync def get(id: UUID, db: Connection = Depends(pool)):\r\n```\r\n\r\nI actually get an `AttributeError`. I'm assuming `pool` is yieled instead of `pool.__call__`.\r\n```\r\nAttributeError: '_AsyncGeneratorContextManager' object has no attribute 'fetchrow'\r\n```\r\n\r\nWhich makes it pretty clear that I cannot use a contextmanager in a `Depends`, but this creates duplicate and non consistent code when getting a db connection.\r\n\r\nIs this the way it is? Can `Depends` work with both regular yields and contextmanagers directly?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Database connection function must work both as a dependency and as a context manager",
+      "Database connections must be properly released after use",
+      "Function must yield the actual database connection object",
+      "Solution must avoid using context manager decorators directly with FastAPI dependencies"
+    ],
+    "created_at": "2020-04-27T14:09:09Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1154",
+    "source": {
+      "issue_number": 1154
+    },
+    "initial_question": {
+      "title": "get_running_loop/get_event_loop doesnt seem to run in fastapi..but runs in starlette",
+      "body": "This works in Starlette\r\n\r\n```\r\n#!/usr/bin/env python\r\n# -*- coding: utf-8 -*-\r\nimport inspect\r\nimport os\r\nimport sys\r\n\r\nimport asyncio\r\n\r\nimport uvicorn\r\nfrom starlette.applications import Starlette\r\nfrom starlette.responses import JSONResponse\r\n\r\napp = Starlette(debug=True)\r\n\r\n\r\ndef main():\r\n    CONFIG = uvicorn.Config(\r\n        app,\r\n        host=\"0.0.0.0\",\r\n        port=8000,\r\n        lifespan=\"on\",\r\n        loop=\"uvloop\",\r\n        log_level=\"info\",\r\n        use_colors=True,\r\n        workers=1,\r\n    )\r\n    SERVER = uvicorn.Server(config=CONFIG)\r\n    LOOP = asyncio.new_event_loop()\r\n    asyncio.set_event_loop(LOOP)\r\n\r\n    try:\r\n        LOOP.run_until_complete(SERVER.serve())\r\n\r\n    except asyncio.CancelledError:\r\n        pass\r\n\r\n    # uvicorn.run(app, host='127.0.0.1', port=8080)\r\n\r\n\r\n@app.route('/')\r\nasync def image(request):\r\n    # ext = request.path_params['ext']\r\n    loop = asyncio.get_running_loop()\r\n    return JSONResponse({'hello': 'world'})\r\n\r\n\r\n\r\nif __name__ == '__main__':\r\n    main()\r\n\r\n```\r\n\r\nThis does not work in fastapi\r\n```\r\n\r\nfrom fastapi import FastAPI\r\nimport asyncio\r\nimport uvicorn\r\n\r\nimport logging\r\n\r\napp = FastAPI()\r\n\r\n\r\n@app.get(\"/\")\r\ndef root():\r\n    loop = asyncio.get_running_loop()\r\n    return{\"hello\":\"world\"}\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    logging.basicConfig(level=2, format=\"%(levelname)-9s %(message)s\")\r\n    CONFIG = uvicorn.Config(\r\n        app,\r\n        host=\"0.0.0.0\",\r\n        port=8000,\r\n        lifespan=\"on\",\r\n        loop=\"asyncio\",\r\n        log_level=\"info\",\r\n        use_colors=True,\r\n        workers=1,\r\n    )\r\n    SERVER = uvicorn.Server(config=CONFIG)\r\n\r\n    LOOP = asyncio.new_event_loop()\r\n    asyncio.set_event_loop(LOOP)\r\n\r\n    try:\r\n        LOOP.run_until_complete(SERVER.serve())\r\n    except asyncio.CancelledError:\r\n        pass\r\n```\r\n\r\nI'm looking to access the global event loop .\r\nam i doing anything wrong ?"
+    },
+    "satisfaction_conditions": [
+      "The API endpoint must return a valid response",
+      "The application server must start and run successfully"
+    ],
+    "created_at": "2020-03-22T17:28:51Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1081",
+    "source": {
+      "issue_number": 1081
+    },
+    "initial_question": {
+      "title": "How to define the routes using different method",
+      "body": "\r\n### Description\r\n\r\nHow can I define the route supporting 'get' and 'post' methos simutaneously? As like the codes in Flask: \"@app.route('/api/test', methods=['GET', 'POST'])\"\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Route must handle both GET and POST HTTP methods for the same URL path",
+      "Route definition syntax must be valid within the web framework being used",
+      "Handler function(s) must be properly associated with the defined route"
+    ],
+    "created_at": "2020-03-04T10:29:39Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/1035",
+    "source": {
+      "issue_number": 1035
+    },
+    "initial_question": {
+      "title": "Optional Query parameter list",
+      "body": "### First check\r\n\r\n* [ x] I used the GitHub search to find a similar issue and didn't find it.\r\n* [ x] I searched the FastAPI documentation, with the integrated search.\r\n* [ x] I already searched in Google \"How to X in FastAPI\" and didn't find any information.\r\n\r\n### Description\r\n\r\nDocumentation is very clear that we can use lists e,g \r\n```\r\n@app.get(\"/\")\r\nasync def my_query(q: List[str] = Query([\"a\",\"b\",\"c\",\"d\"])):\r\n```\r\nHow can I:\r\nHave an ***optional*** list structure, from the documentation we include the key word `None` \r\ne.g:\r\n```\r\nvalues:str = None\r\n```\r\nMeaning we can have two scenarios:\r\n- `/q=a&q=b (q is present and item is in list) ` \r\n- `/ (q is not present)`\r\n\r\nTryied: `Query(None,[\"a\",\"b\",\"c\",\"d\"])`  but it didnt worked\r\n\r\n\r\n### Additional context\r\nUsing  `fastapi==0.49.0`\r\n"
+    },
+    "satisfaction_conditions": [
+      "API endpoint must handle requests both with and without the query parameter",
+      "When query parameters are present, they must be processed as a list of values",
+      "When query parameters are absent, the endpoint must continue to function without errors",
+      "The solution must be compatible with FastAPI's type system and Query validation"
+    ],
+    "created_at": "2020-02-25T16:05:16Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/960",
+    "source": {
+      "issue_number": 960
+    },
+    "initial_question": {
+      "title": "Question: Fast api (with websockets) and UDP",
+      "body": "Hi,\r\n\r\nWe want to create an application that receives a message from IOT devices via UDP. \r\nWhen a message is received this should be stored in a database and a websocket broadcast should be sent to some clients.\r\n\r\nIs it possible to receive messages via UDP on a FastApi route and then send a message using websockets? I'm using the Postgresql fullstack example right now. \r\n\r\nkind regards,"
+    },
+    "satisfaction_conditions": [
+      "System must successfully receive UDP messages from IoT devices",
+      "System must broadcast updates via WebSocket to connected clients",
+      "System must maintain concurrent UDP and WebSocket connections",
+      "System must properly manage WebSocket client connections"
+    ],
+    "created_at": "2020-02-08T21:04:23Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/952",
+    "source": {
+      "issue_number": 952
+    },
+    "initial_question": {
+      "title": "List of JSON as Input without using BaseModel",
+      "body": "### First check\r\n\r\n* [x] I used the GitHub search to find a similar issue and didn't find it.\r\n* [x] I searched the FastAPI documentation, with the integrated search.\r\n* [x] I already searched in Google \"How to X in FastAPI\" and didn't find any information.\r\n\r\n### Description\r\n\r\nHow can I have a generic JSON as an input\r\n\r\n```\r\n\"params\": {\r\n    \"varA\": {\r\n      \"x\": \"2\",\r\n      \"version\": 4\r\n    },\r\n    \"y\":  [{\r\n              \"p\": 228.0,\r\n              \"q\": \"abcd\"\r\n            }]\r\n}\r\n```\r\nIf I define `y: List[Json]` I get:\r\n\r\n\"msg\": \"JSON object must be str, bytes or bytearray\",\r\n`HTTP/1.1\" 422 Unprocessable Entity`\r\n\r\nor `y: List[str]` or `y: str` \r\n`HTTP/1.1\" 400 Bad Request`\r\n\r\nIs it possible to have a generic JSON List as an input instead of having to define a hard-coded Pydantic BaseModel?\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "API endpoint must accept nested JSON data containing arrays without requiring Pydantic models",
+      "Input data must be properly parsed without type validation errors"
+    ],
+    "created_at": "2020-02-06T18:46:56Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/909",
+    "source": {
+      "issue_number": 909
+    },
+    "initial_question": {
+      "title": "query parameters with dashes instead of underscores",
+      "body": "Simple question that I can't seem to find an answer to. The standard for python variables is to use underscores but when it comes to url part or query parameters it's often you'll see dashes instead. This is what I use everywhere else. In PyCharm I'm getting an error declaring my view parameters as such: \"Illegal target for variable annotation\". \r\n\r\nRealize this isn't FastAPI's fault but wasn't sure where to ask tbh. Any way to use dashes?"
+    },
+    "satisfaction_conditions": [
+      "Query parameters with dashes must be accessible in the API endpoint",
+      "Python variable naming conventions must be respected in the code",
+      "The mapping between URL parameters and code variables must be explicit and maintainable",
+      "The solution must work within FastAPI's type annotation system"
+    ],
+    "created_at": "2020-01-22T22:08:31Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/855",
+    "source": {
+      "issue_number": 855
+    },
+    "initial_question": {
+      "title": "Forward reference for recursive models.",
+      "body": "### First check\r\n\r\n* [x] I used the GitHub search to find a similar issue and didn't find it.\r\n* [x] I searched the FastAPI documentation, with the integrated search.\r\n* [x] I already searched in Google \"How to X in FastAPI\" and didn't find any information.\r\n\r\n### Description\r\n\r\nHello,\r\nI have a recursive model of the following form using a forward reference:\r\n```\r\nclass FilterGroup(BaseModel):\r\n    filters: List[Union[Filter, 'FilterGroup']]\r\n    operation: Literal['and_', 'or_']\r\n```\r\n\r\nUnderstandably the schema generation fails for it. Is there a workaround to use this as input in fastapi?\r\n\r\nThank you very much."
+    },
+    "satisfaction_conditions": [
+      "Model must support recursive self-referential structure",
+      "Schema generation must complete successfully",
+      "Model must maintain type safety",
+      "Forward references must be properly resolved",
+      "Model must retain its original structure and functionality"
+    ],
+    "created_at": "2020-01-13T22:50:02Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/808",
+    "source": {
+      "issue_number": 808
+    },
+    "initial_question": {
+      "title": "How to generate a pydantic model from a sqlalchemy model?",
+      "body": "### Description\r\n\r\nGiven a SQLAlchemy declarative model\r\n```py\r\nBase = declarative_base()\r\n\r\nclass EntityORM(Base):\r\n    __tablename__ = \"entities\"\r\n\r\n    id = Column(Integer, primary_key=True)\r\n    name = Column(String, nullable=False)\r\n    version = Column(Integer, nullable=False)\r\n```\r\nand a pydantic model:\r\n```py\r\nclass Entity(BaseModel):\r\n    id: int\r\n    name: str\r\n    version: int\r\n```\r\n\r\nHow do I go from one to the other, like:\r\n\r\n```py\r\ne1 = EntityORM(name=\"foo\", version=42)\r\ne2 = Entity(e1) # exception: TypeError: __init__() takes 1 positional argument but 2 were given\r\n```\r\n\r\nSomehow FastAPI is doing it with response_model, how can I do that myself? I'd like to always reason about Pydantic models in my code rather than intersperse ORM objects."
+    },
+    "satisfaction_conditions": [
+      "Pydantic model must be able to create instances from SQLAlchemy ORM objects",
+      "All fields from the SQLAlchemy model must be correctly mapped to the Pydantic model",
+      "Conversion must work without manually mapping individual fields"
+    ],
+    "created_at": "2019-12-20T00:42:42Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/798",
+    "source": {
+      "issue_number": 798
+    },
+    "initial_question": {
+      "title": "Retrieve static files from branching endpoints",
+      "body": "How can I retrieve static content with branching endpoints? I have a small project with all my templates and static files in a /dist folder. I can create a inner branch /admin/omni and correctly loaded templates, but associated static files are being pulled from /admin/dist instead of /dist. How do I prevent this behavior?\r\n\r\napp.py\r\n```\r\napp = FastAPI()\r\n\r\napp.mount('/dist', StaticFiles(directory='dist'), name='dist')\r\ntemplates = Jinja2Templates(directory='dist')\r\n\r\n@app.get(\"/\")\r\nasync def homepage(request: Request):\r\nreturn templates.TemplateResponse('homepage.html', {\"request\": request})\r\n\r\n@app.get(\"/omni\")\r\nasync def omni(request: Request):\r\nreturn templates.TemplateResponse('app.html', {\"request\": request})\r\n\r\n@app.get(\"/admin\")\r\nasync def admin(request: Request):\r\nreturn templates.TemplateResponse('admin.html', {\"request\": request})\r\n\r\n@app.get(\"/admin/omni\")\r\nasync def admin_omni(request: Request):\r\nreturn templates.TemplateResponse('app_admin.html', {\"request\": request})\r\n\r\n```\r\n\r\napp_admin.html\r\n```\r\n<html>\r\n<head>\r\n<link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"dist/favicon.68117958.ico\">\r\n<link rel=\"stylesheet\" href=\"dist/app_admin.3cf53168.css\">\r\n</head>\r\n<body>\r\n<div id=\"app_admin\"></div>\r\n<script src=\"dist/app_admin.6744ee61.js\"></script>\r\n</body>\r\n</html>\r\n```\r\n\r\nconsole\r\n```\r\nINFO:     172.22.176.1:65209 - \"GET /admin/omni HTTP/1.1\" 200 OK\r\nINFO:     172.22.176.1:65209 - \"GET /admin/dist/app_admin.3cf53168.css HTTP/1.1\" 404 Not Found\r\nINFO:     172.22.176.1:65208 - \"GET /admin/dist/app_admin.6744ee61.js HTTP/1.1\" 404 Not Found\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Static files are successfully loaded from the root /dist directory regardless of the endpoint path",
+      "Browser requests for static assets resolve to the correct paths",
+      "Static file references in HTML templates resolve consistently across all endpoints",
+      "Mounted static files directory remains accessible from all application routes"
+    ],
+    "created_at": "2019-12-18T05:16:01Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/740",
+    "source": {
+      "issue_number": 740
+    },
+    "initial_question": {
+      "title": "how to use a custom io take in fastapi",
+      "body": "**Description**\r\n\r\nHow can I [...]?\r\n\r\nhow to use a custom io take in fastapi?\r\nI can't get the event_loop out......\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Blocking I/O operations must not block the FastAPI server",
+      "Function execution must complete successfully",
+      "Route handler and I/O function signatures must be compatible",
+      "Response must be returned in valid FastAPI format"
+    ],
+    "created_at": "2019-11-27T09:45:06Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/738",
+    "source": {
+      "issue_number": 738
+    },
+    "initial_question": {
+      "title": "dependency_overrides in production possible?",
+      "body": "**Description**\r\n\r\nIs this a pattern you can use for production?\r\n\r\n```python\r\n\r\ndef storage():\r\n    return ...\r\n\r\ndef s3storage():\r\n   return ...\r\n\r\napp = FastAPI()\r\n@app.get(\"/files/{name})\r\ndef get_item(name, storage = Depends(storage)):\r\n    return storage.read(name)\r\n\r\nif should_use_s3:\r\n    app.dependency_override[storage] = s3storage\r\n```\r\n\r\n**Context**:\r\nLet's say you'd like your app to support multiple providers for file storage, data bases, ...\r\nThe documentation talks about `dependency_override` mostly in the unit testing context.\r\n\r\nBy the way: Thank you for the great library!"
+    },
+    "satisfaction_conditions": [
+      "Storage provider selection must be configurable at runtime",
+      "Provider selection logic must be part of the core application architecture"
+    ],
+    "created_at": "2019-11-26T19:53:45Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/724",
+    "source": {
+      "issue_number": 724
+    },
+    "initial_question": {
+      "title": "Raising the error if input model has extra parameters?",
+      "body": "Hello\r\n\r\nHow can I raise the error if input pydantic's model has extra parameters?\r\nRight now all extra keys are just ignored.\r\n\r\n**Example:**\r\n```\r\nfrom fastapi import FastAPI\r\nfrom pydantic import BaseModel\r\n\r\napp = FastAPI()\r\n\r\nclass UpdateModel(BaseModel):\r\n    name: str\r\n\r\n@app.post(\"/items/\")\r\nasync def update(item: UpdateModel):\r\n    # do smth\r\n```\r\nIf I send `{\"name\": \"FOO\", \"id\": \"BAR\"}` the ID key will be ignored. \r\nIs it any common way to make method to raise error in that case?\r\n\r\n---\r\nThanks for your work."
+    },
+    "satisfaction_conditions": [
+      "Model rejects input containing undefined fields",
+      "Error is raised when extra parameters are provided",
+      "Configuration can be applied at the model level"
+    ],
+    "created_at": "2019-11-21T05:37:22Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/702",
+    "source": {
+      "issue_number": 702
+    },
+    "initial_question": {
+      "title": "How to get the server version number",
+      "body": "**Description**\r\n\r\nHow can I get the server version number, apart from downloading the whole openapi.json file from `api/v1/openapi.json`?  I would not like to download the whole API schema just for the version number only.\r\n\r\nI could create my own endpoint for that, but am I missing a more obvious way of doing it?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Server version information must be accessible without downloading the full OpenAPI schema",
+      "Version information must reflect the API/application version, not the framework version",
+      "Version information must be retrievable via a lightweight HTTP request",
+      "Version information must be consistent with the version defined in the FastAPI application configuration"
+    ],
+    "created_at": "2019-11-11T10:38:14Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/577",
+    "source": {
+      "issue_number": 577
+    },
+    "initial_question": {
+      "title": "How can I persist the SpooledTemporaryFile?",
+      "body": "Hi everyone, thanks for this amazing project. I'm testing out the features of FastAPI and I'm stuck uploading files at the moment. Now my question is:\r\n\r\nHow can I persist the SpooledTemporaryFile?\r\n\r\nIs it possible to move the contents of SpooledTemporaryFile to a specific file path and persist the file when it's done uploading?\r\n\r\nThanks a lot and best regards\r\n"
+    },
+    "satisfaction_conditions": [
+      "Uploaded file content is successfully persisted to permanent storage",
+      "SpooledTemporaryFile data remains intact during transfer",
+      "Solution works within FastAPI's file upload framework",
+      "File can be saved to a specified destination path"
+    ],
+    "created_at": "2019-09-30T17:07:31Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/515",
+    "source": {
+      "issue_number": 515
+    },
+    "initial_question": {
+      "title": "How to capture the whole body of POST, in a single JSON var",
+      "body": "**Description**\r\n\r\nHow can I capture the whole body of a POST operation (posted as application/json) as a single JSON var, without necessarily knowing the incoming schema?\r\n\r\n**Additional context**\r\n\r\nTried as:\r\n\r\n```\r\nfrom pydantic import BaseModel, Json\r\n\r\nclass DynamicSchema(BaseModel):\r\n    item: Json\r\n\r\n@router.post(\"/someurl\")\r\nasync def someMethod(\r\n    item: DynamicSchema\r\n):\r\n```\r\nbut I get a reply of:\r\n\r\n```\r\n{\r\n    \"detail\": [\r\n        {\r\n            \"loc\": [\r\n                \"body\",\r\n                \"item\",\r\n                \"item\"\r\n            ],\r\n            \"msg\": \"field required\",\r\n            \"type\": \"value_error.missing\"\r\n        }\r\n    ]\r\n}\r\n```\r\nfor a submission of:\r\n\r\n```\r\n{\r\n    \"qwerty\": \"me\",\r\n    \"more\": \"other\",\r\n    \"another\": {\r\n        \"dict\": \"q1\"\r\n    }\r\n}\r\n```\r\n\r\nI've tried a ton of other different variations by I still get a validation error.\r\n\r\nI though Body(..., embed=True) might help but I got nowhere with that either.\r\n\r\nPS: The docs are not clear either on how to do something as simple as that (they are **fantastic** though for anything else I've looked)."
+    },
+    "satisfaction_conditions": [
+      "API endpoint must accept arbitrary JSON data without requiring a predefined schema",
+      "Received JSON data must be accessible as a complete object",
+      "API endpoint must successfully parse application/json content type",
+      "No validation errors when receiving valid JSON with arbitrary structure",
+      "Endpoint returns expected response without data transformation"
+    ],
+    "created_at": "2019-09-07T10:44:25Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/487",
+    "source": {
+      "issue_number": 487
+    },
+    "initial_question": {
+      "title": "Correct way to document RedirectResponse in openapi?",
+      "body": "**Description**\r\n\r\nHow can I make openapi work correctly if i my handler return a RedirectResponse?\r\n\r\nI try simply do this but i got ValidationError\r\n\r\n```python\r\nfrom fastapi.applications import FastAPI\r\nfrom starlette.responses import RedirectResponse, Response\r\napp = FastAPI(docs_url=\"/\")\r\n\r\n\r\n@app.get('/redirect', status_code=307, response_class=Response)\r\nasync def redirect():\r\n    return RedirectResponse('/')\r\n# OR\r\n@router.get('/redirect', response_class=RedirectResponse)\r\nasync def redirect():\r\n    return RedirectResponse('/')\r\n\r\nif __name__ == '__main__':\r\n    import uvicorn\r\n    uvicorn.run(app, port=8001, reload=True)\r\n```\r\n\r\n```\r\npydantic.error_wrappers.ValidationError: 4 validation errors\r\npaths -> /redirect -> get -> responses -> default\r\n  field required (type=value_error.missing)\r\ncontent -> __key__\r\n  none is not an allowed value (type=type_error.none.not_allowed)\r\nresponses -> 307 -> content\r\n  value is not none (type=type_error.none.allowed)\r\npaths -> /redirect -> get\r\n  value is not none (type=type_error.none.allowed)\r\n```"
+    },
+    "satisfaction_conditions": [
+      "The endpoint successfully performs HTTP redirection",
+      "The OpenAPI documentation generates without validation errors",
+      "The status code 307 is properly reflected in the response"
+    ],
+    "created_at": "2019-08-30T14:40:31Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/441",
+    "source": {
+      "issue_number": 441
+    },
+    "initial_question": {
+      "title": "Optional bool in query string always True when parameter not present",
+      "body": "**Describe the bug**\r\n\r\nWhen query parameter of type `Optional[bool]` is declared using `Query` class parameter value is not correctly mapped and instead of `None` it maps to instance of `Schema` which when type casted to `bool` returns True.\r\n\r\n**To Reproduce**\r\n\r\nSample code:\r\n\r\n```python\r\nclass QueryParams(BaseModel):\r\n\tfoo: Optional[bool] = None\r\n\r\nasync def query_params(foo: Optional[bool] = Query(None, description=\"Some parameter\")):\r\n\treturn QueryParams(foo=foo)\r\n\r\n@api.get(\"/foo\")\r\nasync def get(data: QueryParams = Depends(query_params)):\r\n\t# When '/foo' is called (without any parameters) the 'foo' parameter \r\n  # inside 'data' has value of 'True' instead of 'None'.\r\n\treturn None\r\n```\r\n\r\nIt however works fine if declared as just:\r\n\r\n```python\r\nasync def query_params(foo: Optional[bool] = None):\r\n\treturn QueryParams(foo=foo)\r\n```\r\n\r\n**Expected behavior**\r\nValue should be assigned only if parameter is present in query string, `None` otherwise.\r\n\r\n**Environment:**\r\n - OS: macOS\r\n - FastAPI Version: 0.35\r\n - Python version: 3.7.3\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Optional boolean query parameters must return None when not provided in the URL",
+      "FastAPI's Query parameters must behave consistently with regular parameters"
+    ],
+    "created_at": "2019-08-16T03:48:04Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/425",
+    "source": {
+      "issue_number": 425
+    },
+    "initial_question": {
+      "title": "Startup event dependencies",
+      "body": "First of all, great work on FastAPI! I've been really impressed so far.\r\n\r\nI need to start a long-running, periodic task on the startup event of my application. This long-running task requires the global app configuration. In my path handlers, I am using FastAPI's dependency injection to access the config, making it very easy to mock the dependency in tests. However, as of now I see no way to use dependency injection to get the config in the startup event. For now I can handle this by modifying the environ through starlette.environ, but it would be nice if I could mock the config in there the same way as I am doing the rest of the time. Is there a way to do this, or am I going about this in completely the wrong way? "
+    },
+    "satisfaction_conditions": [
+      "Configuration data must be accessible during application startup events",
+      "Configuration must be mockable in test environments",
+      "Solution must work with FastAPI's startup event system",
+      "Long-running periodic task can be initialized with required configuration"
+    ],
+    "created_at": "2019-08-07T12:46:22Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/352",
+    "source": {
+      "issue_number": 352
+    },
+    "initial_question": {
+      "title": "Trying to create an endpoint with a 'generic' parameter",
+      "body": "**Description**\r\n\r\nI'm trying to build an API using FastAPI that needs to integrate with another (undocumented) system which I do not have control over. For this reason, I need to be able to create an endpoint that I can use as an integration point without knowing what POST body data will be sent to my API. Is this possible using FastAPI? Am I able to create a sort of 'generic' parameter for an endpoint function which will capture any POST body data into a dictionary?\r\n\r\nThanks in advance. \r\n\r\nTo clarify:\r\nThis is simply so that I can reverse engineer the system I don't have control over. Once I see what data is being sent, I can rewrite the endpoints to be more explicit."
+    },
+    "satisfaction_conditions": [
+      "Endpoint must accept arbitrary JSON POST body data",
+      "POST data must be accessible as a Python data structure",
+      "Endpoint must remain functional without prior knowledge of request body schema"
+    ],
+    "created_at": "2019-06-28T23:12:22Z"
+  },
+  {
+    "id": "https://github.com/fastapi/fastapi/issues/286",
+    "source": {
+      "issue_number": 286
+    },
+    "initial_question": {
+      "title": "422 using a dict body with 0.27.0",
+      "body": "The following endpoint was running fine with 0.26.0 and  Python 3.6.5:\r\n\r\n@app.patch(\"/ps/user\")\r\nasync def patch_user(user_dict: dict, add: List[str] = Query(None)) -> dict:\r\n   ...\r\n\r\nbut with upgrading to 0.27.0 I got the following 422 error:\r\n\r\n```\r\n{\r\n    \"detail\": [\r\n        {\r\n            \"loc\": [\r\n                \"query\",\r\n                \"user_dict\"\r\n            ],\r\n            \"msg\": \"field required\",\r\n            \"type\": \"value_error.missing\"\r\n        }\r\n    ]\r\n}\r\n```\r\nI can't find and according change in the last commits so I assume this is a bug?\r\n\r\nThanks,\r\nDaniel"
+    },
+    "satisfaction_conditions": [
+      "API endpoint must successfully accept dictionary parameters in request body",
+      "Request body must be properly deserialized from JSON to Python dictionary",
+      "API endpoint must maintain backward compatibility with existing valid requests",
+      "HTTP client must send dictionary data in correct JSON format"
+    ],
+    "created_at": "2019-06-03T14:34:29Z"
+  }
+]

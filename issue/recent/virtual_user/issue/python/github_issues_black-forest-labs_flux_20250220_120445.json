@@ -1,0 +1,20 @@
+[
+  {
+    "number": 4,
+    "title": "Incompetence?",
+    "created_at": "2024-08-01T15:21:56Z",
+    "closed_at": "2024-08-01T21:13:11Z",
+    "labels": [],
+    "url": "https://github.com/black-forest-labs/flux/issues/4",
+    "body": "Who decided to put 'cd $HOME' in the local installation commands?\r\n\r\nAnd no requirements.txt? I have to use a -e '[.all]'??? wtf is that?\r\n\r\nWhy not just be normal, and provide instructions that work like literally every other Python  program on the planet?",
+    "comments_url": "https://api.github.com/repos/black-forest-labs/flux/issues/4/comments",
+    "author": "Subash-Chandra",
+    "comments": [
+      {
+        "user": "JonasLoos",
+        "created_at": "2024-08-01T17:12:35Z",
+        "body": "You could just ignore `cd $HOME` if you don't want to have it in your home dir but somewhere else.\r\n\r\n`-e` stands for editable mode and `.[all]` for installing the package in the current directory with all dependencies (which are listed in `pyproject.toml`).\r\n\r\nI guess they might provide the code like this, because it allows for easy importing of the code and so that it can be run by just typing `flux`. This is actually not too uncommon."
+      }
+    ]
+  }
+]

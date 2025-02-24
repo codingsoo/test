@@ -1,0 +1,666 @@
+[
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/3557",
+    "source": {
+      "issue_number": 3557
+    },
+    "initial_question": {
+      "title": "InputObjectGraphType doesn't resolve fieldName correctly",
+      "body": "## Description\r\n\r\nWhen I define an InputObjectGraphType with a field\r\n\r\n```\r\nField<GuidGraphType>(\"id\")\r\n    .Description(\"Some description.\")\r\n    .Resolve(context => context.Source.SomeGuid)\r\n    .NonNull();\r\n```\r\nThe Id is set to it's default value, even though the value is set.  If I change the field name to match the actually property name it works just fine, ie\r\n\r\n```\r\nField<GuidGraphType>(\"someGuid\")\r\n    .Description(\"Some description.\")\r\n    .Resolve(context => context.Source.SomeGuid)\r\n    .NonNull();\r\n```\r\n\r\n### Steps to reproduce\r\n\r\nIn the mutation ObjectGraphType, I setup a field like so:\r\n\r\n```\r\nField<MyGraphType, MyObject>(\"setAccessGroup\")\r\n    .Description(\"Some description.\")\r\n    .Argument<NonNullGraphType<MyInputGraphType>>(\"input\")\r\n    .ResolveAsync(async context =>\r\n    {\r\n        // This next line is where it fails\r\n        var input = context.GetArgument<MyInputGraphType>(\"input\");\r\n        // database call\r\n        return result;\r\n    });\r\n\r\n### Expected result\r\n\r\nIt should map \"id\" to SomeGuid\r\n\r\n### Actual result\r\n\r\nIt only maps \"someGuid\" to SomeGuid\r\n\r\n### Environment\r\n\r\n.NET Framework 4.8\r\n"
+    },
+    "satisfaction_conditions": [
+      "Input field correctly maps to the corresponding property regardless of field name",
+      "Input object field definition syntax is compatible with InputObjectGraphType requirements",
+      "Field type conversion works correctly between .NET type and GraphQL type",
+      "Nullability settings are properly respected"
+    ],
+    "created_at": "2023-03-01T03:44:33Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/3462",
+    "source": {
+      "issue_number": 3462
+    },
+    "initial_question": {
+      "title": "Question: How to create static Connection field",
+      "body": "I  create connection like below code \r\n\r\n`  public static Connection<News> Data1()\r\n    {\r\n        return new Connection<News>();\r\n    }\r\n`\r\n`\r\n    public static Connection<ArticlePicture> Data2()\r\n    {\r\n        return new Connection<ArticlePicture>();\r\n    }`\r\n\r\nbut get error\r\n\r\n`[Error] \"Unable to register GraphType 'AutoRegisteringObjectGraphType<Connection<ArticlePicture>>' with the name 'Connection'. The name 'Connection' is already registered to 'AutoRegisteringObjectGraphType<Connection<News>>'. Check your schema configuration.\"`\r\n\r\nif only Data1 field remove Data2 field, no error.\r\n\r\n I use GraphQL Server version is GraphQL.Server.All 7.2.0 \r\n\r\nHow to create static connection correctly?\r\n\r\nCan anybody help? many thanks!\r\n"
+    },
+    "satisfaction_conditions": [
+      "Each Connection type must have a unique name in the GraphQL schema",
+      "Edge types must also have unique names in the schema",
+      "Type registration must maintain proper relationships between Connection and Edge types",
+      "Solution must work with the auto-registration system of GraphQL.NET",
+      "Multiple generic Connection types of different type parameters must coexist in the same schema"
+    ],
+    "created_at": "2022-12-23T07:07:04Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/3449",
+    "source": {
+      "issue_number": 3449
+    },
+    "initial_question": {
+      "title": "Exception when I iterate through the types of a schema before defining any resolvers etc",
+      "body": "I am trying to read a string as a `Schema` and then print out all of the type names in that schema. \r\n\r\nHere is my script:\r\n\r\n```fsharp\r\n#r \"nuget: GraphQL, 7.2.1\"\r\n#r \"nuget: GraphQL.SystemTextJson\"\r\n\r\nopen GraphQL\r\nopen GraphQL.Types\r\nopen GraphQL.SystemTextJson\r\n\r\nlet definition =\r\n  \"\"\"type User {\r\n  id : ID!\r\n  handle : String!\r\n  bio : String\r\n  karma : Int!\r\n}\r\n\r\nunion CommentParent = Post | Comment\r\n\r\ntype Post {\r\n  id : ID!\r\n  created : String!\r\n  title : String!\r\n  url : String!\r\n  posterId : ID!\r\n  poster : User\r\n  karma : Int!\r\n}\r\n\r\ntype Comment {\r\n  id : ID!\r\n  created : String!\r\n  commenterId : ID!\r\n  commenter : User\r\n  parent : CommentParent\r\n  content : String!\r\n  karma : Int!\r\n}\r\n\r\ntype Query {\r\n  posts(page : Int! = 0) : [Post!]!\r\n  profile(id : ID!) : User\r\n}\r\n\"\"\"\r\n\r\nlet schema = Schema.For(definition)\r\n\r\nprintfn \"Found these GraphQL types: \"\r\n\r\nfor graphQLType in schema.AllTypes do\r\n  match graphQLType with\r\n  | :? GraphQL.Types.INamedType as namedType ->\r\n    printfn $\" - {namedType.Name}\"\r\n  | _ -> ()\r\n\r\nprintfn \"Done. \"\r\n```\r\n\r\nIt throws an error:\r\n\r\n```\r\nSystem.InvalidOperationException: Union type 'CommentParent' does not provide a 'resolveType' function and possible Type 'CommentParent' does not provide a 'isTypeOf' function. There is no way to resolve this possible type during execution.\r\n   at GraphQL.Types.SchemaTypes.ApplyTypeReference(IGraphType type) in /_/src/GraphQL/Types/Collections/SchemaTypes.cs:line 842\r\n   at GraphQL.Types.SchemaTypes.ApplyTypeReferences() in /_/src/GraphQL/Types/Collections/SchemaTypes.cs:line 790\r\n   at GraphQL.Types.SchemaTypes.Initialize(ISchema schema, IServiceProvider serviceProvider, IEnumerable`1 graphTypeMappings) in /_/src/GraphQL/Types/Collections/SchemaTypes.cs:line 225\r\n   at GraphQL.Types.SchemaTypes..ctor(ISchema schema, IServiceProvider serviceProvider, IEnumerable`1 graphTypeMappings) in /_/src/GraphQL/Types/Collections/SchemaTypes.cs:line 133\r\n   at GraphQL.Types.SchemaTypes..ctor(ISchema schema, IServiceProvider serviceProvider) in /_/src/GraphQL/Types/Collections/SchemaTypes.cs:line 118\r\n   at GraphQL.Types.Schema.CreateSchemaTypes() in /_/src/GraphQL/Types/Schema.cs:line 471\r\n   at GraphQL.Types.Schema.CreateAndInitializeSchemaTypes() in /_/src/GraphQL/Types/Schema.cs:line 442\r\n   at GraphQL.Types.Schema.Initialize() in /_/src/GraphQL/Types/Schema.cs:line 210\r\n   at <StartupCode$FSI_0002>.$FSI_0002.main@() in /home/njlr/Repro.fsx:line 8\r\nStopped due to error\r\n```\r\n\r\nIs there a way to examine the types of a schema parsed from a string?"
+    },
+    "satisfaction_conditions": [
+      "Successfully extracts and displays all GraphQL type names from the schema definition string",
+      "Handles all GraphQL type definitions (object types, unions, etc.) without errors",
+      "Processes the schema definition without requiring resolver implementation",
+      "Outputs type names in a readable format"
+    ],
+    "created_at": "2022-12-09T20:22:42Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/3365",
+    "source": {
+      "issue_number": 3365
+    },
+    "initial_question": {
+      "title": "Intercepting Resolver in a FieldBuilder extension",
+      "body": "Hi, \r\nI want to create a FieldBuilder extension that will be applied after Resolve and conditionally can override Resolve behavior. \r\nIn the example below, the extension is called WithComment. \r\nit:\r\n- Adds an argument called comment if not already provided.\r\n- In the resolver, it checks if comment is needed (here the logic is only for demo)\r\n- If comment is needed and not provided, it returns response with error.\r\n- if comment is need and also provided, it should fall back to the original resolver execution.\r\n\r\nI came up with the following approach and wondering if you can advise if it is correct ot there is any better way.\r\n(Only look at the implementation of WithComment extension)\r\n\r\n```csharp\r\nasync Task Main()\r\n{\r\n\tvar schema = new Schema { Query = new TestQuery() };\r\n\tvar result1 = await schema.ExecuteAsync(_ =>\r\n\t\t\t{\r\n\t\t\t\t_.Query = \"{ test1 { status, id, errorMessage } }\";\r\n\t\t\t}\r\n\t);\r\n\r\n\tvar result2 = await schema.ExecuteAsync(_ =>\r\n\t\t\t{\r\n\t\t\t\t_.Query = \"{ test2 { status, id, errorMessage } }\";\r\n\t\t\t}\r\n\t);\r\n\r\n\r\n\tresult1.Dump();\r\n\tresult2.Dump();\r\n}\r\n\r\npublic class TestQuery : ObjectGraphType\r\n{\r\n\tpublic TestQuery()\r\n\t{\r\n\t\tField<TestResponseType, TestResponse>(\"test1\")\r\n\t\t\t.Resolve(context =>\r\n\t\t\t{\r\n\t\t\t\treturn new TestResponse();\r\n\t\t\t})\r\n\t\t\t.WithComment(1);\r\n\r\n\t\tField<TestResponseType, TestResponse>(\"test2\")\r\n\t\t\t.Resolve(context =>\r\n\t\t\t{\r\n\t\t\t\treturn new TestResponse();\r\n\t\t\t})\r\n\t\t\t.WithComment(2);\r\n\r\n\t}\r\n}\r\n\r\npublic static class FieldBuilderExtensions\r\n{\r\n\tpublic static readonly string COMMENT_ARGUMENT = \"comment\";\r\n\r\n\tpublic static FieldBuilder<TSourceType, TReturnType> WithComment<TSourceType, TReturnType>(\r\n\t\t\tthis FieldBuilder<TSourceType, TReturnType> builder, int value) where TReturnType : BaseResponse, new()\r\n\t{\r\n\t\tif (builder.FieldType.Resolver == null) {\r\n\t\t\tthrow new Exception(\"Resolve must be used before WithComment\");\r\n\t\t}\r\n\t\t\r\n\t\tif (builder.FieldType.Arguments == null)\r\n\t\t{\r\n\t\t\tbuilder.FieldType.Arguments = new QueryArguments();\r\n\t\t}\r\n\r\n\t\tif (!builder.FieldType.Arguments.Any(f => f.Name == COMMENT_ARGUMENT))\r\n\t\t{\r\n\t\t\tbuilder.FieldType.Arguments.Add(new QueryArgument<StringGraphType>\r\n\t\t\t{\r\n\t\t\t\tName = COMMENT_ARGUMENT\r\n\t\t\t});\r\n\t\t}\r\n\r\n\t\tvar currentResolver = builder.FieldType.Resolver;\r\n\r\n\t\tbuilder.FieldType.Resolver = new FuncFieldResolver<TSourceType, TReturnType>((IResolveFieldContext<TSourceType> context) =>\r\n\t\t{\r\n\t\t\tvar needsComment = value % 2 == 0;\t//Dummy logic here for demo\r\n\t\t\tvar comment = context.GetArgument<string>(COMMENT_ARGUMENT);\r\n\r\n\t\t\tif (needsComment && comment == null)\r\n\t\t\t{\r\n\t\t\t\treturn new TReturnType() {\r\n\t\t\t\t\tStatus = \"Fail\",\r\n\t\t\t\t\tErrorMessage = \"Comment must be provided\"\r\n\t\t\t\t};\r\n\t\t\t}\r\n\t\t\telse\r\n\t\t\t{\r\n\t\t\t\treturn (TReturnType)currentResolver.ResolveAsync(context).Result;\r\n\t\t\t}\r\n\t\t});\r\n\r\n\t\treturn builder;\r\n\t}\r\n}\r\n\r\npublic class TestResponseType : BaseResponseType<TestResponse>\r\n{\r\n\tpublic TestResponseType()\r\n\t{\r\n\t\tField<StringGraphType>(\"Id\");\r\n\t}\r\n}\r\n\r\npublic class BaseResponseType<T> : ObjectGraphType<T>\r\n{\r\n\tpublic BaseResponseType()\r\n\t{\r\n\t\tField<StringGraphType>(\"status\");\r\n\t\tField<StringGraphType>(\"errorMessage\");\r\n\t}\r\n}\r\n\r\npublic class TestResponse : BaseResponse\r\n{\r\n\tpublic string Id { get; set; }\r\n\tpublic TestResponse()\r\n\t{\r\n\t\tId = \"0\";\r\n\t}\r\n}\r\n\r\npublic class BaseResponse\r\n{\r\n\tpublic string Status { get; set; } = \"success\";\r\n\tpublic string ErrorMessage { get; set; } = \"\";\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Must allow conditional comment requirement validation",
+      "Must integrate with existing resolver chain",
+      "Must provide error feedback when comment requirements aren't met",
+      "Must preserve original resolver behavior when comment requirements are satisfied",
+      "Must support field-level configuration"
+    ],
+    "created_at": "2022-10-19T19:49:15Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/3355",
+    "source": {
+      "issue_number": 3355
+    },
+    "initial_question": {
+      "title": "Inject a query if a directive is present.",
+      "body": "I have created a custom directive, placed on a mutation field that would instruct the mutation as follows:\r\n\r\nThe mutation's resolver is capable of forming, based on the mutation, a \"smart query\" that would retrieve the items affected by the mutation.  The directive would tell the mutation to \"append/inject\" this smart query into the mutation's response as if the client had been knowledgeable enough to send the query in the first place.  The client would specify, using the custom field directive, that it would like the server to execute in this manner.\r\n\r\nI have injected into the DI system an object where this \"smart query\" could be get/set.\r\n\r\nI have a few questions:\r\n1. If this behavior occurs only when the directive is present, does this violate the GraphQL protocol?\r\n2. Is using FieldMiddleware the best way to do this...I could not get a DirectiveVisitor to work?\r\n3. I saw in issue #2649 how to create the \"smart query\" document, but I don't know how to modify the executing document to add the smart query AST elements.  Would you offer any suggestions?"
+    },
+    "satisfaction_conditions": [
+      "Mutation response includes both the original mutation result and additional queried data",
+      "Additional query data follows valid GraphQL schema structure",
+      "Additional query execution occurs after mutation completion",
+      "Client can predictably access the additional query results",
+      "Solution maintains transaction consistency",
+      "Error handling preserves mutation functionality"
+    ],
+    "created_at": "2022-10-11T13:17:41Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/3193",
+    "source": {
+      "issue_number": 3193
+    },
+    "initial_question": {
+      "title": "AutoSchema, is it possible to combine (merge) queries or mutations from several classes?",
+      "body": "Hello, \r\n\r\nI found that `AddAutoSchema` was very useful for the code-first approach, but I found it not so clean to make a class contains all of the queries (and also for mutations). When number of queries and mutations grows it's a little bit hard to manage the code. \r\n\r\nIs it possible to group them for something like this?\r\n\r\n```c#\r\npublic class UserQuery \r\n{\r\n    IList<User> Users(int limit, int offset) {}\r\n    IList<User> User(int id) {}\r\n}\r\n\r\npublic class UserMutation \r\n{\r\n    User CreateUser(User user) {}\r\n    User UpdateUser(int id, User user) {}\r\n    bool DeleteUser(int id) {}\r\n}\r\n\r\npublic class PostQuery \r\n{\r\n    IList<Post> Posts(int limit, int offset) {}\r\n    IList<Post> Post(int id) {}\r\n}\r\n\r\npublic class PostMutation \r\n{\r\n    Post CreatePost(Post post) {}\r\n    Post UpdatePost(int id, Post post) {}\r\n    bool DeletePost(int id) {}\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Query and mutation operations must be logically grouped by domain/entity",
+      "All grouped operations must be accessible through the GraphQL schema",
+      "Original query/mutation signatures must be preserved",
+      "Solution must support multiple distinct operation groups",
+      "GraphQL schema structure must remain valid"
+    ],
+    "created_at": "2022-06-23T04:36:20Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/3109",
+    "source": {
+      "issue_number": 3109
+    },
+    "initial_question": {
+      "title": "Operation is not valid due to the current state of the object error",
+      "body": "Hello, yesterday I had a question related to variables and ended up making this change,\r\n\r\nI changed Variables to,\r\n```\r\npublic JsonElement Variables\r\n{\r\n    get; set;\r\n}\r\n```\r\nand changed,\r\n```\r\nopts.Variables = serializer.ReadNode<Inputs>(request?.Variables);\r\n```\r\n\r\nHowever, today just the build with this change seems to be giving me an \r\n`Operation is not valid due to the current state of the object error` in the GraphQLMiddleware. I was wondering if I've missed something else during the variable upgrade ? Thank you"
+    },
+    "satisfaction_conditions": [
+      "Variables property must correctly deserialize JSON input data",
+      "Type compatibility between the Variables property and its JsonConverter",
+      "Proper handling of null or undefined variable values"
+    ],
+    "created_at": "2022-04-28T23:31:21Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2885",
+    "source": {
+      "issue_number": 2885
+    },
+    "initial_question": {
+      "title": "accessor.Context is null when using DataLoader with a custom document executor",
+      "body": "## Summary\r\n\r\nIn my Startup file I have the following configuration:\r\n```cs\r\n        public class CustomDocumentExecuter : DocumentExecuter { }\r\n\r\n        public void ConfigureServices(IServiceCollection services)\r\n        {\r\n            GraphQL.MicrosoftDI.GraphQLBuilderExtensions\r\n                .AddGraphQL(services)\r\n                .AddServer(true)\r\n                .AddSystemTextJson()\r\n                .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = Environment.IsDevelopment())\r\n                .AddDocumentExecuter<CustomDocumentExecuter>()\r\n                .AddSchema<StarWarsSchema>()\r\n                .AddGraphTypes(typeof(StarWarsSchema).Assembly)\r\n                .AddDataLoader();\r\n        }\r\n```\r\n\r\nThe StarWarsSchema contains a field that uses the DataLoader in the usual way:\r\n```\r\n            Field<StringGraphType>(\r\n                \"batchedName\",\r\n                resolve: context => accessor.Context.GetOrAddBatchLoader<string, string>(\r\n                    \"LoadName\", data.NameById).LoadAsync(context.Source.Id)\r\n                );\r\n```\r\n\r\nEverything works as expected if I leave out the `AddDocumentExecuter` call in the configuration, or if I add the standard `DocumentExecuter`. However, when I add the `CustomDocumentExecuter` above, even though it does not override anything, the dataloader accessor does not work any more - the `accessor.Context` then always gives `null`. The rest seems to work, only the fields using DataLoader show the problem.\r\n\r\nAm I doing anything wrong or is this a bug? How can I use a custom DocumentExecuter together with the DataLoader?\r\n\r\n### Environment\r\n\r\n```\r\n    <TargetFramework>net6.0</TargetFramework>\r\n```\r\n```\r\n    <PackageReference Include=\"GraphQL\" Version=\"4.7.1\" />\r\n    <PackageReference Include=\"GraphQL.DataLoader\" Version=\"4.7.1\" />\r\n    <PackageReference Include=\"GraphQL.MicrosoftDI\" Version=\"4.7.1\" />\r\n    <PackageReference Include=\"GraphQL.Server.Core\" Version=\"5.2.0\" />\r\n    <PackageReference Include=\"GraphQL.Server.Transports.AspNetCore\" Version=\"5.2.0\" />\r\n    <PackageReference Include=\"GraphQL.Server.Transports.AspNetCore.SystemTextJson\" Version=\"5.2.0\" />\r\n```"
+    },
+    "satisfaction_conditions": [
+      "DataLoader context must be accessible and non-null when using a custom DocumentExecuter",
+      "Custom DocumentExecuter must properly support dependency injection",
+      "All existing GraphQL functionality must continue working alongside DataLoader",
+      "Solution must be compatible with the configured GraphQL middleware and services"
+    ],
+    "created_at": "2022-01-27T12:31:58Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2727",
+    "source": {
+      "issue_number": 2727
+    },
+    "initial_question": {
+      "title": "Incorrect resolver return type when using batch loader and GraphQL.MicrosoftDI",
+      "body": "## Summary\r\nWithout GraphQL.MicrosoftDI it works:\r\n\r\n```csharp\r\nField<NonNullGraphType<OrgType>, OrgProto>()\r\n    .Name(\"org\")\r\n    .Description(\"Organization details\")\r\n    .ResolveAsync(context => accessor.Context\r\n        .GetOrAddBatchLoader<long, OrgProto>(\r\n            loaderKey: context.Path + context.FieldAst.Name,\r\n            fetchFunc: batchLoaders.Orgs(context))\r\n        .LoadAsync(context.Source.OrgId)); // LoadAsync returns IDataLoaderResult<Org>\r\n```\r\n\r\nHowever when using GraphQL.MicrosoftDI and .WithService() I get compile error:\r\n\r\n```csharp\r\nField<NonNullGraphType<OrgType>, OrgProto>()\r\n    .Name(\"org\")\r\n    .Description(\"Organization details\")\r\n    .Resolve() // <=== Resolve\r\n    .WithService<BatchLoaders>() // <=== WithService\r\n    .ResolveAsync((context, batchLoaders) => accessor.Context\r\n        .GetOrAddBatchLoader<long, OrgProto>(\r\n            loaderKey: context.Path + context.FieldAst.Name,\r\n            fetchFunc: batchLoaders.Orgs(context))\r\n        .LoadAsync(context.Source.OrgId));\r\n```\r\n\r\nI get following compile error:\r\n```\r\nCannot convert expression type 'GraphQL.DataLoader.IDataLoaderResult<Flymachine.Proto.Orgs.Org>' \r\nto return type 'System.Threading.Tasks.Task<Flymachine.Proto.Orgs.Org>'\r\n```\r\n\r\nWhy I get this error? It seems I can fix this by using `.LoadAsync(...).GetResultAsync()` but I am not sure if it won't break batch loader functionality?:\r\n\r\n```csharp\r\nField<NonNullGraphType<OrgType>, OrgProto>()\r\n    .Name(\"org\")\r\n    .Description(\"Organization details\")\r\n    .Resolve() // <=== Resolve\r\n    .WithService<BatchLoaders>() // <=== WithService\r\n    .ResolveAsync((context, batchLoaders) => accessor.Context\r\n        .GetOrAddBatchLoader<long, OrgProto>(\r\n            loaderKey: context.Path + context.FieldAst.Name,\r\n            fetchFunc: batchLoaders.Orgs(context))\r\n        .LoadAsync(context.Source.OrgId).GetResultAsync()); // <=== .GetResultAsync(), no compile error\r\n```\r\n\r\n~~Is it okay to return `IDataLoaderResult.GetResultAsync()` here? I had no chance yet to test it properly as I am rewriting pretty big schema which fails to compile for now...~~ - finally managed to compile and run the schema and for sure `GetResultAsync()` can't be used because it causes batch-loaders to execute separately and not in batch. So the problem is with types when using `Resolve().WithService<Service>().ResolveAsync(...)`.\r\n\r\n### Environment (if relevant)\r\n\r\nGraphQL.net 4.5.0\r\n.net 5.0\r\nC# 9\r\n"
+    },
+    "satisfaction_conditions": [
+      "The batch loading functionality must remain intact",
+      "The return type must be compatible with the GraphQL field definition",
+      "The solution must work with dependency injection via WithService()",
+      "The field resolver must handle asynchronous data loading correctly"
+    ],
+    "created_at": "2021-12-06T09:08:11Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2610",
+    "source": {
+      "issue_number": 2610
+    },
+    "initial_question": {
+      "title": "how does the defaultValue of GetArgument work?",
+      "body": "Hey guys,\r\n\r\nI'm a bit confused about the defaultValue of the GetArgument function.\r\n\r\n`var myArgument = resolveFieldContext.GetArgument(\"myArgument\", string.Empty);`\r\n\r\nI would expect that `myArgument` has an empty string (`\"\"`) as value when no argument is passed. instead the result is `null`. \r\nWhat do I miss here?\r\n\r\n`var myArgument = resolveFieldContext.GetArgument(\"myArgument\") ?? \"\";` works as expected."
+    },
+    "satisfaction_conditions": [
+      "The code must handle null values appropriately when no argument is provided",
+      "The behavior must align with GraphQL.NET's argument resolution hierarchy",
+      "The code must provide a way to substitute empty strings for null values when desired",
+      "The solution must clarify the distinction between unspecified arguments and null values"
+    ],
+    "created_at": "2021-07-15T12:41:41Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2594",
+    "source": {
+      "issue_number": 2594
+    },
+    "initial_question": {
+      "title": "AutoRegisteringObjectGraphType<> doesnt create default expression resolvers for the auto generated fields?",
+      "body": "Does AutoRegisteringObjectGraphType<> not create the default expression resolvers for the auto generated fields?\r\nIf not ,then how do we update these fields? \r\n\r\nMy scenario is that I'm creating the corresponding graphtypes at runtime using classes that are dynamically created at run time. I'm having these runtime created graphtypes inherit from AutoRegisteringObjectGraphType<>. I guess that since the resolvers for these fields are missing,graphql is not able to filter these fields from the output. \r\n\r\nIs there a way by which I can programmatically update the expression resolvers for these autogenerated fields after the graphtype has been generated at runtime?"
+    },
+    "satisfaction_conditions": [
+      "Fields auto-generated by AutoRegisteringObjectGraphType must resolve correctly during GraphQL query execution",
+      "Solution must work with dynamically generated types at runtime",
+      "Field resolution must work with property name matching"
+    ],
+    "created_at": "2021-07-08T15:07:17Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2582",
+    "source": {
+      "issue_number": 2582
+    },
+    "initial_question": {
+      "title": "Why IDataLoaderResult instead of Task from DataLoader?",
+      "body": "In previous versions (I'm coming from 2.x) the dataloader method 'LoadSync' returned a task. This was nice because that if I needed to make multiple calls the the same dataloader in one field I could just run something like:\r\n\r\n```\r\nawait Task.WhenAll(dataLoadersTasks);\r\n```\r\n\r\nNow with the new IDataLoaderResult I have to chain them with `.Then(...)`. If I want to make many calls to dataloaders that chain would be long. In node/javascript we have moved away from this type of syntax chaining in favor for the async/await stuff.\r\n\r\nIn one of my fields in the gql api I get a list of articleids for which I want to fetch prices for. The batch loaders `LoadAsync` method takes one id as input but now I have a list of ids. Before I just ran `await Task.WhenAll(dataLoadersTasks)` for all these calls to the dataloader. How can I do the same with a list of IDataLoaderResult?\r\n\r\nI also have another problem. I have a interface like:\r\n\r\n```\r\npublic interface IPricingService : ICommerceService\r\n    {\r\n        IDataLoaderResult<Price> GetPrice(string articleId); //Now\r\n        Task<Price> GetPrice(string articleId); //Previously\r\n    }\r\n```\r\n\r\nI have multiple implementations (multiple ecom systems for different markets) of this service. One of them is using a datalaoder and another is not. It depends on the ecom system if there is any need for the dataloader.\r\n\r\nSo now the interface of this service has to return a IDataLoaderResult since the graphql field needs to have the dataloader returned for it to work.\r\n\r\nIs there any way to convert the dataloader to a task so I can batch them and still have the exection strategy trigger the loading at the end of the graphql request so that batch loaders are actually batched.\r\n\r\nI tried the `GetResultAsync` method that returns a task but it also triggers the underlying fetch function so stuff are no longer batched.\r\n\r\nDoes my questions/inputs make any since? :)\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple data loading operations must be able to be batched together",
+      "Data loading execution must be deferred until the appropriate time in the GraphQL request lifecycle",
+      "The interface must support both dataloader and non-dataloader implementations",
+      "The solution must integrate with the GraphQL execution pipeline",
+      "Results from multiple data loading operations must be combinable"
+    ],
+    "created_at": "2021-06-30T09:56:31Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2506",
+    "source": {
+      "issue_number": 2506
+    },
+    "initial_question": {
+      "title": "In FieldMiddleware how to access FileldDefinitions (and metadata) of all fields in a query?",
+      "body": "## Summary\r\n\r\nMy use case is that on root query/mutation level I need to traverse all selected field types and access their metadata before initial/root resolver is called. For example for query `query { a { b { c, d } } }` before executing resolver of `a` I need to gather metadata from `a`, `b`, `c` and `d` fields.\r\n\r\n## Relevant information\r\n\r\n```c#\r\nusing System;\r\nusing System.Linq;\r\nusing System.Threading.Tasks;\r\nusing GraphQL;\r\nusing GraphQL.Instrumentation;\r\nusing GraphQL.Language.AST;\r\n\r\nnamespace MyProject\r\n{\r\n    public class MyMiddleware : IFieldMiddleware\r\n    {\r\n        public async Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)\r\n        {\r\n            if (context.Parent == null)\r\n            {\r\n                // context.FieldDefinition.Metadata; // <- here I can access root field metadata (\"a\" in example)\r\n                var b = context.SubFields[\"b\"];\r\n                \r\n                Console.WriteLine(b.Name); // prints \"b\"\r\n                \r\n                // but how to access FieldDefinition / metadata of \"b\"?\r\n            }\r\n            return await next(context);\r\n        }\r\n    }\r\n}\r\n```\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Access to metadata of all nested fields in the GraphQL query must be available before root resolver execution",
+      "Field traversal must follow the query's selection structure",
+      "Middleware must operate at the root query/mutation level only",
+      "Field metadata must be accessible for both leaf and intermediate fields",
+      "Field resolution process must continue normally after metadata gathering"
+    ],
+    "created_at": "2021-04-16T05:43:09Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2503",
+    "source": {
+      "issue_number": 2503
+    },
+    "initial_question": {
+      "title": "Using output type in the response of mutations",
+      "body": "## Summary\r\nI want to send a field of `ObjectGraph` type in the response of a mutation. I am using apollo GraphQL on the client-side. Returning this way helps with the caching.\r\nI tried to add a field for `ItemGraph` inside `ItemInputGraph`.  But, it will throw an exception since `ItemInputGraph` is of `IInputObjectGraphType` type. Is it possible to add this only at the response of a mutation?\r\n\r\n`mutation MarkAsCompleted($item:ItemInputGraph!){\r\n    markAsCompleted(item: $item){\r\n        success\r\n        item { # this should be the same output type used for querying item\r\n            id\r\n            name\r\n            type\r\n            isCompleted\r\n            completedOn\r\n            completedBy\r\n        }\r\n    }\r\n}`\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Mutation response must include both output data and input parameters",
+      "Input and output types must be properly separated",
+      "Output type must match query type structure",
+      "Mutation must return operation status and associated data",
+      "Schema must support client-side caching"
+    ],
+    "created_at": "2021-04-15T06:06:26Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2496",
+    "source": {
+      "issue_number": 2496
+    },
+    "initial_question": {
+      "title": "How to create single request object from multiple queries input arguments?",
+      "body": "I am working on migrating legacy use cases to our new `GraphQL` service. \r\n\r\n- Internally all our requests gets mapped to single `ProcessRequest` object which holds all input arguments being passed from Schema. \r\n- Then we pass this `ProcessRequest` object to underlying methods which in turn returns back `ProcessResponse` object which has response for that request.\r\n\r\nBelow is `ProcessRequest` class:\r\n\r\n    public interface IProcess\r\n    {\r\n        int ClientId { get; set; }\r\n        int LanguageId { get; set; }\r\n        int CustomerId { get; set; }\r\n    }\r\n\r\n    public interface IData\r\n    {\r\n        IList<Filter> Filters { get; set; }\r\n        KeywordsTemplate KeywordsTemplate { get; set; }\r\n    }\r\n\r\n    public class Filter\r\n    {\r\n        public string Key { get; set; }\r\n        public int Value { get; set; }\r\n    }\r\n\r\n    public class KeywordsTemplate\r\n    {\r\n        public string Query { get; set; }\r\n        public string UserQuery { get; set; }\r\n    }\r\n\r\n    public class ClientType\r\n    {\r\n        public string ClientKey { get; set; }\r\n    }\r\n\r\n    public class Shop\r\n    {\r\n        public double CartAmount { get; set; }\r\n        public double PromoAmount { get; set; }\r\n        public IList<int> ClientIds { get; set; }\r\n    }\r\n\r\n    public class ListingRequest\r\n    {\r\n        public IList<Filter> Filters { get; set; }\r\n        public int ClientNumber { get; set; }\r\n        public string PotType { get; set; }\r\n        public IList<int> ClientIds { get; set; }\r\n    }\r\n\r\n    public class ListingsRequest\r\n    {\r\n        public IList<ListingRequest> Listings { get; set; }\r\n    }\r\n\r\n    public class ProcessRequest : IData, IProcess\r\n    {\r\n        public DetailsRequest DetailsRequest { get; set; }\r\n        public ClientType ClientType { get; set; }\r\n        public ListingsRequest ListingsRequest { get; set; }\r\n        public ProtoRequest ProtoRequest { get; set; }\r\n\r\n        public IList<Filter> Filters { get; set; }\r\n        public KeywordsTemplate KeywordsTemplate { get; set; }\r\n        public int ClientId { get; set; }\r\n    }\r\n\r\nFor my below `GraphQL` query - I map input arguments to my `ProcessRequest` class and then call corresponding methods to get `ProcessResponse` object. Then I created a corresponding model `LandingGroup` from `ProcessResponse` class which exactly matches with what I need in `GraphQL` response for my below `contentRequest` query and then I use that in my `ContentResponseType` class to get what I need.\r\n\r\n    {\r\n      contentRequest(clientId: 123, filters: [{key: \"abc\", value: \"98\"}], clientKey: \"process\") {\r\n        title\r\n        id\r\n        name\r\n      }\r\n    }\r\n\r\nBelow is how I am using my Query -\r\n\r\n    public class TitanQuery : ObjectGraphType<object>\r\n    {\r\n        public TitanQuery(....)\r\n        {\r\n            Name = \"Query\";\r\n\r\n            FieldAsync<ListGraphType<ContentResponseType>>(\r\n                \"contentRequest\",\r\n                arguments: new QueryArguments(\r\n                        new QueryArgument<NonNullGraphType<IntGraphType>>\r\n                        {\r\n                            Name = \"clientId\",\r\n                            Description = \"Client Id of the request\"\r\n\r\n                        },\r\n                        new QueryArgument<ListGraphType<FilterType>>\r\n                        {\r\n                            Name = \"filters\",\r\n                            Description = \"Filters\"\r\n                        },\r\n                        new QueryArgument<StringGraphType>\r\n                        {\r\n                            Name = \"clientKey\",\r\n                            DefaultValue = \"abc\",\r\n                            Description = \"some stuff\"\r\n                        }\r\n                    ),\r\n\r\n                resolve: async context =>\r\n                {\r\n                    var clientId = context.GetArgument<int>(\"clientId\");\r\n                    var filters = context.GetArgument<List<Filter>>(\"filters\");\r\n                    var clientKey = context.GetArgument<string>(\"clientKey\");\r\n\r\n                    // mapping all the arguments to ProcessRequest class\r\n                    ProcessRequest processRequest = new ProcessRequest()\r\n                    {\r\n                        ClientId = clientId,\r\n                        Filters = filters,\r\n                        ClientType = new ClientType()\r\n                        {\r\n                            ClientKey = clientKey\r\n                        },\r\n                        ProtoRequest = new ProtoRequest()\r\n                    };\r\n\r\n                    // below line returns 'ProcessResponse' object by using 'processRequest' object\r\n                    var processResponse = await metadataService.ProcessData(processRequest);\r\n\r\n                    var dataGroups = processResponse.LandingResponse.DataGroups.Select(dataGroup => new LandingGroup\r\n                    {\r\n                        DataGroup = dataGroup,\r\n                        TileContext = processResponse.TileContext\r\n                    });\r\n\r\n                    return dataGroups;\r\n                }\r\n            );\r\n        }\r\n    }\r\n\r\n**Problem Statement**\r\n\r\nEverything works fine for my above single schema use case. Now I have a very different use case with multiple schemas as shown below. I am not able to figure out on how to do it or whether it is even possible to do it? As you can see below I have three different schemas. \r\n\r\n- All the input arguments from below queries maps to single `ProcessRequest` object. \r\n- And then I get single `ProcessResponse` object back from `ProcessRequest` object like the same old way as shown above in the `TitanQuery` class.\r\n- All the GraphQL response fields for each schema is already there in `ProcessResponse` object so I need to find a way to return all those fields back to `GraphQL` response for each query.\r\n- `clientId`, `filters` will be there in all the schemas with same values. They will map to corresponding field in `ProcessRequest` class.\r\n\r\nBelow is my query with multiple schemas:\r\n\r\n    {\r\n      contentRequest(clientId: 123, filters: [{key: \"hello\", value: \"98\"}], clientKey: \"process\") {\r\n        title\r\n        id\r\n        name\r\n      }\r\n      find(queryString: \"\", filters: [{key: \"hello\", value: \"98\"}], clientId: 1234) {\r\n        metricx {\r\n          name\r\n          key\r\n        }\r\n        prodCount\r\n      }\r\n      itemListings(pots: [{potType: \"KITE_1\", filters: [{key: \"c\", value: \"1341\"}]}, {potType: \"KITE_2\", filters: [{key: \"c\", value: \"9812\"}]}], filters: [{key: \"hello\", value: \"98\"}], clientId: 1234, clientKey: \"process\") {\r\n        potType\r\n        productAlgo\r\n        count\r\n        listingEndpoint\r\n      }\r\n    }\r\n\r\nNow my question is how can I make single `ProcessRequest` object by extracting input arguments from all my above queries? And then from single `ProcessResponse` object I need to extract all those fields which each of my query needs in `GraphQL` response. Also I am not sure if we can have different models from `ProcessResponse` object for different combinations of schemas and use them?\r\n\r\n**Note:**\r\n\r\n- I have simplified my response fields for each query to make it easier for understanding but in general they are complicated with lot of fields but all of those fields for each query are part of `ProcessResponse` object only.\r\n- Also this is our legacy use case which we are migrating to our new `GraphQL` service and that legacy service passes queries in that format as of now so we are trying to follow the same format if we can.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple GraphQL queries in a single request must map to a single ProcessRequest object",
+      "Common arguments across queries (clientId, filters, etc.) must be consistently handled",
+      "The response must correctly map ProcessResponse data back to each individual query's expected fields",
+      "The solution must support both single-query and multi-query requests",
+      "The solution must maintain backward compatibility with existing client query formats"
+    ],
+    "created_at": "2021-04-10T18:22:46Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2286",
+    "source": {
+      "issue_number": 2286
+    },
+    "initial_question": {
+      "title": "How to use FieldAsync here bcoz my methods signatures are \"async Task<...>\"",
+      "body": "I have a resolve method like this in which I need to use `await` two times because `BuildRequest` and `ProcessData` method signatures are `async Task<....>` -\r\n\r\n    Field<HumanType>(\r\n        \"human\",\r\n        arguments: new QueryArguments(\r\n            new QueryArgument<NonNullGraphType<StringGraphType>> { Name = \"id\", Description = \"id of the human\" }\r\n        ),\r\n        resolve: context =>\r\n        {\r\n            var human = context.GetArgument<string>(\"id\");\r\n            var requestContext = await clientService.BuildRequest(.....);\r\n            var response = await metadataService.ProcessData(....);\r\n\r\n            return response;\r\n        }\r\n    );\r\n\r\nIs this the right way to use resolve like this? Or is there any async implementations which I can use here?"
+    },
+    "satisfaction_conditions": [
+      "Field definition must properly support asynchronous operations",
+      "Multiple async operations must be able to execute sequentially",
+      "Field resolver must return the expected type",
+      "Query arguments must remain accessible within the resolver"
+    ],
+    "created_at": "2021-02-15T01:48:46Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2278",
+    "source": {
+      "issue_number": 2278
+    },
+    "initial_question": {
+      "title": "Field scalar value and extension method",
+      "body": "I have an extension method on a decimal type like this \r\n```c#\r\n    public static class Conversion\r\n    {\r\n        public static decimal MegaJouleToKcal(this decimal value) => value * Constantes.MegaJouleToKcal;\r\n\r\n    }\r\n``` \r\nBut when i want to use it in an objectType constructor, the second line throw a error\r\n```c#\r\nField(i => i.DEJGoal);\r\nField(i => i.DEJGoal.MegaJouleToKcal(), nullable: true, type: typeof(DecimalGraphType)).Name(\"dejGoalKcal\");\r\n```\r\nlike this \r\n>Cannot infer a Field name from the expression: 'i.DEJGoal.MegaJouleToKcal()' on parent GraphQL type: 'PatientType'.\r\n\r\nIf i don\u00b4t use the extention method it works.\r\nHow can i achieve this ? I simply want to have the same value 'dejGoal' with a different unit.\r\nThanks.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Field name must be explicitly specified when using computed properties",
+      "Extension method must be successfully callable within the Field definition",
+      "Field must represent the same data in different units",
+      "GraphQL schema must remain valid and queryable"
+    ],
+    "created_at": "2021-02-11T18:19:20Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/2256",
+    "source": {
+      "issue_number": 2256
+    },
+    "initial_question": {
+      "title": "DataLoaderContext Is Null",
+      "body": "I'm using GraphQL v 3.3.2 and I'm trying to make work the DataLoader but everytime I try to access the `Context` property inside the injected `IDataLoaderContextAccessor` instance, it is null. I've went through the documentation but didn't find anything useful so unstuck me. I'm not using directly in my code `DocumentExecuter` so the advice in the documentation doesn't seem to apply to my case\r\n\r\n## Startup\r\n\r\nThere is nothing fancy here\r\n\r\n```\r\nservices\r\n                .AddGraphQL(o => { o.EnableMetrics = true; })\r\n                .AddNewtonsoftJson()\r\n                .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = _environment.IsDevelopment())\r\n                .AddDataLoader() \r\n                .AddGraphTypes(ServiceLifetime.Scoped);\r\n```\r\n\r\nMy type\r\n\r\n```\r\npublic class FondsCatalogType : ObjectGraphType<CatalogFondsRepresentation>\r\n    {\r\n        public FondsCatalogType(IDataLoaderContextAccessor dataLoaderContextAccessor)\r\n        {\r\n            Field(t => t.Id, type: typeof(IdGraphType));\r\n\r\n            // more irrelevant field declarations...                    \r\n  \r\n        }\r\n    }\r\n```\r\n\r\nSo I'm getting correctly the instance of `IDataLoaderContextAccessor` but the context is `null`\r\n\r\nIs there something else to configure? \r\n\r\nIf I understand correctly internally the  `DataLoaderDocumentListener` is added to the execution context."
+    },
+    "satisfaction_conditions": [
+      "GraphQL service configuration must include DataLoader support",
+      "IDataLoaderContextAccessor must be properly injected where it will be used"
+    ],
+    "created_at": "2021-02-05T13:32:26Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1934",
+    "source": {
+      "issue_number": 1934
+    },
+    "initial_question": {
+      "title": "ReadonlyResolveFieldContext  in 3.0.0.2026",
+      "body": "In earlier versions I was able to modify the global ResolveFieldContext as follows:\r\n```\r\n public object Resolve(IResolveFieldContext rfc)\r\n....\r\nrfc.Arguments = new Dictionary<string, object>(rfc.Arguments,StringComparer.InvariantCultureIgnoreCase);\r\n.....\r\n```\r\n\r\nThe goal being to allow for arguments to be case-insensitive.\r\nThe current version, because it is read-only, I'm not able to make this modification anymore.\r\n\r\nIs there any way around this problem - ideally this would just be like a configuration setting or something.\r\n\r\nLet me know - thanks for your time!\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Field arguments must be accessible in a case-insensitive manner",
+      "Solution must work with ReadonlyResolveFieldContext in version 3.0.0.2026",
+      "Argument name matching must respect the schema's name conversion rules",
+      "Access to argument values must be preserved for both direct dictionary access and GetArgument methods"
+    ],
+    "created_at": "2020-10-22T22:13:13Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1750",
+    "source": {
+      "issue_number": 1750
+    },
+    "initial_question": {
+      "title": "How to access Field-level arguments in .Net code",
+      "body": "In the documentation, I see how to access arguments and am doing that successfully.  However, I can't seem to find any guidance on how to access the field-level arguments in code.  For instance, I have the following:\r\n\r\n```\r\npublic HoldType ()\r\n        {\r\n            Name = \"Hold\";\r\n\r\n            Field(h => h.HoldId, type: typeof(LongGraphType)).Description(\"Id of the Hold\");            \r\n            Field(h => h.Status)\r\n                .Argument<ListGraphType<IntGraphType>>(\"exclude\", \"List of status codes to exclude from the result\")\r\n                .Description(\"Current status of the Hold\");\r\n        }\r\n```\r\n\r\nThen in my Query definition, I have:\r\n```\r\nField<ListGraphType<HoldType>>(\r\n  \"holds\",\r\n  arguments: new QueryArguments(\r\n    new QueryArgument<ListGraphType<IntGraphType>> { Name = \"exclude\", DefaultValue = new int[] { 999 }, Description = \"Status codes to exclude from the results\" }\r\n  ),\r\n  resolve: context =>\r\n  {\r\n    var exclude = context.GetArgument<int[]>(\"exclude\");  // this works for a parent-level argument - holds(exclude:999)\r\n  });\r\n```\r\n\r\nI want to be able to pass in a list of values to exclude from the query on the status field.    So something like...\r\n\r\n```\r\nquery {\r\n  holds {\r\n    holdId\r\n    status(exclude:999,998,100)\r\n  }\r\n}\r\n```\r\n\r\nAm I going about this the right way?  If so, how do I access the values during resolution?  If I need to pass it at parent level, that's fine, but I know GQL supports field-level arguments so I'm wondering if that's possible."
+    },
+    "satisfaction_conditions": [
+      "Filtering must occur at the appropriate resolution level where complete data access is available",
+      "Query must support a list of multiple status codes to exclude",
+      "Query structure must follow GraphQL specification for argument handling"
+    ],
+    "created_at": "2020-07-29T21:52:24Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1668",
+    "source": {
+      "issue_number": 1668
+    },
+    "initial_question": {
+      "title": "Inheritance of graph types",
+      "body": "I have a question about inheritance of graph types that I have been unable to solve. Imagine the following scenario:\r\n```csharp\r\npublic class Foo\r\n{ \r\n    public int FooProp { get; set; }\r\n}\r\n\r\npublic class Bar : Foo\r\n{ \r\n    public int BarProp { get; set; }\r\n}\r\n\r\npublic class FooGraphType : ObjectGraphType<Foo>\r\n{\r\n    public FooGraphType()\r\n    {\r\n        Field(p => p.FooProp);\r\n     }\r\n}\r\n\r\npublic class BarGraphType : ObjectGraphType<Bar>\r\n{\r\n    public BarGraphType()\r\n    {\r\n        Field(p => p.FooProp);\r\n        Field(p => p.BarProp);\r\n     }\r\n}\r\n```\r\n\r\nMy issue is that I have to redeclare the FooProp field in BarGraphType, which is just a minor annoyance in this example but when Foo has a lot of fields with resolver code etc it gets very attractive to have them in Foo only and not duplicate them in Bar.\r\n\r\nSo my question is, is there some way for BarGraphType to inherit from FooGraphType, get all the fields defined there, and still be able to use it's own model for additional fields?\r\n\r\nI've been looking through the docs and examples but unable to find anything, so I thought I would ask here."
+    },
+    "satisfaction_conditions": [
+      "Fields from the base model type (Foo) must be accessible in the derived GraphType without redeclaration",
+      "The derived GraphType must maintain type safety with its corresponding model type",
+      "The derived GraphType must be able to define additional fields specific to its model type",
+      "The solution must work within C#'s single inheritance constraints"
+    ],
+    "created_at": "2020-05-05T19:50:33Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1630",
+    "source": {
+      "issue_number": 1630
+    },
+    "initial_question": {
+      "title": "How do I register a generic base interface without name collisions?",
+      "body": "## Summary\r\n\r\nI want to do the following:\r\n\r\n- Register an ``InterfaceGraphType<T> where T: IBaseEntity`` where ``IBaseEntity`` contains some very generic fields (Id, Created and Updated)\r\n- Create an abstract generic base object to inherit from so that my object types does not have to implement the same fields over and over again\r\n- Inherit this base object class from different types \r\n- I want the interface be the same for all objects implementing it. That is, i want them all to implement ``BaseEntityInterface`` and not ``BaseEntityInterface<TypeName>``.\r\n    - I want to be able to click on the ``BaseEntityInterface`` in a documentation explorer and list all the types implementing this interface. That will not happen if a generic typename is generated for each implementation. Then there will be only one per interface.\r\n  \r\nRight now, if I use this approach I get a name collision telling me that the name is already registered (if I don\u00b4t generate unique names). So I guess I'm going about this in the wrong way...any hints? \r\n\r\nAnd I do, of course want to use the benefits of having generics so things get typechecked by the compiler.\r\n\r\nI think the actions in #510, and #1284 prevents my use case (which I think is legit)?\r\n\r\n## Relevant information\r\n\r\n```csharp\r\n public class BaseEntityInterface<T> : InterfaceGraphType<T> where T: IBaseEntity\r\n    {\r\n        public BaseEntityInterface()\r\n        {\r\n            this.Description = \"An entity with a id and created/updated timestamps\";\r\n\r\n            this.Field(x => x.Id)\r\n                .Description(\"The unique identifier of the entitity.\");\r\n            this.Field(x => x.Created)\r\n                .Description(\"Timestamp when the entity was first created.\");\r\n            this.Field(x => x.Updated)\r\n                .Description(\"Timestamp when the entity was last updated.\");\r\n        }\r\n    }\r\n\r\n public abstract class BaseEntityObject<T> : ObjectGraphType<T> where T: IBaseEntity\r\n    {\r\n        public BaseEntityObject()\r\n        {\r\n            this.Description = \"An entity with a id and created/updated timestamps\";\r\n\r\n\r\n            this.Field(x => x.Id)\r\n                .Description(\"The unique identifier of the entity.\");\r\n            this.Field(x => x.Created)\r\n                .Description(\"Timestamp when the entity was first created.\");\r\n            this.Field(x => x.Updated)\r\n                .Description(\"Timestamp when the entity was last updated.\");\r\n\r\n            this.Interface<BaseEntityInterface<T>>();\r\n            this.IsTypeOf = obj => obj is IBaseEntity;\r\n        }\r\n    }\r\n\r\n// Sample implementation type\r\npublic class InvoiceArticleObject: BaseEntityObject<InvoiceArticle>\r\n    {\r\n        public InvoiceArticleObject()\r\n        {\r\n            this.Description = \"Invoice article.\";\r\n\r\n           // ...\r\n\r\n            this.Interface<BaseEntityInterface<InvoiceArticle>>();\r\n            this.IsTypeOf = obj => obj is InvoiceArticle;\r\n        }\r\n    }\r\n   \r\n```"
+    },
+    "satisfaction_conditions": [
+      "Interface registration must not produce name collisions in the GraphQL schema",
+      "Common base entity fields must be accessible across all implementing types",
+      "Type checking must be preserved for generic implementations"
+    ],
+    "created_at": "2020-03-31T17:49:24Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1591",
+    "source": {
+      "issue_number": 1591
+    },
+    "initial_question": {
+      "title": "How can I gain access to the HttpRequest object in n ObjectGraphType Field Resolve Function",
+      "body": "This is the code for my GraphQL controller;\r\n\r\n    [Route(\"[controller]\")]\r\n    public class GraphQLController : Controller\r\n    {\r\n        private readonly IDocumentExecuter _documentExecuter;\r\n        private readonly ISchema _schema;\r\n\r\n        public GraphQLController(ISchema schema, IDocumentExecuter documentExecuter)\r\n        {\r\n            _schema = schema;\r\n            _documentExecuter = documentExecuter;\r\n        }\r\n\r\n        [HttpPost]\r\n        public async Task<IActionResult> Post([FromBody] GraphQLQuery query)\r\n        {\r\n            if (query == null) { throw new ArgumentNullException(nameof(query)); }\r\n            var inputs = query.Variables.ToInputs();\r\n            //I can get the Request Object here\r\n            var executionOptions = new ExecutionOptions\r\n            {\r\n                Schema = _schema,\r\n                Query = query.Query,\r\n                Inputs = inputs\r\n            };\r\n\r\n            var result = await _documentExecuter.ExecuteAsync(executionOptions).ConfigureAwait(false);\r\n\r\n            if (result.Errors?.Count > 0)\r\n            {       \r\n                return BadRequest(result);\r\n            }\r\n\r\n            return Ok(result);\r\n        }\r\n    }\r\n\r\nI would like to be able to access the HttpRequest object (obtained in the controller action) in a resolve function of am ObjectGraphType field;\r\n\r\n            Field<FooGraphType>(\r\n                \"baz\",\r\n                resolve: context =>\r\n                {\r\n                    //Get the Request here\r\n                });\r\n\r\nMore generally, is there a method for including additional information in the \"context\" or by some other means, so that it can be accessed in the resolve function?"
+    },
+    "satisfaction_conditions": [
+      "The resolve function must have access to the HTTP request information",
+      "The solution must work within the GraphQL execution context"
+    ],
+    "created_at": "2020-03-05T08:35:06Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1560",
+    "source": {
+      "issue_number": 1560
+    },
+    "initial_question": {
+      "title": "Get requested fields",
+      "body": "Hi.\r\nIn node version you can access to \"info\" field of GraphQLResolveInfo, to get what fields are requested in query.\r\n\r\nHow can you do in graphql .net core?\r\nIt can be usefull to decide what sql queries I need to do to resolve all requested fields.\r\n\r\nThanks"
+    },
+    "satisfaction_conditions": [
+      "Access to requested GraphQL fields is provided",
+      "Information can be accessed within resolver context",
+      "Works with standard GraphQL .NET Core setup"
+    ],
+    "created_at": "2020-02-23T08:37:54Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1520",
+    "source": {
+      "issue_number": 1520
+    },
+    "initial_question": {
+      "title": "Get GraphQL Schema when using GraphType First",
+      "body": "We are building our api using a GraphType first approach, however it would be useful to be able to export this to a GraphQL schema as this is easier to discuss with others. I cannot find any documentation or obvious methods that seem to allow me to do this. Am I missing it or is this not possible currently?\r\n\r\nFor example, I was hoping to be able to do something like:\r\n```\r\nusing System;\r\nusing System.Threading.Tasks;\r\nusing GraphQL;\r\nusing GraphQL.Types;\r\n\r\npublic class Droid\r\n{\r\n  public string Id { get; set; }\r\n  public string Name { get; set; }\r\n}\r\n\r\npublic class DroidType : ObjectGraphType<Droid>\r\n{\r\n  public DroidType()\r\n  {\r\n    Field(x => x.Id).Description(\"The Id of the Droid.\");\r\n    Field(x => x.Name).Description(\"The name of the Droid.\");\r\n  }\r\n}\r\n\r\npublic class StarWarsQuery : ObjectGraphType\r\n{\r\n  public StarWarsQuery()\r\n  {\r\n    Field<DroidType>(\r\n      \"hero\",\r\n      resolve: context => new Droid { Id = \"1\", Name = \"R2-D2\" }\r\n    );\r\n  }\r\n}\r\n\r\npublic class Program\r\n{\r\n  public static async Task Main(string[] args)\r\n  {\r\n    var schema = new Schema { Query = new StarWarsQuery() };\r\n\r\n    var gqlSchema = await schema.ToGraphQLSchema();\r\n\r\n    Console.WriteLine(gqlSchema);\r\n  }\r\n}\r\n```\r\n\r\nWhich would give:\r\n```\r\ntype Droid {\r\n    id: String!\r\n    name: String!\r\n  }\r\n\r\n  type Query {\r\n    hero: Droid\r\n  }\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Schema must be convertible to readable GraphQL SDL format",
+      "Output must preserve all type definitions and relationships",
+      "Schema generation must be programmatically accessible",
+      "Output must follow standard GraphQL SDL syntax"
+    ],
+    "created_at": "2020-02-04T14:31:33Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1331",
+    "source": {
+      "issue_number": 1331
+    },
+    "initial_question": {
+      "title": "ObjectGraphType meaning",
+      "body": "I wonder about the need for an `ObjectGraphType` type:\r\n```c#\r\npublic class ObjectGraphType : ObjectGraphType<object>\r\n{\r\n}\r\n```\r\nIt is a degenerate type that does not carry any logic, the so-called type-alias. In general, such types are not recommended. Is there any reason to have this type explicitly given? I see that the vast majority of its use is in the test project. Is it possible to move it there, and in the main project use `ObjectGraphType<object>` instead?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Backward compatibility with existing code must be maintained",
+      "Support for non-generic use cases must be preserved",
+      "Type system must support both generic and non-generic variants",
+      "Existing test coverage must continue to function"
+    ],
+    "created_at": "2019-10-07T13:56:21Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1314",
+    "source": {
+      "issue_number": 1314
+    },
+    "initial_question": {
+      "title": "Why won't dependency injection work in my Type classes? trying to inject IDataLoaderContextAccessor",
+      "body": "I am using GraphQL.NET 3.5.0-alpha0027 in a asp.net core 2.2 api project\r\n\r\nmy ConfigureServices is as follows\r\n\r\n        public void ConfigureServices(IServiceCollection services)\r\n        {\r\n            services.AddMvc();\r\n            services.AddDbContext<BodySystemContext>();\r\n            services.AddSingleton<IServiceProvider>(c => new FuncServiceProvider(type => c.GetRequiredService(type)));\r\n            services.AddScoped<GraphQLSchema>();\r\n            services.AddGraphQL(o => { o.ExposeExceptions = true; o.EnableMetrics = true; })\r\n                .AddGraphTypes(ServiceLifetime.Scoped)\r\n                .AddDataLoader();\r\n        }\r\n\r\nmy Configure is as follows\r\n\r\n        public void Configure(IApplicationBuilder app, IHostingEnvironment env)\r\n        {\r\n            app.UseGraphQL<GraphQLSchema>();\r\n            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());\r\n        }\r\n\r\nmy type class is as follows\r\n\r\n    public class BodySystemType : ObjectGraphType<BodySystem>\r\n    {\r\n        public BodySystemType(IDataLoaderContextAccessor dataLoaderAccessor)\r\n        {\r\n            Field(f => f.Id, type: typeof(IdGraphType));\r\n            Field(f => f.Name);\r\n            Field(f => f.Description, nullable: true);\r\n            Field(f => f.RowVersion, type: typeof(ListGraphType<ByteGraphType>));\r\n            Field<ListGraphType<BodySystemTranslationType>>(\r\n                \"BodySystemTranslations\",\r\n                resolve: context =>\r\n                {\r\n                    var loader =\r\n                        dataLoaderAccessor.Context.GetOrAddCollectionBatchLoader<short, BodySystemTranslation>(\r\n                            \"GetBodySystemTranslationByBodySystem\", GetBodySystemTranslationByBodySystemId);\r\n                    return loader.LoadAsync(context.Source.Id);\r\n                });\r\n        }\r\n\r\n        public async Task<ILookup<short, BodySystemTranslation>> GetBodySystemTranslationByBodySystemId(IEnumerable<short> bodySystemIds)\r\n        {\r\n            var bodySystemTranslations = await (new BodySystemContext()).BodySystemTranslation.Where(a => bodySystemIds.Contains(a.BodySystemId)).ToListAsync();\r\n            return bodySystemTranslations.ToLookup(x => x.BodySystemId);\r\n        }\r\n    }\r\n\r\nmy project compiles and runs playground alright but it won't show a schema and when i try to query it fails with error about needing a type with a parameterless constructor\r\n\r\n\"errors\": [\r\n    {\r\n      \"message\": \"GraphQL.ExecutionError: Failed to call Activator.CreateInstance. Type: Api.GraphQL.Types.BodySystemType ---> System.Exception: Failed to call Activator.CreateInstance. Type: Api.GraphQL.Types.BodySystemType ---> System.MissingMethodException: No parameterless constructor defined for this object.\\r\\n   at System.RuntimeTypeHandle.CreateInstance(RuntimeType type, Boolean publicOnly, Boolean wrapExceptions, Boolean& canBeCached, RuntimeMethodHandleInternal& ctor)\\r\\n   at System.RuntimeType.CreateInstanceSlow(Boolean publicOnly, Boolean wrapExceptions, Boolean skipCheckThis, Boolean fillCache)\\r\\n   at System.Activator.CreateInstance(Type type, Boolean nonPublic, Boolean wrapExceptions)\\r\\n   at GraphQL.DefaultServiceProvider.GetService(Type serviceType)\\r\\n   --- End of inner exception stack trace ---\\r\\n   at GraphQL.DefaultServiceProvider.GetService(Type serviceType)\\r\\n   at GraphQL.Utilities.ServiceProviderExtensions.GetRequiredService(IServiceProvider provider, Type serviceType)\\r\\n   at GraphQL.Types.Schema.<CreateTypesLookup>b__59_1(Type type)\\r\\n   at GraphQL.Types.GraphTypesLookup.AddTypeIfNotRegistered(Type type, TypeCollectionContext context)\\r\\n   at GraphQL.Types.GraphTypesLookup.HandleField(Type parentType, FieldType field, TypeCollectionContext context)\\r\\n   at GraphQL.Types.GraphTypesLookup.AddType(IGraphType type, TypeCollectionContext context)\\r\\n   at GraphQL.Types.GraphTypesLookup.Create(IEnumerable`1 types, IEnumerable`1 directives, Func`2 resolveType, IFieldNameConverter fieldNameConverter, Boolean seal)\\r\\n   at GraphQL.Types.Schema.CreateTypesLookup()\\r\\n   at System.Lazy`1.ViaFactory(LazyThreadSafetyMode mode)\\r\\n   at System.Lazy`1.ExecutionAndPublication(LazyHelper executionAndPublication, Boolean useDefaultConstructor)\\r\\n   at System.Lazy`1.CreateValue()\\r\\n   at GraphQL.Types.Schema.get_AllTypes()\\r\\n   at GraphQL.Instrumentation.FieldMiddlewareBuilder.ApplyTo(ISchema schema)\\r\\n   at GraphQL.DocumentExecuter.ExecuteAsync(ExecutionOptions options)\\r\\n   --- End of inner exception stack trace ---\",\r\n      \"extensions\": {\r\n        \"code\": \"MISSING_METHOD\"\r\n      }\r\n    }\r\n\r\nafter some searching i figured that it cannot resolve the IDataLoaderContextAccessor ... is that right ? and if yes how can i solve this ? and how can i use the dataloader IDataLoaderContextAccessor  without injection !!!"
+    },
+    "satisfaction_conditions": [
+      "Schema must have access to the dependency injection service provider",
+      "GraphQL type dependencies must be resolvable through the service container",
+      "GraphQL schema initialization must complete without constructor errors"
+    ],
+    "created_at": "2019-09-25T15:57:06Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/988",
+    "source": {
+      "issue_number": 988
+    },
+    "initial_question": {
+      "title": "Can I add a QueryArgument than can accept either string or List<string> for incoming values?",
+      "body": "Can I add a QueryArgument than can accept either string or List<string> for incoming values?\r\n\r\nnew QueryArgument< StringGraphType   > { Name = \"fType\"},\r\nnew QueryArgument<  ListGraphType  <  StringGraphType  >> { Name = \"fType\"},\r\n\r\nAn input data type which is more as IEnumerable\r\n\r\nUse case: To make something backward compatible during data type change for an incoming QueryArgument\r\nquery UseCaseExample {\r\n QueryField(fType:\"ValueA\" fType__AsList:[\"Value1\" \"Value2\"] ) {\r\n\r\ncan be handled as either\r\nquery UseCaseExample {\r\n QueryField(fType:\"ValueA\") {\r\n\r\nOR\r\nquery UseCaseExample {\r\n QueryField(fType:[\"Value1\" \"Value2\"] ) {\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Query argument must maintain GraphQL type safety compliance",
+      "Backward compatibility must be preserved when changing argument types",
+      "Query argument must handle either single values or lists, but through separate fields",
+      "Schema changes must follow proper GraphQL deprecation patterns"
+    ],
+    "created_at": "2019-01-23T01:52:44Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/958",
+    "source": {
+      "issue_number": 958
+    },
+    "initial_question": {
+      "title": "Deserialize arguments to a type with private constructor",
+      "body": "In the following example, my `Test` model has a parameterless private constructor. That's why it throws an exception saying, `System.MissingMethodException: 'No parameterless constructor defined for this object.'` while deserializing the arguments to the specified type.\r\n\r\n```\r\nField<TestType>(\"test\", \"create test\",\r\n                arguments: new QueryArguments(\r\n                    new QueryArgument<NonNullGraphType<TestInputType>> {Name = \"test\", Description = \"test input\"}\r\n                ),\r\n                resolve: context =>\r\n                {\r\n                    var test = context.GetArgument<Test>(\"test\");\r\n                    return repository.AddAsync(test);\r\n                });\r\n```\r\n\r\nQuestion: Is there any way to make it work while keeping the parameterless constructor private?\r\n\r\nN.B: Json.Net can handle non public default constructor for deserialization i.e.  \r\n```\r\nJsonSerializerSettings settings = new JsonSerializerSettings \r\n{ \r\n    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor \r\n};\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Successfully deserializes objects with private parameterless constructors",
+      "Maintains type safety during argument conversion",
+      "Preserves private constructor access level",
+      "Integrates with the existing GraphQL resolve context",
+      "Returns object instance compatible with repository operations"
+    ],
+    "created_at": "2018-12-30T19:34:08Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/864",
+    "source": {
+      "issue_number": 864
+    },
+    "initial_question": {
+      "title": "How to map input object to complex object",
+      "body": "## Summary\r\nI would like to know how to map the following mutation (PersonInput) to the models Person having an Account, using GraphQL.NET 2.0\r\n\r\n```\r\nmutation createPerson ($person: PersonInput!){\r\n  createPerson(person: $person)\r\n  {\r\n\tid\r\n  }\r\n}\r\n```\r\n\r\n```\r\n{\r\n \"person\": {\r\n\t\"firstName\": \"Sjaak\",\r\n\t\"lastName\": \"Trekhaak\",\r\n\t\"email\": \"jan@test.com\",\r\n\t\"password\": \"sjanie\"\r\n  }\r\n}\r\n```\r\n\r\n```\r\npublic class PersonInputObject : InputObjectGraphType\r\n{\r\n\tpublic RentePersonInputObject InputObject()\r\n\t{\r\n\t\tthis.Name = \"PersonInput\";\r\n\t\t\r\n\t\tthis.Field(typeof(StringGraphType), \"firstName\");\r\n\t\t\r\n\t\tthis.Field(typeof(StringGraphType), \"lastName\");\r\n\t\t\r\n\t\tthis.Field(typeof(StringGraphType), \"password\");\r\n\t\t\r\n\t\tthis.Field(typeof(StringGraphType), \"email\");\r\n\t}\r\n}\r\n\r\npublic class Person\r\n{\r\n\tpublic int Id { get; set; }\r\n\tpublic string FirstName { get; set; }\r\n\tpublic string LastName { get; set; }\r\n\r\n\tpublic Account Account { get; set; }\r\n}\r\n\r\npublic class Account\r\n{\r\n\tpublic string Email { get; set; }\r\n\tpublic string Password { get; set; }\r\n}\r\n```\r\n\r\nThis is my mutation object.\r\n\r\n```\r\npublic MutationObject()\r\n{\r\n\tthis.Name = \"Mutation\";\r\n\tthis.Description = \"The mutation type, represents all updates we can make to our data.\";\r\n\r\n        \r\n\r\n\tthis.FieldAsync<PersonObject, Person>(\r\n\t\t\"createPerson\",\r\n\t\t\"Create a person.\",\r\n\t\targuments: new QueryArguments(\r\n\t\t\tnew QueryArgument<NonNullGraphType<PersonInputObject>>()\r\n\t\t\t{\r\n\t\t\t\tName = \"person\",\r\n\t\t\t\tDescription = \"The person you want to create.\",\r\n\t\t\t}),\r\n\t\tresolve: context =>\r\n\t\t{\r\n\t\t\tvar person= context.GetArgument<Person>(\"person\");\r\n// dostuff\r\n\t\t\t\r\n\t\t\treturn person;\r\n\t\t}\r\n\t);\r\n}\r\n```\r\n\r\nOr should I resolve everything by hand in the mutation's resolver?\r\n\r\nAny examples available?\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Input data from PersonInput must be correctly mapped to a Person object with nested Account structure",
+      "All fields from the input (firstName, lastName, email, password) must be preserved in the resulting object",
+      "The solution must handle null input values appropriately",
+      "The transformation must work within GraphQL.NET's mutation resolver context",
+      "The solution must support custom complex object mapping"
+    ],
+    "created_at": "2018-10-16T19:29:24Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/766",
+    "source": {
+      "issue_number": 766
+    },
+    "initial_question": {
+      "title": "Disable Introspection Query",
+      "body": "Is there any way to disable the introspection query in an specific environment (production, in my case)?"
+    },
+    "satisfaction_conditions": [
+      "Introspection queries must be identifiable and distinguishable from regular queries",
+      "Introspection blocking must be environment-specific",
+      "Blocked introspection attempts must return an error response",
+      "Solution must not interfere with regular (non-introspection) queries",
+      "Implementation must integrate with existing GraphQL request pipeline"
+    ],
+    "created_at": "2018-08-02T21:24:04Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/759",
+    "source": {
+      "issue_number": 759
+    },
+    "initial_question": {
+      "title": "Why does the generic EnumerationGraphType<TEnum> use the name of TEnum as the graphql type name? - inconsistent with ObjectGraphType",
+      "body": "This is regarding a line in `graphql-dotnet/src/GraphQL/Types/EnumerationGraphType.cs`  that sets the name to the name of the underlying TEnum\r\n```\r\npublic EnumerationGraphType()\r\n{\r\n    var type = typeof(TEnum);\r\n\r\n    Name = Name ?? StringUtils.ToPascalCase(type.Name);\r\n...\r\n```\r\n\r\nI'm not sure why that name is being set there. Here is an example of it causing a problem:\r\n```\r\npublic class Organisation\r\n{\r\n    public enum AccessLevel { Admin, Member }\r\n}\r\n\r\npublic class Project\r\n{\r\n    public enum AccessLevel { Admin, Member, ReadOnly }\r\n}\r\n\r\npublic class OrganisationAccessLevelEnum : EnumerationGraphType<Organisation.AccessLevel>\r\n{\r\n    public AccessLevelEnum()\r\n    {\r\n        AddValue(\"ADMIN\", \"\", Organisation.AccessLevel.Admin);\r\n        AddValue(\"MEMBER\", \"\", Organisation.AccessLevel.Member);\r\n    }\r\n}\r\n\r\npublic class ProjectAccessLevelEnum : EnumerationGraphType<Project.AccessLevel>\r\n{\r\n    public AccessLevelEnum()\r\n    {\r\n        AddValue(\"ADMIN\", \"\", Organisation.AccessLevel.Admin);\r\n        AddValue(\"MEMBER\", \"\", Organisation.AccessLevel.Member);\r\n        AddValue(\"READ_ONLY\", \"\", Organisation.AccessLevel.ReadOnly);\r\n    }\r\n}\r\n```\r\nBoth of those enums will get named \"AccessLevel\".\r\n\r\nI'm able to avoid it by removing the generic like this:\r\n```\r\npublic class ProjectAccessLevelEnum : EnumerationGraphType\r\n{\r\n    public AccessLevelEnum()\r\n    {\r\n        AddValue(\"ADMIN\", \"\", Organisation.AccessLevel.Admin);\r\n        AddValue(\"MEMBER\", \"\", Organisation.AccessLevel.Member);\r\n        AddValue(\"READ_ONLY\", \"\", Organisation.AccessLevel.ReadOnly);\r\n    }\r\n}\r\n```\r\nwhich will use the name \"ProjectAccessLevelEnum\"\r\n\r\nMy question is: Why does the generic version of EnumerationGraphType work this way? -  the generic version of ObjectGraphType does not do this. "
+    },
+    "satisfaction_conditions": [
+      "The GraphQL type naming mechanism must be configurable",
+      "Enum values must be correctly mapped to their corresponding GraphQL types",
+      "The solution must preserve automatic enum value population when using generic types"
+    ],
+    "created_at": "2018-08-01T16:45:34Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/737",
+    "source": {
+      "issue_number": 737
+    },
+    "initial_question": {
+      "title": "How can i use DataTables with ObjectGraphType?",
+      "body": "My issue is that i have legacy functions returning .net DataTables and writing POCOs for each datatable is a tedious task. How can i integrate Datatables and Datasets into the root query.\r\nI'm thinking something like this.\r\n```\r\n//Example field\r\nField<DataTable>(\r\n                \"Employees\",\r\n                resolve: context => GetAllEmployees();\r\n\r\n//And the Legacy Data access layer\r\npublic Datatable GetAllEmployees( ){ \r\n// Legacy code executing sql queries \r\n}\r\n```\r\nPlease help me , i'm stuck in this issue."
+    },
+    "satisfaction_conditions": [
+      "GraphQL schema must successfully process DataTable/DataRow objects",
+      "Field resolution must correctly extract individual column values from DataRows",
+      "Solution must work with existing legacy data access code",
+      "Implementation must avoid manual POCO creation for each DataTable",
+      "GraphQL schema must maintain type safety"
+    ],
+    "created_at": "2018-07-15T20:49:14Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/695",
+    "source": {
+      "issue_number": 695
+    },
+    "initial_question": {
+      "title": "Using FieldAsync to resolve an async mutation ",
+      "body": "Is this the correct way to make a mutation resolver async?\r\nUsing GraphQL Version 0.17.3\r\n\r\n```csharp\r\n// in startup\r\n    var result = await _documentExecuter.ExecuteAsync(_ =>\r\n    {\r\n        _.Schema = new Schema \r\n            {\r\n                Query = new Query();\r\n                Mutation = new Mutation();\r\n            }\r\n        // ...\r\n    });\r\n\r\n// mutation using FieldAsync\r\npublic class Mutation : ObjectGraphType\r\n{\r\n    public Mutation()\r\n    {\r\n        Name = \"Mutation\";\r\n\r\n        // note that createTransaction is async\r\n        FieldAsync<TransactionNode>(\"createTransaction\",\r\n            // arguments: new QueryArguments {...}\r\n            resolve: async ctx => await TransactionInput.CreateTransaction();\r\n        // ...\r\n    }\r\n}\r\n\r\n// async mutation resolver\r\npublic class TransactionInput : InputObjectGraphType\r\n{\r\n    // ...\r\n    public static async Task<TransactionNode> CreateTransaction()\r\n    { \r\n        // ...\r\n        await _httpClient.SendAsync()\r\n        // ...\r\n    }\r\n    // ...\r\n}\r\n```\r\nThanks"
+    },
+    "satisfaction_conditions": [
+      "Mutation resolver successfully handles asynchronous operations",
+      "GraphQL schema correctly processes the mutation result",
+      "Resolver returns appropriate type matching the field definition",
+      "Asynchronous task completion is properly awaited"
+    ],
+    "created_at": "2018-06-14T12:17:15Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/667",
+    "source": {
+      "issue_number": 667
+    },
+    "initial_question": {
+      "title": "[Question] - nested mutations or multiple files",
+      "body": "Hi guys,\r\n\r\nI'm trying to figure out how to do nested mutations if it's even possible? \r\n\r\nI want to have better, logical spearation.\r\n**Schema.Mutation** is type **IObjectGraphType**. \r\nSo I created corresponding file. Everything is fine when I have all mutations in one file, but it's stupid for anything bigger than example project. I want to split mutations logical into separate file, but how to wrap it and make it work ? "
+    },
+    "satisfaction_conditions": [
+      "Mutations must be logically separable into multiple files",
+      "All separated mutation components must integrate with the main Schema.Mutation",
+      "Mutation functionality must remain unchanged after separation",
+      "Solution must maintain proper GraphQL schema structure",
+      "Separated mutations must be discoverable by the system"
+    ],
+    "created_at": "2018-05-24T11:19:54Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/653",
+    "source": {
+      "issue_number": 653
+    },
+    "initial_question": {
+      "title": "Issue Resolving Dependencies in context.GetArgument<T>",
+      "body": "I am running into an error when trying to get an argument from a mutation\r\n\r\n```namespace Performance.GraphQl\r\n{\r\n    public class PerformanceMutation :ObjectGraphType<object>\r\n    {\r\n        public PerformanceMutation(PerformanceService service, Core core)\r\n        {\r\n            Field<SessionType>(\r\n                \"createSession\",\r\n                arguments: new QueryArguments(\r\n                    new QueryArgument<NonNullGraphType<SessionInputType>> { Name = \"session\" }\r\n                ),              \r\n                resolve: context =>\r\n                {\r\n                    var session = context.GetArgument<PerformanceSession>(\"session\"); //System.MissingMethodException: 'No parameterless constructor defined for this object.'\r\n                    var test = new PerformanceSession(core);//this works fine\r\n                    return service.AddSession(test); //As does this.\r\n                }\r\n            );\r\n        }\r\n    }\r\n\r\n }\r\n```\r\n\r\nThe PerformanceSession Object by my company's design needs a constructor that takes a Core object\r\n```\r\nnamespace Performance.Data\r\n{\r\n    public class PerformanceSession : ModelBase\r\n    {\r\n        public PerformanceSession(Core core) : base(core)\r\n        {\r\n        }\r\n\r\n        public override IModelPersistenceBase GetPersistence()\r\n        {\r\n            return new PerformanceSessionPersistence(UlineCore);\r\n        }\r\n///OTHER LOGIC///\r\n    }\r\n```\r\n\r\nIs having a DI dependent class in the context.GetArguments<T> method not supported?  \r\n\r\nHere is my Schmea in case that is needed to help, but I pretty much copied from the StarWars example.\r\n```\r\nnamespace Performance.GraphQl\r\n{\r\n    public class PerformanceSchema : Schema\r\n    {\r\n        public PerformanceSchema(IDependencyResolver resolver): base(resolver)\r\n        {\r\n            Query = resolver.Resolve<PerformanceQuery>();\r\n            Mutation = resolver.Resolve<PerformanceMutation>();\r\n            \r\n        }\r\n    }\r\n}\r\n```\r\n\r\nAnd the Resolver\r\n```namespace Performance\r\n{\r\n    public class UnityResolver : IDependencyResolver\r\n    {\r\n        protected IUnityContainer container;\r\n\r\n        public UnityResolver(IUnityContainer container)\r\n        {\r\n            if (container == null)\r\n            {\r\n                throw new ArgumentNullException(\"container\");\r\n            }\r\n            this.container = container;\r\n        }\r\n\r\n        public object GetService(Type serviceType)\r\n        {\r\n            try\r\n            {\r\n                return container.Resolve(serviceType);\r\n            }\r\n            catch (ResolutionFailedException)\r\n            {\r\n                return null;\r\n            }\r\n        }\r\n\r\n        public IEnumerable<object> GetServices(Type serviceType)\r\n        {\r\n            try\r\n            {\r\n                return container.ResolveAll(serviceType);\r\n            }\r\n            catch (ResolutionFailedException)\r\n            {\r\n                return new List<object>();\r\n            }\r\n        }\r\n\r\n        public IDependencyScope BeginScope()\r\n        {\r\n            var child = container.CreateChildContainer();\r\n            return new UnityResolver(child);\r\n        }\r\n\r\n        public void Dispose()\r\n        {\r\n            Dispose(true);\r\n        }\r\n\r\n        protected virtual void Dispose(bool disposing)\r\n        {\r\n            container.Dispose();\r\n        }\r\n    }\r\n}```\r\n\r\nThanks for any help you can provide\r\n"
+    },
+    "satisfaction_conditions": [
+      "Data structure must maintain compatibility with GraphQL's argument passing system",
+      "Original business logic and dependencies must remain functional"
+    ],
+    "created_at": "2018-05-07T15:53:48Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/636",
+    "source": {
+      "issue_number": 636
+    },
+    "initial_question": {
+      "title": "[Question] about value objects",
+      "body": "i have an object with a value object email and i need query the email as string. \u00bfHow can i do this whitout use a DTO class?"
+    },
+    "satisfaction_conditions": [
+      "Email value object must be serialized as a string in the API response",
+      "Solution must work without creating a separate DTO class",
+      "Custom type conversion must handle both serialization and deserialization",
+      "Solution must integrate with existing GraphQL schema/type system"
+    ],
+    "created_at": "2018-04-20T20:49:35Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/616",
+    "source": {
+      "issue_number": 616
+    },
+    "initial_question": {
+      "title": "IDependencyResolver obsolete, how do I properly setup schema using .net core 2.0 DI and GraphQL ?",
+      "body": "I am setting up my  .net core environment to use .net core DI with GraphQL . The sample code (starwars) does this: \r\n\r\nservices.AddSingleton<ISchema>(  s => new StarWarsSchema(new FuncDependencyResolver(type => (IGraphType)s.GetRequiredService(type))));\r\n\r\nHowever, the IDependencyResolver interface is not available in the GraphQL version I am using (latest at this time: 0.17.3) so I can't use that code. Is there any example of how to do this with this latest version of graphQL or should I revert to some previous version instead?. "
+    },
+    "satisfaction_conditions": [
+      "Schema initialization must successfully resolve dependencies",
+      "Solution must be compatible with the GraphQL version being used",
+      "Constructor injection for GraphTypes must work throughout the object graph",
+      "Integration with .NET Core dependency injection system must be maintained"
+    ],
+    "created_at": "2018-04-05T16:10:50Z"
+  },
+  {
+    "id": "https://github.com/graphql-dotnet/graphql-dotnet/issues/287",
+    "source": {
+      "issue_number": 287
+    },
+    "initial_question": {
+      "title": "Need Advice - Passing Headers received on request to resolver method",
+      "body": "@joemcbride I am trying to capture the headers received on /graphql request and then make them available in resolve methods so that this information can be used for passing to next API calls made by graphql server for resolving fields.\r\n\r\nBased on my understanding I am planning capture headers in Middleware and then pass it to the request using _.UserContext method:\r\n```\r\n            return await new DocumentExecuter().ExecuteAsync(_ =>\r\n            {\r\n                _.Schema = schema;\r\n                _.Query = graphqlRequest.Query;\r\n                _.Inputs = inputs;\r\n                _.OperationName = graphqlRequest.OperationName;\r\n                _.UserContext = request.Headers;\r\n                _.FieldNameConverter = new DefaultFieldNameConverter();\r\n                \r\n            }).ConfigureAwait(false);\r\n```\r\n\r\nThis becomes available in query / root field. However, how can I access these in resolver method built by me. Do I need to pass a reference or context is supposed to be auto available there:\r\n\r\n```\r\n\tField<TestAPIReturnType>( \"TestAPI\",\r\n\t\targuments: new  QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = \"id\"}),\r\n\t\t\t\tresolve: context => {\r\n                                      var Headers = context.UserContext;\r\n\t\t\t\t\tstring __id =  context.GetArgument<string>(\"IdentityID\");\r\n\t\t\t\t\tif(String.IsNullOrWhiteSpace(__id)){return null;}\r\n\t\t\t\t\treturn TestAPIResolver.GetSingle_Resolver(__id);\r\n\t\t\t\t}\r\n\t\t\t);\r\n```"
+    },
+    "satisfaction_conditions": [
+      "HTTP headers from incoming GraphQL requests must be accessible in resolver methods",
+      "Header information must persist throughout the entire request lifecycle",
+      "Context data structure must be extensible for future additions",
+      "Header access must be type-safe and well-defined"
+    ],
+    "created_at": "2017-03-01T19:50:09Z"
+  }
+]

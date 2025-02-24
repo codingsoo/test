@@ -1,0 +1,1520 @@
+[
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/27985",
+    "source": {
+      "issue_number": 27985
+    },
+    "initial_question": {
+      "title": "BatchedMesh: `deleteGeometry` - how to re-activate?",
+      "body": "### Description\r\n\r\nWhen I call `deleteGeometry` the instance is marked as inactive\r\nBut how can I use this already allocated space in the buffers again? \r\n- `addGeometry` will not re-use available space ad the moment\r\n- calling `setGeometry` will not activate the instance again\r\n\r\n### Solution\r\nKeep track of freed space / search all inactive holes and try to re-use it when calling `addGeometry`\r\n\r\n### Alternatives\r\n- User code keeps track of freed space and `setGeometry` will also set `active[index] true` \r\n- `setVisibleAt` also sets `active` to true again\r\n- add `setActiveAt` + an API to query available space at index x (could be a generator method or some mechanism to prevent accidental mutation of internal state)\r\n\r\n### Additional context\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Geometry instances must maintain consistent identifiers after buffer optimization",
+      "System must clearly distinguish between temporarily hidden and permanently deleted geometries",
+      "API must prevent invalid operations on deleted geometries",
+      "Visibility changes must not affect the underlying geometry allocation"
+    ],
+    "created_at": "2024-03-24T14:56:28Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/20294",
+    "source": {
+      "issue_number": 20294
+    },
+    "initial_question": {
+      "title": "OrbitControls: disable in mousedown, no events triggered in mousemove",
+      "body": "In r120, disabling orbit controls on mousedown no longer triggers mousemove events when dragging. To reproduce add the following code to misc_controls_orbit.html. This worked in the last several releases. Thanks.\r\n\r\n```\r\nrenderer.domElement.addEventListener('mousemove', ()=>{\r\n   console.log('mousemove');\r\n});\r\nrenderer.domElement.addEventListener('mousedown', (e)=>{\r\n   controls.enabled = false;\r\n});\r\nrenderer.domElement.addEventListener('mouseup', ()=>{\r\n   controls.enabled = true;\r\n});\t\t\r\n```\r\n\r\n\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Controls must be able to toggle between enabled and disabled states"
+    ],
+    "created_at": "2020-09-08T17:41:27Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/20058",
+    "source": {
+      "issue_number": 20058
+    },
+    "initial_question": {
+      "title": "GLTFLoader: Alpha mode should default to Blend when material color has transparency",
+      "body": "##### Description of the problem\r\nSome software exports GLTFs without setting alpha mode, even in materials with transparency. Blender correctly renders these materials as transparent, but the GLTFLoader defaults to opaque even when an alpha < 1.0 is specified in the material.\r\n\r\n##### Suggested solution\r\nWhen alpha < 1.0, if no `alphaMode` is specified, default to `BLEND` rather than `OPAQUE`."
+    },
+    "satisfaction_conditions": [
+      "Material transparency handling must comply with glTF 2.0 specification",
+      "Default alphaMode behavior must match specification requirements",
+      "Alpha value interpretation must be driven by alphaMode setting",
+      "Solution must handle both explicit alpha values and texture alpha channels correctly"
+    ],
+    "created_at": "2020-08-12T17:04:20Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/19475",
+    "source": {
+      "issue_number": 19475
+    },
+    "initial_question": {
+      "title": "why  function intersectObject  deleted  \"if ( object.visible === false ) return;\"?",
+      "body": "\tfunction intersectObject( object, raycaster, intersects, recursive ) {\r\n               \r\n\r\n>  if ( object.visible === false ) return;\r\n\r\n\t\tif ( object.layers.test( raycaster.layers ) ) {\r\n\r\n\t\t\tobject.raycast( raycaster, intersects );\r\n\r\n\t\t}\r\n\r\n\t\tif ( recursive === true ) {\r\n\r\n\t\t\tvar children = object.children;\r\n\r\n\t\t\tfor ( var i = 0, l = children.length; i < l; i ++ ) {\r\n\r\n\t\t\t\tintersectObject( children[ i ], raycaster, intersects, true );\r\n\r\n\t\t\t}\r\n\r\n\t\t}\r\n\r\n\t}\r\n\r\n........................................................................................................................................................................"
+    },
+    "satisfaction_conditions": [
+      "Object visibility filtering must be handled through layers instead of the visible property",
+      "Raycaster must ignore the Object3D.visible property",
+      "Layer-based filtering must be maintained through object.layers.test()"
+    ],
+    "created_at": "2020-05-27T09:38:41Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/19082",
+    "source": {
+      "issue_number": 19082
+    },
+    "initial_question": {
+      "title": "threejs.org broken for IE11",
+      "body": "Hi,\r\n\r\nnot sure if this is the right place to post this issue. Feel free to point me to the correct place if not :)\r\n\r\nWhen opening the site, the layout is all over the place and the examples don't work at all.\r\nTested with IE11, version 11.0.9600.19650.\r\n\r\n\r\nCheers.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "User understands that IE11 compatibility is no longer supported",
+      "User is aware of the specific technical limitations in IE11",
+      "User accepts the need to move away from IE11"
+    ],
+    "created_at": "2020-04-08T10:38:57Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/13990",
+    "source": {
+      "issue_number": 13990
+    },
+    "initial_question": {
+      "title": "Is the behavior of CanvasRenderer and WebGLRenderer exactly the same except for performance?",
+      "body": "I'm using three.js with nodejs to do server side rendering(without GPU), and what I want is to generate a thumbnail of a 3D mesh. \r\n\r\nRight now I can generate thumbnail using CanvasRenderer, but I'm wondering if the images rendered by these two methods are consistent? or if there is API supported by WebGLRenderer whereas isn't supported by CanvasRenderer?\r\n\r\nThanks and with best regards."
+    },
+    "satisfaction_conditions": [
+      "The answer must clarify the visual output differences between CanvasRenderer and WebGLRenderer",
+      "The answer must explain the fundamental technical differences between the renderers",
+      "The answer must address feature/API support differences between the renderers"
+    ],
+    "created_at": "2018-05-04T09:03:00Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/12000",
+    "source": {
+      "issue_number": 12000
+    },
+    "initial_question": {
+      "title": "Status of Multiple Materials",
+      "body": "I don't know if multiple materials is now supported in any way?\r\n\r\nMultiMaterial has been deprecated - but I cannot find any documentation or help on how to create a custom mesh (NOT a CUBE) with multiple materials - or how my faceVertexUvs structure has to look or how to get this working..\r\n\r\nAny help or links please?"
+    },
+    "satisfaction_conditions": [
+      "Multiple materials can be applied to a single mesh",
+      "Solution works with custom mesh geometries",
+      "Material assignment follows current Three.js standards",
+      "Material indices in geometry remain properly mapped"
+    ],
+    "created_at": "2017-08-21T14:35:01Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/9926",
+    "source": {
+      "issue_number": 9926
+    },
+    "initial_question": {
+      "title": "When calling .updateMatrixWorld,  .matrixWorldInverse not updated automatically, is this a bug?",
+      "body": "##### Description of the problem\n\nAs title\n##### Three.js version\n- [x] r81\n  ##### Browser\n- [x] All of them\n  ##### OS\n- [x] All of them\n  ##### Hardware Requirements (graphics card, VR Device, ...)\n"
+    },
+    "satisfaction_conditions": [
+      "Camera's matrixWorldInverse must be synchronized with the current frame's camera position",
+      "2D position mapping must align with 3D position in the same frame"
+    ],
+    "created_at": "2016-10-24T11:54:19Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/7305",
+    "source": {
+      "issue_number": 7305
+    },
+    "initial_question": {
+      "title": "r72: MeshNormalMaterial and FlatShading",
+      "body": "It looks like the `shading` parameter has been removed from MeshNormalMaterial in r72. I really liked the look of it and was wondering if there was some other way to accomplish it?\n"
+    },
+    "satisfaction_conditions": [
+      "Material displays flat shading visual appearance",
+      "Works with Three.js r72 or later versions",
+      "Geometry renders with face normals instead of vertex normals",
+      "Maintains compatibility with MeshNormalMaterial"
+    ],
+    "created_at": "2015-10-07T18:20:03Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/5850",
+    "source": {
+      "issue_number": 5850
+    },
+    "initial_question": {
+      "title": "Loader files should be out of \"example\" folder",
+      "body": "Hi all!\nI need to use the OBJMTLLoader.js file.\nI downloaded the .zip with the \"mrdoob-three.js-ca14c79\" folder inside, and, when I find the OBJMTLLoader.js file, it was into the \"example\" folder.\nWhy is that?\nWhen I download a library, the first step is \"remove the example folder\".\n\nShould this files be into the src or build library?!.\nI can't feel confident with this file if it is into the example folder. It sound like: \"This is just an example, don't use it\".\n\nShould I use the /examples/js/loaders/OBJMTLLoader.js on my website?\n\nSee you!\n"
+    },
+    "satisfaction_conditions": [
+      "File organization maintains reasonable bundle size"
+    ],
+    "created_at": "2015-01-03T23:16:45Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/5637",
+    "source": {
+      "issue_number": 5637
+    },
+    "initial_question": {
+      "title": "Blender exporter can't export the material without scene selected",
+      "body": "I just tried the blender exporter in dev branch. In the options, when checking the geometry and material with scene unchecked, then only the geometry was exported, and the material not. When i checked the geometry and material and scene, the whole scene was exported, including geometry and materials.\nMy expectation is:\nif (only geometry is checked) export geometry;\nif (geometry and material are checked) export mesh;\nif (geometry and material and scene are checked) export scene.\n"
+    },
+    "satisfaction_conditions": [
+      "Face Materials option must successfully export materials when geometry-only export is selected"
+    ],
+    "created_at": "2014-11-15T17:47:35Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/4158",
+    "source": {
+      "issue_number": 4158
+    },
+    "initial_question": {
+      "title": "small typo in MorphAnimMesh",
+      "body": "Noticed a small typo on line 79 in MorphAnimMesh.js. \n\n``` javascript\nif ( ! firstAnimation ) firstAnimation = label;\n```\n\nshould probably be\n\n``` javascript\nif ( ! geometry.firstAnimation ) firstAnimation = label;\n```\n\nI have been porting a lot of three.js code to dart lately, and every now and then I notice small typos in some files.  Until now I've just corrected them and forgot about it, but then I thought it would be better if I report it here. I understand that some dead code is placed there deliberately for debugging purposes, but there is some obvious out of place code as well.\n\nSomething else I've noticed is that you always declare every variable at the top of functions. In some of the bigger functions the top looks very cluttered. Isn't it better practice to declare them as locally as possible? \n"
+    },
+    "satisfaction_conditions": [
+      "Code functionality remains unchanged"
+    ],
+    "created_at": "2013-11-30T23:56:21Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/4028",
+    "source": {
+      "issue_number": 4028
+    },
+    "initial_question": {
+      "title": "Can I rely on scene.__objectsAdded & scene__objectsRemoved ?",
+      "body": "I would like to rely on `scene.__objectsAdded` & `scene__objectsRemoved` (I'm creating a custom CSS renderer)\n\nHowever, I noticed that @mrdoob has mentioned he intends to remove these eventually (#3840):\n\n> @mrdoob: I actually want to remove __objects, __objectsAdded and __objectsRemoved altogether at some point. These were \"premature\" optimisations for WebGLRenderer. \n\n(scene.__objects was already removed). If `scene.__objectsAdded` & `scene__objectsRemoved`  are removed in the future, would they be replaced with an equivalent API? I don't mind relying on these if it just means a simple api-change later down the line... otherwise, if I rely on them now and they are removed completely later on, I could end up having to make a lot of changes to my code.  \n"
+    },
+    "satisfaction_conditions": [
+      "The solution must provide a reliable way to track objects being added to and removed from a scene",
+      "The tracking mechanism must work for both direct and indirect object additions to the scene",
+      "The tracking system must work for all object types, including built-in Three.js types",
+      "The implementation must be future-proof and not rely on deprecated or internal APIs"
+    ],
+    "created_at": "2013-10-28T21:51:10Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/3155",
+    "source": {
+      "issue_number": 3155
+    },
+    "initial_question": {
+      "title": "TrackballControls.js need to upgrade?",
+      "body": "Hi, I'm updating my software to version 56 of three.js, but TrackballControls.js seems not to work.\n\nCan also need an update?\n\nThank you very much for this great library.\nOscar.\n"
+    },
+    "satisfaction_conditions": [
+      "TrackballControls version matches Three.js version"
+    ],
+    "created_at": "2013-03-03T17:50:24Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/2912",
+    "source": {
+      "issue_number": 2912
+    },
+    "initial_question": {
+      "title": "tessels on contacting edges  with three.js",
+      "body": "when I displays a model made \u200b\u200bwith multiple meshes, the meshs contacting edges show black marks depending on the angle of vision ... that it comes from my file or display? how to remedy this problem?\n"
+    },
+    "satisfaction_conditions": [
+      "Camera settings prevent z-fighting artifacts",
+      "Original model geometry is preserved"
+    ],
+    "created_at": "2013-01-10T14:44:09Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/2573",
+    "source": {
+      "issue_number": 2573
+    },
+    "initial_question": {
+      "title": "archShape, add point",
+      "body": "Hi, is it possible to \"add more points\".\n\nLike a parametter to tell the arc how many segment we want to have in the circle.\n\nI use is like that :\n\n```\narcShape.absarc( 0, 0, orbit, 0, Math.PI*2, true );\n```\n\nOr should I use another way to draw my circle ? Because that way there's way too few points.\n"
+    },
+    "satisfaction_conditions": [
+      "The arc/circle must be rendered with sufficient point density",
+      "The solution must provide a method to control the number of segments/points",
+      "The solution must maintain compatibility with the existing arc drawing functionality"
+    ],
+    "created_at": "2012-10-30T10:45:06Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/2361",
+    "source": {
+      "issue_number": 2361
+    },
+    "initial_question": {
+      "title": "Problem with scale.x = 0",
+      "body": "Hi\nAccording to working with THREE.js, a new problem occurs. Warning, Matrix3.getInverse(): determinant == 0, occurs  in Google chromes console when I enter scale.x = 0 for a mesh.\n\nWould you please let me know the solution?\n"
+    },
+    "satisfaction_conditions": [
+      "Mesh scaling operation must not trigger matrix determinant errors",
+      "Mesh must be able to visually shrink to invisibility during animation",
+      "Animation transition must appear smooth",
+      "Solution must work within THREE.js animation system"
+    ],
+    "created_at": "2012-08-29T07:43:04Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/2075",
+    "source": {
+      "issue_number": 2075
+    },
+    "initial_question": {
+      "title": "ray.intersectObject(s) requires intersected objects to be in the scene.",
+      "body": "I am not sure this is a bug, but I have a use case where I have a rectangular plane made of many (~50x50) rectangular tiles.  I want to do the standard intersection of a ray to determine human interaction.  \n\nTo avoid intersecting my ray with hundreds of rectangles, I wanted to compute the intersection with the larger rectangle (not rendered or actually part of the scene).  \n\nI discovered that unless the rectangle was part of the scene, ray.intersectObject will not return an intersecting object!\n"
+    },
+    "satisfaction_conditions": [
+      "Ray intersection detection works correctly with transformed objects",
+      "Object's world matrix is up-to-date before ray intersection check",
+      "Ray intersection works with objects regardless of scene membership"
+    ],
+    "created_at": "2012-06-19T00:26:58Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1977",
+    "source": {
+      "issue_number": 1977
+    },
+    "initial_question": {
+      "title": "Object3D.lookAt different from Camera.lookAt?",
+      "body": "Hi,\n\nI just noticed that Camera.lookAt and Object3D lookAt do not use the same code (meaning they switch eye and target parameters).\nIt may be a dumb question but it seems illogical to me. Can you try to explain why?\n\nThanks.\n"
+    },
+    "satisfaction_conditions": [
+      "Explanation must address the directional difference between Camera.lookAt and Object3D.lookAt",
+      "Response must explain the relationship between z-axis orientation and the lookAt behavior"
+    ],
+    "created_at": "2012-05-24T13:28:11Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1956",
+    "source": {
+      "issue_number": 1956
+    },
+    "initial_question": {
+      "title": "Drawing a simple (open) line",
+      "body": "After upgrading to r49 I'm getting errors on some very simple code that draws an open line that goes through several points.\n\nOld code that worked:\n\n``` js\nvar g = new THREE.Geometry();\ng.vertices = [\n    new THREE.Vertex(new THREE.Vector3(0,0,0)),\n    new THREE.Vertex(new THREE.Vector3(150,0,0))\n];\nvar line = new THREE.Line(g, new THREE.LineBasicMaterial({ color : 0x0000ff }));\nscene.add(line);\n```\n\nNow returns:\n\n``` js\nTHREE.Vertex has been DEPRECATED. Use THREE.Vector3 instead.\nTypeError: this.vertices[c].length is not a function\n```\n\nMy current workaround is to do:\n\n``` js\nvar points = [\n    new THREE.Vector3(0,0,0),\n    new THREE.Vector3(150,0,0)\n];\nvar g = new THREE.Shape(points).createPointsGeometry();\n```\n\nBut that creates a closed shape.\n\nWhat's the canonical way of drawing a simple, open, line?\n"
+    },
+    "satisfaction_conditions": [
+      "Line must render as an open path between specified points",
+      "Code must be compatible with Three.js r49 or later",
+      "No deprecation warnings should appear in console",
+      "Line must be visible in the 3D scene",
+      "No runtime errors should occur during execution"
+    ],
+    "created_at": "2012-05-21T13:39:38Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1943",
+    "source": {
+      "issue_number": 1943
+    },
+    "initial_question": {
+      "title": "window.ondrop texture",
+      "body": "I'm trying to create a script that allows users to drop their own texture on my model, but i am a little stuck here.\n\nMy code so far:\n\n``` javascript\nwindow.ondrop = function( event ){\n    event.preventDefault();\n\n    for (i = 0; i < event.dataTransfer.files.length; i ++){\n        var file = event.dataTransfer.files[ i ];\n        var extention =  file.name.split( '.' ).pop();\n        if (extention == 'jpg') loadImage( file );\n    }\n}\n\nfunction loadImage( file ){\n    var reader = new FileReader();\n    reader.readAsDataURL( file );\n    reader.onload = function( event ){\n\n        var img = new Image();\n        img.src = event.currentTarget.result;\n        img.onload = function(){\n\n            var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( img ) } );\n            //var material = new THREE.MeshBasicMaterial( { color: new THREE.Color( 0xffffff ), wireframe: true } ); //< This works!\n            three.object.material = material;\n\n        }\n    }\n}\n```\n\nAfter i drop an image on my window, and the script applies the new material on my model, my model turns black.\nI think this line causes the error\n\n``` javascript\nnew THREE.Texture( img )\n```\n\nBut i can't find a solution anywhere in the documentation.\n"
+    },
+    "satisfaction_conditions": [
+      "Dropped image file must be successfully loaded and converted to a usable texture format"
+    ],
+    "created_at": "2012-05-19T01:05:16Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1933",
+    "source": {
+      "issue_number": 1933
+    },
+    "initial_question": {
+      "title": "Background Color",
+      "body": "I was wondering what the easiest way to have a background color for the canvas. I would like to have say a red background then draw my scene on top of that.  I was thinking of adding a simply polygon the size of the canvas, however the points would then be transformed by the projection matrix etc... and this would affect the drawn polygon.  Am I just missing something here or is there an easier way to do this?\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "The background color must be visible within the WebGL canvas area only",
+      "The background color must appear behind all other rendered scene elements",
+      "The background color must persist throughout scene rendering",
+      "The background color must work with the WebGL rendering pipeline"
+    ],
+    "created_at": "2012-05-17T14:45:08Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1932",
+    "source": {
+      "issue_number": 1932
+    },
+    "initial_question": {
+      "title": "A problem when building a skybox",
+      "body": "I got problems when building a skybox\nI use a big cube to show the sky\nBut in the cube,I can't see the fog\nIt seems that fog is only at outside of the skybox\nHow to solve the problem?\n\nAnd I think 2000_2000_2000 is not big enough\nAfter I change the size of the cube at 200000_200000_200000\nI can't see the skybox anymore\nI only change the size,why can't I see that?\n\nAll I want is a 'moving' skybox\nfor example,it seems there are some cloud floating in the sky\nMaybe I should rotate the skybox?\nOr I should use ShaderMaterial to do this?\nCan anyone give me some advice,thanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Skybox must be visible within camera's rendering range",
+      "Skybox scale must maintain visual integrity"
+    ],
+    "created_at": "2012-05-17T14:42:51Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1931",
+    "source": {
+      "issue_number": 1931
+    },
+    "initial_question": {
+      "title": "Want to change the height of a cube mesh",
+      "body": "I have been able to change the height of a cube geometry mesh by using mesh.scale.y however this is unsatisfactory as i only want to increase it upwards or downwards but when I scale it it changes uniformly in both directions upwards and downwards.  Is there a simple way of doing this without scale which requires to update the position adjusting for the bottom or top to make it look like its growing in one direction only.\n\nPS - Couldnt find a forum to post this question in so gave up searching on google and posted it here.  Also would like to thank the Three.js team for this amazing framework as writing straight WebGL which I was doing was a taking too long.\n"
+    },
+    "satisfaction_conditions": [
+      "Mesh height changes in only one vertical direction (up or down)",
+      "Original mesh proportions are maintained in non-changing dimensions",
+      "Visual appearance matches natural growth/shrinkage from one end",
+      "Height modification is controllable by a variable amount"
+    ],
+    "created_at": "2012-05-17T14:06:23Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1912",
+    "source": {
+      "issue_number": 1912
+    },
+    "initial_question": {
+      "title": "Have TrackballControls follow the object",
+      "body": "I'm using the TrackballControls to create a third person scene where the user can move their character around the scene. However, I'm having trouble updating the camera to follow the character as it moves around. If I'm activating the TrackballControls with the mouse, it stays within the min/max distances I set, but if I just move my character without moving the mouse, my character just moves away, past the max distance.\n\nIs there a way to have the camera follow an object using TrackballControls (e.g. rotate around the object but stay within the max distance if no rotating is going on but the object is moving)?\n"
+    },
+    "satisfaction_conditions": [
+      "Camera position updates automatically when character moves"
+    ],
+    "created_at": "2012-05-14T13:55:06Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1795",
+    "source": {
+      "issue_number": 1795
+    },
+    "initial_question": {
+      "title": "Changing Material/Texture of Plane/Cube",
+      "body": "Hi,\n\nJust want to change the material of a Plane so that I can use it like an animated sprite.\nI know it's probably not the best way to do it but I'm just looking for the most basic way possible for the moment as I am just getting to grips with threejs.\n\nMy code looks a bit like this at the moment:\n\n``` javascript\n var material = new THREE.MeshLambertMaterial({\n            map: textures[0],needsUpdate:true\n                });\n\n         var cube = new THREE.Mesh(new THREE.PlaneGeometry(1,1), material);\n```\n\nlater in the script I call \n\n``` javascript\ncube.material=new THREE.MeshLambertMaterial({\n            map: textures[1],needsUpdate:true\n                });\n```\n\nBut the material does not change.\n\nAm I approaching this in the wrong way?\n\nEdit: The material is being updated (i can see from the console) but it is not being displayed on screen...\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "The texture change must work with the existing mesh geometry",
+      "The texture switching mechanism must support multiple textures from a predefined array"
+    ],
+    "created_at": "2012-04-23T16:16:27Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1768",
+    "source": {
+      "issue_number": 1768
+    },
+    "initial_question": {
+      "title": "Setting center of mesh?",
+      "body": "Say, a mesh is constructed from a geometry:\n\n``` javascript\nvar mesh = new THREE.Mesh( geometry, material );\n```\n\n Is there a way to set the center of mesh to be the center of `geometry.boundingBox`, so that after `mesh.position.set(0,0,0)`, the center of the `boundingBox` is at (0,0,0)?\n"
+    },
+    "satisfaction_conditions": [
+      "The mesh's bounding box center aligns with the world origin when position is set to (0,0,0)"
+    ],
+    "created_at": "2012-04-19T16:36:00Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1763",
+    "source": {
+      "issue_number": 1763
+    },
+    "initial_question": {
+      "title": "Control the visibility of part of a mesh?",
+      "body": "Hi, yet another newbie question.\n\nIs there a viable way to render only selected parts of a mesh, by material id?\n\nThans in advance,\n\n r.\n"
+    },
+    "satisfaction_conditions": [
+      "Selected portions of a mesh must be able to be hidden from view while others remain visible",
+      "The visibility control must work at runtime",
+      "The solution must work with material-based mesh segmentation"
+    ],
+    "created_at": "2012-04-19T08:29:28Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1756",
+    "source": {
+      "issue_number": 1756
+    },
+    "initial_question": {
+      "title": "How to highlight a face?",
+      "body": "I've created a scene with roads in it. Each of my roads was originally drawn as a separate mesh and when the user hovered over one of them I changed the material temporarily to show which road section would be selected if a mouse click is done. This proved to be very slow for rendering.\n\nSo I've merged all my roads into a single mesh. This renders much much faster but I have an issue now with highlighting what the user has hovered over. \n\nI've tried changing face.color but nothing happens. \n\nAny suggestions?\n"
+    },
+    "satisfaction_conditions": [
+      "Rendering performance must remain efficient"
+    ],
+    "created_at": "2012-04-18T14:48:50Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1691",
+    "source": {
+      "issue_number": 1691
+    },
+    "initial_question": {
+      "title": "Problem with TrackballControls, <select> and Chrome.",
+      "body": "Hi,\n\nI've a problem in Chrome with the use of TrackballControls and the 'select' HTML component. The mouseDown event listener of theTrackballControls seems to prevent  the 'select' to work. ( no problem with Firefox).\n\nIs there a way to fix this ? \n\nThanks,\nLaurent\n"
+    },
+    "satisfaction_conditions": [
+      "TrackballControls and HTML select elements must function simultaneously in Chrome",
+      "Mouse events are properly targeted to the correct DOM elements",
+      "TrackballControls initialization must specify correct scope",
+      "Browser compatibility across Chrome and Firefox"
+    ],
+    "created_at": "2012-04-11T09:17:04Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1669",
+    "source": {
+      "issue_number": 1669
+    },
+    "initial_question": {
+      "title": "How to set camera rotating around a line, Not axis X,Y,Z",
+      "body": "I have define a perspectiveCamera, Now I want the camera to rotate around  x=0, z = -100 , not x=0 , z =0 , But I don't konw how to  achieve it .\n"
+    },
+    "satisfaction_conditions": [
+      "Camera maintains a circular motion path centered at (0, -100)",
+      "Camera maintains consistent distance from center point during rotation",
+      "Camera rotation is continuous and smooth",
+      "Camera consistently points toward the center of rotation"
+    ],
+    "created_at": "2012-04-09T02:24:40Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1653",
+    "source": {
+      "issue_number": 1653
+    },
+    "initial_question": {
+      "title": "problems with scene.add()",
+      "body": "I have defined a scene,and added objects to it,such as camera, light,mesh object and so on, but it still give me an error saying a._objectsAdded is undefine in Row300 of  Three.js, I don't know why.\n\nto show my issue clearly , I follow my code:\n\n``` javascript\ninit();\nanimate();\nfunction init(){\n  container = document.createElement(\"div\");\n  document.body.appendChild(container);\n\n  scene = new THREE.Scene();\n\n  camera = new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,10000);\n  camera.position.set(0,300,500);\n  scene.add( camera );\n\n  light = new THREE.DirectionalLight(0xffffff,2);\n  light.position.set(1,1,1).normalize;\n  scene.add( light );\n\n  var light = new THREE.DirectionalLight( 0xffffff );\n  light.position.set( -1, -1, -1 ).normalize();\n  scene.add( light );\n\n  var geometry = new THREE.CubeGeometry(200,150,250);\n  var material = new THREE.MeshBasicMaterial({ color:0xb50845}); \n  mesh = new THREE.Mesh(geometry,material);\n  scene.add( mesh );\n\n  renderer = new THREE.WebGLRenderer();\n  renderer.sortObjects = false;\n  renderer.setSize(window.innerWidth,window.innerHeight);\n\n  container.appendChild(renderer.domElement);\n\n  stats = new Stats();\n  stats.domElement.style.position = \"absolute\";\n  stats.domElement.style.top = \"0px\";\n  stats.domElement.style.left = \"0px\";\n\n  container.appendChild(stats.domElement);\n  }\n  //\u6267\u884c\u52a8\u753b\n  function animate(){\n    requestAnimationFrame(animate);\n    render();\n    stats.update();\n  }\n  //\u4f9banimate()\u51fd\u6570\u8c03\u7528\n  var thelta = 0;\n  var radius = 100;\n  function render(){\n\n    thelta += 0.2;\n    camera.position.x = radius * Math.sin(thelta*Math.PI/360);\n    camera.position.y = radius * Math.sin(thelta*Math.PI/360);\n    camera.position.z = radius * Math.cos(thelta*Math.PI/360);\n\n    camera.lookAt( scene.position );\n    renderer.render(camera,scene);\n  }\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Scene rendering parameters must be in correct order",
+      "All Three.js method calls must be properly terminated",
+      "Scene must render without undefined object errors",
+      "Camera movement and scene updates must execute without errors"
+    ],
+    "created_at": "2012-04-07T13:52:10Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1649",
+    "source": {
+      "issue_number": 1649
+    },
+    "initial_question": {
+      "title": "Can't change color of LineBasicMaterial or MeshBasicMaterial",
+      "body": "(providing example for LineBasicMaterial, but it's the same for MeshBasicMaterial)\n\nI'd like to randomly change the color of some lines every frame, without having to re-create the lines, or creating/associating a new material for them. So I thought to just change the \"color\" property of their material...\n\nI tried a few tricks ( i.e. setting the followings to true: `geometry.dynamic geometry.dirtyColors geometry.__dirtyVertices geometry.__dirtyNormals` ) , but I still can't change the color of a line dynamically.\n\nSee minimal code below.\n\nThe line is drawn with a random color for one frame, and then:\n- using webgl, it's drawn black. I.e. the color created at construction \"sticks\" to the material, and subsequent changes just turn the line black...\n- using the canvas renderer, the changes are disregarded and only the first color sticks.\n\n``` javascript\n    function animate() {\n        requestAnimationFrame( animate );\n        render();\n    }\n\n   var material;\n\n   function render() {\n\n     // setting this to false creates a material\n     // with random color each frame\n     // (which works fine, just to show that\n     // the code has no major flaws)\n     var dynamicMaterialColor = true;\n\n     if (material === undefined || ! dynamicMaterialColor ) {\n       material = new THREE.LineBasicMaterial({\n         color: Math.floor(Math.random() * 16777216),\n       });\n     }\n     // if the material has already been created,\n     // re-use it and just change the color.\n     else {\n       // Attempting to change the color of the material.\n       // Commenting this line below shows that\n       // the first color *does* stick to the material.\n       // It's subsequent changes that turn the line\n       // black.\n       material.color = Math.floor(Math.random() * 16777216);\n     }\n\n    // just creates the geometry of the line. \n    var geometry = new THREE.Geometry();\n     geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(-20, 0, 0)));\n     geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(20, 0, 0)));\n\n    // creates the line object and add to scene\n     var line = new THREE.Line(geometry, material);\n     scene.add(line);\n\n     renderer.render(scene, camera);\n\n     // remove the line from scene, just to be clean\n     scene.remove(scene.objects[0]);\n\n   }\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Material color updates dynamically each frame without creating new materials",
+      "Color changes persist and display correctly in the renderer",
+      "Color property updates are applied through the appropriate Three.js API method"
+    ],
+    "created_at": "2012-04-06T21:46:51Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1626",
+    "source": {
+      "issue_number": 1626
+    },
+    "initial_question": {
+      "title": "JSON 3.0 model format",
+      "body": "How do I access a property of my arquvio. JSON from a html page?\n\nthank you!!\n"
+    },
+    "satisfaction_conditions": [
+      "JSON material properties must be accessible from HTML/JavaScript code",
+      "Correct property names must be used for material modifications",
+      "Changes must be applicable to specific material indices"
+    ],
+    "created_at": "2012-04-02T18:56:16Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1600",
+    "source": {
+      "issue_number": 1600
+    },
+    "initial_question": {
+      "title": "Using two keys as shortcut (FirstPersonControls)",
+      "body": "I'm doing some modifications in FirstPersonControls to use in my specific problem as discussed at #1466.\n\nNow I need to change onKeyDown and onKeyUp functions. I intend to use two keys as shortcuts, like CTRL + UP to go ahead instead of the UP key only. \n\nCan anyone help me?\n"
+    },
+    "satisfaction_conditions": [
+      "Keyboard combinations with CTRL + directional keys trigger distinct actions from single key presses",
+      "Camera movement stops when key combination is released",
+      "No unintended simultaneous actions when using key combinations",
+      "State tracking accurately reflects current key status",
+      "Camera view and movement controls respond independently"
+    ],
+    "created_at": "2012-03-28T17:11:03Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1597",
+    "source": {
+      "issue_number": 1597
+    },
+    "initial_question": {
+      "title": "dae hierarchy intersectObjects",
+      "body": "Hi,\n\nI am using ray.intersectObjects  to select objects in a dae\n\n``` javascript\nvar intersects = ray.intersectObjects( dae.children );\n```\n\nIt was working great with a dae with only one \"level\" of hiearchy. But now i have dae where dae.chldren[i] might have chidren of its own.\nAnd intersectObjects doesnt go through children\nI could recursively call intersectObjects on childrens but i wont get the  \"first\" one touched by the ray.\n\nIs there a way to do what i want?\nThank you\n"
+    },
+    "satisfaction_conditions": [
+      "Ray intersection detection must work across all levels of object hierarchy",
+      "All intersectable objects must be included in the collision check",
+      "Ray intersection must return the first object hit in correct order",
+      "Solution must work with loaded DAE (Collada) model structures"
+    ],
+    "created_at": "2012-03-28T07:53:49Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1593",
+    "source": {
+      "issue_number": 1593
+    },
+    "initial_question": {
+      "title": "How to use matrix for transformation",
+      "body": "Hello everybody,\n\nI want display an object in my navigator which come from a stl file. I load it and i display it. It is far away on the display, it is not at the center of the frame. When I open my stl file with \"blender\", I remark that my object is not localised at the center of the frame. Indeed, he is at (10,22,30) for example. So, the object in my navigator is at the same position that in \"blender\". So, I translate it with some calculation at the center of the landmark. BUT ^^, I remark that the attribute \"position\" of the object had values (0,0,0) at the initial position (before I translate it at the center of the frame, so (0,0,0) = (10,22,30) in obsolute frame), consequently after the translation, the object has position (-10,-22,-30). When I try to use setRotation(a), to rotate my object, it rotates around HIS origin that is to say (10,22,30) !!! How can I rotate my object on itself ? I would like that the center of the rotation be the center of the frame. I would like a function where I can specify the center of rotation.\n\nDavid\n"
+    },
+    "satisfaction_conditions": [
+      "Object rotates around the center of the frame (0,0,0) rather than its local origin",
+      "Relative positions between objects are preserved",
+      "Objects can be transformed as a unified group",
+      "Original object positions are maintained in the scene graph"
+    ],
+    "created_at": "2012-03-27T15:01:16Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1588",
+    "source": {
+      "issue_number": 1588
+    },
+    "initial_question": {
+      "title": "Use of TrackballControls and ray.intersectObject together",
+      "body": "I have been attempting to combine TrackballControls together with object selection using ray.intersectObject, by combining code from the webgl_interactive_draggablecubes example and the webgl_trackballcamera_earth examples. I have been able to get both effects happening but not reliably. For example, in one case the object selection happened when the mouse wasn't quite pointing at the objects. Can anyone point me to an example where these two features are combined, please?\n\nThank you.\n"
+    },
+    "satisfaction_conditions": [
+      "Object selection accurately corresponds to mouse pointer position",
+      "Viewport dimensions remain properly synchronized with window size"
+    ],
+    "created_at": "2012-03-25T21:48:26Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1561",
+    "source": {
+      "issue_number": 1561
+    },
+    "initial_question": {
+      "title": "Bounding box with rotation",
+      "body": "I'm experimenting with collision detection and I'm trying to build AABBs for objects in my game.\n\nShould I be using the computeBoundingBox method from Geometry.js for this purpose? I'm drawing the box as a mesh but it doesn't take rotation into account. I would expect it to resize when I recompute it after the object rotates.\n\nFrom the source code it looks like computeBoundingBox relies on the geometry vertices, but I notice that these don't change with the mesh rotation. \n"
+    },
+    "satisfaction_conditions": [
+      "Bounding box must update correctly when object rotates",
+      "Bounding box must be axis-aligned in world space",
+      "Bounding box must fully contain the transformed object",
+      "Solution must handle transformation from object space to world space"
+    ],
+    "created_at": "2012-03-21T18:53:52Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1560",
+    "source": {
+      "issue_number": 1560
+    },
+    "initial_question": {
+      "title": "THREE.MeshFaceMaterial support morph targets?",
+      "body": "Hey,\nJust wondering if MeshFaceMaterial supports morph targets? I'm currently using this code \n\n``` javascript\nvar loader = new THREE.JSONLoader( true );\nloader.load( \"models/bird/bird13.js\", function( geometry ) {\n       geometry.computeMorphNormals();\n       var material = new THREE.MeshFaceMaterial( {  morphTargets: true, morphNormals: true } );\n       mesh1 = new THREE.MorphAnimMesh( geometry, material );\n       mesh1.duration = 3200;\n       morphs.push(mesh1);\n       scene.add(mesh1);\n} );\n```\n\nThe model loads but nothing else. However this code works fine when I use MeshLambertMaterial.\nThanks :)\n"
+    },
+    "satisfaction_conditions": [
+      "Model loads and displays without errors"
+    ],
+    "created_at": "2012-03-21T17:16:27Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1542",
+    "source": {
+      "issue_number": 1542
+    },
+    "initial_question": {
+      "title": "JSONLoader Geometry not being added to the scene.",
+      "body": "I have used the max exporter to export a simple plane and added this to the scene. That works so far and shows up in the scene. Next I used the obj converter to export a textured cube and tried adding this to scene. The scene loads up but the cube is nowhere to be seen. Here is the code I have been using. \n\n``` javascript\nnew THREE.JSONLoader().load('plane.js', function(geometry){\n\n    var material = new THREE.MeshLambertMaterial(); \n    var mesh = new THREE.Mesh( geometry, material );\n    scene.add( mesh );\n})\n\nvar jsonLoader = new THREE.JSONLoader();\njsonLoader.load( \"obj/example/box.js\", function( geometry ) { createScene( geometry ) } );\n\nfunction createScene( geometry ) {\n\n    var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );\n\n}\n```\n\nAny suggestions? Thanks\n"
+    },
+    "satisfaction_conditions": [
+      "Asynchronously loaded geometries must be properly handled",
+      "Scene modifications must occur within the appropriate callback scope"
+    ],
+    "created_at": "2012-03-19T08:23:00Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1503",
+    "source": {
+      "issue_number": 1503
+    },
+    "initial_question": {
+      "title": "CanvasRenderer.js include...",
+      "body": "I have checked the Three.js file and I found a CanvasRenderer function inside...\nIf I want to call the CanvasRenderer.js file/include, is it some kind of override?\n\nHow can I imlement the CanvasRenderer.js and not the function inside Three.js?\n\nI'm having the same issue, and I'm trying to implement the same changes...without luck:\n#1440\n"
+    },
+    "satisfaction_conditions": [
+      "CanvasRenderer functionality is accessible in the application",
+      "Custom CanvasRenderer implementation takes precedence over Three.js built-in version",
+      "Proper load order ensures correct dependency resolution"
+    ],
+    "created_at": "2012-03-14T09:40:15Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1489",
+    "source": {
+      "issue_number": 1489
+    },
+    "initial_question": {
+      "title": "Cannot add a mesh to two scenes?",
+      "body": "It seems that if I add a mesh M to both scene A & scene B (with the same set of objects but different lighting), it is rendered only in scene B instead of being shown in both scenes. Do I have to clone the mesh if I want to render it in different scenes? \n"
+    },
+    "satisfaction_conditions": [
+      "The mesh must be visible in all intended scenes simultaneously",
+      "Each instance of the mesh must maintain independent parent-child relationships"
+    ],
+    "created_at": "2012-03-12T07:47:44Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1487",
+    "source": {
+      "issue_number": 1487
+    },
+    "initial_question": {
+      "title": "what metrics?",
+      "body": "i have a question what unit of measurement are used for figure coordinates, pixel or something else?\n"
+    },
+    "satisfaction_conditions": [
+      "Explanation clarifies that units are arbitrary and relative",
+      "Demonstrates that object proportions remain consistent",
+      "Explains unit flexibility for scene scaling"
+    ],
+    "created_at": "2012-03-11T19:22:57Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1432",
+    "source": {
+      "issue_number": 1432
+    },
+    "initial_question": {
+      "title": "Scene scaling",
+      "body": "Hi there,\n\nfirst I'd like to thank for three.js, the library is awesome.\nI'm rather new to it though and I've got a question concerning the scaling of the scene: I couldn't find a scale or the equivalent of the GL_MODELVIEW matrix property in the scene or the camera, and was wondering how I could perform the equivalent of a glScalef to change the scale of all a scene's objects at once. The other option would be to change the scale of each object individually, obviously, but it'd be way easier to just change the model/view matrix.\n\nThanks,\n\nMax\n"
+    },
+    "satisfaction_conditions": [
+      "All scene objects must scale uniformly together",
+      "Camera perspective must remain unchanged",
+      "Scaling must be applicable to the entire scene as a single operation",
+      "Solution must preserve relative positions and orientations between objects"
+    ],
+    "created_at": "2012-03-01T19:11:53Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1424",
+    "source": {
+      "issue_number": 1424
+    },
+    "initial_question": {
+      "title": "FitAll function implementation",
+      "body": "Hi, I have a new `THREE.PerspectiveCamera` and a `THREE.TrackballControls` in my scene and I am trying to implement a function that fit all the models in the scene maintaing the camera direction. I am having an hard time to getting this functionality working.\n\nWhat I'm doing is:\n-    Compute scene bounding box\n-    Compute the \"radius\" of that bounding box getting half of its diagonal\n-    Compute an offset that move back the camera from the scene bounding box center that much needed to center a sphere with the \"radius\" of scene bounding box given the camera vertical field of view\n-   Update the camera position\n\nWith this code:\n\n``` javascript\nfunction fitAll()\n{   \n    // Compute world AABB           \n    var aabbMin = new THREE.Vector3();\n    var aabbMax = new THREE.Vector3();\n    for (var m = 0; m < meshes.length; m++) \n    {\n        var geo = meshes[m];\n\n        aabbMin.x = Math.min(aabbMin.x, geo.boundingBox.min.x);\n        aabbMin.y = Math.min(aabbMin.y, geo.boundingBox.min.y);\n        aabbMin.z = Math.min(aabbMin.z, geo.boundingBox.min.z);\n        aabbMax.x = Math.max(aabbMax.x, geo.boundingBox.max.x);\n        aabbMax.y = Math.max(aabbMax.y, geo.boundingBox.max.y);\n        aabbMax.z = Math.max(aabbMax.z, geo.boundingBox.max.z);                 \n    }\n\n    // Compute world AABB center\n    var aabbCenter = new THREE.Vector3();\n    aabbCenter.x = (aabbMax.x + aabbMin.x) * 0.5;\n    aabbCenter.y = (aabbMax.y + aabbMin.y) * 0.5;\n    aabbCenter.z = (aabbMax.z + aabbMin.z) * 0.5;\n\n    // Compute world AABB \"radius\"\n    var diag = new THREE.Vector3();\n    diag = diag.sub(aabbMax, aabbMin);\n    var radius = diag.length() * 0.5;\n\n    // Compute offset needed to move the camera back that much needed to center AABB\n    // camera.fov is the vertical field of view\n    var offset = radius / Math.tan(Math.PI / 180.0 * camera.fov * 0.5);\n\n    // Compute new camera position\n    var dir = camera.matrix.getColumnZ();\n    dir.multiplyScalar(offset); \n    var newPos = new THREE.Vector3();\n    newPos.add(aabbCenter, dir);\n\n    // Update camera\n    camera.position.set( newPos.x, newPos.y, newPos.z );\n    camera.lookAt(aabbCenter);\n}\n\n```\n\nIn another raw OpenGL viewer I wrote this trick worked very well, guess I am missing some three.js stuff. Any tips?\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "All objects in the scene must be fully visible in the camera view",
+      "The camera's viewing direction must be preserved",
+      "Scene objects must remain centered in the viewport",
+      "Camera controls must remain functional after view adjustment",
+      "View adjustment must account for camera's field of view"
+    ],
+    "created_at": "2012-02-29T12:43:06Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1418",
+    "source": {
+      "issue_number": 1418
+    },
+    "initial_question": {
+      "title": "Is there a way to use Nearest Neighbour scaling for textures?",
+      "body": "I am trying to use pixel art for my models and I'm loading a 16x16 .png for each face of a cube. Textures seem to be scaled using something that looks similar to Photoshop's Bicubic option, and this causes the pixel art to blur. Is there a way I can scale them in a manner more similar to Photoshop's Nearest Neighbour option, and preserve the sharp edges?\n"
+    },
+    "satisfaction_conditions": [
+      "Texture scaling maintains sharp pixel edges without blurring",
+      "Texture rendering matches 'Nearest Neighbor' style scaling"
+    ],
+    "created_at": "2012-02-28T14:40:23Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1410",
+    "source": {
+      "issue_number": 1410
+    },
+    "initial_question": {
+      "title": "Detecting a non dragging click",
+      "body": "Hi,\nI'm working on a project using Three.js and am currently using the TrackballControls (Until I possibly write my own application specific ones).\n\nThe problem I have is:\nI'm Raycasting to detect any clicks on certain objects in my scene.\nWhen someone clicks one, an info window appears showing info about the object.\nWhat I want to happen then is if they click anywhere (e.g. not registering a intersection with the Ray / the intersects returned is 0) then it closes the info box.\nSounds simple enough except when I click and drag it also hides the info box.\nI need some way to determine between a click and drag for the trackballcontrol and a click just to select nothing.\n\nThanks in advance.\nCode available if needed :)\n"
+    },
+    "satisfaction_conditions": [
+      "Must distinguish between drag operations and single clicks",
+      "Must detect when no objects are clicked",
+      "Must preserve normal TrackballControls/OrbitControls functionality",
+      "Must maintain info box visibility during drag operations",
+      "Must work with the existing raycasting system"
+    ],
+    "created_at": "2012-02-27T20:45:01Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1407",
+    "source": {
+      "issue_number": 1407
+    },
+    "initial_question": {
+      "title": "set TextGeometry pivot point",
+      "body": "Hi, I wonder how can I use the lookAt() method with a TextGeometry.\nI saw only a hack  for positioning a text:\n\n``` javascript\nvar centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );\ntextMesh1.position.x = centerOffset;\n```\n\nBut If I use `lookAt()`  with text object It rotates from the bottom-left.\n\nWrapping the `TextGeometry` in a `Object3D` does not help either.. or at least I failed..\n\nIm also interested in setting base point for other geometries.\n\nThanks for helping..\n"
+    },
+    "satisfaction_conditions": [
+      "Text geometry's pivot point must be at its center",
+      "Text geometry must rotate correctly when using lookAt()",
+      "Solution must work with TextGeometry specifically",
+      "Geometry's position calculations must account for its full dimensions"
+    ],
+    "created_at": "2012-02-27T10:29:57Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1400",
+    "source": {
+      "issue_number": 1400
+    },
+    "initial_question": {
+      "title": "Load image with  Explorer 9",
+      "body": "Hi,\nI have insert un image into panel, but is not supported by Explorer 9\nthere is another way to load an image into a scene to rotate?\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "Image can be rendered within a 3D scene",
+      "Material rendering is compatible with CanvasRenderer"
+    ],
+    "created_at": "2012-02-27T01:03:00Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1380",
+    "source": {
+      "issue_number": 1380
+    },
+    "initial_question": {
+      "title": "Static light positions in scene ",
+      "body": "Hi,\n\nI would like to have a light attached to the Camera so that it does not rotate when I rotate the whole scene through `THREE.TrackballControls`. \n\nI am setting up lights like this:\n\n``` javascript\nvar light = new THREE.DirectionalLight( 0xFFFFFF, 1 );\nlight.position.set( -0.65, 0.59, 0.48 ).normalize();\nscene.add( light );\n```\n\nI think the problem is because lights are binded to the scene. In OpenGL I could set them with an identity modelView matrix and have them fixed but not really sure how to do this with three.js. Has anybody had this problem before?\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "Light maintains constant position relative to camera view",
+      "Light illumination remains consistent during scene manipulation",
+      "Light position persists through camera movement"
+    ],
+    "created_at": "2012-02-22T15:17:46Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1358",
+    "source": {
+      "issue_number": 1358
+    },
+    "initial_question": {
+      "title": "smooth shading?",
+      "body": "Hi \nI have one probem \nI have a balloon created with blender exported three.js\nwhen I load the red balloon is not smooth but has many square\n\nThanx\n\n``` javascript\nvar container = document.getElementById( 'container' );\n\ncamera = new THREE.PerspectiveCamera( 10, window.innerWidth / window.innerHeight, 1, 1000 );\ncamera.position.y = - 6;\ncamera.position.z = 100;\n\nscene = new THREE.Scene();\n\nvar light = new THREE.DirectionalLight(0xffffff);\nlight.position.set(0, 0, 1).normalize();\nscene.add(light);\n\nloader = new THREE.JSONLoader();\nloader.load('obj/balloon-tutorial.js', function (geometry) {\n    geometry.materials[0].shading = THREE.FlatShading;\n\n    mesh = new THREE.Object3D();\n    mesh.position.x = 0;\n    mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;\n    scene.add(mesh);\n    geometry.computeVertexNormals();\n    var part1 = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());\n\n    mesh.add(part1);\n\n   var part2 = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial({ color: 0xffffff, shading: THREE.FlatShading, overdraw: true }));\n   mesh.add(part2);\n\n});\n\nrenderer = new THREE.WebGLRenderer({ antialias: true });\nrenderer.setSize( window.innerWidth, window.innerHeight );\ncontainer.appendChild( renderer.domElement );\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Original model geometry and structure preserved"
+    ],
+    "created_at": "2012-02-19T16:53:27Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1344",
+    "source": {
+      "issue_number": 1344
+    },
+    "initial_question": {
+      "title": "How can I specify the up direction when using camera.lookAt?",
+      "body": "Just wonder how can I specify the up direction (a.k.a. up vector) when using camera.lookAt? Say I positioned my camera to look from point A to point B but I also want to spin the camera around axis AB. How can this be possible without an up vector?\n"
+    },
+    "satisfaction_conditions": [
+      "Up vector direction must be configurable"
+    ],
+    "created_at": "2012-02-16T18:06:38Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1322",
+    "source": {
+      "issue_number": 1322
+    },
+    "initial_question": {
+      "title": "Making a cylinder transparent",
+      "body": "Can I adjust the alpha on a simple geometry like a cylinder?  Let's say I want to push people through a tube (like Futurama) and I want to see into the tube as they pass through (but still see the boundaries of the tube itself).  Can I do this with a Material, or would I need to use a simple Texture?\n"
+    },
+    "satisfaction_conditions": [
+      "The cylinder's material must be partially transparent",
+      "The cylinder's boundaries must remain visible",
+      "Objects inside the cylinder must be visible from outside",
+      "The transparency effect must work in real-time"
+    ],
+    "created_at": "2012-02-14T03:06:01Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1315",
+    "source": {
+      "issue_number": 1315
+    },
+    "initial_question": {
+      "title": "using the three.js exporter from Blender directly",
+      "body": "Hi , guys, how to deploy three.js in 2.61 ? I place io_mesh_threejs into dir `Blender Foundation\\Blender\\2.61\\scripts\\addons\\`, \nrestart blender2.61 and without option in `File -> Export -> Three.js`. pls tell me how to fix it, many thanks.\n\nthreejs version is most updated `r47`.\n"
+    },
+    "satisfaction_conditions": [
+      "Three.js exporter addon is properly installed in Blender's addon directory"
+    ],
+    "created_at": "2012-02-12T06:10:05Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1312",
+    "source": {
+      "issue_number": 1312
+    },
+    "initial_question": {
+      "title": "How to convert 3D plane corners to 2D screen co-ordinates?",
+      "body": "Hi, \n\nI'm using an external image material on a PlaneGeometry plane for the floor of my 3D space (i.e. it lies flat, along the z-axis), and I'm adding blocks on top for the 3D elements. As I'm using the CanvasRenderer, the blocks look fine while the floor isn't good enough (I understand the issues with affine transformations which makes this so). \n\nSo, when the user wants to save their view, my intention is to turn off the floor, upload a PNG of just the 3D blocks to the server, then re-render the floor on the server using ImageMagick by distorting the floor image, and then I can add the canvas-rendered block image on top. \n\nThe problem I have is this: I can't figure out how to get the 2D screen co-ordinates of my floor out of the 3D space. If I can get these, then I can pass them to ImageMagick to distort the image appropriately. \n\nAny help is appreciated. Thanks in advance!\n"
+    },
+    "satisfaction_conditions": [
+      "3D coordinates from the plane geometry must be accurately converted to 2D screen coordinates",
+      "Resulting 2D coordinates must account for the screen dimensions",
+      "Conversion must respect the current camera perspective"
+    ],
+    "created_at": "2012-02-11T19:45:18Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1305",
+    "source": {
+      "issue_number": 1305
+    },
+    "initial_question": {
+      "title": "Avoid setting crossOrigin when dealing with data urls",
+      "body": "Greetings,\n\nin this piece of code, can we avoid setting d.crossOrigin when we are dealing with a data url ?\n\n``` javascript\nTHREE.ImageUtils = {crossOrigin: \"\",loadTexture: function(a, b, c) {\n        var d = new Image, e = new THREE.Texture(d, b);\n        d.onload = function() {\n            e.needsUpdate = !0;\n            c && c(this)\n        };\n        d.crossOrigin = this.crossOrigin;\n        d.src = a;\n        return e\n```\n\nYou can add a check like this:\n\n``` javascript\nif( a.substr(0,4) != \"data\" )\n  d.crossOrigin = this.crossOrigin;\n```\n\nthis does the trick. Otherwise Chrome 17 throws a Cross-origin image load denied by Cross-Origin Resource Sharing policy for a data url.\n\nT.\n"
+    },
+    "satisfaction_conditions": [
+      "No CORS errors occur when loading data URLs",
+      "Texture loads successfully from data URL",
+      "CrossOrigin property is not unnecessarily set for data URLs"
+    ],
+    "created_at": "2012-02-10T21:51:06Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1277",
+    "source": {
+      "issue_number": 1277
+    },
+    "initial_question": {
+      "title": "rendering datatexture",
+      "body": "Currently trying to create a datatexture, made up of blue pixels and then applied to a sphere...However, the scene does not render.\n\nIs this a problem with my code? or a bug?\n\nWhen trying to render with a loaded image texture, it works fine (line 4)\n\n``` javascript\nvar textureWidth = 1250;\nvar textureHeight = 625;\n\nsphere = new THREE.SphereGeometry( 500, 60, 40 );\n//map = THREE.ImageUtils.loadTexture( 'img.jpg' );\n\nvar size = textureWidth * textureHeight;\nvar dataColor = new Uint8Array( size * 3 );\nfor (var i = 0; i < size; i ++) {\n    dataColor[ i * 3 ]     = 0;\n    dataColor[ i * 3 + 1 ] = 0;\n    dataColor[ i * 3 + 2 ] = 255;\n}\nmap = new THREE.DataTexture(dataColor, textureWidth, textureHeight, THREE.RGBFormat );\nmap.needsUpdate = true;\n\nmaterial = new THREE.MeshBasicMaterial( { wireframe: false, map: map } )\nmesh = new THREE.Mesh( sphere, material );\nmesh.scale.x = -1;\nscene.add( mesh );\n```\n"
+    },
+    "satisfaction_conditions": [
+      "The texture data array must be properly initialized and updated",
+      "The sphere mesh must be correctly configured in the scene"
+    ],
+    "created_at": "2012-02-08T17:15:38Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1254",
+    "source": {
+      "issue_number": 1254
+    },
+    "initial_question": {
+      "title": "Rotate a cube around it's edge.",
+      "body": "Hi, Everybody!\n\nI was asking already about rotations around an arbitrary axis and got clear answers posted in #1219 and #1220.\n\nBut it's still unclear how to rotate a cube around one of it's edges (could anyone to share such a code if it exists).\n\nThere were posted two functions in #1219:\n\n``` javascript\nfunction rotateAroundObjectAxis( object, axis, radians ) { .. }\n```\n\nand\n\n``` javascript\nfunction rotateAroundWorldAxis( object, axis, radians ) { .. }\n```\n\nThey allow me to rotate a cube about an arbitrary axis that goes through the center of it's bounding box.\n\nWhat I need is to rotate an object around an arbitrary axis which is not necessarily goes though the object's center.\n\nHow to do that correctly?\n\nSorry, if I'm a bit annoying about that but I want to implement such a functionality.\n\nThanks.\n\nP.S. It seems that I need a function that looks like:\n\nfunction rotateAroundArbitraryAxis( object, axisDirection, axisBasePoint, radians ) { .. }\n\nby axisBasePoint I mean the point the specified axis goes through.\n\nI read on the Internet that such a rotation should be done in several steps:\n1. translate space so that the rotation axis passes through the origin.\n2. rotate space about the Z axis so that the rotation axis lies in the XZ plane.\n3. rotate space about the Y axis so that the rotation axis lies along Z axis.\n4. perform the desired rotation by Theta about the z axis.\n5. apply the inverse of step (3).\n6. apply the inverse of step (2).\n7. apply the inverse of step (1).\n\nDo I understand it correctly?\n\nHow to perform such an operation with three.js?\n\nI tried to multiply different (translation/rotation) matrices with each other in three.js but did not get the desired result :-(\n\nMany thanks.\n"
+    },
+    "satisfaction_conditions": [
+      "Rotation amount can be controlled precisely",
+      "Works within Three.js environment"
+    ],
+    "created_at": "2012-02-05T20:33:10Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1225",
+    "source": {
+      "issue_number": 1225
+    },
+    "initial_question": {
+      "title": "Saving three.js geometry to json format",
+      "body": "I want to save an object created dynamically in code to the JSON model format.  However, on loading the model back in, half of the faces are not visible.\n\nHere's the code I'm using to save a simple THREE.CubeGeometry object for example:\n\n``` javascript\nsaveGeometryToJSON: function (geometry) {\n    var i,\n        json = {\n            metadata: { \n                formatVersion: 3\n            },\n            scale: 1.000000,\n            materials: [],\n            vertices: [],\n            morphTargets: [],\n            morphColors: [],\n            normals: [],\n            colors: [],\n            uvs: [[]],                  \n            faces: []\n        };\n\n    for (i = 0; i < geometry.vertices.length; i++) {\n        json.vertices.push(geometry.vertices[i].position.x);\n        json.vertices.push(geometry.vertices[i].position.y);\n        json.vertices.push(geometry.vertices[i].position.z);\n    }\n\n    for (i = 0; i < geometry.faces.length; i++) {\n        json.faces.push(0); // bitmask with 3 vectors, and face normals\n\n        json.faces.push(geometry.faces[i].a);\n        json.faces.push(geometry.faces[i].b);\n        json.faces.push(geometry.faces[i].c);\n\n        json.normals.push(geometry.faces[i].normal.x);\n        json.normals.push(geometry.faces[i].normal.y);\n        json.normals.push(geometry.faces[i].normal.z);\n    }\n\n    return JSON.stringify(json);\n}\n```\n\nThis results in a .js file:\n\n``` json\n{\n    \"metadata\": {\n        \"formatVersion\":3\n    },\n    \"scale\":1,\n\n    \"materials\":[],\n    \"vertices\":[5,25,5,5,25,-5,5,-25,5,5,-25,-5,-5,25,-5,-5,25,5,-5,-25,-5,-5,-25,5],\n    \"morphTargets\":[],\n    \"morphColors\":[],\n    \"normals\":[1,0,0,-1,0,0,0,1,0,0,-1,0,0,0,1,0,0,-1],\n    \"colors\":[],\n    \"uvs\":[[]],\n    \"faces\":[0,0,2,3,0,4,6,7,0,4,5,0,0,7,6,3,0,5,7,2,0,1,3,6]\n}\n```\n\nWhen loading the file back using the JSONLoader, half of the faces are not displayed.\n\nAny help would be greatly appreciated.\n"
+    },
+    "satisfaction_conditions": [
+      "All faces of the 3D geometry must be correctly visible when loaded back",
+      "JSON output must distinguish between different face types (3-vertex vs 4-vertex faces)",
+      "All geometric data (vertices, normals, face indices) must be preserved in the JSON output",
+      "JSON format must be compatible with Three.js JSONLoader"
+    ],
+    "created_at": "2012-01-31T17:54:37Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1209",
+    "source": {
+      "issue_number": 1209
+    },
+    "initial_question": {
+      "title": "How to determine objects in frustum for Canvas and GL?",
+      "body": "I am using the WebGLRenderer as the primary and CanvasRenderer as a fallback and wonder how to determine the objects visible in the frustum for both.\n\nThanks much\n"
+    },
+    "satisfaction_conditions": [
+      "Must correctly identify objects within the camera's view frustum",
+      "Must work with both WebGLRenderer and CanvasRenderer",
+      "Must handle 3D spatial calculations accurately",
+      "Must account for object size/bounds"
+    ],
+    "created_at": "2012-01-29T07:17:14Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1202",
+    "source": {
+      "issue_number": 1202
+    },
+    "initial_question": {
+      "title": "Rotation property of child objects inside a Collada Scene not working...",
+      "body": "Hey,\n\nBelow are snippets of code from my experiment and I have found something odd:\n\n``` javascript\nmesh1 = collada.scene;\n\nfunction animate() {\n    var door = mesh1.getChildByName(\"node-door1\", true);\n    //WORKS\n    door.position.y += 0.01;\n    //WORKS\n    door.scale.x += 0.001;\n    //DOESN'T WORK\n    door.rotation.y += 0.01;\n    //WORKS\n    mesh1.rotation.y += 0.01;\n}\n```\n\nAny ideas why position and scale work but rotation doesn't?  You can rotate the Collada scene but not objects within it!\n"
+    },
+    "satisfaction_conditions": [
+      "Other transformations (position, scale) continue to work",
+      "Parent scene rotation remains functional",
+      "Child objects can be correctly identified and accessed"
+    ],
+    "created_at": "2012-01-27T21:41:55Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1195",
+    "source": {
+      "issue_number": 1195
+    },
+    "initial_question": {
+      "title": "camera setting",
+      "body": "Hi all~\nI made models by using Blender.\nAnd I arranged and rendered them in Blender.\n\nBut the models seems smaller in THREE.js\nI use default blender camera. \nTHREE.js' fov and aspect are same as blender's.\nThe distance of the camera from the model is 4.\nI don't know Three.js' unit is same as Blender's.\nBlender's unit is meter. (4m)\n\nDo I miss something? Do I have to calculate something?\n"
+    },
+    "satisfaction_conditions": [
+      "Camera field of view (FOV) values must be correctly aligned between Blender and Three.js",
+      "Aspect ratio is consistently applied across both platforms"
+    ],
+    "created_at": "2012-01-27T06:08:58Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1178",
+    "source": {
+      "issue_number": 1178
+    },
+    "initial_question": {
+      "title": "Get rotation angle from PerspectiveCamera w/RollControls",
+      "body": "Hello,\n\nApologies if this seems obvious but I'm new to Three.js and 3D maths in general.\n\nI'm using RollControls with a standard PerspectiveCamera in my 3D WebGL scene.  I want to be able to get the rotation angle(s) of the camera.\n\nI have tried querying camera.rotation, but it always returns (0,0,0) - presumably because RollControls uses matrices to perform the rotations and movement.\n\nWhat is the best practice for getting x, y, and z rotation angles for the camera in this case?\n"
+    },
+    "satisfaction_conditions": [
+      "Camera rotation angles must be accurately retrievable even when using RollControls",
+      "Rotation values must be convertible to a 0-360 degree compass heading"
+    ],
+    "created_at": "2012-01-24T15:58:59Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1140",
+    "source": {
+      "issue_number": 1140
+    },
+    "initial_question": {
+      "title": "overrideMimeType not supported in IE9",
+      "body": "While attempting to load a JSON model, I ran into a scripting error in IE.  It appears they have not implemented XMLHttpRequest.overrideMimeType().  I am able to get around the error using:\n\n``` javascript\nf.open(\"GET\",c,!0);  if (f.overrideMimeType)f.overrideMimeType(\"text/plain; charset=x-user-defined\");  f.setRequestHeader(\"Content-Type\",\"text/plain\");\n```\n\ninstead of\n\n``` javascript\nf.open(\"GET\",c,!0);  f.overrideMimeType(\"text/plain; charset=x-user-defined\");   f.setRequestHeader(\"Content-Type\",\"text/plain\");\n```\n\nI'm not certain if this introduces any new issues with other browsers, but am now able to view a model in IE 9.\n"
+    },
+    "satisfaction_conditions": [
+      "JSON model loads successfully in IE9",
+      "MIME type handling works across browsers",
+      "Content-Type header is properly processed"
+    ],
+    "created_at": "2012-01-19T17:36:24Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1091",
+    "source": {
+      "issue_number": 1091
+    },
+    "initial_question": {
+      "title": "Dynamically updating vertex coordinates on a Mesh' Geometry? ",
+      "body": "Hi,\n\nIm trying to update the vertex coordinates on the geometry of a (custom) mesh by doing this on some loop callback:\n\n``` javascript\n<meshvar>.geometry.vertices[idx].position.y = someNewYVal;\n```\n\nhowever the render on the screen is not showing the modifications. My question is whether this should work and the error is somewhere else... or is there anything I need to do to 'invalidate' the mesh geometry?\n\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Mesh vertex coordinates must update visually in real-time",
+      "Geometry must be properly marked for update",
+      "Geometry must be configured to allow dynamic updates",
+      "Original mesh instance remains in scene"
+    ],
+    "created_at": "2012-01-12T17:34:19Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/1020",
+    "source": {
+      "issue_number": 1020
+    },
+    "initial_question": {
+      "title": "drawing a triangle does not work",
+      "body": "what is wrong in the following in creating a triangle:\nthe triangle does not appear\n\n``` javascript\nvar geometry2 = new THREE.Geometry();\nvar fface = THREE.Face3();\nvar meshmaterial = new THREE.MeshLambertMaterial(\n{\ncolor: 0xff0000\n});\nfor ( var i = 0; i < 3; i ++ ) {\n...\n\nfface.vertices.push(new THREE.Vertex(position));\n}\n\ngeometry2.faces.push(fface);                \nvar mesh = new THREE.Mesh(geometry2, meshmaterial);\nvar group = new THREE.Object3D();\ngroup.add(mesh);\nscene.add( group );\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Mesh must be properly added to scene graph"
+    ],
+    "created_at": "2012-01-04T12:04:55Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/990",
+    "source": {
+      "issue_number": 990
+    },
+    "initial_question": {
+      "title": "OBJ converted to Three is rendered all in black.",
+      "body": "Hi All,\n\nI used convert_obj_three.py (only specified -i & -o).\nWhen rendering the output, everything is in black.\nIf I use MeshNormalMaterial, rainbow-ish colors are used.\nThe code is in the below.\n(If someone can tell me how to upload OBJ data to this forum, I will post it as well)\n\nSo the question is, how do I render the converted OBJ with real textures?\n\nThanks,\nQ\n\n``` html\n<script>\n\n    var SCREEN_WIDTH = window.innerWidth;\n    var SCREEN_HEIGHT = window.innerHeight;\n    var container, stats;\n    var camera, scene, webglRenderer;\n    var zmesh;\n\n    var mouseX = 0, mouseY = 0;\n    var windowHalfX = window.innerWidth / 2;\n    var windowHalfY = window.innerHeight / 2;\n\n    document.addEventListener('mousemove', onDocumentMouseMove, false);\n\n    init();\n    animate();\n\n    function init() {\n        container = document.createElement('div');\n        document.body.appendChild(container);\n\n        camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000);\n        camera.position.z = 500;\n\n        scene = new THREE.Scene();\n\n        // RENDERER\n\n        try {\n            webglRenderer = new THREE.WebGLRenderer();\n            webglRenderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);\n            webglRenderer.domElement.style.position = \"relative\";\n\n            container.appendChild(webglRenderer.domElement);\n\n        } catch(e) {\n            alert(e.toLocaleString());\n        }\n\n        // STATS\n\n        stats = new Stats();\n        stats.domElement.style.position = 'absolute';\n        stats.domElement.style.top = '0px';\n        stats.domElement.zIndex = 100;\n        container.appendChild(stats.domElement);\n\n        var loader = new THREE.JSONLoader();\n        var callback = function (geometry) {createScene(geometry)};\n        loader.load(\"obj/my_city/my_city_0.js\", callback);\n    }\n\n    function createScene(geometry) {\n        zmesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());\n        zmesh.overdraw = true;\n        scene.add(zmesh);\n    }\n\n    function onDocumentMouseMove(event) {\n        mouseX = (event.clientX - windowHalfX);\n        mouseY = (event.clientY - windowHalfY);\n    }\n\n    function animate() {\n        requestAnimationFrame(animate);\n\n        render();\n        stats.update();\n    }\n\n    function render() {\n        camera.position.x += (mouseX - camera.position.x) * .05;\n        camera.position.y += (-mouseY - camera.position.y) * .05;\n\n        camera.lookAt(scene.position);\n\n        webglRenderer.render(scene, camera);\n    }\n\n</script>\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Converted OBJ model data must retain original texture/material information"
+    ],
+    "created_at": "2011-12-30T21:39:31Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/984",
+    "source": {
+      "issue_number": 984
+    },
+    "initial_question": {
+      "title": "Exported model from Blender fails on loading",
+      "body": "I have exported a cube from blender that resulted in the file:\n\n``` json\n{\n    \"metadata\": {\n        \"formatVersion\" : 3,\n        \"generatedBy\"   : \"Blender 2.60 Exporter\",\n        \"vertices\"      : 8,\n        \"faces\"         : 6,\n        \"normals\"       : 8,\n        \"colors\"        : 0,\n        \"uvs\"           : 0,\n        \"materials\"     : 1,\n        \"morphTargets\"  : 0\n    },\n\n    \"scale\" : 1.000000,\n\n    \"materials\": [  {\n    \"DbgColor\" : 15658734,\n    \"DbgIndex\" : 0,\n    \"DbgName\" : \"Material\",\n    \"colorAmbient\" : [0.0, 0.0, 0.0],\n    \"colorDiffuse\" : [0.6400000190734865, 0.6400000190734865, 0.6400000190734865],\n    \"colorSpecular\" : [0.5, 0.5, 0.5],\n    \"shading\" : \"Lambert\",\n    \"specularCoef\" : 50,\n    \"transparency\" : 1.0,\n    \"vertexColors\" : false\n    }],\n\n    \"vertices\": [],\n\n    \"morphTargets\": [],\n\n    \"normals\": [0.577349,0.577349,-0.577349,0.577349,-0.577349,-0.577349,-0.577349,-0.577349,-0.577349,-0.577349,0.577349,-0.577349,0.577349,0.577349,0.577349,-0.577349,0.577349,0.577349,-0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349],\n\n    \"colors\": [],\n\n    \"uvs\": [[]],\n\n    \"faces\": [35,0,1,2,3,0,0,1,2,3,35,4,7,6,5,0,4,5,6,7,35,0,4,5,1,0,0,4,7,1,35,1,5,6,2,0,1,7,6,2,35,2,6,7,3,0,2,6,5,3,35,4,0,3,7,0,4,0,3,5]\n\n}\n\n```\n\nI have the following loader:\n\n``` javascript\nvar scene;\n    $(document).ready(function(){\n      init();\n    });\n    function init(){\n      container = document.getElementById('container');\n\n      scene = new THREE.Scene();\n\n      var material = new THREE.MeshFaceMaterial();\n      camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );\n      camera.position.z = 100;\n      scene.add( camera );\n\n      var loader = new THREE.JSONLoader();\n      loader.load({model:'untitled.Cube.js',  callback:createScene});\n      renderer = new THREE.WebGLRenderer();\n      renderer.render(scene, camera)\n      renderer.setSize( window.innerWidth, window.innerHeight );\n      container.appendChild(renderer.domElement);\n\n    }\n    function createScene( geometry ) {\n      console.log(geometry);\n      geometry.materials[0][0].shading = THREE.FlatShading;\n      geometry.materials[0][0].morphTargets = true;\n\n      var material = new THREE.MeshFaceMaterial();\n\n      mesh = new THREE.Mesh( geometry, material );\n      mesh.scale.set(50, 50, 50);\n\n      scene.addObject( mesh );\n    }\n```\n\nThe rest of the code may not really make sense - I'm just starting this but my code is failing on \n\n``` javascript\nloader.load({model:'untitled.Cube.js',  callback:createScene});\n```\n\nIt fails on line `3452` of the un-minified code \n\n``` javascript\nface.centroid.addSelf( this.vertices[ face.a ].position );\n```\n\nUpon introspection, it's clear that vertices is an empty array. Any ideas what's wrong here?\n"
+    },
+    "satisfaction_conditions": [
+      "The exported model format must be compatible with the Three.js JSON loader"
+    ],
+    "created_at": "2011-12-29T22:41:42Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/975",
+    "source": {
+      "issue_number": 975
+    },
+    "initial_question": {
+      "title": "Geometry instancing?",
+      "body": "I am working on a scene which contains thousands of identical cuboids.  What is my best approach; just build the scene normally or is there something special I can do to take advantage of instancing?  The cuboids move around so the scene is not completely static.\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple objects share the same base geometry data",
+      "Individual objects remain independently manipulatable",
+      "Solution works within WebGL limitations"
+    ],
+    "created_at": "2011-12-28T01:28:52Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/972",
+    "source": {
+      "issue_number": 972
+    },
+    "initial_question": {
+      "title": "Modify vertex-positions of Plane?",
+      "body": "Hello, I'm new to Three.js and started playing around with the demos. I've tried to modify the positions of my plane like this:\n\n``` javascript\nvar oGeo = new THREE.PlaneGeometry( 1, 1, 1, 1 );\n\noGeo.vertices[0].position.z =  -0.5;\noGeo.vertices[0].position.y =  0.2;\n```\n\nThat worked for the positioning, but I think my light won't get applied on this plane like it should. There has to be a proper way doing this. Can you help me, please?\n\nWhat I'm actually trying to do is a tilemap with 16x16 planes. I want to be able to modify the y-position of every plane dynamically.\n"
+    },
+    "satisfaction_conditions": [
+      "Vertex positions of the plane geometry must be modifiable at runtime",
+      "Lighting must correctly respond to geometry modifications",
+      "Changes to geometry must be visible in rendered output",
+      "Surface normals must be correctly updated after geometry changes",
+      "Renderer must be notified of geometry updates"
+    ],
+    "created_at": "2011-12-27T12:27:25Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/902",
+    "source": {
+      "issue_number": 902
+    },
+    "initial_question": {
+      "title": "How can I dynamically change object's opacity?",
+      "body": "This is my object:\n\n``` javascript\nvar object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( {  map: THREE.ImageUtils.loadTexture( \"image.png\" ) } ) );\nobject.position.set(2, 3, 1.5);\n```\n\nnow after I've created this object in init(); function, I can directly go to the object and change his position,like this:\n\n``` javascript\nobject.position.x = 15;\n```\n\nNow the question is how can I change the opacity of the texture???\n\nThanks :-)\n"
+    },
+    "satisfaction_conditions": [
+      "Material must be configured to support transparency",
+      "Opacity value must be modifiable after object creation"
+    ],
+    "created_at": "2011-12-14T09:23:22Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/872",
+    "source": {
+      "issue_number": 872
+    },
+    "initial_question": {
+      "title": "makeInvert removal",
+      "body": "Hi!\n\nIs there a reason for the removal of the method makeInvert in Matrix4? I have previously used that to calculate position from local space to a parents space, like this: \n\n``` javascript\nvar childWorldMatrix = childMesh.matrixWorld;\nvar tempParentMatrix = new THREE.Matrix4();\nvar inverse = new THREE.Matrix4();\nTHREE.Matrix4.makeInvert(scene.matrixWorld,inverse);\ntempParentMatrix.multiply(inverse,childWorldMatrix );\nspotLight.position = tempParentMatrix.getPosition();\n```\n\nIs there perhaps a smarter way of doing this? Some build-in function?\n\n/Einar\n"
+    },
+    "satisfaction_conditions": [
+      "Matrix inversion operation must be successfully performed",
+      "Method must be compatible with Three.js Matrix4 class",
+      "Solution must handle the same input/output types as the original code"
+    ],
+    "created_at": "2011-12-08T07:38:21Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/856",
+    "source": {
+      "issue_number": 856
+    },
+    "initial_question": {
+      "title": "WebGLRenderer->enableDepthBufferWrite ",
+      "body": "I get an error when using this in R46, the API reference still refers to it, has it been renamed? No mention in the change log?\n"
+    },
+    "satisfaction_conditions": [
+      "Depth buffer writing functionality is accessible through material properties",
+      "Code executes without the original API error",
+      "Depth buffer writing behavior can be toggled as needed",
+      "Solution reflects current Three.js API structure"
+    ],
+    "created_at": "2011-12-06T18:30:59Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/846",
+    "source": {
+      "issue_number": 846
+    },
+    "initial_question": {
+      "title": "Texture from image part",
+      "body": "Hello.\nI'm new in three.js and I need to create a texture from a part of an image. Can you give me some help?\nI can use the all image in a texture without a problem. but I need to use just a piece of the image.\n\nthanks\n"
+    },
+    "satisfaction_conditions": [
+      "UV coordinates are correctly associated with the geometry's faces"
+    ],
+    "created_at": "2011-12-05T11:42:20Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/792",
+    "source": {
+      "issue_number": 792
+    },
+    "initial_question": {
+      "title": "updating mesh matrix in webgl_materials_video.html example",
+      "body": "i have a function i took from one of these three.js post to map a physics engine (JigLibJS) to a mesh object:\n\n``` javascript\nfunction JL2THREE(target, pos, dir) {\n    var position = new THREE.Matrix4();\n    position.setTranslation(pos[0], pos[1], pos[2])\n    var rotate = new THREE.Matrix4(dir[0], dir[1], dir[2], dir[3], dir[4], dir[5], dir[6], dir[7], dir[8], dir[9], dir[10], dir[11], dir[12], dir[13], dir[14], dir[15]);\n    position.multiplySelf(rotate);\n    target.matrix = position;\n    target.updateMatrix();\n    target.matrixWorldNeedsUpdate = true;\n}\n```\n\nwhen I use this function in the video.html example, it doesn't seem to change anything.\n\nI setup all the meshes with .matrixAutoUpdate = false flag but still nothing works.\n\nIf i adjust the mesh's position however, it works.   So, `mesh.position.set(pos[0],pos[1],pos[2])` works, but the above code doesn't.\n\nAm I missing something?\n"
+    },
+    "satisfaction_conditions": [
+      "Matrix auto-update is properly disabled"
+    ],
+    "created_at": "2011-11-24T03:31:26Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/773",
+    "source": {
+      "issue_number": 773
+    },
+    "initial_question": {
+      "title": "Mapping particles with mesh vertices",
+      "body": "Hi everybody,\n\nI was wondering if it was possible to map vertices from my planeGeometry with particles ? My issue is that I have two seperate things. My ParticleSystem, and my planeGeometry. Is there a way with three.js to say that my planeGeometry is actually a ParticleSystem? Or is my only option is to handle the different things separately?\n"
+    },
+    "satisfaction_conditions": [
+      "Particles must visually align with mesh vertices",
+      "Multiple instances must support independent positioning",
+      "Vertex positions must update correctly with object transformations"
+    ],
+    "created_at": "2011-11-18T16:37:31Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/756",
+    "source": {
+      "issue_number": 756
+    },
+    "initial_question": {
+      "title": "How to handle textures in .obj files",
+      "body": "How can I use the texture informations in the .obj files to get coordinates for the texture.jpeg file? \n\nFor me values between 1 and 0.1 like \"vt 0.948307 0.566459\" makes no sense... I expected something like coordinates for the texture JPEG file. Similar to \"vt 454 232\" for the pixel X = 454 Y = 232 in the texture JPEG file. \n\nIn the convert_obj_three.py file is the following part: \n\n```\n        # Texture coordinates in (u,v[,w]) coordinates, w is optional\n        # vt 0.500 -1.352 [0.234]\n        if chunks[0] == \"vt\" and len(chunks) >= 3:\n            u = float(chunks[1])\n            v = float(chunks[2])\n            w = 0\n            if len(chunks)>3:\n                w = float(chunks[3])\n            uvs.append([u,v,w])\n```\n\nBut I can not find the part where the converter uses these informations to extract the color infos from the texture file. Can somebody give me a hint? \n"
+    },
+    "satisfaction_conditions": [
+      "UV coordinates must be correctly mapped to pixel coordinates",
+      "Texture wrapping must be properly handled",
+      "OBJ file texture data must be correctly interpreted",
+      "Texture image dimensions must be considered in coordinate calculations"
+    ],
+    "created_at": "2011-11-14T16:45:42Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/731",
+    "source": {
+      "issue_number": 731
+    },
+    "initial_question": {
+      "title": "Data values direct from an array in object positions are returned as Radians",
+      "body": "Funky funk, mesh.rotation.y is receiving values as radians and not degree's (hence why that \"Math.PI\" was added)\noriginally the values from the array were (0,90,180,270) degrees with unexpected results, changing them to(0,1,2,3) work as used as Radians.\n\n``` javascript\nloader.load( { model: \"tiles/tile_grass.js\", callback: function( geometry ) {\n    for(var a = 0; a < data.length; a++) {\n        for(var b = 0; b < data[a].length; b++) {\n            //console.debug(a,b,data);\n            var drawTile = data[a][b];\n            if  (tileArray[drawTile] == 3){\n                var rotateTile = dataRotation[a][b];\n                var mesh = new THREE.Mesh( geometry, matTile);\n                mesh.scale.set( 10, 10, 10 );\n                mesh.rotation.y = tileRotArray[rotateTile] * Math.PI;\n                mesh.position.x = b * 160 - tileOffset;\n                mesh.position.z = a * 160 - tileOffset;\n                scene.add(mesh);\n            };\n        }\n    }\n} } );\n```\n"
+    },
+    "satisfaction_conditions": [
+      "The solution must work within Three.js's rotation system"
+    ],
+    "created_at": "2011-11-07T09:40:24Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/723",
+    "source": {
+      "issue_number": 723
+    },
+    "initial_question": {
+      "title": "Create circle camera trajectory",
+      "body": "How can we create PerspectiveCamera and limit it to Circle (S=[0,0,0], r=300, y +- 200) ?\n\nI want to let user rotate around object in in circle trajectory but limit his distance from [0,0,0] to 300 in x*z and +-200 y (so not full Ball)\n"
+    },
+    "satisfaction_conditions": [
+      "Camera maintains constant distance from center point",
+      "Camera vertical movement is bounded",
+      "Camera continuously looks at center point",
+      "Camera responds to user input for movement"
+    ],
+    "created_at": "2011-11-04T08:48:54Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/718",
+    "source": {
+      "issue_number": 718
+    },
+    "initial_question": {
+      "title": "help with intersection test",
+      "body": "I had an intersection that was working fine when my canvas was taking up the whole window in my browser however ever since I have added other elements to the document the intersection is no longer correct, I realize that I might need to use other sizes then the window.innerHeight and width but nothing that I tried really worked.\n\nthis is my intersection code:\n\n``` javascript\nfunction findIntersections(event) {\n    var mouseX = event.clientX / renderer.domElement.width;\n    var mouseY = event.clientY / renderer.domElement.height;\n\n    var vector = new THREE.Vector3(mouseX * 2 - 1, - mouseY * 2 + 1, 0.5 );\n\n    projector.unprojectVector( vector, camera );\n\n        var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );\n\n    intersects = ray.intersectScene( scene );\n}\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Mouse coordinates must be correctly normalized relative to the canvas position",
+      "Intersection detection must work regardless of canvas size and position"
+    ],
+    "created_at": "2011-11-02T21:01:15Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/682",
+    "source": {
+      "issue_number": 682
+    },
+    "initial_question": {
+      "title": "blending mode and html Background",
+      "body": "Hi,\ni would like to know if there is a way to get a blending mode according with the background html color (an image in html background for example) ?\nI've tried using 'setClearColorHex', but when i set this, all my html background color became red (my image became tint in red).\n\nthanks your answer\n"
+    },
+    "satisfaction_conditions": [
+      "Canvas transparency must be properly configured"
+    ],
+    "created_at": "2011-10-24T17:22:49Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/615",
+    "source": {
+      "issue_number": 615
+    },
+    "initial_question": {
+      "title": "Exporting Modo/blender obj in three js",
+      "body": "I'm attempting to export a .js file from blender 2.59 using an .obj created in modo. The option to export in .js is locked when using the objs.  Are there limitations to the js exporter? Quad polys or merged verts? \n"
+    },
+    "satisfaction_conditions": [
+      "The Three.js export option becomes accessible in the interface",
+      "At least one object is selected in the scene"
+    ],
+    "created_at": "2011-10-05T19:13:10Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/614",
+    "source": {
+      "issue_number": 614
+    },
+    "initial_question": {
+      "title": "Switch between Flat and Smooth Shading in the same scene",
+      "body": "Hi, I noticed that when I have 2 objects with 2 different materials, one using FlatShading and the other using SmoothShading.  The renderer (WebGL) only pays attention to the first material shading value.  I was wondering if this was intended or if I was doing something wrong?\n"
+    },
+    "satisfaction_conditions": [
+      "Objects requiring different shading types must use separate geometry definitions"
+    ],
+    "created_at": "2011-10-05T16:08:09Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/515",
+    "source": {
+      "issue_number": 515
+    },
+    "initial_question": {
+      "title": "setFaceCulling FRONT & BACK problem ",
+      "body": "Hi everyone, i'm a  stuck with a culling problem. \nI've got some buildings from a file defined by many linear rings. But these linear ring may not have  defined in the counterclockwise order, so some walls have a bad orientation. \nSo my idea was to use the setFaceCulling method of the WebGLRenderer to set the culling to both front and back. (I know, it's not very efficient but use this will solve my problem.)\n\nIn order to do that, I follow the WebGLRenderer usage from the wiki and call \"renderer.setFaceCulling(true,\"ccw\");\" in my program.\nBut that's has no effect, all my object turn invisible :( . \n\nSomeone have an idea? I've missed something? It's a bug?\n"
+    },
+    "satisfaction_conditions": [
+      "All building faces remain visible regardless of their winding order",
+      "Building geometry is rendered completely without invisible faces"
+    ],
+    "created_at": "2011-09-09T07:54:42Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/497",
+    "source": {
+      "issue_number": 497
+    },
+    "initial_question": {
+      "title": "handling clicks on html gui elements vs 3.js graphics",
+      "body": "I know this is more a JS question than 3.js but I thought id ask here because i think other must have had the same problem also. so how would I be able to tell whether an html menu has been clicked vs whether an \"interactive\" cube/object has been clicked? i have 1 onchange event handler for the menu and then im using onmousedown for the interacative cube. is there some event that i can use that lets me handle mouse events using jquery or pure js?\n"
+    },
+    "satisfaction_conditions": [
+      "Events from HTML menu elements and 3D objects must be distinguishable",
+      "Menu clicks must not trigger 3D object interactions"
+    ],
+    "created_at": "2011-09-04T20:22:27Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/473",
+    "source": {
+      "issue_number": 473
+    },
+    "initial_question": {
+      "title": "Order of the transparent pass",
+      "body": "Hello. \n\nAt the updated revision 43, changed the order of the transparent pass.\nWhy renderer to draw from front to back?\nMy model which include transparent polygon is not be drawn correctly at Revision 43.\n"
+    },
+    "satisfaction_conditions": [
+      "Back-to-front rendering order is maintained for transparent objects"
+    ],
+    "created_at": "2011-08-31T07:18:39Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/451",
+    "source": {
+      "issue_number": 451
+    },
+    "initial_question": {
+      "title": "JSONLoader and MTL File",
+      "body": "I have broken down the problem into following steps:\n1. I have an obj file and an mtl file associated with it.\n2. I use the python converter script to convert the obj file into the JSON model format as:\n   \n   > > python convert_obj_three.py -i infile.obj -o outfile.js\n\n3.Upon inspecting the newly created outfile.js, I see that the \"materials\" sub-array is populated with the data from the mtl file.\n1. To load this outfile.js model, I use JSONLoader. But all I see is the model being loaded. The material data (from the mtl file) is not being shown.\n\nCan someone please explain how to get this working.\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "Model geometry loads and displays correctly",
+      "Multiple materials can be handled simultaneously",
+      "Material assignments persist per face/surface"
+    ],
+    "created_at": "2011-08-24T12:46:08Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/449",
+    "source": {
+      "issue_number": 449
+    },
+    "initial_question": {
+      "title": "ParticleSystem and Sprite",
+      "body": "Hey guys.\n\nI have a ParticleSystem to draw particles and I'm using sprite to create a large sun in the world. However, there seems to be a problem. \nWhen a particle is drawn over a sprite, the transparent edges of the particle texture get drawn like there's no sun behind it. Simply black edges....\n\nSo basically: Is there a way to draw particles with ParticleSystem that has transparent texture to create a circle in a world with sprites that also has transparent texture without any alpha draw issues?\n\nI hope my question is clear, any feedback would be more than welcome!\n\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Particles must render correctly over sprites without black/incorrect edges",
+      "Proper transparency handling between overlapping elements",
+      "Correct render order of transparent objects"
+    ],
+    "created_at": "2011-08-24T08:45:13Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/402",
+    "source": {
+      "issue_number": 402
+    },
+    "initial_question": {
+      "title": "Attach object to surface on vertex-shaded mesh",
+      "body": "This is not an issue with the engine really, it's more of a question. Is it possible to sync a objects movement with a mesh that has been manipulated through a vertex shader? I have an ocean and wants a floating boat on it's surface. The mesh has a sin-function applied for animated waves. I'm trying to use the same offset-function on the boat, but it wont stick. I just guessing, is it because the vertex-shader changes the vertices from the modelView-perspective and not object-space? Is there a better  way to find the surface-position for any given xz-point?\n"
+    },
+    "satisfaction_conditions": [
+      "Surface position is correctly calculated in the appropriate coordinate space"
+    ],
+    "created_at": "2011-08-04T21:38:46Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/394",
+    "source": {
+      "issue_number": 394
+    },
+    "initial_question": {
+      "title": "Rotation matrices",
+      "body": "I have a question: Is it possible to apply a custom rotation/scale matrix to a mesh using built-in functions? I want to do a rotation with scaling at the same time, the math is done but I have to implement it.\n"
+    },
+    "satisfaction_conditions": [
+      "Matrix manipulation control is enabled",
+      "Custom matrix modifications are possible"
+    ],
+    "created_at": "2011-08-02T17:24:57Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/389",
+    "source": {
+      "issue_number": 389
+    },
+    "initial_question": {
+      "title": "Problem with uniform array",
+      "body": "Hi,\nI'm trying to fill a uniform array of vec3 values but with no result. I've tried the following:\n\n``` javascript\nuniforms = {\n        \"cps\": { type: \"fv\", value: [{ type: \"v3\", value: new THREE.Vector3(30, 30, 0) }, { type: \"v3\", value: new THREE.Vector3(100, 30, 0) }] }\n}\n```\n\nand this:\n\n``` javascript\nuniforms = {\n       \"cps\": { type: \"fv\", value: [new THREE.Vector3(30, 30, 0), new THREE.Vector3(100, 30, 0)] }\n}\n```\n\nI've also tried using other types such as \"v3\" and \"fv3\".\n\nLater in shader I have the following declaration:\nuniform vec3 cps[2];\n\nBut when I try to use the passed coordinates they are always 0,0,0 as if JS did not pass anything to the shader.\n\nHow should I initialize uniform vec3 array from JS using Three.js? Thank you!\nCheers,\n-K\n"
+    },
+    "satisfaction_conditions": [
+      "Array length in JavaScript must match the shader's expected array size"
+    ],
+    "created_at": "2011-07-29T19:41:18Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/363",
+    "source": {
+      "issue_number": 363
+    },
+    "initial_question": {
+      "title": "texture loading/binding error",
+      "body": "First of all, many thanks to everyone who's contributed to this!!\n\nI've been running into a snag when loading several textures into a scene with a THREE.WebGLRenderTarget.\n\nWhen I change the webgl_rtt.html example to the following it runs but half the spheres don't show up:\n\n``` javascript\n//line 166\nvar n = 5,\ngeometry = new THREE.SphereGeometry( 10, 64, 32 ),\nmaterial2 = new THREE.MeshLambertMaterial( { color:0xffffff, map: rtTexture } );\nmaterial3 = new THREE.MeshBasicMaterial( { color:0xffffff, map: THREE.ImageUtils.loadTexture( \"textures/lava/lavatile.jpg\") } );\n\nfor( var j = 0; j < n; j++ ) {\n    for( var i = 0; i < n; i++ ) {\n        if((i+j)%2) mesh = new THREE.Mesh( geometry, material2 );\n        else  mesh = new THREE.Mesh( geometry, material3 );\n```\n\nand I see this error in the terminal:\n`ERROR:gles2_cmd_decoder.cc(4021)] glDrawXXX: attempt to access out of range vertices`\n\nHowever, when I swap material3 and material2 I see all the spheres and no error:\n\n``` javascript\nif((i+j)%2) mesh = new THREE.Mesh( geometry, material3 );\nelse  mesh = new THREE.Mesh( geometry, material2 );\n```\n\nIf anyone can shed some light on this I'd appreciate it.\n"
+    },
+    "satisfaction_conditions": [
+      "All spheres in the scene must render completely without missing geometry",
+      "No WebGL buffer access errors should occur during rendering",
+      "Materials with different buffer requirements must be able to share the same geometry without errors"
+    ],
+    "created_at": "2011-07-17T06:41:24Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/353",
+    "source": {
+      "issue_number": 353
+    },
+    "initial_question": {
+      "title": "Change ambient and color in mesh phong material.",
+      "body": "I have this code.\n\n``` javascript\nvar DefaultWallOutMaterial = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff  }  );\n```\n\nBut when i do\n\n``` javascript\nDefaultWallOutMaterial .ambient = 0xF7DBD7;\nDefaultWallOutMaterial .color= 0xF7DBD7;\n```\n\nThe object doesn't update the material with the new color (It appears black).\n\nAny Help please?\n"
+    },
+    "satisfaction_conditions": [
+      "Material color properties must update visually when changed at runtime",
+      "Color property modifications must use appropriate Three.js methods/syntax",
+      "Both ambient and color properties must be successfully modified",
+      "Material must maintain valid rendering state after modifications"
+    ],
+    "created_at": "2011-07-14T11:38:08Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/263",
+    "source": {
+      "issue_number": 263
+    },
+    "initial_question": {
+      "title": "how to change color of a particle",
+      "body": "hi:\n\ni have...\nvar par = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xffffff } ) );\n\nhow to do a change after?\n\nmd doob... YOU ARE MY HEROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!\n"
+    },
+    "satisfaction_conditions": [
+      "Particle color must be modifiable after initial creation",
+      "New color value must be properly applied to the existing particle material",
+      "Original particle instance must remain valid"
+    ],
+    "created_at": "2011-06-14T17:57:39Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/237",
+    "source": {
+      "issue_number": 237
+    },
+    "initial_question": {
+      "title": "Distance in PointLight",
+      "body": "I'm just wondering how does the distance parameter in pointlight work. Setting anything above 0 seems to turn off the light and any greater negative values doesn't not seem to change the lighting settings..\n"
+    },
+    "satisfaction_conditions": [
+      "Light attenuation behavior correctly responds to distance parameter",
+      "Zero distance value results in uniform lighting",
+      "Positive distance values show gradual light falloff",
+      "Light intensity transition is linear"
+    ],
+    "created_at": "2011-06-04T18:26:29Z"
+  },
+  {
+    "id": "https://github.com/mrdoob/three.js/issues/155",
+    "source": {
+      "issue_number": 155
+    },
+    "initial_question": {
+      "title": "One question about the script \"convert_obj_three.py\"",
+      "body": "Hey \n\nI've got one question about the script \"convert_obj_three.py\". \n\nI've tried to convert one .obj with but binary conversion has only created a .js file and not .bin file. Is this normal? \n\n(I've typed this command : python convert_obj_three.py -i infile.obj -o outfile.js)\n\nThanks in advance. \n"
+    },
+    "satisfaction_conditions": [
+      "Binary file output must be explicitly requested",
+      "Two output files must be generated for binary conversion"
+    ],
+    "created_at": "2011-04-03T12:42:27Z"
+  }
+]

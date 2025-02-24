@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/jmattaa/laser/issues/20",
+    "source": {
+      "issue_number": 20
+    },
+    "initial_question": {
+      "title": "Terms and requirements for use cases",
+      "body": "That tool must be used only in terminal app inside launched gui session, or it must support strict tui modes like grub or putty ssh?"
+    },
+    "satisfaction_conditions": [
+      "Tool functions in text-based terminal interfaces",
+      "Display formatting is configurable",
+      "Tool operates without requiring graphical interface"
+    ],
+    "created_at": "2024-11-07T07:03:01Z"
+  }
+]

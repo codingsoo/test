@@ -1,0 +1,122 @@
+[
+  {
+    "number": 2530,
+    "title": "Webpack watch doesn't output the new build",
+    "created_at": "2016-05-21T11:27:37Z",
+    "closed_at": "2016-05-24T04:49:14Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/webpack/webpack/issues/2530",
+    "body": "Watch recognizes a change in the file and the command line shows it works on a new build, but the file on the file system never gets updated. As soon as I quit the watching process and start it again the correct output is produced. Also running it manually with the following command doesn't give any more insight nor output:\n\n```\nwebpack --progress --colors --watch --display-error-details --display-chunks --profile\n```\n## webpack.config.js\n\n``` js\nvar path = require('path');\nmodule.exports = {\n    devtool : 'source-map',\n    watch: true,\n    context: __dirname + '/App',\n    entry: './index',\n    output: {\n        path: path.join(__dirname, 'wwwroot/dist'),\n        filename: '[name]-bundle.js'\n    },\n    resolve: {\n        extensions: ['', '.js', '.ts', '.tsx', '.css'],        \n    },\n    module: {\n        loaders: [\n            { test: /\\.tsx?$/, loaders: ['ts-loader']},\n            { test: /\\.css$/, loader: 'style-loader'}\n        ]\n    },\n    plugins: []\n}\n```\n\nThe file in question is quite simple and I'm only changing text in the paragraph for testing:\n## index.tsx\n\n```\nimport * as React from 'react';\nimport * as ReactDOM from 'react-dom';\n\nclass Dashboard extends React.Component<{}, {}> {\n    render(){\n        return(\n            <p>Hello!</p>\n        );\n    }\n}\n\nReactDOM.render(<Dashboard />, document.getElementById('app'));\n```\n## Output\n\n```\nwebpack --progress --colors --watch --display-error-details --display-chunks --profile\n 10% 0/1 build modulests-loader: Using typescript@1.8.10 and c:\\Development\\Enterprise Net2 Manager\\Portal\\tsconfig.json\n1481ms build modules\n8ms seal\n8ms optimize\n10ms hashing\n20ms create chunk assets\n2ms additional chunk assets\n354ms optimize chunk assets\n 90% optimize assetsemiting\n450ms optimize assets\n41ms emit\nHash: 80d04fe372c49da68b8f\nVersion: webpack 1.13.0\nTime: 2404ms\n             Asset    Size  Chunks             Chunk Names\n    main-bundle.js  693 kB       0  [emitted]  main\nmain-bundle.js.map  810 kB       0  [emitted]  main\nchunk    {0} main-bundle.js, main-bundle.js.map (main) 655 kB [rendered]\n     + 168 hidden modules\n204ms build modules\n3ms seal\n10ms optimize\n4ms hashing\n9ms create chunk assets\n2ms additional chunk assets\n382ms optimize chunk assets\n 90% optimize assetsemiting\n372ms optimize assets\n39ms emit\nHash: 93b94d46db379ef92759\nVersion: webpack 1.13.0\nTime: 1028ms\n             Asset    Size  Chunks             Chunk Names\n    main-bundle.js  693 kB       0  [emitted]  main\nmain-bundle.js.map  810 kB       0  [emitted]  main\nchunk    {0} main-bundle.js, main-bundle.js.map (main) 655 kB [rendered]\n     + 168 hidden modules\n```\n",
+    "comments_url": "https://api.github.com/repos/webpack/webpack/issues/2530/comments",
+    "author": "janpieterz",
+    "comments": [
+      {
+        "user": "sokra",
+        "created_at": "2016-05-22T19:18:00Z",
+        "body": "Does this only apply to typescript files or does the same happen with normal js files?\n"
+      },
+      {
+        "user": "janpieterz",
+        "created_at": "2016-05-23T04:17:07Z",
+        "body": "I tried, same behavior. Then I removed the '/App' from the context and specified the entry with /App and it started working (both JS and TS(x)).\n\nSince the output did pick up the change but never the file, should this be a bug? Below my (now working) config:\n\n``` js\nvar path = require('path');\nmodule.exports = {\n    devtool : 'source-map',\n    watch: true,\n    context: __dirname,\n    entry: './App/index',\n    output: {\n        path: path.join(__dirname, 'wwwroot/dist'),\n        filename: '[name]-bundle.js'\n    },\n    resolve: {\n        extensions: ['', '.js', '.ts', '.tsx', '.css'],        \n    },\n    module: {\n        loaders: [\n            { test: /\\.tsx?$/, loaders: ['ts-loader']},\n            { test: /\\.css$/, loader: 'style-loader'}\n        ]\n    },\n    plugins: []\n}\n```\n"
+      },
+      {
+        "user": "sokra",
+        "created_at": "2016-05-23T16:46:02Z",
+        "body": "Just spotted that you are using windows. This means `__dirname + \"/App\"` is an invalid path as windows uses `\\` as separator. Better use `path.resolve(__dirname, \"App\")`.\n"
+      }
+    ]
+  },
+  {
+    "number": 2416,
+    "title": "\"ERROR in Entry module not found\" for module that exists",
+    "created_at": "2016-04-29T21:01:16Z",
+    "closed_at": "2016-04-30T22:27:54Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/webpack/webpack/issues/2416",
+    "body": "Bash log:\n\n``` bash\n~/code/blockai/merkletree$ npm run gh-pages:build\n\n> merkletree@1.4.0 gh-pages:build /Users/olalonde/code/blockai/merkletree\n> cd demo && rm -rf dist && webpack\n\nHash: 396f0bfb9d565b6f60f0\nVersion: webpack 1.13.0\nTime: 25ms\n\nERROR in Entry module not found: Error: Cannot resolve module 'app.js' in /Users/olalonde/code/blockai/merkletree/demo/src\n~/code/blockai/merkletree$ ls /Users/olalonde/code/blockai/merkletree/demo/src\napp.js\n~/code/blockai/merkletree$ cat demo/webpack.config.js\nmodule.exports = {\n  context: `${__dirname}/src`,\n  entry: 'app.js',\n  output: {\n    filename: 'bundle.js',\n    path: `${__dirname}/dist`,\n  },\n  module: {\n    loaders: [\n      {\n        test: /\\.js$/,\n        exclude: /node_modules/,\n        loader: 'babel',\n        query: {\n          presets: ['react', 'es2015'],\n        },\n      },\n    ],\n  },\n}\n~/code/blockai/merkletree$ node --version\nv6.0.0\n```\n\nThe module exists on the filesystem, etc. but webpack says it can't resolve the module. Here's the content of `app.js`:\n\n``` javascript\nimport ReactDOM from 'react-dom'\nimport React from 'react'\n\nconst App = () => (\n  <p>hello world!</p>\n)\n\nReactDOM.render(\n  <App />,\n  document.getElementById('app')\n)\n```\n",
+    "comments_url": "https://api.github.com/repos/webpack/webpack/issues/2416/comments",
+    "author": "olalonde",
+    "comments": [
+      {
+        "user": "olalonde",
+        "created_at": "2016-04-29T21:05:58Z",
+        "body": "Hmm, replacing\n\n``` javascript\n  context: `${__dirname}/src`,\n  entry: 'app.js',\n```\n\nwith \n\n``` javascript\n  // context: `${__dirname}/src/`,\n  entry: `${__dirname}/src/app.js`,\n```\n\nfixed the error. Maybe I'm misunderstanding the meaning of the `context` option?\n"
+      },
+      {
+        "user": "sokra",
+        "created_at": "2016-04-30T22:23:38Z",
+        "body": "``` js\n  context: `${__dirname}/src`,\n  entry: './app.js',\n```\n\nentry is a module request, `app.js` will look for a module named `app.js` in your node_modules\n"
+      }
+    ]
+  },
+  {
+    "number": 2346,
+    "title": "Under devServer key in webpack.config.js, I set hot: true option, but it dosen't work ",
+    "created_at": "2016-04-16T08:22:17Z",
+    "closed_at": "2016-04-17T07:39:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/webpack/webpack/issues/2346",
+    "body": "CLI: webpack-dev-server --hot works, \nbut\n\n``` js\ndevServer:{\n    hot: true\n}\n```\n\nit throws Uncaught Error: [HMR] Hot Module Replacement is disabled.\n",
+    "comments_url": "https://api.github.com/repos/webpack/webpack/issues/2346/comments",
+    "author": "Authorlove",
+    "comments": [
+      {
+        "user": "bebraw",
+        "created_at": "2016-04-16T08:30:25Z",
+        "body": "If you use `hot: true` that way, I think you need to set\n\n``` javascript\nplugins: [\n  new webpack.HotModuleReplacementPlugin()\n]\n```\n\nA little confusing, yeah.\n"
+      }
+    ]
+  },
+  {
+    "number": 1798,
+    "title": "How does webpack search path?",
+    "created_at": "2015-12-24T11:21:32Z",
+    "closed_at": "2015-12-24T11:54:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/webpack/webpack/issues/1798",
+    "body": "//webpack.config.js\nalias: {\n     header: \"./static/js/app/src/common/header.js\"\n  }\n\n//entry.js\nrequire(\"header\");\n\nModule not found: Error: Cannot resolve 'file' or 'directory' ./static/js/app/src/common/header.js in c:\\demo\\static\\js\\app\\src\\price\n\nSo,how import header.js correctly? \n",
+    "comments_url": "https://api.github.com/repos/webpack/webpack/issues/1798/comments",
+    "author": "ibufu",
+    "comments": [
+      {
+        "user": "bebraw",
+        "created_at": "2015-12-24T11:30:26Z",
+        "body": "@ibufu Can you try `path.join(__dirname, \"./static/js/app/src/common/header.js\")`? Just a hunch.\n"
+      }
+    ]
+  },
+  {
+    "number": 55,
+    "title": "Relative Path Resolution",
+    "created_at": "2013-01-22T07:51:46Z",
+    "closed_at": "2013-01-22T17:03:38Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/webpack/webpack/issues/55",
+    "body": "Hi sokra,\n\nwhen I try to build the following setup\n\n```\nproject root\n|__ lib\n|    |__ lib.js\n|__ src\n|    |__ main.js\n|__ build.js\n```\n\nwith `webpack 0.8.2`, where `lib.js` is some arbitrary library and `main.js` is as simple as\n\n```\n// main.js\n'use strict';\n\n/*global require:true */\nrequire = require('enhanced-require')(module, {\n    recursive: true\n});\n\nvar Lib = require('../lib/lib.js');\n```\n\nthen `node build` (i.e. basically a clone of your build script) would throw the following error:\n\n```\nERROR: Cannot find module '../lib/lib.js'\n Error: Error: Module \"jshint\" not found in context \"<project root>\\src\"\n  Error: <project root>\\node_modules\\webpack\\buildin\\jshint-webpack-web-loader is not a directory\n @ <project root>\\src\\main.js (line 8, column 14)\n```\n\nThis sample works if `lib.js` is moved to `src` and the import in `main.js` is changed accordingly. By the way, it does not matter if `require` or `enhanced-require` is used.\n\nBest regards,\nmiffels\n",
+    "comments_url": "https://api.github.com/repos/webpack/webpack/issues/55/comments",
+    "author": "miffels",
+    "comments": [
+      {
+        "user": "sokra",
+        "created_at": "2013-01-22T09:10:12Z",
+        "body": "check the build script... You applied a post loader for any file in `lib` (`postLoaders`). You want to post load the files with `jshint-loader`, but it's not `npm install`ed.\n\nTry `npm install jshint-loader` if you want to post load the files.\n\nOr remove the `postLoader` from you config.\n"
+      },
+      {
+        "user": "miffels",
+        "created_at": "2013-01-22T17:03:37Z",
+        "body": "Gosh, of course:\n\n```\n    ...\n    preLoaders\": [\n        {\n            \"test\": \"\\\\.js$\",\n            \"include\": \"lib\",\n            \"exclude\": [\n                \"jam\",\n                \"web_modules\",\n                \"node_modules\"\n            ],\n            \"loader\": \"jshint\"\n        }\n    ],\n    ...\n```\n\nshould be\n\n```\n            ...\n            \"include\": \"src\",\n            ...\n```\n\nand the loader was missing, too. There were no postLoaders, though.\n\nFor some reason I knew that the moment would come when I just misconfigured something and created an embarassing issue for no reason :smile:\n\nThanks for pointing out the real issue!\n\nBest regards,\nmiffels\n"
+      }
+    ]
+  }
+]

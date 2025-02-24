@@ -1,0 +1,204 @@
+[
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/312",
+    "source": {
+      "issue_number": 312
+    },
+    "initial_question": {
+      "title": "How to enclose the json string in square brackets?",
+      "body": "How can I get the output as:\r\n\r\n[{\r\n    \"cars\": [{\r\n            \"CarType\":  \"BMW\",\r\n            \"carID\":    \"bmw123\"\r\n        }, {\r\n            \"CarType\":  \"mercedes\",\r\n            \"carID\":    \"mercedes123\"\r\n        }]\r\n}]\r\n\r\nI'm able to get output as:\r\n{\r\n    \"cars\": [{\r\n            \"CarType\":  \"BMW\",\r\n            \"carID\":    \"bmw123\"\r\n        }, {\r\n            \"CarType\":  \"mercedes\",\r\n            \"carID\":    \"mercedes123\"\r\n        }]\r\n}\r\n\r\nhow can I enclose the string with square brackets?"
+    },
+    "satisfaction_conditions": [
+      "Output JSON must be a single-element array containing the original object",
+      "Original JSON structure must be preserved intact within the array",
+      "Output must be valid JSON format",
+      "Transformation must be non-destructive to the original data"
+    ],
+    "created_at": "2018-11-08T14:55:43Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/309",
+    "source": {
+      "issue_number": 309
+    },
+    "initial_question": {
+      "title": "Reading Raw child",
+      "body": "Hi, \r\nI have this Json string:\r\n{\"cmd\":10,\"uId\":\"221ed5a229405c0e6315\",\"pyl\":{\"time\":\"2359f846\", \"time2\":\"2359f846\"}}\r\n\r\nI need to access to \"pyl\" content and consider it as a RAW data\r\nHow can i achieve that?\r\n\r\nI've tried \t\r\npayloadJSON = cJSON_GetObjectItem(manageMessageJSON, \"pyl\");\r\nbut in that way i retrieve only the Object PYL and cannot access all the contents but cycling each child. I would like to parse PYL content and then access single fields.\r\n\r\nThanks in advance\r\nLeonardo"
+    },
+    "satisfaction_conditions": [
+      "Successfully extracts nested values from within the 'pyl' object",
+      "Maintains proper JSON data type handling",
+      "Provides direct access to individual fields",
+      "Handles JSON parsing without data loss",
+      "Performs proper error checking"
+    ],
+    "created_at": "2018-10-17T13:45:39Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/281",
+    "source": {
+      "issue_number": 281
+    },
+    "initial_question": {
+      "title": "how to free?",
+      "body": "excuse me, in the example \"char* create_monitor(void)\", how to free the string after already used? using \"cJSON_free\" or \"free\"?"
+    },
+    "satisfaction_conditions": [
+      "Memory deallocation matches allocation method",
+      "Deallocation function is compatible with library configuration"
+    ],
+    "created_at": "2018-07-23T09:04:17Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/277",
+    "source": {
+      "issue_number": 277
+    },
+    "initial_question": {
+      "title": "How to compare two json objects?",
+      "body": "I need to determine if two json objects are identical for a unit test.I don't see any built in function for this.\r\n\r\nThe order of the two isn't deterministic, so `strcmp` with `cJSON_Print` won't work.\r\n\r\nIs there any recommended way to do this, or do I have to do `cJSON_GetObjectItemCaseSensitive` for each item that will be in the object?"
+    },
+    "satisfaction_conditions": [
+      "JSON objects with identical content must be identified as equal regardless of property order",
+      "The comparison must work within a unit testing context",
+      "The comparison must be case-sensitive for object keys"
+    ],
+    "created_at": "2018-06-26T19:46:42Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/270",
+    "source": {
+      "issue_number": 270
+    },
+    "initial_question": {
+      "title": "cJSON_AddObjectToObject with a cJSON* parameter?",
+      "body": "Is there any possibility to add a cJSON* object to another cJSON* object? The function that sounds like it would do what I want takes a string as parameter and doesn't seem to have any alternatives. Let me show why I need it:\r\nI have two structs:\r\n\r\n```c\r\ntypedef struct pet_t {\r\ncategory_t *category;\r\n} pet_t;\r\ntypedef struct category_t {\r\nchar *name;\r\nlong id;\r\n} category_t;\r\n```\r\nNow I would like to have a method for both of them like that:\r\n```c\r\ncJSON* pet_toJSON(pet_t *pet);\r\ncJSON* category_toJSON(category_t *category);\r\n```\r\nThe implementation I would like to have like that:\r\n```c\r\ncJSON *pet_toJSON(pet_t *pet) {\r\ncJSON *petJSONObject = cJSON_CreateObject();\r\ncJSON *categoryJSONObject = category_toJSON(pet->category);\r\ncJSON_AddObjectToObject(petJSONObject, \"category\", categoryJSONObject);\r\n```\r\nCurrently this is not possible and I do it like that:\r\n```c\r\ncJSON *pet_toJSON(pet_t *pet) {\r\ncJSON *petJSONObject = cJSON_CreateObject();\r\ncJSON *categoryJSONObject;\r\nif(cJSON_AddObjectToObject(petJSONObject, \"category\") == NULL) {\r\n\tgoto end;\r\n}\r\ncategoryJSONObject = cJSON_GetObjectItem(petJSONObject,\r\n\t                                                \"category\");\r\nif(cJSON_AddNumberToObject(categoryJSONObject, \"id\",\r\n\t                           pet->category->id) == NULL)\r\n{\r\n\tgoto end;\r\n}\r\n// Category->name\r\nif(cJSON_AddStringToObject(categoryJSONObject, \"name\",\r\n\t                          pet->category->name) == NULL)\r\n{\r\n\tgoto end;\r\n}\r\n```\r\n\r\nIs there any way to add a already created JSON Object to another one?"
+    },
+    "satisfaction_conditions": [
+      "Nested JSON objects must be properly created and linked",
+      "Memory management must be handled correctly",
+      "Object hierarchy must match struct hierarchy",
+      "Error handling must be implemented",
+      "Generated JSON must be valid and serializable"
+    ],
+    "created_at": "2018-06-14T09:12:14Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/224",
+    "source": {
+      "issue_number": 224
+    },
+    "initial_question": {
+      "title": "question about cJSON_Number",
+      "body": "I have a question about cJSON_Number : in the cJSON struct there are 2 numbers, valueint and valuedouble. From what I saw while doing some tests, I understand that if type == cJSON_Number, I understood the number is stored in both values. What I would like to know if is there is any way to know if a cJSON_Number is an int or a double.\r\n\r\nI am asking this because I needed a function to convert cJSON objects to strings so I created one : \r\n```c\r\nvoid cJSON_ToString(cJSON* json, char str[200])\r\n{\r\n  cJSON* p_courant = json->child;\r\n  int j = cJSON_GetArraySize(json);\r\n  int i;\r\n  char n[12];\r\n  strcat(str,\"{\");\r\n  for (i = 1; i <= j ; i++)\r\n  {\r\n    strcat(str,\"\\\"\");\r\n    strcat(str,(char*)(p_courant->string));\r\n    strcat(str,\"\\\" : \");\r\n    if (p_courant->type == cJSON_String)\r\n    {\r\n      strcat(str,\"\\\"\");\r\n      strcat(str,(char*)(p_courant->valuestring));\r\n      strcat(str,\"\\\"\");\r\n    }\r\n    else if (p_courant->type == cJSON_Number)\r\n    {\r\n      sprintf(n,\"%f\",(double)(p_courant->valuedouble));\r\n      strcat(str,n);\r\n    }\r\n    if (i != j)\r\n    {\r\n      strcat(str,\",\");\r\n      p_courant = p_courant->next;\r\n    }\r\n  }\r\n  strcat(str,\"}\");\r\n}\r\n```\r\n\r\nbut I would like to be able to deal with both integers and floats, which I don't know how to do right now because cJSON_Number can be either."
+    },
+    "satisfaction_conditions": [
+      "Must correctly distinguish between integer and floating-point numbers in cJSON_Number values",
+      "Must generate valid JSON string output that preserves number type formatting",
+      "Must handle all valid cJSON object structures",
+      "Must prevent buffer overflow when converting to string",
+      "Must maintain compatibility with cJSON's internal number representation"
+    ],
+    "created_at": "2017-12-13T10:21:19Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/223",
+    "source": {
+      "issue_number": 223
+    },
+    "initial_question": {
+      "title": "Help! question about: cJSON_Print",
+      "body": "**IDE:  Keil.**\r\n**MCU: STM32F303**\r\n\r\n**my test code:**\r\n\r\n```c\r\nvoid cJSON_test(void)\r\n{\r\n\tchar *s = \"{\\\"list\\\":[{\\\"name\\\":\\\"xiao hong\\\",\\\"age\\\":10},{\\\"name\\\":\\\"hua hua\\\",\\\"age\\\":11}]}\";\r\n\tcJSON *root = cJSON_Parse(s);\r\n\tif (!root)\r\n\t{\r\n\t\tprintf(\"Error before: [%s]\\n\",cJSON_GetErrorPtr());\r\n\t}\r\n\tprintf(\"%s \\r\\n\",s);\r\n\tchar *str = cJSON_Print(root);\r\n\tprintf(\"%s \\r\\n\",str);\r\n\tcJSON_Delete(root);\r\n}\r\n```\r\n\r\n**Result:**\r\n```json\r\n{\"list\":[{\"name\":\"xiao hong\",\"age\":10},{\"name\":\"hua hua\",\"age\":11}]} \r\n8\u0007\r\n```\r\n\r\nWhat's the happen of the second print????\r\ni can't understand that why the  cJSON_Parse is OK but cJSON_Print is wrong...I didn't change anything\r\n\r\nif I change the string s to `\"{\\\"list\\\":{\\\"name\\\":\\\"xiao hong\\\"}}\"`\r\n**Result:**\r\n```json\r\n{\"list\":{\"name\":\"xiao hong\"}}\r\n{\"list\":{\"name\":\"xiao hong\"}}\r\n```\r\n\r\n\r\nthe result is ok, and i want to find the cause by debug, i find that:\r\n\r\n```c\r\nstatic unsigned char *print(const cJSON * const item, cJSON_bool format, const internal_hooks * const hooks)\r\n{\r\n    printbuffer buffer[1];\r\n    unsigned char *printed = NULL;\r\n\r\n    memset(buffer, 0, sizeof(buffer));\r\n\r\n    /* create buffer */\r\n    buffer->buffer = (unsigned char*) hooks->allocate(256);\r\n    buffer->format = format;\r\n    buffer->hooks = *hooks;\r\n             //if result is wrong ,buffer ==0, i can't understand why the buffer will equal to 0?\r\n    if (buffer->buffer == NULL)\r\n    {\r\n        goto fail;\r\n    }\r\n```\r\n\r\n\r\nI am desperate,please help...\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "JSON output must match input structure when printed"
+    ],
+    "created_at": "2017-12-13T09:26:26Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/198",
+    "source": {
+      "issue_number": 198
+    },
+    "initial_question": {
+      "title": "unknow character appearing while using the exmaple Test",
+      "body": "I am using your example code with ESP32. I get some '.' before every data ... \r\nhere is my output.\r\n```\r\nVersion: 1.5.8\r\n{\r\n.\"name\":.\"Jack (\\\"Bee\\\") Nimble\",\r\n.\"format\":.{\r\n..\"type\":.\"rect\",\r\n..\"width\":.1920,\r\n..\"height\":.1080,\r\n..\"interlace\":.false,\r\n..\"frame rate\":.24\r\n.}\r\n}\r\n[\"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\"]\r\n[[0, -1, 0], [1, 0, 0], [0, 0, 1]]\r\n{\r\n.\"Image\":.{\r\n..\"Width\":.800,\r\n..\"Height\":.600,\r\n..\"Title\":.\"View from 15th Floor\",\r\n..\"Thumbnail\":.{\r\n...\"Url\":.\"http:/*www.example.com/image/481989943\",\r\n...\"Height\":.125,\r\n...\"Width\":.\"100\"\r\n..},\r\n..\"IDs\":.[116, 943, 234, 38793]\r\n.}\r\n}\r\n[{\r\n..\"precision\":.\"zip\",\r\n..\"Latitude\":.37.7668,\r\n..\"Longitude\":.-122.3959,\r\n..\"Address\":.\"\",\r\n..\"City\":.\"SAN FRANCISCO\",\r\n..\"State\":.\"CA\",\r\n..\"Zip\":.\"94107\",\r\n..\"Country\":.\"US\"\r\n.}, {\r\n..\"precision\":.\"zip\",\r\n..\"Latitude\":.37.371991,\r\n..\"Longitude\":.-122.026,\r\n..\"Address\":.\"\",\r\n..\"City\":.\"SUNNYVALE\",\r\n..\"State\":.\"CA\",\r\n..\"Zip\":.\"94085\",\r\n..\"Country\":.\"US\"\r\n.}]\r\n{\r\n.\"number\":.null\r\n}\r\n```\r\n\r\nwhat are this dot's ?? is it only issue with the printf of ESP32 IDF? I will post it there to."
+    },
+    "satisfaction_conditions": [
+      "Serial output displays JSON data without unwanted dot characters",
+      "Terminal/serial monitor correctly displays special characters",
+      "JSON structure remains intact and readable",
+      "Serial communication tool compatibility"
+    ],
+    "created_at": "2017-08-28T08:39:23Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/169",
+    "source": {
+      "issue_number": 169
+    },
+    "initial_question": {
+      "title": "Printing to user-supplied buffer",
+      "body": "It should be possible to print to a user-defined buffer:\r\n\r\n`size_t (bytes_written) cJSON_PrintUnformatted(cJSON *item, void *buf, size_t buf_len);`\r\n\r\nThis would halve memory consumption and avoid malloc() overhead. Doing this is currently impossible, because the printbuffer struct is not public.\r\n\r\n "
+    },
+    "satisfaction_conditions": [
+      "Function must successfully write JSON output to a pre-allocated buffer",
+      "Function must indicate success/failure of the write operation",
+      "Buffer size management must be handled safely",
+      "Solution must reduce memory allocation overhead"
+    ],
+    "created_at": "2017-05-19T08:19:51Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/167",
+    "source": {
+      "issue_number": 167
+    },
+    "initial_question": {
+      "title": "Is there an interface to iterate json keys?",
+      "body": "i failed to find such an interface in cJSON.h, so can i work around to iterate json keys?"
+    },
+    "satisfaction_conditions": [
+      "Ability to access all keys in a JSON object sequentially",
+      "Works within cJSON library context",
+      "Handles null key cases safely",
+      "Provides access to both key and associated element"
+    ],
+    "created_at": "2017-05-10T03:15:42Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/154",
+    "source": {
+      "issue_number": 154
+    },
+    "initial_question": {
+      "title": "client's responsibility to free memory?",
+      "body": "Hey Folks, \r\n\r\nI'm playing with the library and I'm wondering if the client is responsible to release the memory allocated by the cJSON struct. Here is an example:\r\n\r\n```c\r\nchar * test(char * t)\r\n{\r\n   cJSON * r = cJSON_Parse(t);\r\n   free(t);\r\n   char * s;\r\n   cJSON *id =  cJSON_GetObjectItem(r, \"id\");\r\n   s = id->valuestring;\r\n   free(r);                   //with or without this, s still points to the valid data\r\n   return s;\r\n}\r\n```\r\n\r\nI was thinking that I need to allocate  memory for the returned string since 'id'  goes away and so does 'id-valuestring' once it returns, but a test shows that it actually points to correct data. I checked that 'id->valuestring' is dynamically allocated, then client has the responsibility to free it like the following? \r\n\r\n```c\r\nchar * id = test(jsonstring);\r\n//do something with id\r\nfree(id);\r\n```\r\nAlso, with or without 'free(r)', it returns the same, so should I release the cJSON structure once I'm done? Is there a cascading 'free' function that could free all the dynamically allocated memory in the structure? is that just cJSON_Delete(root)? What if I already make a few objects like\r\n\r\n```c\r\ncJSON * t = cJSON_GetObjectItem(id,  \"name\");\r\n```\r\nthis t is actually the direct child of id, not root, would cJSON.Delete(root) free the whole thing?\r\nThanks,\r\nRui"
+    },
+    "satisfaction_conditions": [
+      "All allocated memory must be properly freed without memory leaks",
+      "Returned string data must remain valid after the cJSON structure is freed",
+      "Nested cJSON objects must be properly handled during cleanup",
+      "Memory ownership responsibilities must be clearly defined",
+      "String data must be properly null-terminated"
+    ],
+    "created_at": "2017-04-20T22:32:52Z"
+  },
+  {
+    "id": "https://github.com/DaveGamble/cJSON/issues/132",
+    "source": {
+      "issue_number": 132
+    },
+    "initial_question": {
+      "title": "How to get the JSON size before invoke cJSON_PrintPreallocated",
+      "body": "Hi,\r\nI have a question about the JSON size.\r\nI built a JSON Object and I need to print it into a char buffer allocated dynamically.\r\nTo allocate the buffer I need to compute the length of the JSON.\r\n \r\nI tried to invoke the **cJSON_PrintPreallocated** passing a buffer with the exactly size of JSON (computed by hand) but the function fails. If I add an extra 30 byte the cJSON_PrintPreallocated return success.\r\n\r\nIs there a function to create a buffer which length is exactly equal to the size of my JSON?\r\n\r\nThanks!\r\n"
+    },
+    "satisfaction_conditions": [
+      "Buffer allocation must include sufficient extra space beyond the exact JSON size",
+      "Memory allocation must be appropriate for embedded system constraints",
+      "Buffer size must be predictable at allocation time",
+      "JSON printing operation must complete successfully without memory errors"
+    ],
+    "created_at": "2017-03-22T15:16:15Z"
+  }
+]

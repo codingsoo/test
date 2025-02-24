@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/elizaOS/agent-twitter-client/issues/12",
+    "source": {
+      "issue_number": 12
+    },
+    "initial_question": {
+      "title": "Tweets without the image when using sendTweet",
+      "body": "Saw there is update in the code and sendTweetWithMedia is removed and image can be sent using sendTweet, I tried but it posted without the image.\r\nhere's the part of code - \r\n```   const img = await fetch(imgUrl);\r\n      const arrayBuffer = await img.arrayBuffer();\r\n      const imgBuffer = Buffer.from(arrayBuffer);\r\n      const response = await scraper.sendTweet(replyText, tweetId, {data:imgBuffer,mediaType: 'image/jpeg'} );\r\n```\r\nIt works with sendTweetWithMedia(), just putting the imgBuffer in array, as it needs Buffer[]"
+    },
+    "satisfaction_conditions": [
+      "Image data must be properly formatted for the API",
+      "API method must receive all required parameters"
+    ],
+    "created_at": "2024-11-29T07:07:22Z"
+  }
+]

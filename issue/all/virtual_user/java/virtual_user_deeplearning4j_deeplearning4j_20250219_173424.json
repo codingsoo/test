@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/deeplearning4j/deeplearning4j/issues/8201",
+    "source": {
+      "issue_number": 8201
+    },
+    "initial_question": {
+      "title": "DataVec: Add NHWC support for ImageRecordReader / NativeImageLoader",
+      "body": ""
+    },
+    "satisfaction_conditions": [
+      "Image data must be correctly transformed from NCHW to NHWC format",
+      "Dimensional ordering must be preserved while changing format"
+    ],
+    "created_at": "2019-09-05T03:42:19Z"
+  }
+]

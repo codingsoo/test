@@ -1,0 +1,34 @@
+[
+  {
+    "id": "https://github.com/Zyphra/Zonos/issues/26",
+    "source": {
+      "issue_number": 26
+    },
+    "initial_question": {
+      "title": "chinese language code",
+      "body": "Thank you for your open-source project. I am currently doing some testing and saw the definition of supported_language_codes in conditioning.py, \n\nsupported_language_codes = [\n    'af', 'am', 'an', 'ar', 'as', 'az', 'ba', 'bg', 'bn', 'bpy', 'bs', 'ca', 'cmn',\n    'cs', 'cy', 'da', 'de', 'el', 'en-029', 'en-gb', 'en-gb-scotland', 'en-gb-x-gbclan',\n    'en-gb-x-gbcwmd', 'en-gb-x-rp', 'en-us', 'eo', 'es', 'es-419', 'et', 'eu', 'fa',\n    'fa-latn', 'fi', 'fr-be', 'fr-ch', 'fr-fr', 'ga', 'gd', 'gn', 'grc', 'gu', 'hak',\n    'hi', 'hr', 'ht', 'hu', 'hy', 'hyw', 'ia', 'id', 'is', 'it', 'ja', 'jbo', 'ka',\n    'kk', 'kl', 'kn', 'ko', 'kok', 'ku', 'ky', 'la', 'lfn', 'lt', 'lv', 'mi', 'mk',\n    'ml', 'mr', 'ms', 'mt', 'my', 'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pa', 'pap',\n    'pl', 'pt', 'pt-br', 'py', 'quc', 'ro', 'ru', 'ru-lv', 'sd', 'shn', 'si', 'sk',\n    'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'tn', 'tr', 'tt', 'ur', 'uz', 'vi',\n    'vi-vn-x-central', 'vi-vn-x-south', 'yue'\n]\n\nbut I\u2019m not sure which one represents Chinese. I tried cs, but it seems incorrect. Could you please help me confirm this? Thank you."
+    },
+    "satisfaction_conditions": [
+      "Correct language code is used for Chinese language variants",
+      "Distinction between Chinese variants is clear",
+      "Selected language code exists in supported_language_codes list"
+    ],
+    "created_at": "2025-02-11T11:21:22Z"
+  },
+  {
+    "id": "https://github.com/Zyphra/Zonos/issues/7",
+    "source": {
+      "issue_number": 7
+    },
+    "initial_question": {
+      "title": "How do I prevent Zonos from adding reverb to the generated audio",
+      "body": "Hi!\n\nThis project is fascinating! \nThanks alot for sharing that gem.\n\nNo, how can I prevent Zonos from adding reverb to the generated audio.\n\nThanks :)"
+    },
+    "satisfaction_conditions": [
+      "Solution maintains basic audio generation functionality",
+      "Input speaker reference quality impacts reverb presence",
+      "Solution can be applied before or during the audio generation process"
+    ],
+    "created_at": "2025-02-10T22:56:33Z"
+  }
+]

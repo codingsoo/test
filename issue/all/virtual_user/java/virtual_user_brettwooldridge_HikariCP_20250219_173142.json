@@ -1,0 +1,245 @@
+[
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/1385",
+    "source": {
+      "issue_number": 1385
+    },
+    "initial_question": {
+      "title": "Does the getIdleConnections() method under HikariPoolMXBean class brings the idle connections that are still valid connections?",
+      "body": "#### Environment\r\n```\r\nHikariCP version: 3.2.0\r\nJDK version     : 1.8.0_102\r\nDatabase        : AS400\r\nDriver version  : jt400-jdk8 v9.8\r\n```\r\nI am trying to switch the datasources from a primary AS400 to a secondary AS400 in case the primary AS400 is not online. To do this I am looking at the idle connections in the pool. Idle connections are still valid connections to the DB, correct?"
+    },
+    "satisfaction_conditions": [
+      "Database connection status must be accurately detectable",
+      "Connection validity must be verifiable",
+      "Pool state monitoring must reflect real-time conditions",
+      "Failed connections must be detectable before use",
+      "Connection pool exhaustion must be detectable"
+    ],
+    "created_at": "2019-05-30T13:21:14Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/1080",
+    "source": {
+      "issue_number": 1080
+    },
+    "initial_question": {
+      "title": "BoneCP also tested???",
+      "body": "I wonder who is responsible for the output of:\r\n`04:49:427 [Timer-3] INFO DbDownTest - BoneCPDataSource got a connection.`\r\n?\r\n\r\nI thought you only tested C3P0, Tomcat DBCP2, Vibur and Hikari.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Rationale for exclusion/inclusion of components is explained",
+      "Project maintenance status information is provided"
+    ],
+    "created_at": "2018-02-08T15:52:28Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/1052",
+    "source": {
+      "issue_number": 1052
+    },
+    "initial_question": {
+      "title": "Java 9 status",
+      "body": "Hi\r\n\r\nCurrently there are two versions of HikariCP displayed on the site main page:\r\n\r\n1) Java 8 maven artifact:\r\n2) Java 9 Early Access maven artifact:\r\n\r\nHowever it is not clear the difference between them? Java 9 Early Access version was last released on April, 2017. So now when JDK 9 is released what version should we use? Is it safe to use Java 8 artifact or Java 9 is preferred?\r\n\r\nPlease, give more detail. Thanks."
+    },
+    "satisfaction_conditions": [
+      "The chosen artifact version must be compatible with the target Java environment",
+      "The selected version must be from a stable, officially supported release",
+      "The version choice must be clearly identified as recommended/preferred",
+      "The solution must address backwards compatibility concerns"
+    ],
+    "created_at": "2017-12-30T23:11:27Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/1028",
+    "source": {
+      "issue_number": 1028
+    },
+    "initial_question": {
+      "title": "Decreasing of pool size in runtime",
+      "body": "#### Environment\r\n```\r\nHikariCP version: 2.2.5\r\nJDK version       : 1.8.0_144\r\nDatabase           : MySQL\r\nDriver version    : 5.1.43\r\nHibernate           : 4.3.6\r\n```\r\n-----------------------------------------------------------------------------------------\r\nI'm trying to investigate problem:\r\n\r\n`org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction; nested exception is javax.persistence.PersistenceException: org.hibernate.exception.GenericJDBCException: Could not open connection \r\n    at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:431) \r\n    at org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:373) \r\n    at org.springframework.transaction.interceptor.TransactionAspectSupport.createTransactionIfNecessary(TransactionAspectSupport.java:427) \r\n    at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:276) \r\n    at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96) \r\n    at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) \r\n    at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:655) \r\n    at de.bcg.xchange.requests.rest.RequestResource$$EnhancerBySpringCGLIB$$3bf285f1.fetchConversationByRequest(<generated>) \r\n    at sun.reflect.GeneratedMethodAccessor554.invoke(Unknown Source) \r\n    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) \r\n    at java.lang.reflect.Method.invoke(Method.java:498) \r\n    at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:221) \r\n    at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:136) \r\n    at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:110) \r\n    at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:817) \r\n    at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:731) \r\n    at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:85) \r\n    at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:959) \r\n    at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:893) \r\n    at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:968) \r\n    at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:859) \r\n    at javax.servlet.http.HttpServlet.service(HttpServlet.java:624) \r\n    at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:844) \r\n    at javax.servlet.http.HttpServlet.service(HttpServlet.java:731) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.gzip.GZipServletFilter.doFilter(GZipServletFilter.java:46) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.MDCUserInfoServletFilter.doFilter(MDCUserInfoServletFilter.java:52) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:346) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:262) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at ch.qos.logback.classic.helpers.MDCInsertingServletFilter.doFilter(MDCInsertingServletFilter.java:51) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.MDCInvocationFilter.doFilter(MDCInvocationFilter.java:25) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at com.codahale.metrics.servlet.AbstractInstrumentedFilter.doFilter(AbstractInstrumentedFilter.java:104) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.boot.actuate.autoconfigure.EndpointWebMvcAutoConfiguration$ApplicationContextHeaderFilter.doFilterInternal(EndpointWebMvcAutoConfiguration.java:237) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at de.bcg.xchange.platform.filters.MDCUserInfoServletFilter.doFilter(MDCUserInfoServletFilter.java:52) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.boot.actuate.trace.WebRequestTraceFilter.doFilterInternal(WebRequestTraceFilter.java:112) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:316) \r\n    at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:126) \r\n    at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:90) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:114) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:122) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:169) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:48) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at de.bcg.xchange.platform.filters.AcceptedTermsOfUseFilter.doFilterInternal(AcceptedTermsOfUseFilter.java:45) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at de.bcg.xchange.platform.filters.AgentLoginFilter.doFilterInternal(AgentLoginFilter.java:94) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at de.bcg.xchange.platform.filters.ImpersonateUserFilter.doFilterInternal(ImpersonateUserFilter.java:78) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter.doFilter(OAuth2AuthenticationProcessingFilter.java:140) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:120) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:64) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:91) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:53) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:330) \r\n    at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:213) \r\n    at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:176) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:346) \r\n    at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:262) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.HttpPutFormContentFilter.doFilterInternal(HttpPutFormContentFilter.java:87) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:77) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:121) \r\n    at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107) \r\n    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241) \r\n    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208) \r\n    at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:218) \r\n    at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:110) \r\n    at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:506) \r\n    at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:169) \r\n    at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:103) \r\n    at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:962) \r\n    at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116) \r\n    at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:445) \r\n    at org.apache.coyote.ajp.AjpProcessor.process(AjpProcessor.java:190) \r\n    at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:637) \r\n    at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:316) \r\n    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) \r\n    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) \r\n    at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) \r\n    at java.lang.Thread.run(Thread.java:748) \r\nCaused by: javax.persistence.PersistenceException: org.hibernate.exception.GenericJDBCException: Could not open connection \r\n    at org.hibernate.jpa.spi.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1763) \r\n    at org.hibernate.jpa.spi.AbstractEntityManagerImpl.convert(AbstractEntityManagerImpl.java:1677) \r\n    at org.hibernate.jpa.spi.AbstractEntityManagerImpl.throwPersistenceException(AbstractEntityManagerImpl.java:1771) \r\n    at org.hibernate.jpa.internal.TransactionImpl.begin(TransactionImpl.java:64) \r\n    at org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(HibernateJpaDialect.java:170) \r\n    at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:380) \r\n     ... 126 common frames omitted \r\nCaused by: org.hibernate.exception.GenericJDBCException: Could not open connection \r\n    at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:54) \r\n    at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:126) \r\n    at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:112) \r\n    at org.hibernate.engine.jdbc.internal.LogicalConnectionImpl.obtainConnection(LogicalConnectionImpl.java:235) \r\n    at org.hibernate.engine.jdbc.internal.LogicalConnectionImpl.getConnection(LogicalConnectionImpl.java:171) \r\n    at org.hibernate.engine.transaction.internal.jdbc.JdbcTransaction.doBegin(JdbcTransaction.java:67) \r\n    at org.hibernate.engine.transaction.spi.AbstractTransactionImpl.begin(AbstractTransactionImpl.java:162) \r\n    at org.hibernate.internal.SessionImpl.beginTransaction(SessionImpl.java:1435) \r\n    at org.hibernate.jpa.internal.TransactionImpl.begin(TransactionImpl.java:61) \r\n     ... 128 common frames omitted \r\nCaused by: java.sql.SQLException: Timeout after 34877ms of waiting for a connection. \r\n    at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:205) \r\n    at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:91) \r\n    at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:139) \r\n    at org.hibernate.internal.AbstractSessionImpl$NonContextualJdbcConnectionAccess.obtainConnection(AbstractSessionImpl.java:380) \r\n    at org.hibernate.engine.jdbc.internal.LogicalConnectionImpl.obtainConnection(LogicalConnectionImpl.java:228) \r\n     ... 133 common frames omitted`\r\n\r\nI've enabled logging and found out one strange thing, could you please help to understand that:\r\nI'm using default maxPoolSize and minimumIdle and typical state of connections is:\r\n\r\n2017-11-27 15:27:00,352 [DEBUG] com.zaxxer.hikari.pool.HikariPool - Before cleanup pool stats HikariPool-0 (**total=10**, inUse=3, avail=7, waiting=0)\r\n2017-11-27 15:27:00,353 [DEBUG] com.zaxxer.hikari.pool.HikariPool - After cleanup pool stats HikariPool-0 (**total=10**, inUse=3, avail=7, waiting=0)\r\n\r\nAs I get from the documentation for minimumIdle \"we recommend not setting this value and instead allowing HikariCP to act as a **fixed size connection pool**\", so I expect that total connections should always be equal to maxPoolSize.\r\nBut I see sometimes such cases:\r\n\r\n2017-11-27 15:35:30,351 [DEBUG] com.zaxxer.hikari.pool.HikariPool - Before cleanup pool stats HikariPool-0 (total=10, inUse=4, avail=6, waiting=0)\r\n2017-11-27 15:35:30,353 [DEBUG] com.zaxxer.hikari.pool.HikariPool - After cleanup pool stats HikariPool-0 (**total=5**, inUse=4, avail=1, waiting=0)\r\n\r\n2017-11-27 16:11:07,255 [DEBUG] com.zaxxer.hikari.pool.HikariPool - Before cleanup pool stats HikariPool-0 (total=10, inUse=3, avail=7, waiting=0)\r\n2017-11-27 16:11:07,259 [DEBUG] com.zaxxer.hikari.pool.HikariPool - After cleanup pool stats HikariPool-0 (**total=3**, inUse=3, avail=0, waiting=0)\r\n\r\nAnd thinking why it's changing and could it be a reason for the problem with java.sql.SQLException: Timeout after 34877ms of waiting for a connection that time-to-time there's fewer connections in the pool that is needed (this error appears pretty rarely)? Can minimumIdle help with the problem?"
+    },
+    "satisfaction_conditions": [
+      "Connection leaks can be detected and diagnosed"
+    ],
+    "created_at": "2017-11-27T18:01:21Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/859",
+    "source": {
+      "issue_number": 859
+    },
+    "initial_question": {
+      "title": "Will the pool offer invalid connection to users and will it automatically reconnect?",
+      "body": "In my project I always receive a \"Connection is not available, request timed out after\" error,I'm not sure if it is because the pool offered me a invalid connection even after the check. And I am also not sure what the pool will do with an invalid connection"
+    },
+    "satisfaction_conditions": [
+      "Connection pool timeout errors must be properly diagnosed",
+      "Connection validity must be verifiable",
+      "Resource exhaustion must be detectable",
+      "Connection management issues must be traceable",
+      "Timeout thresholds must be appropriately configured"
+    ],
+    "created_at": "2017-04-06T01:39:25Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/645",
+    "source": {
+      "issue_number": 645
+    },
+    "initial_question": {
+      "title": "MariaDB setConnectionTimeout not working",
+      "body": "DB : 5.5.5-10.1.13-MariaDB-1~trusty\nOS  : Ubuntu\nDriver : mariadb-java-client-1.4.5\n\nI try to configure when application attempt to connect database wait 1.5 sec stop if server is not found.\nI try follow\nconfig = new HikariConfig();\nconfig.setConnectionTimeout(1500);\nis not working so switch to\nconfig.addDataSourceProperty(\"connectionTimeout\", \"1500\");\nstill not working then do follow\nconfig.addDataSourceProperty(\"connectTimeout\", \"1500\");\nAnd now working perfect. But still \"config.setConnectionTimeout(1500);\" look better way to do it.\nGuess is need support for different variable name.\n"
+    },
+    "satisfaction_conditions": [
+      "Connection timeout behavior matches the intended use case",
+      "Application stops attempting database connection after 1.5 seconds when server is unreachable",
+      "Configuration method uses the correct property name for the specific driver",
+      "Connection timeout setting is properly propagated to the underlying database driver"
+    ],
+    "created_at": "2016-06-11T07:58:22Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/561",
+    "source": {
+      "issue_number": 561
+    },
+    "initial_question": {
+      "title": "2 Questions Only",
+      "body": "1. Does hikari takes care of the connections {in the connection pool} when cpu {About machine} max out to 100% ?\n2. In-relation to question 1, If no then will it issue a log that there is a connection leak?\n\nthanks,\nDave\n"
+    },
+    "satisfaction_conditions": [
+      "Connection leak detection functionality must operate regardless of connection state",
+      "Connection leak events must be logged when detection threshold is exceeded",
+      "System behavior under high CPU load must be documented"
+    ],
+    "created_at": "2016-01-27T08:22:21Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/447",
+    "source": {
+      "issue_number": 447
+    },
+    "initial_question": {
+      "title": "Why does Hikari depend on hibernate-core?",
+      "body": "That's a heavy dependency to pull in when a project just wants to use JDBC with a pooling impl. I'm curious why it is necessary. If it's only there to aid Hibernate projects, couldn't it be split into a separate library?\n"
+    },
+    "satisfaction_conditions": [
+      "Hibernate dependency is not transitively included in projects using HikariCP",
+      "Hibernate integration remains available for projects that need it",
+      "Dependency scope configuration prevents automatic inclusion"
+    ],
+    "created_at": "2015-10-07T20:20:28Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/434",
+    "source": {
+      "issue_number": 434
+    },
+    "initial_question": {
+      "title": "Pooled connection couldn't be reused.",
+      "body": "Failed to test reusing the pooled connection on `HikariCP 2.4.1` below,\n\n``` java\n\nimport java.sql.Connection;\nimport com.zaxxer.hikari.HikariDataSource;\n\npublic class Main {\n\n    public static void main(String[] args) throws Exception {\n\n        HikariDataSource ds = new HikariDataSource();\n        ds.setJdbcUrl(\"jdbc:mysql:///test\");\n        ds.setAutoCommit(false);\n        ds.setMaximumPoolSize(1);\n\n        Connection conn = ds.getConnection();\n        conn.createStatement().executeQuery(\"select 1\");\n\n        new Thread(() -> {\n            try {\n/*   \n  The following line caused java.sql.SQLTransientConnectionException: \n  HikariPool-0 - Connection is not available, request timed out after 30000ms.\n*/\n                Connection conn2 = ds.getConnection(); \n                conn2.createStatement().executeQuery(\"select 2\");\n                conn2.commit();\n            } catch (Exception e) {\n                e.printStackTrace();\n            }\n        }).start();\n\n        conn.commit();\n    }\n}\n\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Connection pool reuse must be verifiable",
+      "Connection wrappers must be handled appropriately",
+      "Pool size limitations must be respected"
+    ],
+    "created_at": "2015-09-28T14:51:14Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/391",
+    "source": {
+      "issue_number": 391
+    },
+    "initial_question": {
+      "title": "Impossible to pass connection specific properties",
+      "body": "On my particular Oracle CP on HikariCP (ds) theres no way to pass specific Connection parameters:\n\n```\n    HikariConfig conf = new HikariConfig(\"testCpConnection.properties\");\n    HikariDataSource ds = new HikariDataSource(conf);\n    Properties pp = new Properties();\n    pp.put(\"connectionProperties.defaultRowPrefetch\", \"10000\");\n    ds.setDataSourceProperties(pp);\n```\n\nwith Orcle DataSource is possible to do this:\n\n```\n    OracleDataSource ds = new OracleDataSource();\n    ds.setURL(\"jdbc:oracle:thin:@xxxxxxxxx\");\n    ds.setUser(\"user\");\n    ds.setPassword(\"password\");\n\n    Properties pp = new Properties();\n    pp.put(\"defaultRowPrefetch\", \"10000\");\n\n    ds.setConnectionProperties(pp);\n```\n\nperhaps I'm wrong also because in some previous version was possible to implement an IConnectionCustomizer that isn't supported anymore.\n\nRegards\n    Antonio\n"
+    },
+    "satisfaction_conditions": [
+      "Connection-specific properties must be successfully applied to Oracle database connections in HikariCP",
+      "The solution must work within HikariCP's current architecture"
+    ],
+    "created_at": "2015-08-20T16:38:01Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/303",
+    "source": {
+      "issue_number": 303
+    },
+    "initial_question": {
+      "title": "Setting MetricRegistry at runtime",
+      "body": "Hi @brettwooldridge, \n\nFirst of all thanks for the great library. \n\nI would like to set CodaHale MetricRegistry at runtime. This is required because I am not configuring datasource. But it seems that I am little bid late for setting it. Is it possible to propagate a change in HikariDataSource to track metrics?\n"
+    },
+    "satisfaction_conditions": [
+      "MetricRegistry can be set after pool initialization",
+      "New connections participate in metrics collection",
+      "System continues functioning with partial metrics",
+      "Metrics data becomes statistically valid over time"
+    ],
+    "created_at": "2015-04-10T14:28:11Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/283",
+    "source": {
+      "issue_number": 283
+    },
+    "initial_question": {
+      "title": "Why is setConnectionInitSql deprecated?",
+      "body": "We are using this setting to change Oracle's default sorting behavior for a certain application:\n\nALTER SESSION SET NLS_SORT = XGERMAN_DIN\n\nShouldn't such use cases be supported in future, too?\n"
+    },
+    "satisfaction_conditions": [
+      "Database session configuration remains possible",
+      "Functionality is maintained across version updates",
+      "Documentation clearly indicates feature status"
+    ],
+    "created_at": "2015-03-13T10:11:35Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/210",
+    "source": {
+      "issue_number": 210
+    },
+    "initial_question": {
+      "title": "Is it essential to call `shutdown()` on HikariDataSource?",
+      "body": ""
+    },
+    "satisfaction_conditions": [
+      "Database connections must be properly released when application terminates",
+      "Resource cleanup must occur even in case of abnormal application termination",
+      "Connection cleanup mechanism must be compatible with the specific DataSource implementation being used",
+      "Cleanup strategy must not interfere with normal application operation",
+      "Database resources must eventually be freed even if immediate cleanup fails"
+    ],
+    "created_at": "2014-11-28T11:53:48Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/155",
+    "source": {
+      "issue_number": 155
+    },
+    "initial_question": {
+      "title": "Passing useLegacyDatetimeCode without using jdbcUrl",
+      "body": "When using bonecp I passed with jdbc url ...:3306/DBNAME?useLegacyDatetimeCode=false\n\nHow can I pass it using the new HikariCP DataSource?\n\nIs this ok?\nconfig.addDataSourceProperty(\"useLegacyDatetimeCode\", \"false\");\n"
+    },
+    "satisfaction_conditions": [
+      "DataSource configuration is accepted by HikariCP"
+    ],
+    "created_at": "2014-10-04T12:19:40Z"
+  },
+  {
+    "id": "https://github.com/brettwooldridge/HikariCP/issues/151",
+    "source": {
+      "issue_number": 151
+    },
+    "initial_question": {
+      "title": "HikariConfig username property?",
+      "body": "HikariConfig has a property which represents  the default authentication username.\nHowever, what's the property name: username or user?\nThe home page's introduction is conflict.\nI'm from China. Sorry for my terrible English.\n"
+    },
+    "satisfaction_conditions": [
+      "Username property is correctly recognized by the chosen connection method",
+      "Authentication credentials are properly passed through the connection chain",
+      "Solution accounts for driver-specific username property requirements"
+    ],
+    "created_at": "2014-09-29T16:48:10Z"
+  }
+]

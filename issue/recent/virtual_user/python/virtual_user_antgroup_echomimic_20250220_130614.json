@@ -1,0 +1,45 @@
+[
+  {
+    "id": "https://github.com/antgroup/echomimic/issues/21",
+    "source": {
+      "issue_number": 21
+    },
+    "initial_question": {
+      "title": "How can I solve this error?",
+      "body": "Traceback (most recent call last):\r\n  File \"/home/tom/fssd/EchoMimic/infer_audio2vid.py\", line 23, in <module>\r\n    from src.models.unet_2d_condition import UNet2DConditionModel\r\n  File \"/home/tom/fssd/EchoMimic/src/models/unet_2d_condition.py\", line 18, in <module>\r\n    from diffusers.models.embeddings import (\r\nImportError: cannot import name 'PositionNet' from 'diffusers.models.embeddings' (/opt/conda/lib/python3.10/site-packages/diffusers/models/embeddings.py)"
+    },
+    "satisfaction_conditions": [
+      "Diffusers package version compatibility is established"
+    ],
+    "created_at": "2024-07-11T10:43:31Z"
+  },
+  {
+    "id": "https://github.com/antgroup/echomimic/issues/19",
+    "source": {
+      "issue_number": 19
+    },
+    "initial_question": {
+      "title": "Is there anyone who set up the enviroment successfully?",
+      "body": "```\r\nconda create -n echomimic python=3.8\r\nconda activate echomimic\r\npip install -r requirements.txt\r\n```\r\nThe above code does not works well for me, and the following errors is given to me,  anyone can help me, or give a docker img to others. \r\n```\r\n\r\nraceback (most recent call last):\r\n  File \"/ssdcache/jtmeng/miniconda3/envs/echomimic/lib/python3.8/site-packages/diffusers/utils/import_utils.py\", line 808, in _get_module\r\n    return importlib.import_module(\".\" + module_name, self.__name__)\r\n  File \"/ssdcache/jtmeng/miniconda3/envs/echomimic/lib/python3.8/importlib/__init__.py\", line 127, in import_module\r\n    return _bootstrap._gcd_import(name[level:], package, level)\r\n  File \"<frozen importlib._bootstrap>\", line 1014, in _gcd_import\r\n  File \"<frozen importlib._bootstrap>\", line 991, in _find_and_load\r\n  File \"<frozen importlib._bootstrap>\", line 961, in _find_and_load_unlocked\r\n  File \"<frozen importlib._bootstrap>\", line 219, in _call_with_frames_removed\r\n  File \"<frozen importlib._bootstrap>\", line 1014, in _gcd_import\r\n  File \"<frozen importlib._bootstrap>\", line 991, in _find_and_load\r\n  File \"<frozen importlib._bootstrap>\", line 975, in _find_and_load_unlocked\r\n  File \"<frozen importlib._bootstrap>\", line 671, in _load_unlocked\r\n  File \"<frozen importlib._bootstrap_external>\", line 843, in exec_module\r\n  File \"<frozen importlib._bootstrap>\", line 219, in _call_with_frames_removed\r\n  File \"/ssdcache/jtmeng/miniconda3/envs/echomimic/lib/python3.8/site-packages/diffusers/models/autoencoders/__init__.py\", line 1, in <module>\r\n    from .autoencoder_asym_kl import AsymmetricAutoencoderKL\r\n  File \"/ssdcache/jtmeng/miniconda3/envs/echomimic/lib/python3.8/site-packages/diffusers/models/autoencoders/autoencoder_asym_kl.py\", line 21, in <module>\r\n    from ..modeling_outputs import AutoencoderKLOutput\r\n  File \"/ssdcache/jtmeng/miniconda3/envs/echomimic/lib/python3.8/site-packages/diffusers/models/modeling_outputs.py\", line 7, in <module>\r\n    class AutoencoderKLOutput(BaseOutput):\r\n  File \"/ssdcache/jtmeng/miniconda3/envs/echomimic/lib/python3.8/site-packages/diffusers/utils/outputs.py\", line 61, in __init_subclass__\r\n    import torch.utils._pytree\r\nModuleNotFoundError: No module named 'torch.utils._pytree'\r\n\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Python 3.8 environment is properly initialized"
+    ],
+    "created_at": "2024-07-11T10:05:58Z"
+  },
+  {
+    "id": "https://github.com/antgroup/echomimic/issues/10",
+    "source": {
+      "issue_number": 10
+    },
+    "initial_question": {
+      "title": "ImportError: cannot import name 'PositionNet' from 'diffusers.models.embeddings' ",
+      "body": "(echomimic) C:\\ALLWEBUI\\EchoMimic\\EchoMimic>python -u infer_audio2vid.py\r\nTraceback (most recent call last):\r\n  File \"infer_audio2vid.py\", line 23, in <module>\r\n    from src.models.unet_2d_condition import UNet2DConditionModel\r\n  File \"C:\\ALLWEBUI\\EchoMimic\\EchoMimic\\src\\models\\unet_2d_condition.py\", line 18, in <module>\r\n    from diffusers.models.embeddings import (\r\nImportError: cannot import name 'PositionNet' from 'diffusers.models.embeddings' (C:\\Users\\admin\\.conda\\envs\\echomimic\\lib\\site-packages\\diffusers\\models\\embeddings.py)"
+    },
+    "satisfaction_conditions": [
+      "The PositionNet class must be available in the diffusers.models.embeddings module",
+      "The diffusers package version must be compatible with the EchoMimic codebase"
+    ],
+    "created_at": "2024-07-10T16:02:33Z"
+  }
+]

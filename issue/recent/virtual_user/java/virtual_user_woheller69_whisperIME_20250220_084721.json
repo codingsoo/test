@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/woheller69/whisperIME/issues/16",
+    "source": {
+      "issue_number": 16
+    },
+    "initial_question": {
+      "title": "HeliBoard integration",
+      "body": "Just a quick question, how do I get HeliBoard to call Whisper instead of the Google voice assistant when pressing the mic button in the toolbar?"
+    },
+    "satisfaction_conditions": [
+      "Default voice input system is successfully modified"
+    ],
+    "created_at": "2025-01-13T09:55:42Z"
+  }
+]

@@ -1,0 +1,908 @@
+[
+  {
+    "id": "https://github.com/expressjs/express/issues/6025",
+    "source": {
+      "issue_number": 6025
+    },
+    "initial_question": {
+      "title": "Raw Body Not Passed Correctly to Svix Webhook Verification",
+      "body": "\r\nHi Express team,\r\n\r\nI'm encountering an issue while trying to verify a webhook payload using Svix in my Express.js app. Despite following the recommended approach from both the Svix documentation and Express documentation, I continue to receive an error stating:\r\n\r\n```\r\nError verifying the webhook: Expected payload to be of type string or Buffer.\r\n\r\n```\r\n**Context**:\r\nNode.js version: v20.17.0\r\nExpress version: 4.21.0\r\nbody-parser: I'm using bodyParser.raw({ type: \"application/json\" }) to pass the raw payload as recommended by Svix.\r\nSvix version: 1.35.0\r\n\r\nCode Snippet:\r\n\r\n```\r\nimport express from \"express\";\r\nimport { Webhook } from \"svix\";\r\nimport bodyParser from \"body-parser\";\r\n\r\nconst router = express.Router();\r\n\r\nrouter.post(\r\n  \"/webhook\",\r\n  bodyParser.raw({ type: \"application/json\" }), // Using raw body-parser\r\n  async (req, res, next) => {\r\n    const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;\r\n\r\n    if (!WEBHOOK_SECRET) {\r\n      return next(new Error(\"WEBHOOK_SECRET is missing in the environment.\"));\r\n    }\r\n\r\n    const payload = req.body;\r\n    const headers = req.headers;\r\n\r\n    const wh = new Webhook(WEBHOOK_SECRET);\r\n\r\n    try {\r\n      const evt = wh.verify(payload, headers);\r\n      // Further webhook processing...\r\n      return res.status(200).json({ success: true });\r\n    } catch (err) {\r\n      console.error(\"Webhook verification failed:\", err.message);\r\n      return res.status(400).json({\r\n        success: false,\r\n        message: \"Webhook verification failed.\",\r\n      });\r\n    }\r\n  }\r\n);\r\n\r\nexport default router;\r\n```\r\n\r\n**Problem**:\r\nAccording to the Svix documentation, the raw JSON payload must be passed directly to the Webhook.verify() method, without modification. However, Express appears to deserialize the JSON body into a JavaScript object, which causes the verification to fail because Svix expects a string or Buffer.\r\n\r\nOddly, the verification works when I manually wrap the payload in JSON.stringify():\r\n\r\n```\r\nconst evt = wh.verify(JSON.stringify(payload), headers);\r\n```\r\nHowever, this workaround is not ideal and could lead to other issues (as noted by Svix). I believe this issue arises from how Express handles the request body, even when using bodyParser.raw.\r\n\r\n**Expected Behavior:**\r\nExpress should provide the raw JSON payload to req.body when using bodyParser.raw({ type: \"application/json\" }).\r\n\r\n**Actual Behavior:**\r\nThe payload appears to be deserialized into a JavaScript object, causing the webhook verification to fail with the error: Expected payload to be of type string or Buffer.\r\n\r\nCould you provide insight on whether this is an issue with the body-parser, Express itself, or if there is a recommended approach to ensure the raw JSON body is passed to Svix?\r\n\r\nThank you!\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Raw request payload must be preserved as Buffer/string when reaching webhook verification",
+      "JSON parsing middleware must not interfere with webhook endpoint",
+      "Webhook verification must successfully complete without manual payload transformation"
+    ],
+    "created_at": "2024-10-05T17:56:43Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/5060",
+    "source": {
+      "issue_number": 5060
+    },
+    "initial_question": {
+      "title": "`item[]` format is parsed differently in express v5 compared to v4",
+      "body": "In express v4, if request contained query parameters suffixed with `[]` such as `items[]`. It would automatically be parsed into an array. This is no longer the case with express v5. \r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Query parameters with [] suffix are correctly parsed into arrays",
+      "Solution maintains compatibility with existing code expecting array parsing",
+      "Query parser configuration is properly set in Express application",
+      "Solution is documented and intentional"
+    ],
+    "created_at": "2022-12-09T19:05:34Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4808",
+    "source": {
+      "issue_number": 4808
+    },
+    "initial_question": {
+      "title": "EADDRINUSE code in express",
+      "body": "\r\n```js\r\n// using nodejs we can write code to retry to listen on port using\r\nconst server = http.createServer().listen(3000);\r\nserver.on('error',function(err) {\r\n    if (err.code === 'EADDRINUSE') {\r\n        console.log('Address in use, retrying...');\r\n        setTimeout(() => {\r\n            server.close();\r\n            server.listen(3000, 'localhost');\r\n        }, 1000);\r\n    }\r\n});\r\n```\r\nhow to do this same thing in express \r\n```js\r\nconst app = require('express')();\r\napp.on('err',function(err) {\r\nconsole.log('error occured'); // this doesnt work\r\n});\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Server must detect EADDRINUSE errors when port is already in use",
+      "Error handling must work with Express application instance",
+      "Server must attempt to reconnect after detecting port conflict",
+      "Error event listener must successfully capture server errors"
+    ],
+    "created_at": "2022-02-04T16:59:02Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4677",
+    "source": {
+      "issue_number": 4677
+    },
+    "initial_question": {
+      "title": "Regex as path not functioning as expected",
+      "body": "In my express app, I have the following code:\r\n```js\r\napp.all(/\\/port\\/(([1-9]\\d{0,3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))\\/.*/g,(req,res,next){\r\n   // ...\r\n})\r\n```\r\nHalf the time, when going to /port/3001 it 404s, the other half of the time it works. It seems like the regex system used by Express is the cause as testing this using \r\n```js\r\n/\\/port\\/(([1-9]\\d{0,3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5]))\\/.*/g.test('/port/3001')\r\n``` \r\nreturns true."
+    },
+    "satisfaction_conditions": [
+      "The regex pattern must maintain its match state correctly between requests",
+      "The route pattern must correctly validate port numbers in the URL",
+      "The pattern matching behavior must be predictable and documented"
+    ],
+    "created_at": "2021-08-15T23:09:39Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4655",
+    "source": {
+      "issue_number": 4655
+    },
+    "initial_question": {
+      "title": "data is not coming on server",
+      "body": "i was trying node.js in typescript and code is same as JS but data is not coming on server\r\n\r\n\r\napp.ts file\r\n```\r\nimport express from 'express'\r\nimport bodyParser from 'body-parser'\r\nimport config from '../config/config'\r\nimport logging from '../config/logger'\r\nimport { connectDB } from './utils/DB'\r\n// init express variable to app ==========\r\nconst app = express()\r\n\r\n\r\nconst NAMESPACE = 'server'\r\n\r\n\r\n// body parser ===========================\r\napp.use(express.json())\r\napp.use(express.urlencoded({ extended: false }))\r\n\r\nconnectDB()\r\n\r\n// logger ===================================\r\napp.use((req, res, next) => {\r\n    logging.info(NAMESPACE, `METHOD - [${req.method}], URL - [${req.url}], IP - [${req.socket.remoteAddress}]`)\r\n    res.on('finish', () => {\r\n        logging.info(NAMESPACE, `METHOD - [${req.method}], URL - [${req.url}], IP - [${req.socket.remoteAddress}], STATUS - [${res.statusCode}]`)\r\n    })\r\n    next()\r\n})\r\n\r\n\r\n// routes ======================================\r\nimport loginRoutes from './routes/login'\r\n\r\napp.use('/api/login', loginRoutes)\r\n\r\n\r\n\r\n// error handling ===============================\r\napp.use((req, res, next) => {\r\n    const error = new Error('Page not found');\r\n    return res.json({ message: error.message, statusCode: 404 }).status(404);\r\n})\r\n\r\n\r\n// server start =================================\r\napp.listen(config.server.port, () => {\r\n    console.log(`Server started on port ${config.server.port}`);\r\n})\r\n```\r\n\r\n\r\nroute/login.ts file\r\n```\r\nimport express from 'express'\r\nimport login_contollers from '../controllers/login'\r\nconst loginAPI = express.Router()\r\n\r\nloginAPI.post('/user', login_contollers.login)\r\n\r\n\r\nexport default loginAPI\r\n```\r\n\r\ncontroller/login.ts file\r\n\r\n```\r\nimport jwt from \"jsonwebtoken\";\r\n\r\ndeclare var process: {\r\n    env: {\r\n        JWT_SECRET_KEY: string,\r\n        JWT_EXPIRE_TIME: number\r\n    }\r\n}\r\n\r\n\r\nconsole.log(process.env.JWT_EXPIRE_TIME)\r\n\r\n// creating jsonwebtoken\r\n\r\nconst getToken = async (id: String) => {\r\n    console.log('from getToken', id)\r\n    return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {\r\n        // in what time token expire\r\n        expiresIn: process.env.JWT_EXPIRE_TIME\r\n    })\r\n}\r\n\r\n\r\n// interface req {\r\n//     body: string,\r\n// }\r\n\r\n\r\nconst login = async (req: any, res: any, next: any) => {\r\n    console.log(req.body)\r\n     if (!id) {\r\n         return res.json({message:'please add id'}).status(200)\r\n     } else {\r\n         const token = await getToken(id)\r\n         console.log(token)\r\n         return res.json({ message: 'hello', token })\r\n     }\r\n    next()\r\n}\r\n\r\nconst LOGIN_API = {\r\n    login\r\n}\r\n\r\nexport default LOGIN_API\r\n```\r\n\r\n**in terminal it showing blank array like this {}**\r\n\r\nbut it did't work so i try bodyParser but that is also not working....\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Middleware configuration executes before route handlers"
+    ],
+    "created_at": "2021-07-23T13:25:36Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4529",
+    "source": {
+      "issue_number": 4529
+    },
+    "initial_question": {
+      "title": "Router only response first route if using dependency injection on router",
+      "body": "This is related to #4528 \r\n\r\nFull codes are as per following:\r\n\r\n<details>\r\n<summary>/index.js</summary>\r\n\r\n```js\r\nconst express = require('express');\r\nconst app = express();\r\n\r\napp.use('/buy',require('./routes/buy'))\r\napp.use('/sell',require('./routes/sell'))\r\n\r\napp.listen(5000,()=>{\r\n  console.log('Server start')\r\n})\r\n```\r\n</details>\r\n\r\n<details>\r\n<summary>/routes/buy.js</summary>\r\n\r\n```js\r\nconst express = require('express')\r\nconst router = express.Router()\r\nconst buyController = require('../controller/buy.js')\r\n\r\nrouter.use('/:id/log', require('./log')(router, 'BuyModel'))\r\nrouter.route('/').get(buyController.fetchBuys)\r\n\r\nmodule.exports = router\r\n```\r\n</details>\r\n\r\n<details>\r\n<summary>/routes/sell.js</summary>\r\n\r\n```js\r\nconst express = require('express')\r\nconst router = express.Router()\r\n\r\nrouter.use('/:id/log', require('./log')(router, 'SaleModel'))\r\n\r\nmodule.exports = router\r\n```\r\n</details>\r\n\r\n<details>\r\n<summary>/routes/log.js</summary>\r\n\r\n```js\r\nconst logController = require('../controller/log')\r\n\r\nmodule.exports = function(router, model){\r\n  router.route('/')\r\n    .get(logController.fetchLogs(model))\r\n  return router\r\n}\r\n```\r\n</details>\r\n\r\n<details>\r\n<summary>/controller/log.js</summary>\r\n\r\n```js\r\nexports.fetchLogs = model => (req, res, next) => {\r\n  console.log('fetch logs');\r\n  console.log('base_url:', req.baseUrl);\r\n  console.log('...');\r\n\r\n  return res.status(200).send('done')\r\n}\r\n```\r\n</details>\r\n\r\n<details>\r\n<summary>/controller/buy.js</summary>\r\n\r\n```js\r\nexports.fetchBuys = (req, res, next) => {\r\n  console.log('base_url:', req.baseUrl);\r\n  console.log('result: fetch buys');\r\n  console.log('...')\r\n  res.status(200).send()\r\n}\r\n\r\n```\r\n</details>\r\n\r\n---\r\n\r\nCurrent code consoles:\r\n\r\n**GET: /buy**\r\nfetch logs\r\nbase_url: /buy\r\n\r\n**GET: /buy/123/log**\r\nfetch logs\r\nbase_url: /buy/123/log\r\n\r\n---\r\n\r\nWhat I hope is:\r\n\r\n**GET: /buy**\r\nfetch buys\r\nbase_url: /buy\r\n\r\n**GET: /buy/123/log**\r\nfetch logs\r\nbase_url: /buy/123/log\r\n\r\n---\r\n\r\nIf I reverse the route sequence in /routes/buy.js like following\r\n\r\n```js\r\nrouter.route('/').get(buyController.fetchBuys)\r\nrouter.use('/:id/log', require('./log')(router, 'BuyModel'))\r\n```\r\n\r\n**GET: /buy**\r\nfetch buys\r\nbase_url: /buy\r\n\r\n**GET: /buy/123/log**\r\nfetch buys\r\nbase_url: /buy/123/log\r\n\r\n---\r\n\r\nWould like to know how can I make it work if I still want to use dependency injection in router"
+    },
+    "satisfaction_conditions": [
+      "Base URL paths must be correctly preserved and accessible",
+      "Dependency injection pattern must remain functional"
+    ],
+    "created_at": "2021-02-18T07:23:22Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4525",
+    "source": {
+      "issue_number": 4525
+    },
+    "initial_question": {
+      "title": "Expressjs dealing with high traffic",
+      "body": "So I want to know how do I wait for response to be sent to the user ?\r\n\r\nlets say my code has some sort of external requests that takes few seconds to response so using async functions the code waits for the response of that request then process it and sends the result back to the user, but it works only for 1 user meaning that if i request like 100 requests per time I will be getting a response but with conflicts of the entered data\r\nlike the request number 62 had the response of the request number 33 and so.\r\nhow do I mange this ? are there any libraries or methods to overcome it or it's just some sort of errors in my code ? "
+    },
+    "satisfaction_conditions": [
+      "Each concurrent request must maintain its own independent context",
+      "Response data must correctly match the original request",
+      "System must handle multiple concurrent requests without data conflicts",
+      "Variables must be properly scoped to prevent cross-request contamination",
+      "Asynchronous operations must complete with their original request context"
+    ],
+    "created_at": "2021-02-08T13:12:00Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4344",
+    "source": {
+      "issue_number": 4344
+    },
+    "initial_question": {
+      "title": "How to set error.name in extended class Error in Node.js?",
+      "body": "I'm trying to set the error name `err.name = 'ExpressValidatorError';` \r\n\r\nof an custom Error class `class AppError extends Error` \r\n\r\nthat is passed to centralErrorHandler to filter and handle errors by `err.name`.\r\n\r\nI have did a lot of research but still couldn't figure out why `err.name` in centralErrorHandler console logs as `undefined`.\r\n\r\nWhen I change `return next(err);` in auth.controller.js to `throw err;`, the `err.name` does console log as `'ExpressValidatorError'` but i'm not sure if using throw is correct.\r\n\r\n\r\n\r\ncentralErrorHandler.js\r\n```\r\nmodule.exports = (err, req, res, next) => {           \r\n        console.log(err.name);\r\n        if(err.name === 'ExpressValidatorError') err = handleExpressValidatorError(err);            \r\n}\r\n\r\n```\r\n\r\nauth.controller.js\r\n```\r\nconst {validationResult} = require('express-validator');\r\n\r\nexports.signup = (req, res) => {     \r\n    const errors = validationResult(req); \r\n   \r\n      if (!errors.isEmpty()) {\r\n        let err = new AppError(`Invalid login credentials.`, 422);\r\n        err.name = 'ExpressValidatorError';            \r\n             \r\n        return next(err);\r\n      }\r\n\r\n    res.status(200).send(req.user);          \r\n}\r\n```\r\n\r\nappError.js\r\n```\r\nclass AppError extends Error {\r\n    constructor(message, statusCode){\r\n        super(message);\r\n\r\n        this.statusCode = statusCode;\r\n        this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';        \r\n        this.isOperational = true;        \r\n\r\n        Error.captureStackTrace(this, this.constructor);\r\n    }\r\n}\r\n\r\nmodule.exports = AppError;\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Custom error class must properly inherit from Error"
+    ],
+    "created_at": "2020-07-11T00:14:42Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4333",
+    "source": {
+      "issue_number": 4333
+    },
+    "initial_question": {
+      "title": "Router doens't match with an route",
+      "body": "So, I have a following index.js file, where I define the default route and another endpoint that points to a router.\r\n\r\nTherefore, **when I try to access the endpoint /endpoint/something points to the default route, that is '/'.** I don't know what could happen.\r\n\r\nActivating the debug options shows that the new layer, in that case, endpoint was created, but I cannot figure out how to access it.\r\n\r\nSomeone could help? Thanks in advance.\r\n\r\n```js\r\nimport express from 'express';\r\nimport bodyParser from 'body-parser';\r\nimport dotenv from 'dotenv';\r\nimport endpointRouter from './src/endpoint/endpoint.router';\r\n\r\ndotenv.config();\r\n\r\nconst app = express();\r\napp.use(bodyParser.json());\r\napp.use(bodyParser.urlencoded({ extended: true }));\r\n\r\n// routes\r\napp.use('/', (req, res) => res.status(200).send({message: 'Welcome'}));\r\napp.use('/endpoint', endpointRouter);\r\n\r\napp.listen(process.env.PORT, process.env.IPCONFIG, () => console.log(`Process listening on ${process.env.PORT}`));\r\n\r\nexport default app;\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Root route '/' must remain accessible and return welcome message",
+      "Express middleware and routes must be properly initialized"
+    ],
+    "created_at": "2020-06-30T13:20:31Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4252",
+    "source": {
+      "issue_number": 4252
+    },
+    "initial_question": {
+      "title": "Cookie's don't clear if maxAge is set",
+      "body": "If a cookie with a `maxAge` is set, performing `res.clearCookie()` will not clear the cookie.\r\n\r\nWe update the expiry in `clearCookie()` so the `expires` property is overriden to a past date:\r\n```javascript\r\nres.clearCookie = function clearCookie(name, options) {\r\n  var opts = merge({ expires: new Date(1), path: '/' }, options);\r\n\r\n  return this.cookie(name, '', opts);\r\n};\r\n```\r\n\r\nBut then when `this.cookie()` is called, it sees the cookie has a `maxAge` property, which will override the expiry date in this code:\r\n\r\n```javascript\r\n  if ('maxAge' in opts) {\r\n    opts.expires = new Date(Date.now() + opts.maxAge);\r\n    opts.maxAge /= 1000;\r\n  }\r\n```\r\n\r\nand the cookie therefore wouldn't be cleared *(In fact, it would actually cause the cookie's expiry date to be further into the future)*."
+    },
+    "satisfaction_conditions": [
+      "Cookie behavior must be consistent with provided options",
+      "Default clearCookie() behavior results in cookie deletion",
+      "MaxAge option takes precedence over expires option",
+      "Cookie value clearing preserves specified expiration"
+    ],
+    "created_at": "2020-04-24T20:14:01Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/4094",
+    "source": {
+      "issue_number": 4094
+    },
+    "initial_question": {
+      "title": "[Feature]dynamic set and delete route",
+      "body": "When running a application, I set some routes like this:\r\n```js\r\n[some arrays].forEach(route => {\r\n   app.post(route.path, (req, res) => {\r\n       //...\r\n   })\r\n})\r\n```\r\nwhen I change a route's path in that array, new route is available, \r\n**but old route is available too.**\r\n\r\nhow to let the old routes invalidate.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Route updates must preserve request handling functionality",
+      "Route updates must be reflected without application restart"
+    ],
+    "created_at": "2019-11-03T14:36:24Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3998",
+    "source": {
+      "issue_number": 3998
+    },
+    "initial_question": {
+      "title": "OPTIONS request doesn't follow the order of route declaration",
+      "body": "I just notice that an OPTIONS request doesn't follow the order of route declaration and applies for all the routes that are defined using the same instance. \r\nI am not sure if it's bug or an intended behaviour since I don't fully understand the nature of OPTIONS request.\r\n\r\nHere are 2 code snippets\r\n\r\n```js\r\nconst app = require('express')();\r\n\r\napp.use((req, res, next) => {\r\n  res.send('Blocked');\r\n});\r\n\r\napp.get('/route1', (req, res) => {\r\n  res.send('route1');\r\n});\r\n\r\napp.get('/route2', (req, res) => {\r\n  res.send('route2')\r\n});\r\n\r\napp.listen(3000, () => {\r\n  console.log('Server started on port: 3000');\r\n});\r\n```\r\n\r\n```js\r\nconst app = require('express')();\r\n\r\napp.get('/route1', (req, res) => {\r\n  res.send('route1');\r\n});\r\n\r\napp.use((req, res, next) => {\r\n  res.send('Blocked');\r\n});\r\n\r\napp.get('/route2', (req, res) => {\r\n  res.send('route2')\r\n});\r\n\r\napp.listen(3000, () => {\r\n  console.log('Server started on port: 3000');\r\n});\r\n```\r\n\r\nIn first case, both GET and OPTIONS request to any of the 2 routes returns the message \"blocked\" as expected since the middleware is defined prior to both and hence any request to either of these will first pass through it.\r\n\r\nIn second case, both GET and OPTIONS request to the second route return the message \"blocked\". Again as expected.  But for the first route, the GET request return the message \"route1\" while the OPTIONS request returns the message \"Blocked\". \r\n\r\nWhy did the GET request was successfully served but the OPTIONS request first passed through the middleware that was defined after that route?\r\n\r\nI'm using v4.17.1"
+    },
+    "satisfaction_conditions": [
+      "OPTIONS requests must be handled according to middleware execution order when explicitly handled",
+      "Default OPTIONS handling must only trigger when no other handler processes the request",
+      "Route-specific GET handlers must execute based on their declaration order",
+      "Middleware must intercept all requests to paths declared after it"
+    ],
+    "created_at": "2019-07-02T06:15:04Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3962",
+    "source": {
+      "issue_number": 3962
+    },
+    "initial_question": {
+      "title": "trust-proxy function not called?",
+      "body": "My Express server is running in a docker container with an nginx docker container proxying request to it.\r\n\r\n```\r\nRequest -> (nginx) -> (express)\r\n```\r\n\r\nI've been trying to set up Express so it only trusts the one nginx proxy, but so far I've not been able to get the `trust-proxy` setting to work.\r\nThe function I pass to the `trust-proxy` setting seems to never get called in my application.\r\n\r\n```ts\r\napp.set('trust proxy', (ip: string) => {\r\n    console.error(`PROXY ADDR: ${ip}`);\r\n    return false;\r\n});\r\n```\r\nWith this configuration, the `console.error` never appears in the logs.\r\n\r\nAm I doing something wrong here with my configuration, or is `trust proxy` not working as intended?\r\n\r\nMinimal reproduction:\r\n```ts\r\nconst app = express();\r\n\r\napp.set('trust proxy', (ip: string) => {\r\n    console.error(`PROXY ADDR: ${ip}`);\r\n    return false;\r\n});\r\n\r\napp.use('*', (_req: express.Request, res: express.Response) => {\r\n    return res.send('Hi');\r\n});\r\n\r\nconst webServer = createServer(app);\r\nwebServer.listen(3731);\r\n```"
+    },
+    "satisfaction_conditions": [
+      "The Express application must properly receive requests through the nginx proxy"
+    ],
+    "created_at": "2019-05-17T09:36:34Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3957",
+    "source": {
+      "issue_number": 3957
+    },
+    "initial_question": {
+      "title": "Routing Issue",
+      "body": "Hello,\r\n\r\nI've been using the Router function for a bit now and have an endpoint that does two different functions, one gets the current user /users/me and one gets a user that is searched /users/:id, sadly these endpoints conflict for some reason, can someone please help me in finding a solution? These endpoints are BOTH in the same file."
+    },
+    "satisfaction_conditions": [
+      "Routes must not conflict when one path is '/users/me' and another is '/users/:id'",
+      "The ':id' parameter route must only match numeric values if that's the requirement",
+      "Both routes must be accessible from the same router/file"
+    ],
+    "created_at": "2019-05-15T02:18:52Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3890",
+    "source": {
+      "issue_number": 3890
+    },
+    "initial_question": {
+      "title": "How to render mySQL Data using Express and EJS",
+      "body": "Hi I can't figure out how to display my mySQL data on an HTML page. Right now I am using Express, mySQL, and EJS as my template engine. My project is to create a Jeopardy web application. I have my mySQL database called Jeopardy set up with themes, categories, and questions tables. I want to use Express (Node.js) to read in all the data. Then I want to send that data to the ejs file to render HTML. I want to display all my table data on the html page. Can someone help me?\r\n\r\nHere is my current error. When I go to localhost:3000 this same error pops up in the webpage and the console. I don't know why this is happening. I used res.render() to define obj as a variable for the ejs file to use but it's not recognizing it. Is there anything else you guys think I should fix? I am using all these languages/frameworks for the first time so I've very inexperienced.\r\n```\r\nReferenceError: /Users/Ruthvik/Downloads/Jeopardy/views/index.ejs:7\r\n    5|   </head>\r\n    6|   <body>\r\n >> 7|     <h1><%= obj %></h1>\r\n    8|     <p>Welcome to <%= obj %></p>\r\n    9|   </body>\r\n    10| </html>\r\n\r\nobj is not defined\r\n    at eval (eval at compile (/Users/Ruthvik/Downloads/Jeopardy/node_modules/ejs/lib/ejs.js:592:12), <anonymous>:11:26)\r\n    at returnedFn (/Users/Ruthvik/Downloads/Jeopardy/node_modules/ejs/lib/ejs.js:623:17)\r\n    at tryHandleCache (/Users/Ruthvik/Downloads/Jeopardy/node_modules/ejs/lib/ejs.js:251:36)\r\n    at View.exports.renderFile [as engine] (/Users/Ruthvik/Downloads/Jeopardy/node_modules/ejs/lib/ejs.js:480:10)\r\n    at View.render (/Users/Ruthvik/Downloads/Jeopardy/node_modules/express/lib/view.js:135:8)\r\n    at tryRender (/Users/Ruthvik/Downloads/Jeopardy/node_modules/express/lib/application.js:640:10)\r\n    at Function.render (/Users/Ruthvik/Downloads/Jeopardy/node_modules/express/lib/application.js:592:3)\r\n    at ServerResponse.render (/Users/Ruthvik/Downloads/Jeopardy/node_modules/express/lib/response.js:1008:7)\r\n    at Query.<anonymous> (/Users/Ruthvik/Downloads/Jeopardy/server.js:26:21)\r\n    at Query.<anonymous> (/Users/Ruthvik/node_modules/mysql/lib/Connection.js:502:10)\r\n```\r\n\r\n\r\nserver.js\r\n```\r\nconst express = require('express');\r\nconst app = express();\r\nconst mysql = require('mysql');\r\n\r\nvar con = mysql.createConnection({\r\n    host: \"localhost\",\r\n    user: \"root\",\r\n    password: \"Federer5\",\r\n    database: \"Jeopardy\"\r\n});\r\n\r\napp.engine('html', require('ejs').renderFile);\r\napp.set('view engine', 'ejs');\r\n\r\nvar obj = {};\r\napp.get('/', function(req, res) {\r\n    con.connect(function (err) {\r\n        if (err) throw err;\r\n        console.log(\"Connected\");\r\n        var sql = \"SELECT * FROM questions\";\r\n        con.query(sql, function (err, result) {\r\n            if (err) {\r\n                throw err;\r\n            } else {\r\n                obj = {print: result};\r\n                res.render('index', obj);\r\n            }\r\n        });\r\n    });\r\n});\r\n\r\napp.listen(3000, function () {\r\n    console.log('listening on port', 3000);\r\n});\r\n```\r\n\r\nindex.ejs\r\n```\r\n<!DOCTYPE html>\r\n<html>\r\n  <head>\r\n    <link rel='stylesheet' href='/stylesheets/style.css' />\r\n  </head>\r\n  <body>\r\n    <h1><%= obj %></h1>\r\n    <p>Welcome to <%= obj %></p>\r\n  </body>\r\n</html>\r\n\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Database connection must successfully retrieve data"
+    ],
+    "created_at": "2019-02-22T20:16:32Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3889",
+    "source": {
+      "issue_number": 3889
+    },
+    "initial_question": {
+      "title": "Routing by Variable",
+      "body": "I have the fear it's a totally basic-question. But I got stuck at this point ..  :(\r\n\r\nMy usecase:\r\n\r\nThe root-website is running as a \"show-room\", where no input is possible (it is presenteds to the public on multiple screens). The \"show-room\" asks periodically via ajax for data. \r\n\r\nNo it should be possible to switch from another client (with another website, e.g. /setup) the routing to another view and also give some additional information to it. Beside the ajax-transfer I also have already the POST-Datas in the index.js\r\n\r\nOne more time: The root-page shows \" website A\" and over another website I can tell the server, that it should show \"website B\". The Reload could be managed by Javascript/AJAX.\r\n\r\nMy thought was just changing the Routing, but that does not work. Yes, indeed, I did not understand all the mechanism.... ;)\r\n\r\nMy first try in index.js:\r\n```js\r\n// ...\r\napp.get('/', view01.view01Action);\r\n// ...\r\n\r\n// Getting the form-datas    \r\napp.post('/setuppost', function(req, res) {\r\n        res.render('./../setup01/views/setup.handlebars');\r\n        \r\n// Reacting to the form-datas\r\n        if(req.body.selectedView=='view05'){\r\n            app.get('/', view05.view05Action);\r\n            (... handlebars-helpers and so on...)\r\n        }\r\n```\r\n\r\nCould anybody please tell me, how to solve my usecase? THX a lot!"
+    },
+    "satisfaction_conditions": [
+      "Root URL path must dynamically serve different views based on external configuration",
+      "View changes must persist across multiple requests until reconfigured",
+      "Setup interface must be accessible from a separate URL path",
+      "View selection changes must be processed server-side"
+    ],
+    "created_at": "2019-02-22T16:58:02Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3837",
+    "source": {
+      "issue_number": 3837
+    },
+    "initial_question": {
+      "title": "Is it a bad practise to wrap an express app by a user defined object?",
+      "body": "Hi guys. \r\n\r\nI am implementing a middleware which will check whether the given request contains all the required params/body. \r\n\r\n```javascript\r\napp.use(checkRequestData);\r\n\r\napp.post(\"/user\", controller.addUser);\r\napp.get(\"/user/:id\", controller.getUser);\r\n```\r\n\r\nNow in **checkRequestData**, I can get **req.body** but **req.params.id** is returning *undefined*. To get the req.params.id, I have written the following function\r\n```javascript\r\n\r\nexports.checkRequestData = (req, res, next) => {\r\n    /**\r\n     * check whether request carries required data\r\n     */\r\n    next();\r\n};\r\n\r\nexports.applyMiddleware = (app) => (...middleware) => {\r\n    return new class {\r\n\r\n        middeware(req, res, next){            \r\n            middlewares.forEach((mw) => {\r\n                mw(req, res, next);\r\n            });\r\n        }\r\n\r\n        get(route, controller){\r\n            return app.get(route, this.middeware, controller);\r\n        }\r\n\r\n        post(route, controller){\r\n            return app.post(route, this.middeware, controller);\r\n        }\r\n    }\r\n}; \r\n```\r\n\r\nAnd the server file is modified as follows:\r\n\r\n```javascript\r\nconst _app = applyMiddleware(app)(checkRequestData);\r\n\r\n_app.post(\"/user\", controller.addUser);\r\n_app.get(\"/user/:id\", controller.getUser);\r\n```\r\n\r\nUsing this method I am able to get the request data. \r\n\r\nIs this the right approach of using express middlewares? Will this cause any issues to the in-built express methods?"
+    },
+    "satisfaction_conditions": [
+      "Middleware must have access to all request parameters (including route params)",
+      "Route parameter validation must work for all defined routes",
+      "Middleware execution must occur after route matching",
+      "Solution must maintain standard Express middleware behavior",
+      "Implementation must support multiple middleware functions"
+    ],
+    "created_at": "2018-12-27T15:43:14Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3800",
+    "source": {
+      "issue_number": 3800
+    },
+    "initial_question": {
+      "title": "How to rewrite url when using routers",
+      "body": "Hello, trying to rewrite the url to redirect requests but having some problems when the url doesn't have a trailing slash. Here is a minimal app to demonstrate.\r\n\r\n```js\r\nconst express = require('express')\r\nconst app = express()\r\nconst port = 3000\r\nconst router = express.Router()\r\n\r\nconst subFolder = '/forum'\r\n\r\napp.use(subFolder, rewrite);\r\n\r\nfunction rewrite(req, res, next) {\r\n    console.log(req.path)\r\n    if (req.path !== '/') {\r\n        return next()\r\n    }\r\n    req.url = '/categories'\r\n    app.handle(req, res, next);\r\n}\r\n\r\nrouter.get('/regular-page', (req, res) => res.send('Hello World!'))\r\nrouter.get('/categories', (req, res) => res.send('Categories'));\r\napp.use(subFolder, router);\r\n\r\napp.listen(port, () => console.log(`Example app listening on port ${port}!`))\r\n```\r\n\r\nThe goal is to redirect `localhost:3000/forum` and `localhost:3000/forum/` to `localhost:3000:/forum/categories`. Right now only `localhost:3000/forum/` works. The other just 404s.\r\n\r\nThanks.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Non-rewritten URLs continue to work normally",
+      "URL rewriting only affects the root forum path",
+      "Rewritten requests must return the categories page content"
+    ],
+    "created_at": "2018-11-13T20:43:24Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3629",
+    "source": {
+      "issue_number": 3629
+    },
+    "initial_question": {
+      "title": "Adding database models to the request object?",
+      "body": "I have a question about what the request object can be used for within Express. In particular, I'm considering creating a middleware that adds a database model to the request object, something like this:\r\n\r\n```javascript\r\nconst express = require('express');\r\nconst db = require('./databaseModel.js');\r\n\r\nconst app = express();\r\n\r\napp.use((req, res, next) => {\r\n    req.db = db;\r\n    next();\r\n}\r\n\r\napp.get('/store', (req, res) => {\r\n    req.db.getAllStoreItems()\r\n    .then(storeItems => res.send(storeItems))\r\n    .catch(error => res.sendStatus(500));\r\n}\r\n```\r\n\r\nIs this an appropriate use of the request object? I'm considering this approach because it will make it easier to test my route controllers (I can just pass in a mocked database without needing to monkey patch the models), but I haven't seen this usage pattern much online so I'm not sure if there are performance implications/other gotchas that I'm not considering.\r\n\r\nThanks for the help!"
+    },
+    "satisfaction_conditions": [
+      "Database model must be accessible within route handlers",
+      "Solution must maintain application performance",
+      "Database model must be mockable for testing",
+      "Implementation must use Express-supported data sharing mechanisms",
+      "Scope of database access must be controllable"
+    ],
+    "created_at": "2018-04-20T18:49:03Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3588",
+    "source": {
+      "issue_number": 3588
+    },
+    "initial_question": {
+      "title": "Phantom console.error",
+      "body": "I'm getting a strange output in my error logs, just a random \"200\" on it's own line without a stack trace or anything. I tracked it down to:\r\n\r\n    EventEmitter.logerror (lib/application.js:606:43)\r\n\r\nAny ideas what could be causing this?\r\n\r\nThanks"
+    },
+    "satisfaction_conditions": [
+      "Phantom error log entries are eliminated",
+      "Express middleware chain executes correctly without duplicate calls",
+      "Error handling behavior is predictable and traceable"
+    ],
+    "created_at": "2018-03-13T23:04:04Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3432",
+    "source": {
+      "issue_number": 3432
+    },
+    "initial_question": {
+      "title": "In-place Express update to 4.15.5 still has old forwarded",
+      "body": "Hello, I'm writing to request an update for the dependency proxy-addr to a version, like version 2.0.2, that has the security patched version of forwarded in it's dependencies., 0.1.2. \r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "The installed version of 'forwarded' package must be 0.1.2 or higher",
+      "The dependency tree must reflect the updated 'forwarded' package",
+      "Express.js must maintain functionality while incorporating the security fix"
+    ],
+    "created_at": "2017-09-27T16:54:34Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3420",
+    "source": {
+      "issue_number": 3420
+    },
+    "initial_question": {
+      "title": "Defining a router-specific error handler",
+      "body": "hi there,\r\n\r\nI would like a little advice on the correct way to define a error handler for a specific router (my use case is a webapp with \"normal\" html routes, and a route `/api` where a new Router instance is attached that only deals in JSON output):\r\n\r\nI am using `Express v4.15.3`, is the following conceptually what I should be doing? :\r\n\r\n```js\r\nconst r = Router;\r\n\r\nr.get('/users', (req, res, next) { res.send({ users : []}); }\r\n\r\n// ... more routes ...\r\n\r\n// add error handler last so that all errors fall into it\r\nr.use((req, res, next, err) { res.send(outputJsonApiError(err)); });\r\n\r\napp.use('/api', r);\r\n```\r\n\r\n\r\nP.S. I have searched the docs and the issues lists but failed to have a \"lightbulb moment\"(tm) ... sorry for the noise (I always struggle a bit with express error handling - in the past I have ended up with a footgun more than once!)"
+    },
+    "satisfaction_conditions": [
+      "Error handler must be defined within the specific router scope",
+      "Error handler must process JSON output format",
+      "Router must be properly mounted to the main application",
+      "Error handler must maintain separation from HTML route error handling"
+    ],
+    "created_at": "2017-09-20T17:44:59Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3381",
+    "source": {
+      "issue_number": 3381
+    },
+    "initial_question": {
+      "title": "Question: Why does the express router call the params keys?",
+      "body": "So I am debugging how to test an express router object. Essentially to have 100% coverage. Anyways, what I noticed while debugging is that the router object creates a stack of routes. Cool, except when I look at the stack, `params` are undefined while `keys` is an array of my params. Pretty misleading. Then in my service, I can request these so called `keys` as `req.params`.\r\n\r\nJust wonder why the params do not get populated here. Is this params property only for inherited params? like from `router.param`"
+    },
+    "satisfaction_conditions": [
+      "Router stack's layer.params must be undefined until route matching occurs",
+      "Route parameters must be accessible via req.params when a route is accessed",
+      "Parameter names must be stored and available before route matching",
+      "Parameter values must be populated only upon successful route matching"
+    ],
+    "created_at": "2017-08-01T19:50:47Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3376",
+    "source": {
+      "issue_number": 3376
+    },
+    "initial_question": {
+      "title": "Regex-based subrouter cannot route anything",
+      "body": "Hello,\r\nI'm experiencing a routing unavailability at `router2` in the code below. This code can route `/api/awesome` but not `mypage`. This code is of course simplified and the part of bigger system, so it is difficult to change the routing structure of `router1` and `router2`.\r\n\r\nWill there be any idea to resolve this while keeping this subrouter structure?\r\n\r\n```js\r\nconst express = require('express');\r\nconst app = express();\r\n\r\nconst router1 = express.Router();\r\nconst router2 = express.Router();\r\n\r\nrouter2.get('/mypage', function(req, res, next) {\r\n\tres.json('mypage');\r\n\tnext();\r\n});\r\n\r\nrouter1.use(/^\\/(?!api).*/, router2);\r\n\r\nrouter1.get('/api/awesome', function(req, res, next) {\r\n\tres.json('awesome');\r\n\tnext();\r\n});\r\n\r\napp.use(router1);\r\n\r\napp.listen(8080);\r\n```\r\n\r\nExpress version: 4.15.3\r\nNode.js version: 8.2.1"
+    },
+    "satisfaction_conditions": [
+      "The /mypage route must be accessible and return the expected response",
+      "The /api/awesome route must remain accessible and functional",
+      "The nested router structure (router1 and router2) must be preserved",
+      "Non-API routes must be correctly forwarded to router2",
+      "The URL path matching must preserve the original path components for subrouter processing"
+    ],
+    "created_at": "2017-07-28T08:31:06Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3319",
+    "source": {
+      "issue_number": 3319
+    },
+    "initial_question": {
+      "title": "why is 'next' in createApplication needed?",
+      "body": "```js\r\nfunction createApplication() {\r\n  var app = function(req, res, next) {\r\n    app.handle(req, res, next);\r\n  };\r\n```\r\nI deleted it in my local env,it turns out fine.\r\nAnd It seems no way to assaign it , how to use this 'next' here?"
+    },
+    "satisfaction_conditions": [
+      "The 'next' parameter must enable middleware chaining functionality",
+      "Application must handle nested/mounted application scenarios correctly"
+    ],
+    "created_at": "2017-05-25T03:09:01Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3283",
+    "source": {
+      "issue_number": 3283
+    },
+    "initial_question": {
+      "title": "Testing for express version",
+      "body": "Hello, I couldn't find in the documentation anywhere if there was a `require('express').version` or `app.version`.\r\n\r\nI have a middleware that has to change how it implements certain code depending on **Express 3.*** vs **Express 4.***.\r\n\r\nFYI: it regards the depreciated usage of path as an array in 3.* but allowed in 4.* and I didn't want to make a express3-module and express4-module for a single if statement."
+    },
+    "satisfaction_conditions": [
+      "Successfully determines Express framework version at runtime",
+      "Works within middleware context",
+      "Maintains single codebase compatibility",
+      "Enables conditional logic based on version"
+    ],
+    "created_at": "2017-04-18T10:24:33Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3282",
+    "source": {
+      "issue_number": 3282
+    },
+    "initial_question": {
+      "title": "inspect an action/handle/route function before i do with something",
+      "body": "i am trying to create a handering API with my routes.\r\nbut i cannot restrict everything. i add a decorator on the function like:\r\n\r\n```javascript\r\napp.use((req, res, next) => {\r\n   // i got the app inside...\r\n  // if it is decorated the handle/route/function it does it self\r\n  if (app.handle.decorated === true) {\r\n    next();\r\n }\r\n ... verify auth ...\r\n})\r\n\r\nconst decorate.auth = () => {};\r\ndecorate.auth.decorated = true;\r\n\r\n// a decorated auth,  so the middleware should skip\r\nroute.get('/something', decorate.auth('public', (req, res) => {\r\n  res.send('ok');\r\n}\r\n```\r\nThe problem is I want to restrict except the ones that are decorated, but i cannot find the handle/route before it is fired. "
+    },
+    "satisfaction_conditions": [
+      "Authorization check occurs before route handler execution"
+    ],
+    "created_at": "2017-04-12T22:19:35Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3274",
+    "source": {
+      "issue_number": 3274
+    },
+    "initial_question": {
+      "title": "TypeError: Router.use() requires middleware function but got a Object",
+      "body": "macOS Sierra 10.12.4\r\nnode v7.8.0\r\nnpm 4.2.0\r\n\r\nindex.js\r\n```javascript\r\nconst express = require('express')\r\nconst bodyParser = require('body-parser')\r\nconst session = require('express-session')\r\nconst mongoose = require('mongoose')\r\nconst MongoStore = require('connect-mongo')(session)\r\nconst morgan = require('morgan')\r\nconst csrf = require('lusca').csrf()\r\nconst fs = require('fs')\r\nconst path = require('path')\r\nconst rfs = require('rotating-file-stream')\r\n\r\nmongoose.connect('mongodb://localhost/test')\r\n\r\nconst app = express()\r\n\r\nconst logDir = path.join(__dirname, 'log')\r\nfs.existsSync(logDir) || fs.mkdirSync(logDir)\r\nconst accessLogStream = rfs('access.log', {\r\n  interval: '1d',\r\n  path: logDir\r\n})\r\n\r\napp.use(bodyParser.json())\r\napp.use(bodyParser.urlencoded({extended: true}))\r\napp.use(session({\r\n  secret: 'ohmy411',\r\n  store: new MongoStore({\r\n    mongooseConnection: mongoose.connection\r\n  })\r\n}))\r\napp.use(morgan('combined'), { stream: accessLogStream })\r\napp.use((req, res, next) => csrf(req, res, next))\r\n\r\napp.get('/', (req, res) => res.send('hello world'))\r\n\r\napp.listen(3000)\r\n```\r\n\r\nerror info\r\n```\r\n\u279c  server (master) \u2717 node index.js\r\nexpress-session deprecated undefined resave option; provide resave option index.js:26:9\r\nexpress-session deprecated undefined saveUninitialized option; provide saveUninitialized option index.js:26:9\r\n/Users/simonqian/Work/ohmy411/server/node_modules/express/lib/router/index.js:458\r\n      throw new TypeError('Router.use() requires middleware function but got a ' + gettype(fn));\r\n      ^\r\n\r\nTypeError: Router.use() requires middleware function but got a Object\r\n    at Function.use (/Users/simonqian/Work/ohmy411/server/node_modules/express/lib/router/index.js:458:13)\r\n    at Function.<anonymous> (/Users/simonqian/Work/ohmy411/server/node_modules/express/lib/application.js:220:21)\r\n    at Array.forEach (native)\r\n    at Function.use (/Users/simonqian/Work/ohmy411/server/node_modules/express/lib/application.js:217:7)\r\n    at Object.<anonymous> (/Users/simonqian/Work/ohmy411/server/index.js:32:5)\r\n    at Module._compile (module.js:571:32)\r\n    at Object.Module._extensions..js (module.js:580:10)\r\n    at Module.load (module.js:488:32)\r\n    at tryModuleLoad (module.js:447:12)\r\n    at Function.Module._load (module.js:439:3)\r\n    at Module.runMain (module.js:605:10)\r\n    at run (bootstrap_node.js:423:7)\r\n    at startup (bootstrap_node.js:147:9)\r\n    at bootstrap_node.js:538:3\r\n```\r\n\r\ndependencies\r\n```json\r\n  {\r\n    \"body-parser\": \"^1.17.1\",\r\n    \"connect-mongo\": \"^1.3.2\",\r\n    \"express\": \"^4.15.2\",\r\n    \"express-session\": \"^1.15.2\",\r\n    \"lusca\": \"^1.4.1\",\r\n    \"mongoose\": \"^4.9.2\",\r\n    \"morgan\": \"^1.8.1\",\r\n    \"rotating-file-stream\": \"^1.2.1\",\r\n    \"uuid\": \"^3.0.1\"\r\n  }\r\n```\r\n\r\nWhere is it wrong?"
+    },
+    "satisfaction_conditions": [
+      "Middleware configuration syntax must be valid Express.js format",
+      "Morgan logger configuration must receive stream parameter as part of its options object"
+    ],
+    "created_at": "2017-04-08T16:12:50Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3238",
+    "source": {
+      "issue_number": 3238
+    },
+    "initial_question": {
+      "title": "How to render from string?",
+      "body": "Hello.\r\n\r\nHow to render from string?\r\n\r\nindex.js\r\n```\r\nres.render('index', {\"hello\": \"world\"});\r\n```\r\nindex.ejs\r\n```\r\n<%- hello %>\r\n```\r\n\r\nWe need so:\r\n```\r\nvar hello = '<%- hello %>';\r\nres.render(hello, {\"hello\": \"world\"});\r\n```\r\n\r\nIt's possible?"
+    },
+    "satisfaction_conditions": [
+      "Template string must be processed as EJS template",
+      "Template variables must be properly interpolated",
+      "Response must contain the rendered output",
+      "Template string must support EJS syntax"
+    ],
+    "created_at": "2017-03-06T19:10:33Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3234",
+    "source": {
+      "issue_number": 3234
+    },
+    "initial_question": {
+      "title": "Creating a custom renderer for a JS file",
+      "body": "Not sure if this has been asked here before or on SO but I thought I'd post here incase we need to convert to an issue.\r\n\r\nI have the following route;\r\n\r\n```javascript\r\napp.get('/embed/:id.js', (req, res) => {\r\n  res.header('Content-Type', 'text/javascript')\r\n\r\n  res.sendFile(__dirname + '/views/embedTemplate.js', {\r\n    embedId: req.params.id\r\n  })\r\n})\r\n\r\n```\r\n\r\nObviously `sendFile` doesn't permit modifying the file as it's just the `fs` returning the file. So, instead of creating a custom engine to replace `#embedId#` for example, if there a way to `render` the file and modify the contents?\r\n\r\nMy first guess at something like based on the examples would be \r\n\r\n```javascript\r\napp.get('/embed/:id.js', (req, res) => {\r\n  res.header('Content-Type', 'text/javascript')\r\n\r\n  var filePath = __dirname + '/views/embedTemplate.js'\r\n\r\n  var fileToRender = fs.readFile(filePath, function (err, content) {\r\n    if (err) return callback(err)\r\n\r\n    var rendered = content.toString().replace('#embedId#', req.params.id)\r\n    return rendered\r\n  })\r\n\r\n  res.send(fileToRender)\r\n})\r\n```\r\n\r\nAm I missing something that is built into Express?"
+    },
+    "satisfaction_conditions": [
+      "JavaScript file content is dynamically modified with request parameters",
+      "Response is served with correct JavaScript content type",
+      "File reading operation is non-blocking",
+      "Error handling for file operations is implemented",
+      "Complete response is sent to client"
+    ],
+    "created_at": "2017-03-04T08:29:07Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3167",
+    "source": {
+      "issue_number": 3167
+    },
+    "initial_question": {
+      "title": "Why is `new Layer(path...)` used inside `Router` instead of `Layer(path...)`",
+      "body": "I'm going through the source code and I've noticed the following. \r\nIn the `router/index.js` the layer is created like this:\r\n\r\n```\r\n    var layer = new Layer(path, {\r\n      sensitive: this.caseSensitive,\r\n      strict: false,\r\n      end: false\r\n    }, fn);\r\n```\r\nWhile, in `router/route` the layer is created like this:\r\n\r\n`      var layer = Layer('/', {}, handle);`\r\n\r\nBased on the implementation of `Layer`:\r\n\r\n```\r\nfunction Layer(path, options, fn) {\r\n  if (!(this instanceof Layer)) {\r\n    return new Layer(path, options, fn);\r\n  }\r\n```\r\nboth calls do the same. Why use different initializations?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Both initialization methods must produce functionally equivalent Layer instances",
+      "The code must maintain backward compatibility until the next major version",
+      "The initialization pattern inconsistency must be documented or justified",
+      "Test coverage must be maintained across both initialization patterns"
+    ],
+    "created_at": "2017-01-05T08:19:21Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3148",
+    "source": {
+      "issue_number": 3148
+    },
+    "initial_question": {
+      "title": "Is this usecase recommended or discouraged?",
+      "body": "I created some modules for normalizing URLs in different ways (+ there are some others out there), so I would like to bundle them into a single module. This works right now:\r\n\r\n```js\r\napp.use((req, res, next) => {\r\n  req.app.use((req, res, next) => {\r\n    console.log(\"I am called!\");\r\n    next();\r\n  });\r\n  req.app.use((req, res, next) => {\r\n    console.log(\"Me too!\");\r\n    next();\r\n  });\r\n  console.log(\"Great\");\r\n  next();\r\n});\r\n```\r\n\r\nWhich correctly outputs:\r\n\r\n```\r\nGreat\r\nI am called!\r\nMe too!\r\n```\r\n\r\nHowever I worry that this is abusing express functionality/original intent. So I'd like to ask if this is frowned upon or perfectly valid within express' API."
+    },
+    "satisfaction_conditions": [
+      "Middleware execution order must be preserved",
+      "Middleware functions must be properly chained",
+      "Solution must use supported Express API features",
+      "URL normalization modules must be combinable"
+    ],
+    "created_at": "2016-12-09T10:37:53Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3136",
+    "source": {
+      "issue_number": 3136
+    },
+    "initial_question": {
+      "title": "res.redirect(404, '/path/') Not working. ",
+      "body": "This does not work.\r\n\r\n```res.redirect(404, '/path/to/404/page/')```\r\n\r\nThis does. \r\n\r\n```\r\nres.sendStatus(404)'\r\nres.redirect('/path/to/404/page/')\r\n```\r\n\r\nNot sure if that's by design in the case of a 404? Other status codes like `302` work fine. "
+    },
+    "satisfaction_conditions": [
+      "Browser must properly handle the redirect request",
+      "Response must use an appropriate redirect status code",
+      "Redirect and status code operations must be ordered correctly"
+    ],
+    "created_at": "2016-11-21T23:00:49Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3107",
+    "source": {
+      "issue_number": 3107
+    },
+    "initial_question": {
+      "title": "unix socket support",
+      "body": "Is it possible to use express with unix socket instead of `host:port` ?\n\nThe `listen` signature just call underlying server `listen` method, so I tried with:\n\n``` node\nserver = require('net').createServer(express());\nserver.listen('/tmp/sock', function() {\n  fs.chmodSync('/tmp/sock', 0777);\n});\n```\n\nBut then when, through nginx, I try to access a page, express crashes with the following error:\n\n```\n[...]/node_modules/express/lib/router/index.js:140\n  var search = 1 + req.url.indexOf('?');\n                          ^\n\nTypeError: Cannot read property 'indexOf' of undefined\n    at Function.handle ([...]/node_modules/express/lib/router/index.js:140:27)\n    at EventEmitter.handle ([...]/node_modules/express/lib/application.js:173:10)\n    at Server.app ([...]/node_modules/express/lib/express.js:38:9)\n    at emitOne (events.js:77:13)\n    at Server.emit (events.js:169:7)\n    at Pipe.onconnection (net.js:1431:8)\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Express application successfully accepts connections through a Unix socket",
+      "HTTP requests through the Unix socket are properly processed by Express routing"
+    ],
+    "created_at": "2016-10-20T15:35:29Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3098",
+    "source": {
+      "issue_number": 3098
+    },
+    "initial_question": {
+      "title": "Used app / router does not exec `params` middleware without call from within app / router",
+      "body": "I was just creating a router with only a param in it and found out the hard way that it doesn't execute in the `app` it's `app.use` in.\n\nHere's the code:\n\n``` js\nfunction myRouter () {\n  const router = Router({mergeParams: true})\n  router.param('appId', async (req, res, next, appId) => {\n    console.log('hi')\n    return next()\n  })\n  router.all('/:appId/*', (req, res, next) => {\n    return next()\n  })\n  return router\n}\n```\n\nThis will not log `hi` without.\n\n``` js\n  router.all('/:appId/*', (req, res, next) => {\n    return next()\n  })\n```\n\nWhich seems a bit unintuitive.\n"
+    },
+    "satisfaction_conditions": [
+      "Router parameter middleware must execute within its own router scope",
+      "Router must have a matching route that uses the parameter",
+      "Parameter middleware scoping must maintain router composability",
+      "Parameter middleware execution must be predictable within its scope"
+    ],
+    "created_at": "2016-10-12T05:11:05Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3086",
+    "source": {
+      "issue_number": 3086
+    },
+    "initial_question": {
+      "title": "Access native Node.js ClientRequest and ServerResponse objects",
+      "body": "Hello there! Sorry if this question was raised before. How can I access native Node.js request and response objects? For example in `koa` it's possible through getters `context.req = request.req = response.req` and `context.res = request.res = response.res` for request and response respectively.\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "Access to native Node.js request object is available",
+      "Access to native Node.js response object is available",
+      "Documentation clearly indicates the relationship between framework objects and native Node.js objects"
+    ],
+    "created_at": "2016-09-14T07:43:51Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3082",
+    "source": {
+      "issue_number": 3082
+    },
+    "initial_question": {
+      "title": "Set max SSL fragment size in Express",
+      "body": "I'm using express to set up an HTTPS server for some embedded devices. However, due to the lack of computing capabilities, the default SSL fragment size 16384 is too large for these devices. I wonder how I can change this size in express.\nI found that in tls modules, TLSSocket class has a method _tlsSocket.setMaxSendFragment(size)_ which may work, but I can't find out how to use it in Express.\nThis is how my server is established:\n\n```\nvar app = require('express')();\nvar cert_path = '/home/houlu/Programs/Node/http/ssl/';\nvar privateKey = fs.readFileSync(cert_path+'server.key', 'utf8');\nvar certificate = fs.readFileSync(cert_path+'server.crt', 'utf8');\nvar credentials = {key: privateKey, cert: certificate};\n\nhttpsServer = https.createServer(credentials, app);\n```\n\nThanks a lot!  :-)\n"
+    },
+    "satisfaction_conditions": [
+      "Configuration occurs at socket level rather than request level",
+      "Changes are applied to HTTPS server connections",
+      "Changes are compatible with Express application structure"
+    ],
+    "created_at": "2016-09-11T03:38:22Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/3058",
+    "source": {
+      "issue_number": 3058
+    },
+    "initial_question": {
+      "title": "express.Router()",
+      "body": "A function with a name starting with an uppercase letter should only be used as a constructor.\n\nThe sentence `const router = express.Router();` issues with AirBnb eslint.\n"
+    },
+    "satisfaction_conditions": [
+      "The Router instance must be properly initialized",
+      "The resulting router object must maintain full Express.Router functionality"
+    ],
+    "created_at": "2016-08-17T06:43:11Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2969",
+    "source": {
+      "issue_number": 2969
+    },
+    "initial_question": {
+      "title": "Parse Json Strings",
+      "body": "The solution provided in #2460 does not work. Returns \n`URIError: URI malformed`\n\nIn my case for example, my queries should be something of the sort:\n\n`where={%22name%22:%20{%22$like%22:%20%22%bari%22}}`\n\nWhich translates to: \n\n`\n\"where\": {\n  \"name\": {\n    \"$like\": \"%bar\"\n  }\n}\n`\n\nAny help would be appreciated. #2460 is the most similar problem I could find but did not work for me.\n"
+    },
+    "satisfaction_conditions": [
+      "URI-encoded special characters must be properly formatted",
+      "JSON string must be successfully parsed from the query parameter",
+      "Query parameter structure must be preserved"
+    ],
+    "created_at": "2016-04-13T16:42:02Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2911",
+    "source": {
+      "issue_number": 2911
+    },
+    "initial_question": {
+      "title": "Modifying req.params",
+      "body": "I am having some issues adding properties to `req.params`. It seems the params get wiped out when stepping to the next middleware:\n\n```\nfunction foobarRouter(type) {\n  var router = express.router();\n  router.use(function (req, res, next) {\n    req.params.type = type;\n    next();\n  });\n  router.get('/',         renderPage('foobars'));\n  router.get('/new',      renderPage('foobar_edit'));\n  router.get('/:id',      renderPage('foobar'));\n  router.get('/:id/edit', renderPage('foobar_edit'));\n}\napp.use('/foo', foobarRouter('foo'));\napp.use('/bar', foobarRouter('bar'));\n```\n\nDespite explicitly setting `req.params.type`, it is undefined in `renderPage`.\n\nI had a look at `mergeParams: true`, but it seems that this only preserves the params from the parent, which doesn't work in this case because the parent (the `app.use`) doesn't have any real params.\n\nIt would work if I did, `app.use('/:type', foobarRouter());`, but the route needs to be restricted to specific types only.\n\nHow can I modify the `req.params` for a sub-router so that it looks like they came from the parent?\n\nThanks.\n"
+    },
+    "satisfaction_conditions": [
+      "Router must only process requests for predefined path types",
+      "Solution must work with Express Router architecture"
+    ],
+    "created_at": "2016-02-26T12:39:43Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2910",
+    "source": {
+      "issue_number": 2910
+    },
+    "initial_question": {
+      "title": "Blank PDF when served from Express",
+      "body": "Similar to #1555 but that one was closed so not sure if my comment will get any attention.\nCopying my comment from there.\n\nI am running into similar issue with my first ever nodejs service. I have following:\n\n``` javascript\n\nvar headers = {} \n///Setting some custom headers for authentication\n\nvar urlObj = new URL( url );\nvar options = {\n            host: urlObj.host,\n            path: urlObj.pathname + urlObj.query,\n            headers: headers\n };\n http.get( options, function( response ) {\n            var body = '';\n            response.on( 'data', function( data ) {\n                body += data;\n             } );\n\n             response.on( 'end', function() {\n                  res.set( 'Content-Type', 'application/pdf' );\n                  res.send( new Buffer( body, 'binary' ) );\n             } );\n } );\n```\n\nBut I see a blank PDF with the correct number of pages and browser renders it as a PDF but all pages are empty.\nAccessing the `url` directly shows the right pdf so the pdf is fine.\nAny input will be really appreciated.\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "PDF binary data must be preserved without corruption during transfer",
+      "PDF document renders with visible content",
+      "Correct Content-Type header is set for PDF delivery",
+      "Complete PDF data is transmitted before response ends",
+      "Authentication headers are preserved in the proxy request"
+    ],
+    "created_at": "2016-02-25T20:31:06Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2830",
+    "source": {
+      "issue_number": 2830
+    },
+    "initial_question": {
+      "title": "charset=utf8 inserted between two phrase media type in response header",
+      "body": "Hi,\n\nExpress is mangling the response header I'm trying to set for a two phrase media type\n\nWe are establishing a HATEOAS convention where we have a generic collection type, designated as a vnd, and various media types which might be collected there, also a vnd. \n\n```\nres.set('content-type', 'application/vnd.samcorp.collection;content=\"application/vnd.samcorp.foo\"');\n\n```\n\nRead this as - we are sending you a samcorp collection of samcorp.foos. \n\nExpress renders the header as:\n\n```\nHTTP/1.1 200 OK\nX-Powered-By: Express\nContent-Type: application/vnd.samcorp.collection; charset=utf-8; content=\"application/vnd.samcorp.foo\"\n...\n```\n\nIs there a way I can get rid of the intruding charset header?\n\nIt's worth noting that I had to do a lot of googling to discover how to include the content specifier. Using what is below results in an invalid parameter error from Express, so the double quotations in what was above became necessary.\n\n```\n res.set('content-type', 'application/vnd.samcorp.collection;content=application/vnd.samcorp.foo');\n\n```\n\nThanks,\nNicholas\n"
+    },
+    "satisfaction_conditions": [
+      "Content-Type header must not include charset=utf-8 between the vendor media types",
+      "Content-Type header must preserve the collection and content relationship",
+      "Content-Type parameter values containing special characters must be properly formatted",
+      "Response must remain HTTP spec-compliant"
+    ],
+    "created_at": "2015-12-17T23:32:52Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2770",
+    "source": {
+      "issue_number": 2770
+    },
+    "initial_question": {
+      "title": "Each request is calling linux stat",
+      "body": "Hi,\nWe added some monitoring to our servers lately after finding some unexpected latency on some times, and saw on our calls to the servers latency is caused by calling linux stat command.\nWe are still investigating to see if this may be related to other used services, but can it be express related issue? \n"
+    },
+    "satisfaction_conditions": [
+      "Reduced frequency of stat system calls",
+      "Maintained correct file serving functionality",
+      "Proper request handling order"
+    ],
+    "created_at": "2015-09-30T14:39:19Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2740",
+    "source": {
+      "issue_number": 2740
+    },
+    "initial_question": {
+      "title": "Middleware conflicts - question",
+      "body": "Following scenario:\n\n``` js\nvar middlewre = function(){\n    return function(req, res, next){\n        // do somthing\n        next();\n   }\n}\n```\n\nthen you use it twice:\n\n``` js\napp.use('/', middleware());\napp.use('/SomePath', middleware());\n```\n\nIf request comes to '/SomePath' the middleware will run twice. does it make sense? I would expect that '/' is superset and the middleware will run only once.\n"
+    },
+    "satisfaction_conditions": [
+      "Middleware execution count must be controllable",
+      "Middleware state must persist across route matches",
+      "Original middleware functionality must be preserved",
+      "Solution must work with Express.js routing hierarchy",
+      "Request context must remain intact"
+    ],
+    "created_at": "2015-08-21T19:20:01Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2707",
+    "source": {
+      "issue_number": 2707
+    },
+    "initial_question": {
+      "title": "Is there a way to let exceptions bubble up instead of passing to finalhandler",
+      "body": "I'm trying to do some exception handling in my app built on express and it's being problematic that every time I throw an exception it gets printed to the screen.\n\nIs this configurable?\n"
+    },
+    "satisfaction_conditions": [
+      "Error output to web browser must be configurable",
+      "Error output to console/stderr must be configurable",
+      "Error handling flow must be customizable",
+      "Solution must work within Express.js middleware chain",
+      "Environment-based configuration must be supported"
+    ],
+    "created_at": "2015-07-16T03:55:04Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2669",
+    "source": {
+      "issue_number": 2669
+    },
+    "initial_question": {
+      "title": "IP address as a url param error",
+      "body": "When declaring an IP address as a URL parameter `req.params` incorrectly parses the value. \n\nAdd the following param to the URL  `:ip((?:[0-9]{1,3}\\.){3}[0-9]{1,3})`\n\nUse the value 192.168.1.2 for ip\n\nThen check  `req.params.ip` it will return as 1. \n\n```\nconsole.log('req.originalUrl',req.originalUrl);\nconsole.log('(req.params.ip',req.params.ip);\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Regular expression pattern must be compatible with the router's URL parsing system",
+      "Parameter definition must handle standard IPv4 format"
+    ],
+    "created_at": "2015-06-03T17:47:46Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2659",
+    "source": {
+      "issue_number": 2659
+    },
+    "initial_question": {
+      "title": "params in middleware not work",
+      "body": "I have a router with a middleware for manage entry , but not recognize all params from the request,\n\nby example  I have a route like /:username/:idMessage , then the middleware only recognize the username param but not the idMessage\n\n``` javascript\nvar router = express.Router({mergeParams: true});\nrouter.use(function (req, res, next) {\n    console.log(req.params.username);\n    //juliocanares\n\n    console.log(req.params.idMessage);\n    //undefined\n\n    next();\n});\n\n//localhost:3000/juliocanares\nrouter.get('/', function (req, res) {\n    console.log(req.params.username);\n    //juliocanares\n    return res.json({username: req.params.username});\n});\n\n//localhost:3000/juliocanares/10\nrouter.get('/:idMessage', function (req, res) {\n    console.log(req.params.idMessage);\n    //10\n    return res.json({idMessage: req.params.idMessage});\n});\n\napp.use('/:username', router);\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Parameter scope must match the route definition level",
+      "Router configuration must maintain parameter inheritance"
+    ],
+    "created_at": "2015-05-24T05:41:16Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2595",
+    "source": {
+      "issue_number": 2595
+    },
+    "initial_question": {
+      "title": "/lib/response.js -> undefined is not a function at this.get()",
+      "body": "I honestly don't even know what information to provide.\nAll I know is my stack trace says:\n\n_Possibly unhandled TypeError: undefined is not a function... lib\\response.js:130:17_\n\nI am using _bluebird_ promise library and the error is being generated when I try:\n\n```\n.then(response.send, next);\n```\n\nbut not when I do:\n\n```\n.then(function(result) {\n    response.send(result)\n}, next);\n```\n"
+    },
+    "satisfaction_conditions": [
+      "The Promise chain executes without 'undefined is not a function' error",
+      "The response.send method maintains its correct execution context",
+      "The error handling (next) function remains properly connected"
+    ],
+    "created_at": "2015-03-16T02:14:46Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2593",
+    "source": {
+      "issue_number": 2593
+    },
+    "initial_question": {
+      "title": "Router mergeParams=true does not work ",
+      "body": "express 4.12.2. According to the Router doc about `mergeParams` option:\n\n> Preserve the `req.params` values from the parent router. If the parent and the child have conflicting param names, the child\u2019s value take precedence.\n\nMay be I miss something, but it does not behave in that way at all:\n\n``` javascript\nvar express = require('express');\nvar app = express();\n\n\napp.get('/users/:username', function(req, res, next) {\n        console.log('> app.get');\n\n    if (req.params.username !== 'alice') {\n        throw new Error('app.get: username != alice');\n    }\n\n    next();\n});\n\nvar router1 = express.Router({mergeParams: true});\napp.use(router1);\n\nrouter1.get('*', function(req, res, next) {\n        console.log('> router1.get');\n\n        // This throws.  \n    if (req.params.username !== 'alice') {\n        throw new Error('router1.get: username != alice');\n    }\n\n    next();\n});\n\napp.listen(5000, '0.0.0.0');\n```\n\nNow send a GET request with url \"/users/alice\" and it will print:\n\n```\n> app.get\n> router.get\nError: router1.get: username != alice\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Router mounting point must include parameter definitions",
+      "Parameter values must persist through the entire request chain"
+    ],
+    "created_at": "2015-03-14T17:41:11Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2566",
+    "source": {
+      "issue_number": 2566
+    },
+    "initial_question": {
+      "title": "Is there a way to register a function/layer after the app.get function",
+      "body": "I want to do the cleanup thing after each get or post route is done, since `route.use` is called before the `route.$httpmethod`, so I wonder is there a way to register a function which is called **_after**_ the `route.$httpmethod`.\n"
+    },
+    "satisfaction_conditions": [
+      "Code executes cleanup operations after route handlers complete",
+      "Works with both GET and POST HTTP methods",
+      "Cleanup function executes regardless of route handler success or failure",
+      "Maintains proper request/response flow"
+    ],
+    "created_at": "2015-02-24T08:35:45Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2531",
+    "source": {
+      "issue_number": 2531
+    },
+    "initial_question": {
+      "title": "Loosing params consistency in child routes with mergeParams",
+      "body": "Hi folks,\n\nI'm facing an issue which is that if I nest 2 routers like in the example below, my modifications on the `req.params` object are not kept in the child route. Any thought on how to resolve it ?\n\n``` js\nvar express = require('express');\n\nmodule.exports = function(app) {\n\n    var myRouter = express.Router();\n    var mySpecificRouter = express.Router({\n        mergeParams: true\n    });\n\n    myRouter.all('*', app.requestHelper.verifyToken);\n\n    myRouter.route('/')\n        .get(app.controller.my.list);\n\n    myRouter\n        .use('/:id', function(req, res, next) {\n            if (/^[0-9]+$/.test(req.params.id)) {\n                console.log('parent params before parsing', req.params);\n                req.params.id = parseInt(req.params.id, 10);\n                console.log('parent params', req.params);\n                next();\n            } else {\n                app.status(400).send({error:'bad request'});\n            }\n        }, mySpecificRouter);\n\n    mySpecificRouter\n        .route('/')\n        .get(function(req, res, next) {\n            console.log('child params', req.params);\n            app.status(200).send({});\n        });\n\n    app.use('/route', myRouter);\n};\n```\n\nSo the console log of a get request on /route/101 give me the following:\n\n```\nparent params before parsing {id: '100'}\nparent params {id: 100}\nchild params {id: '101'}\n```\n\nWhen I check in the `parentParams` in the index of the router I see the original object instead of the altered one...\n\nThanks !\n"
+    },
+    "satisfaction_conditions": [
+      "Router parameter inheritance must work with mergeParams enabled",
+      "Parameter validation must be performed before modification"
+    ],
+    "created_at": "2015-02-06T14:00:29Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2529",
+    "source": {
+      "issue_number": 2529
+    },
+    "initial_question": {
+      "title": "Deprecated message thrown when using res.status",
+      "body": "I have been aware that since express@4.x, `res.send(201, obj)` format has been deprecated. But I am running into a situation where in 4.x I would want to send an `id` back, as shown as follows:\n\n``` js\nvar app = express();\n\napp.use(function(req, res) {\n  res.statusCode(201).send(1111); // where this is the ID.\n});\n\nrequest(app)\n   .get('/')\n   .expect(1111)\n   .expect(201, done);\n```\n\nBut I would get the deprecated message:\n\n`express deprecated res.send(status)`\n\nI was wondering if how should I approach this situation in `express` where I would want to send an integer back without having to do the following:\n\n``` js\napp.use(function(req, res) {\n  res.statusCode(201).send({ id: 1111 }); // where this is the ID.\n});\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Response returns status code 201 without deprecation warnings",
+      "Response body contains numeric value 1111 in a valid format",
+      "Response passes the provided test expectations",
+      "Response format maintains numeric data type compatibility"
+    ],
+    "created_at": "2015-02-04T05:12:05Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2510",
+    "source": {
+      "issue_number": 2510
+    },
+    "initial_question": {
+      "title": "route can not use in chinese",
+      "body": "work good/articles/:type(%E8%B6%8B%E5%8A%BF|%E8%A7%82%E7%82%B9|%E6%A1%88%E4%BE%8B)\n\nwrong:   /articles/:type(\u8d8b\u52bf|\u89c2\u70b9|\u6848\u4f8b)?\n"
+    },
+    "satisfaction_conditions": [
+      "Route must correctly handle encoded Chinese characters in URL paths",
+      "URL pattern matching must work with decoded Unicode characters",
+      "Route parameters must be validated against specific Chinese character values",
+      "Route must handle both encoded and decoded URL forms"
+    ],
+    "created_at": "2015-01-23T04:09:55Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2392",
+    "source": {
+      "issue_number": 2392
+    },
+    "initial_question": {
+      "title": "Deprecated should only log once",
+      "body": "We're seeing a lot of\n\n```\nexpress deprecated res.send(status, body): Use res.status(status).send(body) instead at node_modules/toobusy-middleware/index.js:76:13\n```\n\nin our logs. It'd be great if express would only log this once, and state something like 'logging of this deprecation warning is now turned off' to avoid filling the logs with nothing but deprecated warnings.\n\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Deprecation warnings must be suppressible in production environment",
+      "Deprecation warnings must remain visible in development environment when desired",
+      "The suppression method must be configurable at runtime",
+      "The solution must handle third-party module deprecation warnings"
+    ],
+    "created_at": "2014-10-11T14:13:27Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/2387",
+    "source": {
+      "issue_number": 2387
+    },
+    "initial_question": {
+      "title": "Router: Cannot use literal characters \\] and \\) in Regex",
+      "body": "I know is horrible having special characters in URLs but I sadly have to manage them, so I tried to use this route:\n\n``` javascript\nrouter.get(\"/thumb/:file([a-zA-Z\\-0-9\\/ \\._\\%,&\\[\\]]+)/:size\", function (req, res) {\n   //do stuff\n});\n```\n\nto handle an URL like: `/thumb/canada/news-events/event-list/185-Roma_Ghezzi[1].jpg/75x75`\n\nAdding the character `\\\\]` will make the route stop working, even if the URL doesn't contain those characters.\n\nEven worst when you try adding the characters `\\\\(` or `\\\\)` because it crashes the process with the error:\n\n```\nSyntaxError: Invalid regular expression: /^\\/thumb\\/(?:([a-zA-Z-0-9\\/ \\._%,&[]))]+)\\/(?:([^\\/]+?))\\/?$/: Unmatched ')'\n    at new RegExp (<anonymous>)\n```\n\nI'd really prefer to use this a rule like the following one:\n\n``` javascript\nrouter.get(\"/thumb/:file(.+)/:size\", function (req, res) {\n   //do stuff\n});\n```\n\nbut the expression `(.+)` doesn't match a string like: `folder/subfolder/file` because the slashes `/` are considered a stop character (I guess).\n"
+    },
+    "satisfaction_conditions": [
+      "Route must successfully match URLs containing multiple path segments between /thumb/ and the size parameter",
+      "Route must correctly parse and separate the file path from the size parameter",
+      "Route must handle special characters in the URL when properly URL-encoded",
+      "Route parameters must be accessible in a usable format in the request handler"
+    ],
+    "created_at": "2014-10-09T14:17:28Z"
+  },
+  {
+    "id": "https://github.com/expressjs/express/issues/5403",
+    "source": {
+      "issue_number": 5403
+    },
+    "initial_question": {
+      "title": "Inconsistent Logging Order for GET and POST Requests",
+      "body": "**Issue Description:**\r\nI have implemented middleware in my Express application to log request details and response time. The main application code is provided below:\r\n\r\n```javascript\r\nconst path = require('path');\r\nconst express = require('express');\r\n\r\nconst friendsRouter = require('./routes/friends.router');\r\nconst messagesRouter = require('./routes/messages.router');\r\n\r\nconst app = express();\r\nconst publicPath = path.join(__dirname, 'public');\r\n\r\nconst PORT = 3000;\r\n\r\napp.use((req, res, next) => {\r\n  const start = Date.now();\r\n  next();\r\n\r\n  const delta = Date.now() - start;\r\n  console.log(`${req.method} ${req.baseUrl}${req.url} ${delta}ms`);\r\n});\r\n\r\napp.use(express.json());\r\napp.use('/static', express.static(publicPath));\r\n\r\napp.use('/friends', friendsRouter);\r\napp.use('/messages', messagesRouter);\r\n\r\napp.listen(PORT, () => {\r\n  console.log(`Server listening on port ${PORT}`);\r\n});\r\n```\r\n\r\nIn friendsRouter, I have an extra middleware to log the ip address:\r\n```javascript\r\nfriendsRouter.use((req, res, next) => {\r\n  console.log('ip address', req.ip);\r\n  next();\r\n});\r\n```\r\n\r\nWhen I send a GET request, the logs are as expected:\r\n```bash\r\nGET /friends/ 2ms\r\nip address ::1\r\n```\r\n\r\nHowever, when I send a POST request, the order of logs is not consistent:\r\n```bash\r\nPOST /friends 4ms\r\nip address ::1\r\n```\r\n\r\n**Expected Behavior:**\r\nConsistent order of logs is expected for both GET and POST requests since the order of middleware functions is not changed.\r\n\r\n**Actual Behavior:**\r\nThe order of logs is inconsistent for GET and POST requests, and there's a noticeable difference in the path format for POST requests.\r\nFor a POST request, there is no / at the end.\r\n\r\n**Additional Information:**\r\nExpress version: 4.18.2\r\nNode.js version: 20.10.0\r\nOperating System: WSL2"
+    },
+    "satisfaction_conditions": [
+      "Logging functionality must not interfere with normal request processing"
+    ],
+    "created_at": "2024-01-23T10:50:40Z"
+  }
+]

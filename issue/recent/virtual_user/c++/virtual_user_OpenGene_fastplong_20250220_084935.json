@@ -1,0 +1,20 @@
+[
+  {
+    "id": "https://github.com/OpenGene/fastplong/issues/1",
+    "source": {
+      "issue_number": 1
+    },
+    "initial_question": {
+      "title": "why reads become more ",
+      "body": "fastplong -w 128 -Q  -i ont.fq.gz -o fastplong.fq.gz\r\nTrying to detect adapter sequence at read start\r\nDetected: TGTACTTCGTTCAGTTACGTATTGCT\r\nTrying to detect adapter sequence at read end\r\nFound possible adapter sequence, but it's too short: AGCAATACGTAACT, specify -e AGCAATACGTAACT to force trimming using this adapter\r\n\r\nWARNING: fastp uses up to 16 threads although you specified 128\r\nBefore filtering:\r\ntotal reads: 100000\r\ntotal bases: 1115995199\r\nQ20 bases: 292467773(26.2069%)\r\nQ30 bases: 35884706(3.21549%)\r\n\r\nAfter filtering:\r\ntotal reads: 101516\r\ntotal bases: 1113424759\r\nQ20 bases: 291912102(26.2175%)\r\nQ30 bases: 35844471(3.2193%)\r\n\r\nFiltering result:\r\nreads passed filter: 101516\r\nreads failed due to low quality: 0\r\nreads failed due to too many N: 0\r\nreads failed due to too short: 8\r\nreads with adapter trimmed: 61654\r\nbases trimmed due to adapters: 2500069\r\n\r\nJSON report: fastplong.json\r\nHTML report: fastplong.html\r\n\r\nfastplong -w 128 -Q -i ont.fq.gz -o fastplong.fq.gz \r\nfastplong v0.2.0, time used: 43 seconds"
+    },
+    "satisfaction_conditions": [
+      "Split reads must have unique identifiers",
+      "Original read relationship must be traceable",
+      "Maximum split limit must be enforced",
+      "Adapter sequences must be properly detected and handled",
+      "Output must be compatible with downstream analysis tools"
+    ],
+    "created_at": "2024-11-10T14:24:15Z"
+  }
+]

@@ -1,0 +1,318 @@
+[
+  {
+    "number": 1535,
+    "title": "Optimizing RabbitMQ Performance and Managing Multiple Instances in CAP",
+    "created_at": "2024-05-22T01:22:23Z",
+    "closed_at": "2024-05-22T01:49:45Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/1535",
+    "body": "\u4f60\u597d\uff0c\u6211\u6709\u51e0\u4e2a\u95ee\u9898\u60f3\u8bf7\u6559\r\n\r\n\u4f7f\u7528RabbitMQ\uff1a\r\n\r\n1\u3001cap\u91c7\u7528\u4e86\u5355\u4e2a\u961f\u5217\uff08\u5982\uff1acap.queue.XXXX.v1\uff09\u6765\u5904\u7406\u6240\u6709\u7684\u6d88\u606f\uff0c\u8fd9\u5bf9\u6027\u80fd\u662f\u5426\u6709\u5f71\u54cd\u3002\r\n\u6bd4\u5982\u5728\u4e24\u4e2a\u573a\u666f\u4e2d\uff0c\u573a\u666f1\u4e2d\u670910w\u4e2a\u6d88\u606f\uff0c\u573a\u666f2\u4e2d\u670910\u4e2a\u6d88\u606f\uff0c\u4f46\u4ed6\u4eec\u90fd\u4f1a\u6295\u9012\u5230\u540c\u4e00\u4e2a\u961f\u5217\uff0c\u9020\u6210\u573a\u666f2\u7684\u65e0\u6545\u7b49\u5f85\u3002\u6211\u53ef\u4ee5\u5982\u4f55\u5904\u7406\u8fd9\u79cd\u60c5\u51b5\r\n\r\n2\u3001\u6211\u53ef\u4ee5\u5982\u4f55\u6ce8\u5165\u591a\u4e2a\u5b9e\u4f8b\r\n\u9879\u76ee\u4e2d\u6211\u53ef\u80fd\u4f1a\u4f7f\u7528\u591a\u4e2aCAP\uff0c\u5728\u5bf9\u63a5\u591a\u4e2a\u9879\u76ee\u65f6\uff0c\u53ef\u80fd\u9879\u76eeA\u4f7f\u7528MQ1\u5b9e\u4f8b\uff0c\u9879\u76eeB\u4f7f\u7528MQ2\u5b9e\u4f8b\uff0c\u6211\u53ef\u4ee5\u5982\u4f55\u6ce8\u5165\u5e76\u83b7\u53d6\u5230\u4e0d\u540c\u7684\u5b9e\u4f8b\u6765\u53d1\u9001\u6216\u5904\u7406\u6d88\u606f",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/1535/comments",
+    "author": "907080752",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2024-05-22T01:37:15Z",
+        "body": "1\u3001\u6ca1\u6709\u5f71\u54cd\uff0cRabbitMQ\u5355\u4e2a\u961f\u5217\u6027\u80fd\u53ef\u4ee5\u8fbe\u5230\u6570\u4e07\u5230\u6570\u5341\u4e07\u6761\u6d88\u606f\u6bcf\u79d2\u3002\u540c\u65f6\u6211\u4eec\u652f\u6301\u6307\u5b9a\u8bbe\u7f6eGroup\u6765\u5c06\u6d88\u606f\u6295\u9012\u5230\u72ec\u7acb\u7684\u961f\u5217\u3002\r\n2\u3001\u4e0d\u652f\u6301\u3002\u7b80\u5355\u6765\u8bf4\u6570\u636e\u6536\u96c6\u9879\u76ee\u4e0d\u662fCAP\u8981\u652f\u6301\u7684\u573a\u666f\uff0c\u8fd9\u79cd\u573a\u666f\u4e0d\u9700\u8981\u4f7f\u7528\u53d1\u4ef6\u7bb1\u6a21\u5f0f\u3002\u4f60\u53ef\u4ee5\u4f7f\u7528\u524d\u7f6e\u5de5\u5177\u805a\u5408\u540e\u518d\u4f7f\u7528CAP\u5904\u7406\u3002"
+      }
+    ]
+  },
+  {
+    "number": 1323,
+    "title": "Disabling cap logs",
+    "created_at": "2023-05-02T22:13:29Z",
+    "closed_at": "2023-05-03T12:07:35Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/1323",
+    "body": "hi,\r\n\r\nwhile using cap library, it writes a lot of log in addition to my app's logs. Is there a way to disable cap's log?",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/1323/comments",
+    "author": "cagataykiziltan",
+    "comments": [
+      {
+        "user": "3ldar",
+        "created_at": "2023-05-03T10:18:28Z",
+        "body": "Yeap you can do it by modifying `appsettings.json` files logging section like below :\r\n```\r\n\"Logging\": {\r\n    \"LogLevel\": {\r\n      \"Default\": \"Information\",\r\n      \"Microsoft\": \"Warning\",\r\n      \"Microsoft.Hosting.Lifetime\": \"Information\",\r\n      \"DotNetCore.CAP\" : \"Warning\r\n \r\n    }\r\n  }\r\n```"
+      },
+      {
+        "user": "canperk",
+        "created_at": "2024-04-26T14:32:49Z",
+        "body": "We cannot do that in yaml files like\n\nLogging__LogLevel__DotnetCore.CAP"
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2024-04-26T15:18:34Z",
+        "body": "@canperk \r\n \r\n`Logging__LogLevel__DotnetCore.CAP`  -->  `Logging__LogLevel__DotNetCore.CAP` \uff1f\r\n\r\nn to N"
+      },
+      {
+        "user": "canperk",
+        "created_at": "2024-04-30T08:23:10Z",
+        "body": "@yang-xiaodong  This is the full configuration but I suspect there is priority issue here:\r\n\r\n```\r\n- name: Logging__LogLevel__Default\r\n  value: \"Information\"\r\n- name: Logging__LogLevel__DotNetCore.CAP\r\n  value: \"Warning\"\r\n- name: Logging__LogLevel__Microsoft\r\n  value: \"Warning\"\r\n- name: Logging__LogLevel__Microsoft.Hosting.Lifetime\r\n  value: \"Information\"\r\n- name: \"Logging__ApplicationInsights__LogLevel__Default\"\r\n  value: \"Information\"\r\n- name: \"Logging__ApplicationInsights__LogLevel__Microsoft\"\r\n  value: \"Error\"\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1070,
+    "title": "Share the same SQL server as CAP storage for multiple services",
+    "created_at": "2022-01-15T01:14:41Z",
+    "closed_at": "2022-01-18T09:18:14Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/1070",
+    "body": "Hi, I'm wondering if it's a good practice to share the same message storage for multiple services using CAP? For example, some of our microservices doesn't have a database, it just receives messages from azure service bus and process them. Can I just create a centralised SQL server as CAP message store and share them between these services? \r\n\r\nThanks",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/1070/comments",
+    "author": "waterydan",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2022-01-15T09:09:36Z",
+        "body": "Yes, You can use `TableNamePrefix` option to specify that each service uses the different table.\r\n\r\n```\r\npublic void ConfigureServices(IServiceCollection services)\r\n{\r\n    services.AddCap(x =>\r\n    {\r\n        x.UseKafka(\"\");\r\n        x.UseMySql(opt =>\r\n        {\r\n            opt.ConnectionString = \"connection string\";\r\n            opt.TableNamePrefix = \"appone\"; // different table name prefix here\r\n        });\r\n    });\r\n}\r\n```"
+      },
+      {
+        "user": "dengyangxi",
+        "created_at": "2023-06-06T03:15:18Z",
+        "body": "@yang-xiaodong  \r\nDoes Microsoft's SQL Server support custom table prefixes         \r\nTableNamePrefix   "
+      }
+    ]
+  },
+  {
+    "number": 386,
+    "title": "How to subscribe multiple message in console app",
+    "created_at": "2019-08-26T06:29:24Z",
+    "closed_at": "2019-08-26T06:51:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/386",
+    "body": "Hi yang-xiaodong\r\n\r\n Follow by issues #275.\r\n I'd like to ask you how to subscribe multiple message in console app?\r\n\r\nTks so much\r\n",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/386/comments",
+    "author": "tuongntk",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2019-08-26T06:42:38Z",
+        "body": "You can add multiple consumer method to subscribe multiple message.\r\n\r\n```cs\r\n[CapSubscribe(\"sample.rabbitmq.mysql.test1\")]\r\npublic void Subscribe1(DateTime time)\r\n{\r\nConsole.WriteLine($@\"{DateTime.Now}, Subscriber1 invoked, Sent time:{time}\");\r\n}\r\n\r\n[CapSubscribe(\"sample.rabbitmq.mysql.test2\")]\r\npublic void Subscribe2(DateTime time)\r\n{\r\nConsole.WriteLine($@\"{DateTime.Now}, Subscriber2 invoked, Sent time:{time}\");\r\n}\r\n```"
+      },
+      {
+        "user": "tuongntk",
+        "created_at": "2019-08-26T06:45:39Z",
+        "body": "Tks yang, but in your sample code i found that:\r\n\r\n```cs\r\n public Task StartAsync(CancellationToken cancellationToken)\r\n{\r\n    _logger.LogInformation(\"Timed Background Service is starting.\");\r\n    _timer = new Timer(Publish, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));\r\n    return Task.CompletedTask;\r\n}\r\n```\r\nYou start timer with Publish callback.\r\n\r\nIs it right if i implement more and more subcribers methods. Does it affect to any method ?\r\nTks so much\r\n\r\n"
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2019-08-26T06:49:16Z",
+        "body": "Timer is just to show for example, you can publish or subscribe  messages wherever you want. "
+      }
+    ]
+  },
+  {
+    "number": 304,
+    "title": "\u591a\u6570\u636e\u5e93\uff0c\u53ea\u5efa\u4e86\u4e00\u4e2a\u5e93\u7684\u8868\u7684\u95ee\u9898",
+    "created_at": "2019-03-22T09:00:25Z",
+    "closed_at": "2019-03-22T10:03:55Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/304",
+    "body": "\u4f7f\u7528\u4e86\u4e24\u4e2a\u6570\u636e\u5e93\uff0c\u53ea\u6709\u5176\u4e2d\u4e00\u4e2a\u6570\u636e\u5e93\u81ea\u52a8\u521b\u5efa\u4e86\u6570\u636e\u8868\uff0c\u53e6\u4e00\u4e2a\u9700\u8981\u624b\u5de5\u521b\u5efa\u6570\u636e\u8868\r\nx.UseSqlServer(ConnnectionFactory.ConnectionString);\r\nx.UseSqlServer(ConnnectionFactory.ConnectionString2);\r\n\r\n\u80fd\u770b\u5230CapOptions.Extensions\u6709\u4e24\u4e2a\u6570\u636e\u5e93\u7684\u5bf9\u50cf\uff0c\u6309\u6211\u7684\u7406\u89e3\u5e94\u8be5\u662f\u652f\u6301\u591a\u6570\u636e\u5e93\u5efa\u8868\u7684",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/304/comments",
+    "author": "cheetahing",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2019-03-22T10:03:31Z",
+        "body": "Multiple databases in one instance is not supported"
+      },
+      {
+        "user": "cheetahing",
+        "created_at": "2019-03-22T11:03:40Z",
+        "body": "1.\u6211\u9700\u8981\u652f\u6301\u591a\u4e2asql server\u6211\u8be5\u4ece\u54ea\u91cc\u5165\u624b\uff0c\u5982\u4f55\u8fdb\u884c\u6539\u9020\uff0c\u6709\u4ec0\u4e48\u5efa\u8bae\uff0c\u6211\u6709\u65f6\u95f4\u53ef\u4ee5\u8d21\u732e\u4ee3\u7801\r\n2.\u6211\u7684\u4e8b\u52a1\u6027\u7684\u4e1a\u52a1\u653e\u5728sql server\u91cc\uff0c\u975e\u4e8b\u52a1(\u5386\u53f2\u6570\u636e)\u901a\u8fc7\u6d88\u606f\u603b\u7ebf\u8fdb\u884c\u540c\u6b65\uff0c\u4ed6\u4eec\u4f1a\u5904\u4e8e\u540c\u4e00\u4e2a\u5fae\u670d\u52a1\u4e2d\uff0c\u6709\u4ec0\u4e48\u5efa\u8bae"
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2019-03-22T11:23:56Z",
+        "body": "@cheetahing  \u4f60\u7684\u601d\u8def\u53ef\u80fd\u6709\u70b9\u95ee\u9898\uff0c\u6211\u5e2e\u4f60\u7406\u4e00\u4e0b\u3002\r\n\r\n\u4f60\u60f3\u7684\u662f\u4e8b\u52a1\u6d88\u606f\u5199SQL Server\uff0c \u5176\u4ed6\u4e0d\u91cd\u8981\u7684\u5386\u53f2\u6d88\u606f\u5199\u5165\u5176\u4ed6\u6570\u636e\u5e93\uff0c\u8fd9\u6837\u5206\u5de5\u804c\u8d23\u6bd4\u8f83\u660e\u786e\uff0c\u573a\u666f\u6bd4\u8f83\u6e05\u6670\uff0c\u4f60\u7684\u60f3\u6cd5\u5927\u6982\u662f\u8fd9\u6837\u5427\uff1f\r\n\r\n\u90a3\u4e48\u6211\u4eec\u53ef\u4ee5\u4ece\u4e24\u65b9\u9762\u6765\u5206\u6790\u3002\r\n1\u3001\u5047\u5982\u4f60\u4eec\u4e1a\u52a1\u91cf\u5f88\u5927\uff0c\u6d88\u606f\u6570\u91cf\u53ef\u80fd\u8fbe\u5230\u6bcf\u79d2\u51e0\u5343\u6216\u8005\u51e0\u4e07\uff0c\u90a3\u4e48\u4e3a\u4ec0\u4e48\u8fd8\u8981\u4f7f\u7528\u6570\u636e\u5e93\u6216\u8005\u5728\u5185\u5b58\u4e2d\u505a\u4e00\u6b21\u5b58\u50a8\u5462\uff0c\u8fd9\u4e48\u5927\u7684\u541e\u5410\u91cf\u5e94\u8be5\u76f4\u63a5\u8fde\u5230\u6d88\u606f\u961f\u5217\uff0c\u4e0d\u7ecf\u8fc7\u4efb\u4f55\u5904\u7406\u53d1\u9001\u5373\u53ef\uff0c\u4f7f\u6d88\u606f\u961f\u5217\u8fbe\u5230\u6700\u5927\u5cf0\u503c\uff0c\u4f7f\u7528CAP\u53cd\u800c\u4f1a\u964d\u4f4e\u541e\u5410\u91cf\uff0c\u56e0\u4e3aCAP\u9700\u8981\u5904\u7406\u4ee5\u53ca\u5b58\u50a8\u3002\r\n2\u3001\u5047\u5982\u4f60\u4eec\u4e1a\u52a1\u91cf\u5f88\u5c0f\uff0c\u6d88\u606f\u6570\u91cf\u53ef\u80fd\u5c31\u6bcf\u79d2\u51e0\u5341\u6216\u8005\u51e0\u767e\u751a\u81f3\u53ef\u80fd\u8fd8\u8981\u66f4\u5c11\u4e00\u4e9b\uff0c\u90a3\u4e48\u4f7f\u7528SQL Server\u5b58\u50a8\uff08\u5305\u62ec\u5386\u53f2\u6570\u636e\u6d88\u606f\uff09\u53c8\u6709\u4ec0\u4e48\u5173\u7cfb\u5462\uff0cCAP\u4f1a\u5b9a\u671f\u6e05\u7406\u8fd9\u4e9b\u6210\u529f\u7684\u6570\u636e\uff0c\u8fd9\u4e9b\u4e8b\u4ef6\u6570\u636e\u4ec5\u4ec5\u662f\u4e3a\u4e86\u4fdd\u8bc1\u6570\u636e\u4e00\u81f4\u6027\u7684\u4e34\u65f6\u5b58\u50a8\u4ecb\u8d28\u800c\u5df2\uff0c\u4f60\u53ef\u4ee5\u628a\u8fc7\u671f\u4e8b\u4ef6\u8bbe\u7f6e\u5c0f\u4e00\u70b9\uff0c\u8fd9\u6837CAP\u5c31\u4f1a\u66f4\u52a0\u79ef\u6781\u7684\u6e05\u7406\u8fd9\u4e9b\u6570\u636e\u3002\r\n3\u3001\u9700\u8981\u4e8b\u52a1\u7684\u573a\u666f\u5728\u53d1\u6d88\u606f\u7684\u65f6\u5019\u5f00\u542f\u4e8b\u52a1\u5c31\u884c\u4e86\uff0c\u50cf\u5386\u53f2\u6570\u636e\u8fd9\u79cd\u76f4\u63a5\u53d1\u5c31\u884c\u4e86\uff0c\u8fd9\u662f\u6211\u80fd\u591f\u544a\u8bc9\u4f60\u7684\u89e3\u51b3\u65b9\u6848\u3002\r\n\r\n\u4ee5\u4e0a\uff0c\u5e0c\u671b\u4f60\u80fd\u660e\u767d\u6211\u60f3\u8868\u8fbe\u610f\u601d\u7684\u6838\u5fc3\u601d\u60f3\u3002\r\n\r\n\r\n"
+      },
+      {
+        "user": "d4ilys",
+        "created_at": "2021-03-08T01:28:13Z",
+        "body": "@cheetahing \u4f60\u597d\uff0c\u6211\u4e5f\u9047\u5230saas\u7cfb\u7edf\uff0c\u6839\u636e\u6bcf\u6b21\u7684\u8bf7\u6c42\u52a8\u6001\u751f\u6210\u4e0d\u540c\u8fde\u63a5\u4e32\u7684connection\uff0c\u73b0\u5728\u65e0\u5948\u53ea\u80fd\u6539\u6210\u6309\u8868\u9694\u79bb\u79df\u6237\uff0c\u8bf7\u95ee\u4f60\u8fd9\u4e2a\u95ee\u9898\u89e3\u51b3\u4e86\u5417"
+      }
+    ]
+  },
+  {
+    "number": 264,
+    "title": "How to configure RabbitMQ Cluster?",
+    "created_at": "2019-01-03T02:11:13Z",
+    "closed_at": "2019-01-03T02:14:20Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/264",
+    "body": "- [\u221a] Question or discussion\r\n___\r\n### Question\r\n- \u5982\u679cRabbitMQ\u96c6\u7fa4\uff0c\u5728UseRabbitMQ\u7684\u65f6\u5019\u5e94\u8be5\u600e\u4e48\u914d\u7f6e\u5462\uff1f\r\n___",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/264/comments",
+    "author": "fayuanliu",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2019-01-03T02:14:20Z",
+        "body": "You can set the `HostName` like `192.168.1.111,192.168.1.112`"
+      }
+    ]
+  },
+  {
+    "number": 202,
+    "title": "Does CAP support ASP.NET MVC\uff1f",
+    "created_at": "2018-09-10T02:32:03Z",
+    "closed_at": "2018-09-10T02:45:52Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/202",
+    "body": "\u6211\u73b0\u5728\u6709\u4e2a\u9879\u76ee\u662f\u7528 \u4f20\u7edf\u7684asp.net mvc \u6846\u67b6\u8fdb\u884c\u5f00\u53d1\u7684\uff0c\u6846\u67b6\u662f netframework 4.6 \u3002cap\u63d0\u4f9b\u4e86\u50cf\u652f\u6301asp.net core \u90a3\u6837\u5bf9 asp.net mvc \u6846\u67b6\u63d0\u4f9b\u4e86\u652f\u6301\u4e86\u5417\uff1f\r\n PS:\u6211\u4eec\u9879\u76ee\u7528kafka\u4f5c\u4e3a\u4e86\u6d88\u606f\u961f\u5217",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/202/comments",
+    "author": "bluetianx",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2018-09-10T02:37:18Z",
+        "body": "Because CAP depends on DI container , so it does not support .net framework asp.net mvc."
+      }
+    ]
+  },
+  {
+    "number": 124,
+    "title": "Problems with multiple subscriptions",
+    "created_at": "2018-04-29T08:49:42Z",
+    "closed_at": "2018-04-29T14:48:08Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/124",
+    "body": "```\r\npublic void ConfigureServices(IServiceCollection services)\r\n{\r\n    ...\r\n    services.AddTransient<ITestMessage, TestMessage>();\r\n    //services.AddTransient<ITestMessage2, TestMessage2>();\r\n    services.AddCap(x => {  });\r\n}\r\n```\r\n\r\nThe above code works well after commenting out one subscription. However,  there is a puzzling problem when I try to open two subscriptions. Publishers can publish successfully, but subscribers can't receive any messages, I'm very confused. Is it the wrong way I use it? \r\nSee the code below\uff1a\r\n```\r\nprivate async Task SendRequest()\r\n{\r\n    using (var trans = context.Database.BeginTransaction())\r\n    {\r\n        await publisher.PublishAsync(\"Test.Message\", \"\");\r\n        ...\r\n        trans.Commit();\r\n    }\r\n}\r\n\r\npublic interface ITestMessage\r\n{\r\n    void TestSubscriber(string text); \r\n}\r\n\r\npublic class TestMessage : ITestMessage, ICapSubscribe\r\n{\r\n    [CapSubscribe(\"Test.Message\")]\r\n    public void TestSubscriber(string text)\r\n    {\r\n    }\r\n}\r\n```",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/124/comments",
+    "author": "szlee",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2018-04-29T10:30:51Z",
+        "body": "@szlee  Hello,\r\nIf you have multiple subscribers you need to set up different groups like `CapSubscribe(\"Test.Message\", Group = \"test1\")` and `CapSubscribe(\"Test.Message\", Group = \"test2\")` , do you do that?"
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2018-04-29T13:44:20Z",
+        "body": "```\r\npublic interface ITestMessage\r\n{\r\n    void TestSubscriber(string text); \r\n}\r\n\r\npublic class TestMessage : ITestMessage, ICapSubscribe\r\n{\r\n    [CapSubscribe(\"Test.Message\", Group = \"test1\")]\r\n    public void TestSubscriber(string text)\r\n    {\r\n    }\r\n}\r\n```\r\nand \r\n\r\n```\r\npublic interface ITestMessage2\r\n{\r\n    void TestSubscriber(string text); \r\n}\r\n\r\npublic class TestMessage2: ITestMessage2, ICapSubscribe\r\n{\r\n    [CapSubscribe(\"Test.Message\", Group = \"test2\")]\r\n    public void TestSubscriber(string text)\r\n    {\r\n    }\r\n}\r\n```"
+      },
+      {
+        "user": "szlee",
+        "created_at": "2018-04-29T13:58:32Z",
+        "body": "Thanks for your reply. I tried the above methods, it seems that still can not... But I added the following line of Italic code, which works fine...\r\npublic void ConfigureMotionServices(IServiceCollection services)\r\n{\r\n    services.AddTransient<ITestMessage, TestMessage>();\r\n    services.AddTransient<ITestMessage2, TestMessage2>();\r\n    _services.AddCap(x => { x.DefaultGroup = \"Test\"; });_\r\n}\r\n\r\nI have a question, the above code only uses one group, if I need more than one group, how to set the options? Like this?\r\npublic void ConfigureMotionServices(IServiceCollection services)\r\n{\r\n    services.AddTransient<ITestMessage, TestMessage>();\r\n    services.AddTransient<ITestMessage2, TestMessage2>();\r\n    _services.AddCap(x => { x.DefaultGroup = \"Test\"; });_\r\n    services.AddTransient<ITestMessage3, TestMessage3>();\r\n    services.AddTransient<ITestMessage4, TestMessage4>();\r\n    _services.AddCap(x => { x.DefaultGroup = \"Test2\"; });_\r\n}"
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2018-04-29T14:09:32Z",
+        "body": "No, You can't configuration like this. The `DefaultGroup ` represents a group in Kafka or a queue in RabbitMQ.\r\n\r\nIf you follow what I'm saying and it not works , please provide your environment and configuration.\r\n"
+      },
+      {
+        "user": "szlee",
+        "created_at": "2018-04-29T14:20:16Z",
+        "body": "```\r\npublic void ConfigureMotionServices(IServiceCollection services)\r\n{\r\n    services.AddMvc();\r\n    services.AddDbContext<McsDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString(\"DefaultConnection\")));\r\n    services.AddCap(x => { x.UseEntityFramework<McsDbContext>(); x.UseRabbitMQ(\"localhost\"); });\r\n    services.AddTransient<ITestMessage, TestMessage>();\r\n    services.AddTransient<ITestMessage2, TestMessage2>();\r\n    services.AddCap(x => { x.DefaultGroup = \"Test\"; });\r\n    services.AddTransient<ITestMessage3, TestMessage3>();\r\n    services.AddTransient<ITestMessage4, TestMessage4>();\r\n    services.AddCap(x => { x.DefaultGroup = \"Test2\"; });\r\n}\r\npublic void Configure(IApplicationBuilder app, IHostingEnvironment env)\r\n{\r\n    if (env.IsDevelopment()) app.UseDeveloperExceptionPage();\r\n    app.UseCap();  \r\n    app.UseMvc();\r\n}\r\n```"
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2018-04-29T14:27:51Z",
+        "body": "There are too many mistakes in your configuration.\r\n\r\n**Startup.cs**\r\n\r\n```cs\r\npublic void ConfigureMotionServices(IServiceCollection services)\r\n{\r\n    services.AddDbContext<McsDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString(\"DefaultConnection\")));\r\n\r\n    services.AddTransient<ITestMessage, TestMessage>();\r\n    services.AddTransient<ITestMessage2, TestMessage2>();\r\n\r\n    services.AddCap(x => { \r\n        x.UseEntityFramework<McsDbContext>();\r\n        x.UseRabbitMQ(\"localhost\");\r\n    });\r\n\r\n    services.AddMvc();\r\n}\r\n\r\npublic void Configure(IApplicationBuilder app, IHostingEnvironment env)\r\n{\r\n    if (env.IsDevelopment()) \r\n        app.UseDeveloperExceptionPage();\r\n    \r\n    app.UseMvc();\r\n\r\n    app.UseCap(); \r\n}\r\n\r\n```\r\n\r\n**ITestMessage.cs** and **TestMessage.cs**\r\n\r\n```cs\r\npublic interface ITestMessage\r\n{\r\n    void TestSubscriber(string text); \r\n}\r\n\r\npublic class TestMessage : ITestMessage, ICapSubscribe\r\n{\r\n    [CapSubscribe(\"Test.Message\", Group = \"test1\")]\r\n    public void TestSubscriber(string text)\r\n    {\r\n    }\r\n}\r\n```\r\n\r\n\r\n**ITestMessage2.cs** and **TestMessage2.cs**\r\n\r\n```cs\r\npublic interface ITestMessage2\r\n{\r\n    void TestSubscriber(string text); \r\n}\r\n\r\npublic class TestMessage2: ITestMessage2, ICapSubscribe\r\n{\r\n    [CapSubscribe(\"Test.Message\", Group = \"test2\")]\r\n    public void TestSubscriber(string text)\r\n    {\r\n    }\r\n}\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 79,
+    "title": "Can we use CAP without storing messages to Database?",
+    "created_at": "2018-01-21T15:40:50Z",
+    "closed_at": "2018-01-22T15:43:33Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/79",
+    "body": "I can see it takes benefits store messages to database, but will it make the process slower since we want to use RabbitMQ to fire&forget in many cases?",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/79/comments",
+    "author": "trumhemcut",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2018-01-22T01:48:28Z",
+        "body": "CAP is designed to maintain data consistency across Microservice or SOA, it depending on the ACID nature of the database to ensure message reliability. If you leave the database, then this solution is only a message queue client encapsulation, it does not make sense, maybe your scene does not require CAP, just send and receive messages only"
+      }
+    ]
+  },
+  {
+    "number": 52,
+    "title": "how dapper user works?",
+    "created_at": "2017-10-20T03:15:52Z",
+    "closed_at": "2017-10-21T04:49:17Z",
+    "labels": [
+      "help wanted",
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/52",
+    "body": "   \r\n```\r\n        [Route(\"publish\")]\r\n        public async Task<IActionResult> PublishMessage()\r\n        {\r\n            const string cstr = \"Data Source=192.168.0.250;Initial Catalog=CapDemo;User ID=sa;Password=123123;\";\r\n\r\n            var sql1 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo\", new Person { Name = \"\u8001\u5f20\", Age = 30 }, sql1);\r\n\r\n            var sql2 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo.Service\", new Person { Name = \"\u8001\u674e\", Age = 40 }, sql2);\r\n\r\n            return Ok();\r\n        }\r\n```\r\n\r\nshould I create a instance of SqlConnection when publish a message ? ",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/52/comments",
+    "author": "zanpen2000",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2017-10-20T10:12:54Z",
+        "body": "No, just create one SqlConnection in an action."
+      },
+      {
+        "user": "zanpen2000",
+        "created_at": "2017-10-31T11:22:29Z",
+        "body": "@yuleyule66 But When I use one SqlConnection , I got a \"NullReferenceException\", code like below:\r\n```\r\n        [Route(\"publish\")]\r\n        public async Task<IActionResult> PublishMessage()\r\n        {\r\n            const string cstr = \"Data Source=192.168.0.250;Initial Catalog=CapDemo;User ID=sa;Password=123123;\";\r\n\r\n            var sql1 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo\", new Person { Name = \"\u8001\u5f20\", Age = 30 }, sql1);\r\n\r\n            // var sql2 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo.Service\", new Person { Name = \"\u8001\u674e\", Age = 40 }, sql1);\r\n\r\n            return Ok();\r\n        }\r\n```\r\n\r\nThen I got:\r\n```\r\nNullReferenceException: Object reference not set to an instance of an object.\r\nSystem.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource<DbConnectionInternal> retry)\r\nSystem.Data.SqlClient.SqlConnection.Open()\r\nDotNetCore.CAP.Abstractions.CapPublisherBase.PrepareConnectionForAdo(IDbConnection dbConnection, IDbTransaction dbTransaction) in CapPublisherBase.cs\r\n-\r\n        private void PrepareConnectionForAdo(IDbConnection dbConnection, IDbTransaction dbTransaction)\r\n        {\r\n            DbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));\r\n            if (DbConnection.State != ConnectionState.Open)\r\n            {\r\n                IsCapOpenedConn = true;\r\n                DbConnection.Open();\r\n            }\r\n            DbTransaction = dbTransaction;\r\n            if (DbTransaction == null)\r\n            {\r\n                IsCapOpenedTrans = true;\r\n                DbTransaction = dbConnection.BeginTransaction(IsolationLevel.ReadCommitted);\r\nDotNetCore.CAP.Abstractions.CapPublisherBase.PublishAsync<T>(string name, T contentObj, IDbConnection dbConnection, string callbackName, IDbTransaction dbTransaction) in CapPublisherBase.cs\r\n-\r\n        }\r\n        public Task PublishAsync<T>(string name, T contentObj, IDbConnection dbConnection,\r\n            string callbackName = null, IDbTransaction dbTransaction = null)\r\n        {\r\n            CheckIsAdoNet(name);\r\n            PrepareConnectionForAdo(dbConnection, dbTransaction);\r\n            var content = Serialize(contentObj, callbackName);\r\n            return PublishWithTransAsync(name, content);\r\n        }\r\nDemoA.Controllers.ValuesController+<PublishMessage>d__2.MoveNext() in ValuesController.cs\r\n-\r\n            const string cstr = \"Data Source=192.168.0.250;Initial Catalog=CapDemo;User ID=sa;Password=123123;\";\r\n            var sql1 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo\", new Person { Name = \"\u8001\u5f20\", Age = 30 }, sql1);\r\n            // var sql2 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo.Service\", new Person { Name = \"\u8001\u674e\", Age = 40 }, sql1);\r\n            return Ok();\r\n        }\r\n        [NonAction]\r\n        [CapSubscribe(\"CapDemo\")]\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nSystem.Runtime.CompilerServices.TaskAwaiter.GetResult()\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker+<InvokeActionMethodAsync>d__12.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker+<InvokeNextActionFilterAsync>d__10.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.Rethrow(ActionExecutedContext context)\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.Next(ref State next, ref Scope scope, ref object state, ref bool isCompleted)\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker+<InvokeInnerFilterAsync>d__14.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker+<InvokeNextResourceFilter>d__22.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResourceExecutedContext context)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker.Next(ref State next, ref Scope scope, ref object state, ref bool isCompleted)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker+<InvokeFilterPipelineAsync>d__17.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker+<InvokeAsync>d__15.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Builder.RouterMiddleware+<Invoke>d__4.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware+<Invoke>d__7.MoveNext()\r\n```\r\n"
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2017-10-31T14:45:12Z",
+        "body": "Upgrading CAP version to `2.1.0-preview-26231671`, I modified part of the `ICapPublish` interface about publishing message with ADO.NET , and here is a sample code :\r\n\r\n```\r\n    [Route(\"~/publishWithTransactionUsingAdonet\")]\r\n    public async Task<IActionResult> PublishMessageWithTransactionUsingAdonet([FromServices]ICapPublisher publisher)\r\n    {\r\n        var connectionString = \"\";\r\n        using (var sqlConnection = new SqlConnection(connectionString))\r\n        {\r\n            sqlConnection.Open();\r\n            using (var sqlTransaction = sqlConnection.BeginTransaction())\r\n            {\r\n                // \u6b64\u5904\u586b\u5199\u4f60\u7684\u4e1a\u52a1\u4ee3\u7801\uff0c\u901a\u5e38\u60c5\u51b5\u4e0b\uff0c\u4f60\u53ef\u4ee5\u5c06\u4e1a\u52a1\u4ee3\u7801\u4f7f\u7528\u4e00\u4e2a\u59d4\u6258\u4f20\u9012\u8fdb\u6765\u8fdb\u884c\u5c01\u88c5\u8be5\u533a\u57df\u4ee3\u7801\u3002\r\n\r\n                publisher.Publish(\"xxx.services.account.check\", new Person { Name = \"Foo\", Age = 11 }, sqlTransaction);\r\n\r\n                sqlTransaction.Commit();\r\n            }\r\n        }\r\n        return Ok();\r\n    }\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1299,
+    "title": "Kafka partitioning and consumer Client Id property.",
+    "created_at": "2023-03-22T14:53:01Z",
+    "closed_at": "2023-03-28T04:10:49Z",
+    "labels": [
+      "help wanted"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/1299",
+    "body": "Hi,\r\nWe are using this great library heavily in our projects. And our projects require heavy message processing. So we need multi-core processing. It is known that if you need concurrent processing you need to have partitions in kafka. When you set `ConsumerThreadCount` greater than 1 it will have no effect on the concurrency. As the topics will have just 1 partition created by the CAP. This part is manageable you can of course set the partition count manually via kafka command line tools. But when you do this you need to set the `client.id` for each thread that is consuming. Currently, the library only allows for passing config only in the startup stage, and this config is shared by all the consumers. So we need to be able to configure each consumer id individually. If you can provide a callback (it would be better if an async callback) kind of setting which will determine the client id of the consumer it will super useful. \r\nIf anyone has the same issue as us, we are currently using a workaround that requires setting the `ConsumerThreadCount` to 1 and setting the client id at startup. Instead of having multi-threading in a single app, we are using multiple apps to consume concurrently. This is easy to implement in a k8s environment you can easily increase the pod count. But I don't know about self-hosted applications (In IIS you can also increase the worker process count.). Also, I don't know if it is as efficient as having multiple threads.\r\n",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/1299/comments",
+    "author": "3ldar",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2023-03-24T08:42:09Z",
+        "body": "Hi  @3ldar \r\n\r\nThanks for your feedback, I think this is a feature that can be improved, but I need further clarification from you.\r\n\r\nDo you mean that you manually changed the number of kafka partitions by the following command\r\n```\r\nkafka-topics.sh --bootstrap-server localhost:9092 --alter --topic first_topic --partitions 5\r\n```\r\n\r\nAnd you want to change the consumer thread corresponding to the topic partition at runtime ?\r\n\r\n> But when you do this you need to set the `client.id` for each thread that is consuming\r\n\r\nI know that Kafka specifies consumer thread strategies through `partition.assignment.strategy` configuration. How to specify at runtime by command?  \r\n\r\n\r\n"
+      },
+      {
+        "user": "3ldar",
+        "created_at": "2023-03-25T22:54:08Z",
+        "body": "Hi again,\r\n\r\n\r\n>  kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic first_topic --partitions 5\r\n\r\nThis is the exact command I have used. Setting this according to the consumer thread count (or providing another config, which would be way better if it was per-topic configurable) is nice. But the crucial part is `client.id`. The `partition.assignment.strategy` will determine how the clients in the same group will pick or rotate the partitions (and it is ok to set it once at the application startup) but when all the clients have the same id they will share the same offsets and no efficient concurrency will be applied here. (Concurrency would work for different topics well, but not on the same topic. There are many benchmarks about this for kafka.) `client.id` should be set before the consuming starts and it is not necessary to change it at runtime (maybe it should not it might mess up some offsets). \r\n\r\nA singleton service that implements the below interface would work here I think.\r\n```\r\npublic interface IKafkaClientIdProvider {\r\n    Task<string> GetClientId();\r\n    Task<string> GetClientId(string groupId); //one of them can be pick here\r\n}\r\n```\r\n\r\n A default implementation like the one below would work :\r\n```\r\npublic class DefaultKafkaClientIdProvider {\r\n    int clientIdCounter = 0; // consider this is thread-safe\r\n    Task<string> GetClientId() => Task.FromResult($\"fancyClient_{i++}\");\r\n    Task<string> GetClientId(string groupId) => Task.FromResult($\"{groupId}_client_{i++}\");\r\n}\r\n```\r\nMe personally will use some state store like redis to determine the clientId for the related group. Because I have a distributed environment, and have many instances accros the kubernetes clusters for the same service."
+      },
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2023-03-26T13:24:43Z",
+        "body": "Hello,\r\n\r\nI did a test.\r\n\r\nThe `client.id` is not specified and set `ConsumerThreadCount = 3` and set 3 partitions for the test topic, the 3 consumer threads will automatically correspond to the 3 partitions, and the messages will be in concurrent consumption by 3 consumer threads within 3 partitions.\r\n\r\n\r\n```cs\r\n[CapSubscribe(\"sample.kafka.postgrsql\")]\r\npublic void Test2(DateTime value, [FromCap] CapHeader header)\r\n{\r\n    var offset = header[\"my.kafka.offset\"];\r\n    var partition = header[\"my.kafka.partition\"];\r\n    var consumerId = header[\"ConsumerId\"][^2..];\r\n    Console.ForegroundColor = ConsoleColor.Red;\r\n    Console.WriteLine(\"Subscriber output message: \" + value);\r\n    Console.WriteLine(\"ConsumerId: \" + consumerId + \", Offset: \" + offset + \", Partition: \" + partition);\r\n}\r\n```\r\n> header[\"ConsumerId\"]  generated when the `KafkaConsumerClient` created and add to the header when received message.\r\n\r\nThe consumer output:\r\n```\r\nSubscriber output message: 2023/3/26 21:07:20\r\nConsumerId: 92, Offset: 28, Partition: [1]\r\nSubscriber output message: 2023/3/26 21:07:20\r\nConsumerId: 92, Offset: 29, Partition: [1]\r\nSubscriber output message: 2023/3/26 21:07:37\r\nConsumerId: 91, Offset: 22, Partition: [0]\r\nSubscriber output message: 2023/3/26 21:07:38\r\nConsumerId: 91, Offset: 23, Partition: [0]\r\nSubscriber output message: 2023/3/26 21:07:38\r\nConsumerId: 90, Offset: 14, Partition: [2]\r\nSubscriber output message: 2023/3/26 21:07:38\r\nConsumerId: 92, Offset: 30, Partition: [1]\r\nSubscriber output message: 2023/3/26 21:07:38\r\nConsumerId: 92, Offset: 31, Partition: [1]\r\nSubscriber output message: 2023/3/26 21:07:38\r\nConsumerId: 92, Offset: 32, Partition: [1]\r\nSubscriber output message: 2023/3/26 21:07:38\r\nConsumerId: 91, Offset: 24, Partition: [0]\r\nSubscriber output message: 2023/3/26 21:07:39\r\nConsumerId: 90, Offset: 15, Partition: [2]\r\nSubscriber output message: 2023/3/26 21:07:39\r\nConsumerId: 92, Offset: 33, Partition: [1]\r\n```\r\n\r\n\r\nWhen tha app startup and connect to the kafka server, the kafka server will create a new member id for the new consumer , the new consumer (dynamic member) will auto join the group and the server remove the old consumer.\r\n\r\nBelow is the kafka server log when app connect the the server.\r\n\r\n```\r\n2023-03-26 21:06:12 [2023-03-26 13:06:12,156] INFO [GroupCoordinator 1]: Dynamic member with unknown member id joins group cap.queue.sample.kafka.postgresql.v1 in Stable state. Created a new member id rdkafka-cc98ba5e-bd87-4a17-bd22-5f7df8fbbe6b and request the member to rejoin with this id. (kafka.coordinator.group.GroupCoordinator)\r\n2023-03-26 21:06:12 [2023-03-26 13:06:12,161] INFO [GroupCoordinator 1]: Preparing to rebalance group cap.queue.sample.kafka.postgresql.v1 in state PreparingRebalance with old generation 11 (__consumer_offsets-8) (reason: Adding new member rdkafka-cc98ba5e-bd87-4a17-bd22-5f7df8fbbe6b with group instance id None) (kafka.coordinator.group.GroupCoordinator)\r\n2023-03-26 21:06:12 [2023-03-26 13:06:12,204] INFO [GroupCoordinator 1]: Dynamic member with unknown member id joins group cap.queue.sample.kafka.postgresql.v1 in PreparingRebalance state. Created a new member id rdkafka-a8e28383-146d-4a72-8a22-2ed2b3f87120 and request the member to rejoin with this id. (kafka.coordinator.group.GroupCoordinator)\r\n2023-03-26 21:06:12 [2023-03-26 13:06:12,204] INFO [GroupCoordinator 1]: Dynamic member with unknown member id joins group cap.queue.sample.kafka.postgresql.v1 in PreparingRebalance state. Created a new member id rdkafka-b742d5ad-39cf-492c-949d-31172acbe275 and request the member to rejoin with this id. (kafka.coordinator.group.GroupCoordinator)\r\n2023-03-26 21:06:37 [2023-03-26 13:06:37,223] INFO [GroupCoordinator 1]: Member rdkafka-22d4cb6a-592a-417b-b8e6-132346f96937 in group cap.queue.sample.kafka.postgresql.v1 has failed, removing it from the group (kafka.coordinator.group.GroupCoordinator)\r\n2023-03-26 21:06:37 [2023-03-26 13:06:37,304] INFO [GroupCoordinator 1]: Member rdkafka-49cc36c8-51ce-43bb-b6e4-1c973e3ad508 in group cap.queue.sample.kafka.postgresql.v1 has failed, removing it from the group (kafka.coordinator.group.GroupCoordinator)\r\n2023-03-26 21:06:37 [2023-03-26 13:06:37,304] INFO [GroupCoordinator 1]: Member rdkafka-fdaa4e1b-25f2-421e-b1e0-2bc43e780109 in group cap.queue.sample.kafka.postgresql.v1 has failed, removing it from the group (kafka.coordinator.group.GroupCoordinator)\r\n2023-03-26 21:06:37 [2023-03-26 13:06:37,305] INFO [GroupCoordinator 1]: Stabilized group cap.queue.sample.kafka.postgresql.v1 generation 12 (__consumer_offsets-8) with 3 members (kafka.coordinator.group.GroupCoordinator)\r\n```\r\n\r\nThis seems to be exactly what you want, I don't know why you want to specifying the `client.id` ?\r\n"
+      },
+      {
+        "user": "3ldar",
+        "created_at": "2023-03-26T21:40:16Z",
+        "body": "Thanks for all the effort you have done. The first mistake I made is: it should be `consumer.id` not the `client.id`. For the second one; you are right when you did not set a consumer id, the connector assigns a random consumer id and it solves the \"consumer id must be unique among the group members\". I probably misinterpreted the error I had before and started to overthink it.  The last question remains in my mind and not being so sure. When your consumer which has a randomly generated id is restarted an auto-reset offset situation happens because the new id will be different from the previous depending on the setting your consumer will process all the data again. Like I said I am not so sure about it, I might be messing the `group.id` with the `consumer.id`. If I can have some spare time in the morning I will try to simulate the behavior to prove myself wrong \ud83d\ude03 "
+      }
+    ]
+  }
+]

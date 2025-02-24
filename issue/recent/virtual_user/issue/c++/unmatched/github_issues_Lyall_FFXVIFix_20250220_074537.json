@@ -1,0 +1,20 @@
+[
+  {
+    "number": 68,
+    "title": "No Longer Able To Move Mouse Cursor To 2nd Monitor",
+    "created_at": "2024-09-23T20:23:22Z",
+    "closed_at": "2024-09-24T17:28:24Z",
+    "labels": [],
+    "url": "https://github.com/Lyall/FFXVIFix/issues/68",
+    "body": "9/22/24\r\nI play with a Dual Sense controller for this game on PC\r\n\r\n0.7.9 was the last update where you were able to move your mouse cursor over to your monitor.\r\n\r\nUpdated to 0.8.1 and can no longer move mouse cursor.\r\n\r\nI switched to borderless, hit windows key and was able to move it over. Switch it back to fullscreen and no issues. Mouse cursor stayed on 2nd monitor while I gamed on primary monitor with Dual Sense.\r\n\r\n*UPDATE - 9/23/24\r\nToday same thing happened again, repeated same solution, HOWEVER, as soon as I start playing with controller, mouse cursor is moved back to primary monitor.",
+    "comments_url": "https://api.github.com/repos/Lyall/FFXVIFix/issues/68/comments",
+    "author": "RAWZeroG",
+    "comments": [
+      {
+        "user": "Lyall",
+        "created_at": "2024-09-23T20:26:08Z",
+        "body": "Set \"LockCursor = false\" in `FFXVIFix.ini`. It's enabled by default so that borderless mouse behaviour matches windowed."
+      }
+    ]
+  }
+]

@@ -1,0 +1,1154 @@
+[
+  {
+    "number": 35871,
+    "title": "No response code details in upstream_log access logs for each attempt to upstream",
+    "created_at": "2024-08-27T18:04:43Z",
+    "closed_at": "2024-09-04T13:33:36Z",
+    "labels": [
+      "question",
+      "area/access_log"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/35871",
+    "body": "*Title*: *No response code details in upstream_log access logs for each attempt to upstream*\r\n\r\n*Description*:\r\n>We have configured upstream_log in envoy.filters.http.router filter. We wanted to log each failed attempt to upstream to find out what is the reason for failure. \r\nBut we see that when upstream cluster responds with 5xx error, the upstream_log prints empty values for some of the fields like: \r\nresponse_code_details: null\r\nretry_count: 0\r\n\r\nIn 2 upstream request attempts it gives above values in both log entries.\r\n\r\nEnvoy prints 5xx response_code though in upstream log. \r\nAnd the envoy.filters.network.http_connection_manager filter level access logs prints below values:\r\nresponse_code_details: via_upstream\r\nretry_count: 2\r\n\r\nWe would like to have these 2 fields in upstream logs as well As it provided useful info while debugging any issue with upstream cluster.\r\n\r\nSo, Is this an expected behavior or a bug in upstream_log implementation?\r\n\r\n(see our access log config below)\r\n\r\n*Repro steps*:\r\n> Tested with envoy version 1.30.4 with below config for upstream_log.\r\n\r\n\r\n*Admin and Stats Output*:\r\n\r\n*Config*:\r\n   \r\n```name: envoy.filters.http.router\r\n        typed_config:\r\n          \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n          dynamic_stats: true\r\n          start_child_span: true\r\n          suppress_envoy_headers: false\r\n          upstream_log:\r\n          - name: envoy.access_loggers.file\r\n            filter:\r\n              or_filter:\r\n                filters:\r\n                  - status_code_filter:\r\n                      comparison:\r\n                        op: GE\r\n                        value:\r\n                          default_value: 500\r\n                          runtime_key: access_log.access_error.status\r\n                  - status_code_filter:\r\n                      comparison:\r\n                        op: EQ\r\n                        value:\r\n                          default_value: 0\r\n                          runtime_key: access_log.access_error.status\r\n                  - traceable_filter: {}\r\n            typed_config:\r\n              \"@type\": type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog\r\n              path: \"/dev/stdout\"\r\n              log_format:\r\n                formatters:\r\n                - name: envoy.formatter.req_without_query\r\n                  typed_config:\r\n                    \"@type\": type.googleapis.com/envoy.extensions.formatter.req_without_query.v3.ReqWithoutQuery\r\n                json_format:\r\n                  type: \"upstream_log\"\r\n                  response_code: \"%RESPONSE_CODE%\"\r\n                  response_code_details: \"%RESPONSE_CODE_DETAILS%\"\r\n                  connection_termination_details: \"%CONNECTION_TERMINATION_DETAILS%\"\r\n                  response_flags: \"%RESPONSE_FLAGS%\"\r\n                  upstream_transport_failure_reason: \"%UPSTREAM_TRANSPORT_FAILURE_REASON%\"\r\n                  upstream_remote_address: \"%UPSTREAM_REMOTE_ADDRESS%\"\r\n                  x_request_id: \"%REQ(X-REQUEST-ID)%\"\r\n                  upstream_cluster: \"%UPSTREAM_CLUSTER%\"\r\n                  retry_count: \"%UPSTREAM_REQUEST_ATTEMPT_COUNT%\"```\r\n \r\n*Logs*:\r\n>Include the access logs and the Envoy logs.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/35871/comments",
+    "author": "VishalDamgude",
+    "comments": [
+      {
+        "user": "ggreenway",
+        "created_at": "2024-08-27T20:10:32Z",
+        "body": "`UPSTREAM_REQUEST_ATTEMPT_COUNT` is only valid on the downstream request and can be logged there. \r\n\r\nFor `RESPONSE_CODE_DETAILS`, as you can see from the docs, they're referring to the details about the response code sent back to the downstream client, so that is also only applicable on downstream access logs.\r\n\r\n> HTTP response code details provides additional information about the response code, such as who set it (the upstream or envoy) and why.\r\n\r\nSo you probably need to configure both downstream and upstream logs, and you can link them by request id or `%STREAM_ID%`."
+      }
+    ]
+  },
+  {
+    "number": 35773,
+    "title": "Upstream health checks threading model",
+    "created_at": "2024-08-21T16:19:39Z",
+    "closed_at": "2024-10-25T20:01:27Z",
+    "labels": [
+      "question",
+      "stale"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/35773",
+    "body": "I tried looking it up in docs, but didn't find (please help referring if it exist): Are Envoy upstream health checks performed per-worker, or are they running globally from the main thread, and results are posted to workers?\r\nI'd assume the latter, but wanted to make sure",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/35773/comments",
+    "author": "ohadvano",
+    "comments": [
+      {
+        "user": "botengyao",
+        "created_at": "2024-08-22T13:17:53Z",
+        "body": "Yes, health checks are performed on the main thread, and then posted to the thread local configs."
+      }
+    ]
+  },
+  {
+    "number": 35317,
+    "title": "Question about managing state across multiple phases calls in ext-proc for a HTTP request lifecycle",
+    "created_at": "2024-07-22T07:52:13Z",
+    "closed_at": "2024-07-23T05:59:05Z",
+    "labels": [
+      "question",
+      "area/ext_proc"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/35317",
+    "body": "Hi, It seems like ext-proc will call the process over gRPC with multiple stages as soon as it can. In case I need to maintain some state per HTTP request on the external server, I'm curious if there's anything we could leverage in ext-proc.\r\n\r\nIn the WASM filter, each httpContext corresponds to a single HTTP request lifecycle (request/response), meaning the application does not need to manage its own state. I'm wondering if there's a similar mechanism in ext-proc.\r\n\r\nFor example, how can we check whether an incoming `onResponseHeaders` is part of the same HTTP request stream as a previous `onRequestHeaders` call without maintaining the state ourselves?\r\n\r\nSome custom solutions I could come up with:\r\n\r\n1. Whenever I receive `ProcessingRequest_RequestHeaders`, generate a unique `contextId` or leverage the envoy `requestId` attribute.\r\n2. Keep the state based on the `contextId` in our own logic.\r\n3. Whenever I receive `ProcessingRequest_ResponseHeaders`, use the `contextId` to retrieve the proper state.\r\n\r\nIt would be great if we have a way to abstract away the above custom logic for maintaining the state, or it might be better to keep the logic externally from envoy, appreciate any insight!",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/35317/comments",
+    "author": "xr",
+    "comments": [
+      {
+        "user": "yanjunxiang-google",
+        "created_at": "2024-07-22T22:25:50Z",
+        "body": "HI, @xr \r\nOne way I can think of is to have the ext_proc server to track the gRPC stream open/close events, as  Envoy starts a new gRPC stream to communicate with ext_proc server for each HTTP stream. "
+      },
+      {
+        "user": "tyxia",
+        "created_at": "2024-07-22T23:01:07Z",
+        "body": "@xr  No additional work is required from ext_proc filter side as such an affinity model has already been maintained in ext_proc's gRPC callout.\r\n\r\nThis can be purely your external server logic: On the first event (e.g., request header), server has a unique ID per stream and maintain it throughout HTTP lifecycle (request/response).\r\nWe actually have an internal product that is doing something similar. And it has been working well.  "
+      },
+      {
+        "user": "xr",
+        "created_at": "2024-07-23T05:59:05Z",
+        "body": "@yanjunxiang-google @tyxia thanks for the info! good to hear that you are doing sth similar, if each http stream is corresponding with one grpcStream then I could also store the http state inside grpc stream."
+      }
+    ]
+  },
+  {
+    "number": 32004,
+    "title": "FQDN Filter",
+    "created_at": "2024-01-24T12:01:04Z",
+    "closed_at": "2024-04-15T12:02:35Z",
+    "labels": [
+      "question",
+      "stale",
+      "area/tcp_proxy"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/32004",
+    "body": "*FQDN Filter*:\r\n\r\n*Description*:\r\nHello everyone,\r\nThe following question: Is it possible to implement a listener with an FQDN? I want Envoy to only forward traffic when Test.test.io is called. Currently, Envoy Proxy forwards all traffic that comes to port 443.\r\n\r\n```\r\n    -   connect_timeout: 5s\r\n        load_assignment:\r\n            cluster_name: ingress_https\r\n            endpoints:\r\n            -   lb_endpoints:\r\n                -   endpoint:\r\n                        address:\r\n                            socket_address:\r\n                                address: bla.bla.bla.io\r\n                                port_value: 443\r\n                                \r\n         name: ingress_https\r\n        per_connection_buffer_limit_bytes: 32768\r\n        type: strict_dns\r\n```\r\n\r\n```\r\n    -   address:\r\n            socket_address:\r\n                address: 0.0.0.0\r\n                port_value: 443\r\n        filter_chains:\r\n        -   filters:\r\n            -   name: envoy.filters.network.tcp_proxy\r\n                typed_config:\r\n                    '@type': type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy\r\n                    access_log:\r\n                    -   name: envoy.access_loggers.file\r\n                        typed_config:\r\n                            '@type': type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog\r\n                            path: /var/log/envoy/ingress_https_access.log\r\n                    cluster: ingress_https\r\n                    stat_prefix: ingress_https\r\n        name: listener_ingress_https\r\n```",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/32004/comments",
+    "author": "eliassteiner",
+    "comments": [
+      {
+        "user": "zuercher",
+        "created_at": "2024-01-25T18:11:19Z",
+        "body": "I'm not sure I understand your question.\r\n\r\nYour config has the listener accept connections on port 443 for any IPv4 assigned to the host (that's what 0.0.0.0 implies). A specific IP can be configured (e.g. 10.0.0.1), which would cause Envoy to only listen on that IP address (not, for example, 127.0.0.1). But most hosts only have 1 IP and localhost, and your DNS name presumably points at the IP address.\r\n"
+      },
+      {
+        "user": "jewertow",
+        "created_at": "2024-01-25T21:02:59Z",
+        "body": "@eliassteiner you need tls_inspector in you listener:\r\n```\r\n  - address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 443\r\n    listener_filters:\r\n    - name: \"envoy.filters.listener.tls_inspector\"\r\n      typed_config:\r\n        \"@type\": type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector\r\n    filter_chains:\r\n    - filter_chain_match:\r\n        server_names: [\"test.test.io\"]\r\n      filters:\r\n      - name: envoy.filters.network.tcp_proxy\r\n        typed_config:\r\n          '@type': type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy\r\n          ...\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 29814,
+    "title": "`RESPONSE_CODE` is always zero when added as a response header",
+    "created_at": "2023-09-26T17:33:40Z",
+    "closed_at": "2023-09-28T14:49:07Z",
+    "labels": [
+      "bug",
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/29814",
+    "body": "*Title*: `RESPONSE_CODE` is always zero when added as a response header\r\n\r\n*Description*:\r\nI am trying to add `RESPONSE_CODE` to the header of calls going through envoy, but have not been successful. This may sound like an odd request because the call already returns status, but we have a few microservices that are responsible for communicating with third-parties and proxying the response, and we want to be 100% sure the issue is not inside the microservice.\r\n\r\n*Repro steps*:\r\nI have crafted what I think is the simplest possible example where envoy is doing a direct response, and the response code header is still 0. I have tons of other examples but this is the smallest.\r\n```\r\nstatic_resources:\r\n  listeners:\r\n    - name: reverse_proxy\r\n      address:\r\n        socket_address:\r\n          protocol: TCP\r\n          address: 0.0.0.0\r\n          port_value: 10005\r\n      filter_chains:\r\n        - filters:\r\n            - name: envoy.filters.network.http_connection_manager\r\n              typed_config:\r\n                \"@type\": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager\r\n                stat_prefix: ingress_http\r\n                route_config:\r\n                  name: local_route\r\n                  response_headers_to_add:\r\n                    - header:\r\n                        key: \"response-code\"\r\n                        value: \"%RESPONSE_CODE%\"\r\n                  virtual_hosts:\r\n                    - name: local_service\r\n                      domains: [\"*\"]\r\n                      routes:\r\n                        - match:\r\n                            prefix: \"/\"\r\n                          direct_response:\r\n                            status: 200\r\n                            body:\r\n                              inline_string: \"{true}\"\r\n                http_filters:\r\n                  - name: envoy.filters.http.router\r\n                    typed_config:\r\n                      \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n```\r\n\r\nAt this point I am thinking its just an edge-case problem, or I am missing something small but critical.\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/29814/comments",
+    "author": "inssein",
+    "comments": [
+      {
+        "user": "inssein",
+        "created_at": "2023-09-26T21:52:32Z",
+        "body": "I ended up getting it working via lua, but would be nice to keep it simpler :)\r\n\r\n```\r\nhttp_filters:\r\n  - name: lua_response_code\r\n    typed_config:\r\n      \"@type\": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua\r\n      default_source_code:\r\n        inline_string: |\r\n          function envoy_on_response(response_handle)\r\n            response_handle:headers():add(\"response-code\", response_handle:headers():get(\":status\"))\r\n          end\r\n```"
+      },
+      {
+        "user": "StarryVae",
+        "created_at": "2023-09-27T08:21:32Z",
+        "body": "i think `RESPONSE_CODE` in `response_headers_to_add` is only supported after this patch #29028 , maybe you can update your Envoy version and try again."
+      },
+      {
+        "user": "inssein",
+        "created_at": "2023-09-27T16:09:31Z",
+        "body": "I just tried the latest dev build and it works! Not a huge rush for us and looks like this will make it out on the next release (2023/10/16)."
+      }
+    ]
+  },
+  {
+    "number": 28386,
+    "title": "Connection draining on SDS update",
+    "created_at": "2023-07-13T15:57:15Z",
+    "closed_at": "2023-07-17T10:09:08Z",
+    "labels": [
+      "question",
+      "api"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/28386",
+    "body": "In case I'm using LDS, where some of the filter chains in the listener config have SDS config (downstream transport TLS that uses SDS to fetch secrets). After a while, the certificate is refreshed from the SDS. Does it cause connections that currently use the filter chain to drain? Will only new connections get the new certificate?",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/28386/comments",
+    "author": "ohadvano",
+    "comments": [
+      {
+        "user": "soulxu",
+        "created_at": "2023-07-17T09:51:52Z",
+        "body": "there is no draining, only the new connection will use the new certificate"
+      }
+    ]
+  },
+  {
+    "number": 28293,
+    "title": "Is dispatcher thread-local?",
+    "created_at": "2023-07-08T03:26:32Z",
+    "closed_at": "2023-08-18T04:01:27Z",
+    "labels": [
+      "question",
+      "stale"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/28293",
+    "body": "That is, could I call `dispatcher.post()` from another thread? I need to put a task into the worker thread from another thread.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/28293/comments",
+    "author": "kingluo",
+    "comments": [
+      {
+        "user": "kyessenov",
+        "created_at": "2023-07-08T20:51:39Z",
+        "body": "Yes, that's a normal way how thread local storage works, it posts from main thread to worker threads with an updated value."
+      },
+      {
+        "user": "kingluo",
+        "created_at": "2023-07-09T04:14:14Z",
+        "body": "> Yes, that's a normal way how thread local storage works, it posts from main thread to worker threads with an updated value.\r\n\r\nThanks for your reply. And I just confirmed this fact in my coding. BTW, you mean the main thread posts xds update to the worker thread, right?\r\n\r\nAnother side question is whether the post is done by a locked queue and eventfd in Linux, and the worker thread will handle the post callbacks in batch, right?"
+      },
+      {
+        "user": "kyessenov",
+        "created_at": "2023-07-11T21:31:24Z",
+        "body": "I think it's edge triggered. It's using libevent for event management, but I don't recall the details."
+      }
+    ]
+  },
+  {
+    "number": 26893,
+    "title": "An thrift protocol request question",
+    "created_at": "2023-04-24T10:15:25Z",
+    "closed_at": "2023-06-01T12:01:24Z",
+    "labels": [
+      "question",
+      "stale",
+      "area/thrift"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/26893",
+    "body": "The realization of the work for envoy.filters.network.thrift_proxy:\r\nWhen a Thrift protocol request goes to the Envoy, the Envoy decodes the request through the ThriftFilter, converts it into a new HTTP request, and sends the HTTP request to the back-end service. When the response from the back-end service arrives, the Envoy converts the HTTP response into the Thrift serialization format and sends it back to the client.\r\nAm I reading this correctly?\r\nWaiting for your reply, thank you!",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/26893/comments",
+    "author": "jiayoukun",
+    "comments": [
+      {
+        "user": "JuniorHsu",
+        "created_at": "2023-04-25T06:34:37Z",
+        "body": "There's no HTTP protocol involved. It's `thrift_proxy` so envoy basically *proxy* the thrift request to the upstream and the thrift response back to the downstream. We can do metrics/load balancing/routing/filter from features of thrift like thrift header or method. The connection model is like HTTP1 at the moment, i.e., ping-pong model. "
+      }
+    ]
+  },
+  {
+    "number": 25938,
+    "title": "Safe Regex not working for External Authorization Filter..",
+    "created_at": "2023-03-06T17:39:16Z",
+    "closed_at": "2023-03-07T05:35:45Z",
+    "labels": [
+      "question",
+      "area/matching"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/25938",
+    "body": "I do not want to apply external authorization filter for routes starting with /css, /img, /assets. While it is working fine if I put 3 entries using prefix but its not working with safe_regex.\r\n```\r\nstatic_resources:\r\n\r\n  listeners:\r\n  - name: listener_0\r\n    address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 10000\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.filters.network.http_connection_manager\r\n        typed_config:\r\n          \"@type\": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager\r\n          stat_prefix: ingress_http\r\n          access_log:\r\n          - name: envoy.access_loggers.stdout\r\n            typed_config:\r\n              \"@type\": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog\r\n          route_config:\r\n            name: local_route\r\n            virtual_hosts:\r\n            - name: local_service\r\n              domains: [\"*\"]\r\n              typed_per_filter_config:\r\n                envoy.filters.http.ext_authz:\r\n                  \"@type\": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute\r\n                  check_settings:\r\n                    context_extensions:\r\n                      virtual_host: local_service\r\n              routes:\r\n              - match:\r\n                  safe_regex:\r\n                    google_re2: {}\r\n                    regex: \"^/(css|img|assets)/\"\r\n                route:\r\n                  host_rewrite_literal: www.envoyproxy.io\r\n                  cluster: service_envoyproxy_io\r\n                typed_per_filter_config:\r\n                  envoy.filters.http.ext_authz:\r\n                    \"@type\": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute\r\n                    disabled: true\r\n              - match:\r\n                  prefix: \"/\"\r\n                route:\r\n                  host_rewrite_literal: www.envoyproxy.io\r\n                  cluster: service_envoyproxy_io    \r\n          http_filters:\r\n          - name: envoy.filters.http.ext_authz\r\n            typed_config:\r\n              \"@type\": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz\r\n              grpc_service:\r\n                envoy_grpc:\r\n                  cluster_name: ext_authz-grpc-service\r\n                timeout: 0.250s\r\n              transport_api_version: V3\r\n          - name: envoy.filters.http.router\r\n            typed_config:\r\n              \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n\r\n  clusters:\r\n  - name: service_envoyproxy_io\r\n    type: LOGICAL_DNS\r\n    dns_lookup_family: V4_ONLY\r\n    load_assignment:\r\n      cluster_name: service_envoyproxy_io\r\n      endpoints:\r\n      - lb_endpoints:\r\n        - endpoint:\r\n            address:\r\n              socket_address:\r\n                address: www.envoyproxy.io\r\n                port_value: 443\r\n    transport_socket:\r\n      name: envoy.transport_sockets.tls\r\n      typed_config:\r\n        \"@type\": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext\r\n        sni: www.envoyproxy.io\r\n\r\n  - name: ext_authz-grpc-service\r\n    type: STRICT_DNS\r\n    lb_policy: ROUND_ROBIN\r\n    typed_extension_protocol_options:\r\n      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:\r\n        \"@type\": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions\r\n        explicit_http_config:\r\n          http2_protocol_options: {}\r\n    load_assignment:\r\n      cluster_name: ext_authz-grpc-service\r\n      endpoints:\r\n      - lb_endpoints:\r\n        - endpoint:\r\n            address:\r\n              socket_address:\r\n                address: 0.0.0.0\r\n                port_value: 7058\r\n```    ",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/25938/comments",
+    "author": "rakesh-eltropy",
+    "comments": [
+      {
+        "user": "wbpcode",
+        "created_at": "2023-03-07T03:09:57Z",
+        "body": "cc @rakesh-eltropy full match is used by the safe_regex matching here. So, may be `\"^/(css|img|assets)/.*\"` should be used here?"
+      }
+    ]
+  },
+  {
+    "number": 24276,
+    "title": "Migrating from v2 -> v3 config (currently running envoy v1.16.0, want to upgrade to latest)",
+    "created_at": "2022-11-30T18:25:34Z",
+    "closed_at": "2023-01-07T04:01:15Z",
+    "labels": [
+      "question",
+      "stale",
+      "area/xds"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/24276",
+    "body": "Currently running v1.16.0 of envoy and looking to upgrade it, but having a hard time finding any documentation that really explains the differences and upgrade path from v2 -> v3.  Maybe I'm blind, but that's me.  Our current config is:\r\n\r\n```\r\n#/etc/envoy/envoy.yaml\r\nadmin:\r\n  access_log_path: /tmp/admin_access.log\r\n  address:\r\n    socket_address:\r\n      address: 0.0.0.0\r\n      port_value: 8095\r\nstatic_resources:\r\n  listeners:\r\n    - name: listener_0\r\n      address:\r\n        socket_address:\r\n          address: 0.0.0.0\r\n          port_value: 8094\r\n      filter_chains:\r\n        - filters:\r\n            - name: envoy.http_connection_manager\r\n              config:\r\n                stat_prefix: ingress_http\r\n                use_remote_address: true\r\n                stream_idle_timeout: 0s\r\n                access_log:\r\n                  - name: envoy.file_access_log\r\n                    config:\r\n                      path: /dev/stdout\r\n                      format: >\r\n                        [%START_TIME%] \"%REQ(:METHOD)%\r\n                        %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%\"\r\n                        %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED%\r\n                        %BYTES_SENT% %DURATION%\r\n                        %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%\r\n                        \"%REQ(X-FORWARDED-FOR)%\" \"%REQ(USER-AGENT)%\"\r\n                        \"%REQ(X-TRACE)%\" \"%REQ(X-CUSTOMER-ID)%\"\r\n                        \"%REQ(:AUTHORITY)%\" \"%UPSTREAM_HOST%\"\r\n                  - name: envoy.http_grpc_access_log\r\n                    config:\r\n                      common_config:\r\n                        log_name: apirate\r\n                        grpc_service:\r\n                          envoy_grpc:\r\n                            cluster_name: ratelimit\r\n                      additional_request_headers_to_log:\r\n                        - x-customer-id\r\n                        - x-trace\r\n                        - x-forwarded-for\r\n                        - user-agent\r\n                route_config:\r\n                  name: local_route\r\n                  request_headers_to_add:\r\n                    - header:\r\n                        key: x-forwarded-proto\r\n                        value: https\r\n                      append: false\r\n                    - header:\r\n                        key: connection\r\n                        value: close\r\n                      append: false\r\n                  virtual_hosts:\r\n                    - name: local_service\r\n                      domains:\r\n                        - '*'\r\n                      routes:\r\n                        - match:\r\n                            prefix: /rest/transport/\r\n                            headers:\r\n                              - name: X-HAPROXY-CLUSTER\r\n                                exact_match: kube\r\n                          route:\r\n                            cluster: backend-kube\r\n                            timeout: 0s\r\n                            retry_policy:\r\n                              retry_on: connect-failure\r\n                              num_retries: 5\r\n                              retry_host_predicate:\r\n                                - name: envoy.retry_host_predicates.previous_hosts\r\n                              host_selection_retry_max_attempts: 5\r\n                        - match:\r\n                            prefix: /\r\n                            headers:\r\n                              - name: X-HAPROXY-CLUSTER\r\n                                exact_match: kube\r\n                          route:\r\n                            cluster: backend-kube\r\n                            timeout: 0s\r\n                            retry_policy:\r\n                              retry_on: connect-failure\r\n                              num_retries: 5\r\n                              retry_host_predicate:\r\n                                - name: envoy.retry_host_predicates.previous_hosts\r\n                              host_selection_retry_max_attempts: 5\r\n                            rate_limits:\r\n                              actions:\r\n                                - generic_key:\r\n                                    descriptor_value: apirate\r\n                                - request_headers:\r\n                                    header_name: ':authority'\r\n                                    descriptor_key: authority\r\n                                - request_headers:\r\n                                    header_name: ':method'\r\n                                    descriptor_key: method\r\n                                - request_headers:\r\n                                    header_name: ':path'\r\n                                    descriptor_key: path\r\n                                - request_headers:\r\n                                    header_name: user-agent\r\n                                    descriptor_key: userAgent\r\n                                - request_headers:\r\n                                    header_name: x-customer-id\r\n                                    descriptor_key: customerId\r\n                                - request_headers:\r\n                                    header_name: x-trace\r\n                                    descriptor_key: xTrace\r\n                                - request_headers:\r\n                                    header_name: x-forwarded-for\r\n                                    descriptor_key: xForwardedFor\r\n                http_filters:\r\n                  - name: envoy.rate_limit\r\n                    config:\r\n                      domain: apirate\r\n                      failure_mode_deny: false\r\n                      timeout: 0.25s\r\n                      rate_limit_service:\r\n                        grpc_service:\r\n                          timeout: 0.05s\r\n                          envoy_grpc:\r\n                            cluster_name: ratelimit\r\n                  - name: envoy.router\r\n  clusters:\r\n    - name: backend-kube\r\n      connect_timeout: 0.25s\r\n      type: STRICT_DNS\r\n      lb_policy: ROUND_ROBIN\r\n      max_requests_per_connection: 1\r\n      http_protocol_options: {}\r\n      dns_refresh_rate: 5s\r\n      load_assignment:\r\n        cluster_name: backend-kube\r\n        endpoints:\r\n          - lb_endpoints:\r\n              - endpoint:\r\n                  address:\r\n                    socket_address:\r\n                      address: 127.0.0.1\r\n                      port_value: 81\r\n      health_checks:\r\n        http_health_check:\r\n          path: /healthz\r\n        timeout: 1s\r\n        interval: 1s\r\n        interval_jitter_percent: 25\r\n        unhealthy_threshold: 3\r\n        healthy_threshold: 1\r\n        reuse_connection: true\r\n        always_log_health_check_failures: true\r\n      circuit_breakers:\r\n        thresholds:\r\n          - priority: DEFAULT\r\n            max_connections: 65536\r\n            max_pending_requests: 65536\r\n            max_requests: 65536\r\n            max_retries: 1024\r\n          - priority: HIGH\r\n            max_connections: 65536\r\n            max_pending_requests: 65536\r\n            max_requests: 65536\r\n            max_retries: 1024\r\n    - name: ratelimit\r\n      connect_timeout: 0.25s\r\n      type: STRICT_DNS\r\n      lb_policy: ROUND_ROBIN\r\n      http2_protocol_options: {}\r\n      load_assignment:\r\n        cluster_name: ratelimit\r\n        endpoints:\r\n          - lb_endpoints:\r\n              - endpoint:\r\n                  address:\r\n                    socket_address:\r\n                      address: 192.168.0.1\r\n                      port_value: 8081\r\n```\r\n\r\nI'd like to upgrade that to v3 format, but get errors like `INVALID_ARGUMENT:(static_resources.listeners[0].filter_chains[0].filters[0]) config: Cannot find field.) has unknown fields`, which though I'm aware of config being depricated, I know type_config is available.. but not 100% sure how all this works.  Any help (with examples) would be appreciated.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/24276/comments",
+    "author": "sharkannon",
+    "comments": [
+      {
+        "user": "kyessenov",
+        "created_at": "2022-11-30T23:17:47Z",
+        "body": "Yeah, the biggest thing is the usage of the \"typed_config\" consistently:\r\n\r\n```\r\n - name: envoy.http_connection_manager\r\n   typed_config:\r\n     \"@type\": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager\r\n     stat_prefix: ingress_http\r\n```\r\n\r\nThere were some field renames that can be found by looking at the protobuf annotations, so you probably want to gradually convert config and enable strict validation (disallow unknown fields in static and dynamic configs)."
+      },
+      {
+        "user": "sharkannon",
+        "created_at": "2022-11-30T23:53:50Z",
+        "body": "I'm not really impressed with the logging messages about the deprications, but I *think* I got it.  I basically had to fix deprication warnings in 1.16, then upgrade toi 1.17, then fix those.. all the way up to 1.21.. then in 1.22 there was a couple of those type_config issues that came up...\r\n\r\n\r\n```\r\nadmin:\r\n  address:\r\n    socket_address:\r\n      address: 0.0.0.0\r\n      port_value: 8095\r\nstatic_resources:\r\n  listeners:\r\n    - name: listener_0\r\n      address:\r\n        socket_address:\r\n          address: 0.0.0.0\r\n          port_value: 8094\r\n      filter_chains:\r\n        - filters:\r\n            - name: envoy.http_connection_manager\r\n              typed_config:\r\n                \"@type\": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager\r\n                stat_prefix: ingress_http\r\n                use_remote_address: true\r\n                stream_idle_timeout: 0s\r\n                access_log:\r\n                  - name: envoy.access_loggers\r\n                    typed_config:\r\n                      \"@type\": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog\r\n                      log_format:\r\n                        text_format_source: \r\n                          inline_string: >\r\n                            [%START_TIME%] \"%REQ(:METHOD)%\r\n                            %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%\"\r\n                            %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED%\r\n                            %BYTES_SENT% %DURATION%\r\n                            %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%\r\n                            \"%REQ(X-FORWARDED-FOR)%\" \"%REQ(USER-AGENT)%\"\r\n                            \"%REQ(X-TRACE)%\" \"%REQ(X-CUSTOMER-ID)%\"\r\n                            \"%REQ(:AUTHORITY)%\" \"%UPSTREAM_HOST%\"\r\n                  - name: envoy.access_loggers\r\n                    typed_config:\r\n                      \"@type\": type.googleapis.com/envoy.extensions.access_loggers.grpc.v3.HttpGrpcAccessLogConfig\r\n                      common_config:\r\n                        log_name: apirate\r\n                        transport_api_version: V3\r\n                        grpc_service:\r\n                          envoy_grpc:\r\n                            cluster_name: ratelimit\r\n                      additional_request_headers_to_log:\r\n                        - x-customer-id\r\n                        - x-trace\r\n                        - x-forwarded-for\r\n                        - user-agent\r\n                route_config:\r\n                  name: local_route\r\n                  request_headers_to_add:\r\n                    - header:\r\n                        key: x-forwarded-proto\r\n                        value: https\r\n                      append: false\r\n                    - header:\r\n                        key: connection\r\n                        value: close\r\n                      append: false\r\n                  virtual_hosts:\r\n                    - name: local_service\r\n                      domains:\r\n                        - '*'\r\n                      routes:\r\n                        - match:\r\n                            prefix: /rest/transport/\r\n                            headers:\r\n                              - name: X-HAPROXY-CLUSTER\r\n                                string_match: \r\n                                  exact: kube\r\n                          route:\r\n                            cluster: backend-kube\r\n                            timeout: 0s\r\n                            retry_policy:\r\n                              retry_on: connect-failure\r\n                              num_retries: 5\r\n                              retry_host_predicate:\r\n                                - name: envoy.retry_host_predicates\r\n                                  typed_config:\r\n                                    \"@type\": type.googleapis.com/envoy.extensions.retry.host.previous_hosts.v3.PreviousHostsPredicate\r\n                              host_selection_retry_max_attempts: 5\r\n                        - match:\r\n                            prefix: /\r\n                            headers:\r\n                              - name: X-HAPROXY-CLUSTER\r\n                                string_match: \r\n                                  exact: kube\r\n                          route:\r\n                            cluster: backend-kube\r\n                            timeout: 0s\r\n                            retry_policy:\r\n                              retry_on: connect-failure\r\n                              num_retries: 5\r\n                              retry_host_predicate:\r\n                                - name: envoy.retry_host_predicates\r\n                                  typed_config:\r\n                                    \"@type\": type.googleapis.com/envoy.extensions.retry.host.previous_hosts.v3.PreviousHostsPredicate\r\n                              host_selection_retry_max_attempts: 5\r\n                            rate_limits:\r\n                              actions:\r\n                                - generic_key:\r\n                                    descriptor_value: apirate\r\n                                - request_headers:\r\n                                    header_name: ':authority'\r\n                                    descriptor_key: authority\r\n                                - request_headers:\r\n                                    header_name: ':method'\r\n                                    descriptor_key: method\r\n                                - request_headers:\r\n                                    header_name: ':path'\r\n                                    descriptor_key: path\r\n                                - request_headers:\r\n                                    header_name: user-agent\r\n                                    descriptor_key: userAgent\r\n                                - request_headers:\r\n                                    header_name: x-customer-id\r\n                                    descriptor_key: customerId\r\n                                - request_headers:\r\n                                    header_name: x-trace\r\n                                    descriptor_key: xTrace\r\n                                - request_headers:\r\n                                    header_name: x-forwarded-for\r\n                                    descriptor_key: xForwardedFor\r\n                http_filters:\r\n                  - name: envoy.filters.http.ratelimit\r\n                    typed_config:\r\n                      \"@type\": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit\r\n                      domain: apirate\r\n                      failure_mode_deny: false\r\n                      timeout: 0.25s\r\n                      rate_limit_service:\r\n                        transport_api_version: V3\r\n                        grpc_service:\r\n                          timeout: 0.05s\r\n                          envoy_grpc:\r\n                            cluster_name: ratelimit\r\n                  - name: envoy.filters.http.router\r\n                    typed_config:\r\n                      \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n  clusters:\r\n    - name: backend-kube\r\n      connect_timeout: 0.25s\r\n      type: STRICT_DNS\r\n      lb_policy: ROUND_ROBIN\r\n      typed_extension_protocol_options:\r\n        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:\r\n          \"@type\": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions\r\n          common_http_protocol_options:\r\n            max_requests_per_connection: 1\r\n          use_downstream_protocol_config: {}\r\n      dns_refresh_rate: 5s\r\n      load_assignment:\r\n        cluster_name: backend-kube\r\n        endpoints:\r\n          - lb_endpoints:\r\n              - endpoint:\r\n                  address:\r\n                    socket_address:\r\n                      address: 127.0.0.1\r\n                      port_value: 81\r\n      health_checks:\r\n        http_health_check:\r\n          path: /healthz\r\n        timeout: 1s\r\n        interval: 1s\r\n        interval_jitter_percent: 25\r\n        unhealthy_threshold: 3\r\n        healthy_threshold: 1\r\n        reuse_connection: true\r\n        always_log_health_check_failures: true\r\n      circuit_breakers:\r\n        thresholds:\r\n          - priority: DEFAULT\r\n            max_connections: 65536\r\n            max_pending_requests: 65536\r\n            max_requests: 65536\r\n            max_retries: 1024\r\n          - priority: HIGH\r\n            max_connections: 65536\r\n            max_pending_requests: 65536\r\n            max_requests: 65536\r\n            max_retries: 1024\r\n\r\n    - name: ratelimit\r\n      connect_timeout: 0.25s\r\n      type: STRICT_DNS\r\n      lb_policy: ROUND_ROBIN\r\n      load_assignment:\r\n        cluster_name: ratelimit\r\n        endpoints:\r\n          - lb_endpoints:\r\n              - endpoint:\r\n                  address:\r\n                    socket_address:\r\n                      address: 192.168.0.1\r\n                      port_value: 8081\r\n```\r\n\r\nThat starts up, is it the same as my original, I'm not 100% sure.. but it at least starts up, I'll deploy the changes to dev tomorrow to see if it works.  Any suggestions/recommendations/fixes would be appreciated."
+      },
+      {
+        "user": "kyessenov",
+        "created_at": "2022-11-30T23:57:10Z",
+        "body": "I don't see anything wrong but it's always worth testing before deploying. One piece of good news for you is that v3 is forever, there'll be no v4 migration."
+      }
+    ]
+  },
+  {
+    "number": 23016,
+    "title": "ECDS config source from path - discovery response format for resource ",
+    "created_at": "2022-09-07T12:30:04Z",
+    "closed_at": "2022-10-15T16:01:53Z",
+    "labels": [
+      "question",
+      "stale"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/23016",
+    "body": "Hi folks,\r\nI'm also trying to implement ECDS but the config should come from a file.\r\nI'm struggling to make it work... please help me with how to define the contents of the yaml file.\r\n\r\nthis config:\r\n```\r\nversion_info: \"100\"\r\nresources:\r\n- \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n```\r\nfails with:\r\n`Filesystem config update rejected: Unable to unpack as envoy.config.core.v3.TypedExtensionConfig: [type.googleapis.com/envoy.extensions.filters.http.router.v3.Router] `\r\n\r\n```\r\n          http_filters:\r\n          - name: router\r\n            config_discovery:\r\n              type_urls: [\"type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\"]\r\n              config_source:\r\n                path: /usr/local/bin/test-ecds-v1.yml\r\n              default_config:\r\n                \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/23016/comments",
+    "author": "pxpnetworks",
+    "comments": [
+      {
+        "user": "kyessenov",
+        "created_at": "2022-09-07T16:18:05Z",
+        "body": "The issue is that you need to wrap `Router` message into `TypedExtensionConfig` message. That means something like this:\r\n```yaml\r\nversion_info: \"100\"\r\nresources:\r\n- \"@type\": type.googleapis.com/envoy.config.core.v3.TypedExtensionConfig\r\n  name: router\r\n  typed_config:\r\n    \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n```"
+      },
+      {
+        "user": "pxpnetworks",
+        "created_at": "2022-09-07T17:17:37Z",
+        "body": "Thank you @kyessenov , it is accepted now however i tried to add a second http filter (rbac) before router and still get errors loading both rbac and router.\r\nCan you help me with this once again? Thanks!\r\n\r\ncode:\r\n```\r\n- name: envoy.filters.http.rbac\r\n  typed_config:\r\n    \"@type\": \"type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC\"\r\n    shadow_rules:\r\n      action: LOG\r\n      policies:\r\n        \"log\":\r\n          permissions: {any: true}\r\n          principals: {any: true}\r\n```\r\n```\r\nversion_info: \"100\"\r\nresources:\r\n- \"@type\": type.googleapis.com/envoy.config.core.v3.TypedExtensionConfig\r\n  name: router\r\n  typed_config:\r\n    \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n```\r\n```\r\nhttp_filters:\r\n- name: router\r\n  config_discovery:\r\n    type_urls:\r\n    - \"type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC\"\r\n    - \"type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\"\r\n    config_source:\r\n      path: /usr/local/bin/test-ecds-v1.yml\r\n    default_config:\r\n      \"@type\": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router\r\n```\r\n\r\nBR,\r\nStoyan"
+      },
+      {
+        "user": "pxpnetworks",
+        "created_at": "2022-09-08T08:27:09Z",
+        "body": "Figured out I need a separate config_source file for each HTTP filter in the chain, hope that is how it is supposed to work.\r\n"
+      }
+    ]
+  },
+  {
+    "number": 21121,
+    "title": "How envoy queues requests?",
+    "created_at": "2022-05-03T06:06:46Z",
+    "closed_at": "2024-06-26T13:38:23Z",
+    "labels": [
+      "question",
+      "area/grpc"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/21121",
+    "body": "In my case, there are multiple grpc endpoints, each of which can only process one request at a time. It may take several seconds to several minutes to process one request.\r\n\r\nWhat I need:\r\n\r\nEnvoy takes a bunch of requests, assigns one to each endpoint, and enqueues the rest. Once an endpoint finishes, envoy assigns the next in queue to this endpoint.\r\n\r\nI have looked into \"Circuit Breakers\", but it just fails the requests beyond max_requests. \r\n\r\n```\r\n    circuit_breakers:\r\n      thresholds:\r\n        - max_connections: 5\r\n          max_pending_requests: 20\r\n          max_requests: 5\r\n```\r\nUsing the config above, I send 10 requests, only first 5 are successful.\r\n\r\nI have also checked \"connection pool\" and tested max_concurrent_streams. It seems not relevant.\r\n\r\nI am new to envoy. Thanks if anyone could give a hint.\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/21121/comments",
+    "author": "exhau",
+    "comments": [
+      {
+        "user": "alyssawilk",
+        "created_at": "2022-05-04T16:16:41Z",
+        "body": "so the circuit breakers will hard fail if you go over the request limit.\r\nI _believe_ if you go over the connection limit it'll queue.\r\nso I think if you configure your connect limit at 1, and max concurrent streams at 1 you'd get the behavior you wanted.  Please give it a shot and let me know if it doesn't work."
+      },
+      {
+        "user": "alyssawilk",
+        "created_at": "2022-05-04T20:46:47Z",
+        "body": "Yeah, the queuing is done in the connection pool, not at the cluster level, which is sub-optimal for your use case.  I think your use case was one Envoy wasn't really designed for, but I think we'd welcome changes if you're game for queuing at a higher level."
+      },
+      {
+        "user": "exhau",
+        "created_at": "2024-06-23T12:02:36Z",
+        "body": "``` \r\n    http2_protocol_options: \r\n      max_concurrent_streams: 1\r\n    circuit_breakers:\r\n      thresholds:\r\n        - max_connections: 1\r\n```\r\n \r\nIf \"one\" client sends a lot of requests simultaneously, this config works as expected. Each backend processes one request at a time. \r\n \r\nBut when a second client starts sending requests, the backend may process two requests at the same time.\r\n \r\nI wonder if it is by designed. Is there a way to achieve processing request one by one for each endpoint, when multiple clients are sending multiple request?\r\n\r\nThanks~"
+      },
+      {
+        "user": "alyssawilk",
+        "created_at": "2024-06-24T13:07:06Z",
+        "body": "Do you perhaps have multiple worker threads?  These limits apply to each worker thread so my suspicion is Envoy is working as intended but you need to limit worker threads if you want to rate limit so much"
+      },
+      {
+        "user": "exhau",
+        "created_at": "2024-06-26T13:38:23Z",
+        "body": "--concurrency 1\r\nsolved it. thank you again!"
+      }
+    ]
+  },
+  {
+    "number": 17540,
+    "title": "Context management in request-response cycle",
+    "created_at": "2021-07-29T18:42:11Z",
+    "closed_at": "2021-08-09T17:21:27Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/17540",
+    "body": "*Title*: *Context management in request-response cycle*\r\n\r\n*Description*:\r\n\r\n> We are currently testing out Envoy's new ExternalProcessor filter type.  We are using this filter to mutate request headers and request bodies before they reach our downstream applications.  We are removing some of this data from the request and then hoping to re-access it on response.\r\n> \r\n> In development, our filter containers (we have tested with 3 containers running a Go application as our cluster) seems to be maintaining a single context object across the entire request-response lifecycle, which is not what we expected to have happen.  Though this makes our lives easier in some ways (we don't need an external cache to hold onto this data if it can be held in memory of a container), we are concerned that this is not expected behavior and could change in the future.  Since Go's Context library is not doing anything fancy behind the scenes, we have a sneaking suspicion that this peculiar behavior is Envoy-related.\r\n> \r\n> Is maintaining this context expected behavior for Envoy?\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/17540/comments",
+    "author": "mdettelson",
+    "comments": [
+      {
+        "user": "gbrail",
+        "created_at": "2021-08-07T00:49:44Z",
+        "body": "ext_proc starts a bidirectional gRPC stream for each HTTP request/response. (It's basically a long-running gRPC with data going back in forth in two ways.) \r\n\r\nIn go, you'd receive a single call to \"Process,\" and in there you read and write to the stream. Envoy doesn't know anything about Go contexts, but I assume that the Go gRPC code creates a single context and you'll use it as you interact with the stream.\r\n\r\nThis is on purpose, and it is indeed supposed to make things easier for implementers of external processors, since you can maintain state with the gRPC stream. (In Go you handle the whole stream from a single function, running in a single goroutine, so it's particularly easy.) In most cases you shouldn't need a separate state table or anything like that."
+      }
+    ]
+  },
+  {
+    "number": 17476,
+    "title": "Is there a command to view the configuration of eds?",
+    "created_at": "2021-07-24T02:30:22Z",
+    "closed_at": "2021-07-29T07:06:53Z",
+    "labels": [
+      "question",
+      "area/xds",
+      "area/admin"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/17476",
+    "body": "The configuration of endpoints cannot be found using `127.0.0.1:15000/config_dump`. Is there a command to see the configuration issued by eds?",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/17476/comments",
+    "author": "zhangzerui20",
+    "comments": [
+      {
+        "user": "ramaraochavali",
+        "created_at": "2021-07-25T09:59:51Z",
+        "body": "config_dump?include_eds will give eds details"
+      },
+      {
+        "user": "htuch",
+        "created_at": "2021-07-25T18:10:28Z",
+        "body": "Also some of this information is available on the `/clusters` admin endpoint."
+      }
+    ]
+  },
+  {
+    "number": 17353,
+    "title": "Relationship between grpc service definition timeout and cluster definition connect_timeout",
+    "created_at": "2021-07-14T22:12:20Z",
+    "closed_at": "2021-07-16T15:36:01Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/17353",
+    "body": "In the configuration shown below there is timeout: 1s of grpc_service which is defined to call cluster: ext_authz which also has connect_timeout: 5s. Is there a relationship between those two timeouts? The grpc_service timeout is defined as \"the timeout for a specific request\", vs connect_timeout as \"The timeout for new network connections to hosts in the cluster\", so in case the grpc_service timeout is 'started' first, should it be larger or at least, equal to that of the cluster connect_timeout? \r\n\r\nIs there a best practice advice I can follow? For now, I have set both to the same value of 5s for testing, to be set via an environment variable to 3s in prod.\r\n\r\nthanks in advance,\r\nswav\r\n\r\n\"http_filters\": [\r\n             {\r\n              \"name\": \"envoy.filters.http.ext_authz\",\r\n              \"typed_config\": {\r\n               \"@type\": \"type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz\",\r\n               \"grpc_service\": {\r\n                \"envoy_grpc\": {\r\n                 \"cluster_name\": \"ext_authz\"\r\n                },\r\n                **\"timeout\": \"1s\"**\r\n               },\r\n               \"transport_api_version\": \"V3\"\r\n              }\r\n             },\r\n...\r\n\"dynamic_active_clusters\": [\r\n{\r\n     \"version_info\": \"1626296116754330624\",\r\n     \"cluster\": {\r\n      \"@type\": \"type.googleapis.com/envoy.config.cluster.v3.Cluster\",\r\n      \"name\": \"ext_authz\",\r\n      \"type\": \"LOGICAL_DNS\",\r\n      **\"connect_timeout\": \"5s\",**\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/17353/comments",
+    "author": "swav",
+    "comments": [
+      {
+        "user": "snowp",
+        "created_at": "2021-07-16T13:56:02Z",
+        "body": "The connect timeout is how long to wait for the connection to be established, while the timeout is how long to wait for the response for a given request. It probably makes sense to have timeout > connect_timeout"
+      }
+    ]
+  },
+  {
+    "number": 15869,
+    "title": "Connecting with IP when the listener is configured with SNI",
+    "created_at": "2021-04-07T13:10:16Z",
+    "closed_at": "2021-04-20T01:59:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/15869",
+    "body": "We are PoC-ing envoy to use it as our load balancer, we are trying to utilize the SNI feature and it works perfectky fine.\r\n\r\nBut when we try to connect to IP of the listener that is configured with SNI, we get `no matching filter chain found` and the request fails.\r\n\r\nWe use curl with option `-k` to do this.\r\n\r\nBelow is the minimal configuration to do this\r\n\r\n```\r\n- \"@type\": type.googleapis.com/envoy.config.listener.v3.Listener\r\n  name: demo-https\r\n  address:\r\n    socket_address:\r\n      address: 100.x.x.x\r\n      port_value: 443\r\n  listener_filters:\r\n  - name: \"envoy.filters.listener.tls_inspector\"\r\n    typed_config: {}\r\n  filter_chains:\r\n          #- use_proxy_proto: true\r\n  - filter_chain_match:\r\n      server_names: [\"*.example.net\", \"example.net\"]\r\n    transport_socket:\r\n      name: envoy.transport_sockets.tls\r\n      typed_config:\r\n        \"@type\": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext\r\n        cluster: demo-https-cluster\r\n        common_tls_context:\r\n          tls_certificates:\r\n          - certificate_chain: { filename: \"/etc/certs/asterisk.example.net.chain\" }\r\n            private_key: { filename: \"/etc/certs/asterisk.example.net.key\" }\r\n    filters:\r\n    - name: envoy.filters.network.http_connection_manager\r\n      typed_config:\r\n        \"@type\": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager\r\n        stat_prefix: http\r\n        cluster: demo-https-cluster\r\n        rds:\r\n          route_config_name: demo-rds\r\n          config_source:\r\n            path: \"/etc/envoy/rds/demo-rds.yaml\"\r\n        access_log:\r\n        - name: log\r\n          typed_config:\r\n            \"@type\": type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog\r\n            path: \"/var/log/envoy.log\"\r\n            typed_json_format: *json_Format\r\n        http_filters:\r\n        - name: envoy.router\r\n          config: {}\r\n```\r\nMy questions are : \r\n\r\n1. Will connecting with IP work if SNI is enabled and specified?\r\n2. If it does not support, any suggestions to use multiple certificates like haproxy supports?\r\n\r\nThank you !",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/15869/comments",
+    "author": "VigneshSP94",
+    "comments": [
+      {
+        "user": "snowp",
+        "created_at": "2021-04-08T17:11:29Z",
+        "body": "I believe you'd either need to include the ip as one of the SNIs (assuming the client sets the IP as the SNI) or use a second filter chain that doesn't try to match on SNI."
+      },
+      {
+        "user": "lambdai",
+        "created_at": "2021-04-08T21:12:41Z",
+        "body": "Or you can create another filter chain with empty `server_names` to expclity accept either no-SNI or `unknown-SNI`"
+      }
+    ]
+  },
+  {
+    "number": 15071,
+    "title": "round robin load balancing issue on TCP_Proxy with envoy.filters.network.sni_cluster ",
+    "created_at": "2021-02-17T08:54:27Z",
+    "closed_at": "2021-04-29T08:01:18Z",
+    "labels": [
+      "question",
+      "stale"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/15071",
+    "body": "Currently I am using Istio to form a service mesh on 2 k8s clusters, say, clusterA and clusterB.  15443 port is used for cross cluster communication. i.e. in clusterA, we can access the service in clusterB through the mtls port 15443 on the istio ingressgateway of clusterB.   The problem is the traffic is not evenly distributed to the work load of the service in clusterB. \r\n\r\ne.g. \r\n\r\n kubectl logs test-deploy-6df899c68d-fm7h6  -c istio-proxy  --context dev-svc-cluster | grep \"GET\" | wc -l\r\n11659\r\n kubectl logs test-deploy-6df899c68d-sbswr  -c istio-proxy  --context dev-svc-cluster | grep \"GET\" | wc -l\r\n19837\r\n\r\nMay I know there is anything I can do to make  round robin load balancing work in my case?  Thanks.\r\n\r\n\r\nhere is the listener configuration for port 15443 of istio ingressgateway of clusterB:\r\n\r\n    {\r\n        \"name\": \"0.0.0.0_15443\",\r\n        \"address\": {\r\n            \"socketAddress\": {\r\n                \"address\": \"0.0.0.0\",\r\n                \"portValue\": 15443\r\n            }\r\n        },\r\n        \"filterChains\": [\r\n            {\r\n                \"filterChainMatch\": {\r\n                    \"serverNames\": [\r\n                        \"*.local\"\r\n                    ]\r\n                },\r\n                \"filters\": [\r\n                    {\r\n                        \"name\": \"envoy.filters.network.sni_cluster\"\r\n                    },\r\n                    {\r\n                        \"name\": \"envoy.filters.network.rbac\",\r\n                        \"typedConfig\": {\r\n                            \"@type\": \"type.googleapis.com/envoy.extensions.filters.network.rbac.v3.RBAC\",\r\n                            \"rules\": {\r\n                                \"policies\": {\r\n                                    \"ns[istio-system]-policy[allow-ingress-gateway]-rule[0]\": {\r\n                                        \"permissions\": [\r\n                                            {\r\n                                                \"andRules\": {\r\n                                                    \"rules\": [\r\n                                                        {\r\n                                                            \"any\": true\r\n                                                        }\r\n                                                    ]\r\n                                                }\r\n                                            }\r\n                                        ],\r\n                                        \"principals\": [\r\n                                            {\r\n                                                \"andIds\": {\r\n                                                    \"ids\": [\r\n                                                        {\r\n                                                            \"any\": true\r\n                                                        }\r\n                                                    ]\r\n                                                }\r\n                                            }\r\n                                        ]\r\n                                    }\r\n                                }\r\n                            },\r\n                            \"statPrefix\": \"tcp.\"\r\n                        }\r\n                    },\r\n                    {\r\n                        \"name\": \"istio.stats\",\r\n                        \"typedConfig\": {\r\n                            \"@type\": \"type.googleapis.com/udpa.type.v1.TypedStruct\",\r\n                            \"typeUrl\": \"type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm\",\r\n                            \"value\": {\r\n                                \"config\": {\r\n                                    \"configuration\": {\r\n                                        \"@type\": \"type.googleapis.com/google.protobuf.StringValue\",\r\n                                        \"value\": \"{\\n  \\\"metrics\\\": [\\n    {\\n      \\\"dimensions\\\": {\\n        \\\"source_cluster\\\": \\\"node.metadata['CLUSTER_ID']\\\",\\n        \\\"destination_cluster\\\": \\\"upstream_peer.cluster_id\\\"\\n      }\\n    }\\n  ]\\n}\\n\"\r\n                                    },\r\n                                    \"root_id\": \"stats_outbound\",\r\n                                    \"vm_config\": {\r\n                                        \"code\": {\r\n                                            \"local\": {\r\n                                                \"inline_string\": \"envoy.wasm.stats\"\r\n                                            }\r\n                                        },\r\n                                        \"runtime\": \"envoy.wasm.runtime.null\",\r\n                                        \"vm_id\": \"tcp_stats_outbound\"\r\n                                    }\r\n                                }\r\n                            }\r\n                        }\r\n                    },\r\n                    {\r\n                        \"name\": \"envoy.filters.network.tcp_proxy\",\r\n                        \"typedConfig\": {\r\n                            \"@type\": \"type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy\",\r\n                            \"statPrefix\": \"BlackHoleCluster\",\r\n                            \"cluster\": \"BlackHoleCluster\",\r\n                            \"accessLog\": [\r\n                                {\r\n                                    \"name\": \"envoy.access_loggers.file\",\r\n                                    \"typedConfig\": {\r\n                                        \"@type\": \"type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog\",\r\n                                        \"path\": \"/dev/stdout\",\r\n                                        \"logFormat\": {\r\n                                            \"textFormat\": \"[%START_TIME%] \\\"%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%\\\" %RESPONSE_CODE% %RESPONSE_FLAGS% \\\"%UPSTREAM_TRANSPORT_FAILURE_REASON%\\\" %BYTES_RECEIVED% %BYTES_SENT% %DURATION% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)% \\\"%REQ(X-FORWARDED-FOR)%\\\" \\\"%REQ(USER-AGENT)%\\\" \\\"%REQ(X-REQUEST-ID)%\\\" \\\"%REQ(:AUTHORITY)%\\\" \\\"%UPSTREAM_HOST%\\\" %UPSTREAM_CLUSTER% %UPSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_REMOTE_ADDRESS% %REQUESTED_SERVER_NAME% %ROUTE_NAME%\\n\"\r\n                                        }\r\n                                    }\r\n                                }\r\n                            ]\r\n                        }\r\n                    }\r\n                ]\r\n            }\r\n        ],\r\n        \"listenerFilters\": [\r\n            {\r\n                \"name\": \"envoy.filters.listener.tls_inspector\",\r\n                \"typedConfig\": {\r\n                    \"@type\": \"type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector\"\r\n                }\r\n            }\r\n        ],\r\n        \"trafficDirection\": \"OUTBOUND\",\r\n        \"accessLog\": [\r\n            {\r\n                \"name\": \"envoy.access_loggers.file\",\r\n                \"filter\": {\r\n                    \"responseFlagFilter\": {\r\n                        \"flags\": [\r\n                            \"NR\"\r\n                        ]\r\n                    }\r\n                },\r\n                \"typedConfig\": {\r\n                    \"@type\": \"type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog\",\r\n                    \"path\": \"/dev/stdout\",\r\n                    \"logFormat\": {\r\n                        \"textFormat\": \"[%START_TIME%] \\\"%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%\\\" %RESPONSE_CODE% %RESPONSE_FLAGS% \\\"%UPSTREAM_TRANSPORT_FAILURE_REASON%\\\" %BYTES_RECEIVED% %BYTES_SENT% %DURATION% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)% \\\"%REQ(X-FORWARDED-FOR)%\\\" \\\"%REQ(USER-AGENT)%\\\" \\\"%REQ(X-REQUEST-ID)%\\\" \\\"%REQ(:AUTHORITY)%\\\" \\\"%UPSTREAM_HOST%\\\" %UPSTREAM_CLUSTER% %UPSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_REMOTE_ADDRESS% %REQUESTED_SERVER_NAME% %ROUTE_NAME%\\n\"\r\n                    }\r\n                }\r\n            }\r\n        ]\r\n    },\r\n\r\nhere is cluster config\r\n\r\n    {\r\n        \"name\": \"outbound_.8000_._.test-svc.default.svc.cluster.local\",\r\n        \"type\": \"EDS\",\r\n        \"edsClusterConfig\": {\r\n            \"edsConfig\": {\r\n                \"ads\": {},\r\n                \"resourceApiVersion\": \"V3\"\r\n            },\r\n            \"serviceName\": \"outbound_.8000_._.test-svc.default.svc.cluster.local\"\r\n        },\r\n        \"connectTimeout\": \"10s\",\r\n        \"circuitBreakers\": {\r\n            \"thresholds\": [\r\n                {\r\n                    \"maxConnections\": 4294967295,\r\n                    \"maxPendingRequests\": 4294967295,\r\n                    \"maxRequests\": 4294967295,\r\n                    \"maxRetries\": 4294967295\r\n                }\r\n            ]\r\n        },\r\n        \"metadata\": {\r\n            \"filterMetadata\": {\r\n                \"istio\": {\r\n                    \"default_original_port\": 8000,\r\n                    \"services\": [\r\n                        {\r\n                            \"host\": \"test-svc.default.svc.cluster.local\",\r\n                            \"name\": \" test-svc\",\r\n                            \"namespace\": \"default\"\r\n                        }\r\n                    ]\r\n                }\r\n            }\r\n        },\r\n        \"filters\": [\r\n            {\r\n                \"name\": \"istio.metadata_exchange\",\r\n                \"typedConfig\": {\r\n                    \"@type\": \"type.googleapis.com/udpa.type.v1.TypedStruct\",\r\n                    \"typeUrl\": \"type.googleapis.com/envoy.tcp.metadataexchange.config.MetadataExchange\",\r\n                    \"value\": {\r\n                        \"protocol\": \"istio-peer-exchange\"\r\n                    }\r\n                }\r\n            }\r\n        ]\r\n    },\r\n\r\nhere is the end points configuration:\r\n\r\n    {\r\n        \"name\": \"outbound_.8000_._.test-svc.default.svc.cluster.local\",\r\n        \"addedViaApi\": true,\r\n        \"hostStatuses\": [\r\n            {\r\n                \"address\": {\r\n                    \"socketAddress\": {\r\n                        \"address\": \"192.168.241.194\",\r\n                        \"portValue\": 8000\r\n                    }\r\n                },\r\n                \"stats\": [\r\n                    {\r\n                        \"name\": \"cx_connect_fail\"\r\n                    },\r\n                    {\r\n                        \"value\": \"38\",\r\n                        \"name\": \"cx_total\"\r\n                    },\r\n                    {\r\n                        \"name\": \"rq_error\"\r\n                    },\r\n                    {\r\n                        \"name\": \"rq_success\"\r\n                    },\r\n                    {\r\n                        \"name\": \"rq_timeout\"\r\n                    },\r\n                    {\r\n                        \"value\": \"38\",\r\n                        \"name\": \"rq_total\"\r\n                    },\r\n                    {\r\n                        \"type\": \"GAUGE\",\r\n                        \"value\": \"31\",\r\n                        \"name\": \"cx_active\"\r\n                    },\r\n                    {\r\n                        \"type\": \"GAUGE\",\r\n                        \"value\": \"31\",\r\n                        \"name\": \"rq_active\"\r\n                    }\r\n                ],\r\n                \"healthStatus\": {\r\n                    \"edsHealthStatus\": \"HEALTHY\"\r\n                },\r\n                \"weight\": 1,\r\n                \"locality\": {}\r\n            },\r\n            {\r\n                \"address\": {\r\n                    \"socketAddress\": {\r\n                        \"address\": \"192.168.249.65\",\r\n                        \"portValue\": 8000\r\n                    }\r\n                },\r\n                \"stats\": [\r\n                    {\r\n                        \"name\": \"cx_connect_fail\"\r\n                    },\r\n                    {\r\n                        \"value\": \"38\",\r\n                        \"name\": \"cx_total\"\r\n                    },\r\n                    {\r\n                        \"name\": \"rq_error\"\r\n                    },\r\n                    {\r\n                        \"name\": \"rq_success\"\r\n                    },\r\n                    {\r\n                        \"name\": \"rq_timeout\"\r\n                    },\r\n                    {\r\n                        \"value\": \"38\",\r\n                        \"name\": \"rq_total\"\r\n                    },\r\n                    {\r\n                        \"type\": \"GAUGE\",\r\n                        \"value\": \"30\",\r\n                        \"name\": \"cx_active\"\r\n                    },\r\n                    {\r\n                        \"type\": \"GAUGE\",\r\n                        \"value\": \"30\",\r\n                        \"name\": \"rq_active\"\r\n                    }\r\n                ],\r\n                \"healthStatus\": {\r\n                    \"edsHealthStatus\": \"HEALTHY\"\r\n                },\r\n                \"weight\": 1,\r\n                \"locality\": {}\r\n            }\r\n        ],\r\n        \"circuitBreakers\": {\r\n            \"thresholds\": [\r\n                {\r\n                    \"maxConnections\": 4294967295,\r\n                    \"maxPendingRequests\": 4294967295,\r\n                     \"maxRequests\": 4294967295,\r\n                    \"maxRetries\": 4294967295\r\n                },\r\n                {\r\n                    \"priority\": \"HIGH\",\r\n                    \"maxConnections\": 1024,\r\n                    \"maxPendingRequests\": 1024,\r\n                    \"maxRequests\": 1024,\r\n                    \"maxRetries\": 3\r\n                }\r\n            ]\r\n        }\r\n    },\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/15071/comments",
+    "author": "debbyku",
+    "comments": [
+      {
+        "user": "lambdai",
+        "created_at": "2021-02-18T05:41:45Z",
+        "body": "This config looks good.\r\ngrep GET at log file is vague. Is there any metric, graph or access log that can drill down to \"gateway - 192.168.241.194\" and \"gateway - 192.168.249.65\" ? "
+      },
+      {
+        "user": "debbyku",
+        "created_at": "2021-02-18T06:19:26Z",
+        "body": "grep GET is to return the access log like this \r\n\r\n[2021-02-18T06:16:33.248Z] \"GET /rt0/v1/api/racingtouch/ping HTTP/1.1\" 200 - \"-\" 0 18 1 1 \"192.168.177.192\" \"Mozilla/5.0 (pc-x86_64-linux-gnu) Siege/4.0.7\" \"82bf70f0-7b2c-9b69-aae0-94e3e963c989\" \"istio-ingressgateway.istio-system\" \"127.0.0.1:8000\" inbound|8000|| 127.0.0.1:53962 192.168.53.7:8000 192.168.177.192:0 outbound_.8000_._.test-svc.default.svc.cluster.local default\r\n[2021-02-18T06:16:33.249Z] \"GET /rt0/v1/api/racingtouch/ping HTTP/1.1\" 200 - \"-\" 0 18 1 0 \"192.168.98.64\" \"Mozilla/5.0 (pc-x86_64-linux-gnu) Siege/4.0.7\" \"b28ff319-1dc2-994e-aca3-26f88881f40b\" \"istio-ingressgateway.istio-system\" \"127.0.0.1:8000\" inbound|8000|| 127.0.0.1:53922 192.168.53.7:8000 192.168.98.64:0 outbound_.8000_._.test-svc.default.svc.cluster.local default\r\n\r\nit is to count how many requests going to the pod\r\nsorry, the ip changed as I restarted the pod many times."
+      },
+      {
+        "user": "debbyku",
+        "created_at": "2021-02-18T06:27:25Z",
+        "body": "The stats in the endpoints do not count correctly.  The rq_total should be much larger than it and I rarely find the access log for 15443 in the istio ingressgateway."
+      },
+      {
+        "user": "lambdai",
+        "created_at": "2021-02-18T07:46:58Z",
+        "body": "> The stats in the endpoints do not count correctly. The rq_total should be much larger than it and I rarely find the access log for 15443 in the istio ingressgateway.\r\n\r\nThe request in istio-gateway is loadbalanced per `tcp connection` since you use sni_cluster with tcp_proxy filter at istio-ingressgateway. This config doesn't guarantee http request is balanced.\r\n\r\nAt an extreme case, if your siege client use only 1 tcp connection during the your load test, you will see only 1 endpoint handle all the http request. You are right at the beginning: SNI cluster + tcp_proxy doesn't well load balancing http request. \r\n\r\nYou can either switch to another http benchmark tool with max-request-per-connection to give istio-ingressgateway more chances to load balance."
+      },
+      {
+        "user": "debbyku",
+        "created_at": "2021-02-18T13:32:46Z",
+        "body": "Hi @lambdai,  thanks for your advice.\r\nAs the request is from siege -> clusterA isto-ingressgateway -> clusterB istio-ingressgateway(15443) -> service, in clusterA istio-ingressgateway, we set the max-request-per-connection to 10 in order to max. the no. of connections to clusterB 15443, it seems the load balancing performance is much better.  For 4xxxx requests, the difference of number of requests to the service pods is reduced within 100.  \r\n\r\nMay I ask, if max-request-per-connection is set to 10, is there any adverse effect to the overall performance, i.e. it takes more time to create connections. etc?  Originally there is no setting for it.   Thanks."
+      },
+      {
+        "user": "lambdai",
+        "created_at": "2021-03-23T02:07:10Z",
+        "body": "Sorry I missed this one.\r\nFor light weight request the major cost will be tls handshake. I usually use 5ms cpu time to estimate. YMMV"
+      }
+    ]
+  },
+  {
+    "number": 14440,
+    "title": "question: how to fetch the remote IP address in WASM",
+    "created_at": "2020-12-16T14:03:30Z",
+    "closed_at": "2020-12-23T11:20:12Z",
+    "labels": [
+      "question",
+      "area/wasm"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/14440",
+    "body": "I do not find any doc about how to fetch the remote IP address in WASM.\r\n\r\nMany thx for your help.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/14440/comments",
+    "author": "membphis",
+    "comments": [
+      {
+        "user": "alandiegosantos",
+        "created_at": "2020-12-18T23:15:56Z",
+        "body": "It is possible to get the upstream IP address by getting the property _upstream.address_.\r\nI am working with WASM filters written in Rust, so the code looks like: \r\n```\r\nuse log::error;\r\nuse proxy_wasm::traits::*;\r\nuse proxy_wasm::types::*;\r\nuse std::str;\r\n\r\n#[no_mangle]\r\npub fn _start() {\r\n    proxy_wasm::set_log_level(LogLevel::Info);\r\n    proxy_wasm::set_http_context(|_, _| -> Box<dyn HttpContext> { Box::new(HttpFilter) });\r\n}\r\n\r\nstruct HttpFilter;\r\n\r\nimpl Context for HttpFilter{}\r\n\r\nimpl HttpContext for HttpFilter {\r\n    fn on_http_response_headers(&mut self, _: usize) -> Action {\r\n        // Add a header on the response.\r\n        let prop = self.get_property([\"upstream\", \"address\"].to_vec()).unwrap();\r\n        let addr = match str::from_utf8(&prop) {\r\n            Ok(v) => v,\r\n            Err(_e) => \"\",\r\n        };\r\n        error!(\"upstream address {}\",addr);\r\n        Action::Continue\r\n    }\r\n}\r\n```\r\nPS: Do not use that as production code. It is only an example.\r\n\r\nI would like to create the docs about these properties, if possible."
+      }
+    ]
+  },
+  {
+    "number": 12675,
+    "title": "Stats filtering inclusion list is not working for server level metrics",
+    "created_at": "2020-08-17T05:16:20Z",
+    "closed_at": "2020-08-19T04:34:35Z",
+    "labels": [
+      "question",
+      "area/stats"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/12675",
+    "body": "We have the following configuration in envoy\r\n\r\n```yml\r\n    stats_config:\r\n      stats_matcher:\r\n        inclusion_list:\r\n          patterns:\r\n          - suffix: upstream_cx_total\r\n          - exact: envoy_server_state\r\n```\r\nIn this case, the metrics with suffix upstream_cx_total is emitted properly, but the metric envoy_server_state is never emitted. Please check if this a bug, we have a large config and metrics is slowing envoy down, hence wanted to include only the required metrics which is a combination of cluster and server level metrics.\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/12675/comments",
+    "author": "shyamradhakrishnan",
+    "comments": [
+      {
+        "user": "lizan",
+        "created_at": "2020-08-18T11:03:00Z",
+        "body": "@shyamradhakrishnan I believe what you want is `exact: server.state`, the stats matcher is based on their canonical name, names in Prometheus exporter are normalized to Prometheus naming convention (with envoy prefix)."
+      }
+    ]
+  },
+  {
+    "number": 11012,
+    "title": "Question: Envoy configured to use V3 connects to /v2/discovery:clusters",
+    "created_at": "2020-04-30T12:53:22Z",
+    "closed_at": "2020-05-01T10:20:21Z",
+    "labels": [
+      "question",
+      "area/xds"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/11012",
+    "body": "Envoy 1.14.1 is configured to use transport_api_version: V3 for REST xDS. However it still sends requests to \"/v2/discovery:routes\" and \"/v2/discovery:clusters\". Am I missing something obvious here ?\r\n\r\n\r\nConfig:\r\n```\r\ndynamic_resources:\r\n  cds_config:\r\n    api_config_source:\r\n      api_type: REST\r\n      cluster_names: [xds_cluster]\r\n      refresh_delay: 5s\r\n      transport_api_version: V3\r\n\r\n...\r\n          rds:\r\n            route_config_name: Route_configuration\r\n            config_source:\r\n              api_config_source:\r\n                api_type: REST\r\n                cluster_names: [xds_cluster]\r\n                refresh_delay: 5s\r\n                transport_api_version: V3\r\n\r\n```\r\n\r\nLog:\r\n\r\nRoutes:\r\n```\r\n[2020-04-30 12:41:44.722][6][debug][router] [source/common/router/router.cc:477] [C0][S2429303885158800883] cluster 'xds_cluster' match for URL '/v2/discovery:routes'\r\n[2020-04-30 12:41:44.722][6][debug][router] [source/common/router/router.cc:634] [C0][S2429303885158800883] router decoding headers:\r\n':method', 'POST'\r\n':path', '/v2/discovery:routes'\r\n':authority', 'xds_cluster'\r\n':scheme', 'http'\r\n'content-type', 'application/json'\r\n'content-length', '11287'\r\n'x-envoy-internal', 'true'\r\n'x-forwarded-for', '172.17.0.2'\r\n'x-envoy-expected-rq-timeout-ms', '1000'\r\n\r\n```\r\nClusters:\r\n```\r\n[2020-04-30 12:41:37.982][6][debug][config] [source/common/config/http_subscription_impl.cc:68] Sending REST request for /v2/discovery:clusters\r\n[2020-04-30 12:41:37.983][6][debug][router] [source/common/router/router.cc:477] [C0][S7534484415178178826] cluster 'xds_cluster' match for URL '/v2/discovery:clusters'\r\n[2020-04-30 12:41:37.983][6][debug][router] [source/common/router/router.cc:634] [C0][S7534484415178178826] router decoding headers:\r\n':method', 'POST'\r\n':path', '/v2/discovery:clusters'\r\n':authority', 'xds_cluster'\r\n':scheme', 'http'\r\n'content-type', 'application/json'\r\n'content-length', '11246'\r\n'x-envoy-internal', 'true'\r\n'x-forwarded-for', '172.17.0.2'\r\n'x-envoy-expected-rq-timeout-ms', '1000'\r\n\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/11012/comments",
+    "author": "andrewtikhonov",
+    "comments": [
+      {
+        "user": "htuch",
+        "created_at": "2020-05-01T01:06:22Z",
+        "body": "I think this is definitely not the correct behavior Envoy side, but curious what happens if you set `resource_api_version` to v3 as well?"
+      },
+      {
+        "user": "andrewtikhonov",
+        "created_at": "2020-05-01T10:02:50Z",
+        "body": "Thanks. `resource_api_version` enabled it.\r\n\r\n```\r\ndynamic_resources:\r\n  cds_config:\r\n    resource_api_version: V3\r\n    api_config_source:\r\n      api_type: REST\r\n      cluster_names: [xds_cluster]\r\n      refresh_delay: 5s\r\n\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 10967,
+    "title": "Clarifications on upstream_rq_time and downstream_rq_time",
+    "created_at": "2020-04-27T18:48:00Z",
+    "closed_at": "2020-06-06T09:10:40Z",
+    "labels": [
+      "question",
+      "stale"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/10967",
+    "body": "Hi, I am trying to understand better what `upstream_rq_time` and `downstream_rq_time` exactly measure. I referred to the documentation but it wasn't clear to me. For ex. consider  `request: service A -> Envoy A -> Envoy B -> Service B; response: Service B -> Envoy B -> Envoy A -> Service A`, what do `upstream_rq_time` and `downstream_rq_time` mean here? How is the total RTT calculated?",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/10967/comments",
+    "author": "shashankram",
+    "comments": [
+      {
+        "user": "zuercher",
+        "created_at": "2020-04-27T19:27:39Z",
+        "body": "Envoy A's downstream_rq_time measures the time elapsed from when Envoy A starts handling Service A's request until the entire response has sent to Service A.\r\n\r\nEnvoy A's upstream_rq_time measures the time elapsed from the point where Service A's entire request has been received by the HTTP router filter until the entire upstream response from Envoy B has been received.\r\n\r\nThe same is true for Envoy B, except the downstream is Envoy A's request/response and the upstream is Service B.\r\n\r\nSo Envoy A's downstream_rq_time > Envoy A's upstream_rq_time > Envoy B's downtream_rq_time > Envoy B's upstream_rq_time.\r\n\r\nAssuming there are no blocking filters in use (e.g. ext_auth) I expect the times to be reasonably close together."
+      }
+    ]
+  },
+  {
+    "number": 10955,
+    "title": "Web socket disconnection after 100 seconds",
+    "created_at": "2020-04-27T06:36:18Z",
+    "closed_at": "2020-04-28T06:08:45Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/10955",
+    "body": "*Description:*\r\n>I am using a signalR C# client connection (over websocket) to establish a realtime communication with a service signalr hub through envoy proxy (executed as the latest official docker image). From the client to envoy the communication is HTTPs, from envoy to the hub the communication is a simple HTTP. After 100 seconds from the start of the connection, the communication ends abruptly. If i directly connect the client to the service hub this behavior does not occur (the connection remains stable beyond 100 seconds).\r\n>Since this seems to be a configuration problem (more than a bug), i ask if someone can find a possible error in my configuration (it is my first time to use Envoy and i find nothing online specific to SignalR, websocket and Envoy).\r\n>If further informations are needed i will provide it as an update to this issue.\r\n>Thanks for any help you can provide.\r\n\r\n*Configuration*\r\n\r\n\tadmin:\r\n\t  access_log_path: /tmp/admin_access.log\r\n\t  address:\r\n\t\tsocket_address: \r\n\t\t  address: 0.0.0.0\r\n\t\t  port_value: 9901\r\n\r\n\tstatic_resources:\r\n\t  listeners:\r\n\t\t- address:\r\n\t\t\tsocket_address:\r\n\t\t\t  address: 0.0.0.0\r\n\t\t\t  port_value: 443\r\n\t\t  filter_chains:\r\n\t\t\t- filters:\r\n\t\t\t  - name: main_routing\r\n\t\t\t\ttyped_config: \r\n\t\t\t\t  \"@type\": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager\r\n\t\t\t\t  codec_type: auto\r\n\t\t\t\t  access_log:\r\n\t\t\t\t  - name: envoy.access_loggers.file\r\n\t\t\t\t\ttyped_config:\r\n\t\t\t\t\t  \"@type\": type.googleapis.com/envoy.config.accesslog.v2.FileAccessLog\r\n\t\t\t\t\t  path: /dev/stdout\r\n\t\t\t\t\t  json_format:\r\n\t\t\t\t\t\ttime: \"%START_TIME%\"\r\n\t\t\t\t\t\tprotocol: \"%PROTOCOL%\"\r\n\t\t\t\t\t\tduration: \"%DURATION%\"\r\n\t\t\t\t\t\trequest_method: \"%REQ(:METHOD)%\"\r\n\t\t\t\t\t\trequest_host: \"%REQ(HOST)%\"\r\n\t\t\t\t\t\tpath: \"%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%\"\r\n\t\t\t\t\t\tresponse_flags: \"%RESPONSE_FLAGS%\"\r\n\t\t\t\t\t\troute_name: \"%ROUTE_NAME%\"\r\n\t\t\t\t\t\tupstream_host: \"%UPSTREAM_HOST%\"\r\n\t\t\t\t\t\tupstream_cluster: \"%UPSTREAM_CLUSTER%\"\r\n\t\t\t\t\t\tupstream_local_address: \"%UPSTREAM_LOCAL_ADDRESS%\"\r\n\r\n\t\t\t\t  stat_prefix: ingress_http\r\n\t\t\t\t  route_config:\r\n\t\t\t\t\tname: local_config\r\n\t\t\t\t\tvirtual_hosts:\r\n\r\n\t\t\t\t\t- name: proxy_priv_hub\r\n\t\t\t\t\t  domains: \r\n\t\t\t\t\t  - \"my.cluster_domain.com\"\r\n\t\t\t\t\t  routes:\r\n\t\t\t\t\t\t- match: { prefix: \"/evt/\", case_sensitive: false }\r\n\t\t\t\t\t\t  route: \r\n\t\t\t\t\t\t\tcluster: MY_CLUSTER_NAME\r\n\t\t\t\t\t\t\tauto_host_rewrite: true\r\n\t\t\t\t\t\t\tprefix_rewrite: \"/prv/\"\r\n\t\t\t\t\t\t\tupgrade_configs:\r\n\t\t\t\t\t\t\t  upgrade_type: \"websocket\"\r\n\t\t\t\t\t\t\t  enabled: true\r\n\r\n\t\t\t\t  http_filters:\r\n\t\t\t\t\t- name: envoy.filters.http.fault\r\n\t\t\t\t\t  typed_config:\r\n\t\t\t\t\t\t\"@type\": type.googleapis.com/envoy.config.filter.http.fault.v2.HTTPFault\r\n\t\t\t\t\t\tabort:\r\n\t\t\t\t\t\t  http_status: 503\r\n\t\t\t\t\t\t  percentage:\r\n\t\t\t\t\t\t\tnumerator: 0\r\n\t\t\t\t\t\t\tdenominator: HUNDRED\r\n\t\t\t\t\t- name: envoy.filters.http.router\r\n\t\t\t\t\t  typed_config: {}\r\n\t\t\t  tls_context:\r\n\t\t\t\tcommon_tls_context:\r\n\t\t\t\t  tls_certificates:\r\n\t\t\t\t\t- certificate_chain:\r\n\t\t\t\t\t\tfilename: \"/etc/ssl/certs/ca-certificates.crt\"\r\n\t\t\t\t\t  private_key:\r\n\t\t\t\t\t\tfilename: \"/etc/ssl/certs/ca-certificates.key\"\r\n\r\n\t  clusters:\r\n\t\t- name: MY_CLUSTER_NAME\r\n\t\t  connect_timeout: 0.25s\r\n\t\t  type: strict_dns\r\n\t\t  lb_policy: round_robin\r\n\t\t  load_assignment:\r\n\t\t\tcluster_name: MY_CLUSTER_NAME\r\n\t\t\tendpoints:\r\n\t\t\t- lb_endpoints:\r\n\t\t\t  - endpoint:\r\n\t\t\t\t  address:\r\n\t\t\t\t\tsocket_address: { address: MY_CLUSTER_NAME, port_value: 80 }\r\n\r\n\r\n*Logs*\r\n\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:27.979][12][debug][connection] [source/extensions/transport_sockets/tls/ssl_socket.cc:226] [C67]\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:27.979][12][debug][connection] [source/common/network/connection_impl.cc:558] [C67] remote close\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:27.979][12][debug][connection] [source/common/network/connection_impl.cc:200] [C67] closing socket: 0\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:27.979][12][debug][connection] [source/extensions/transport_sockets/tls/ssl_socket.cc:298] [C67] SSL shutdown: rc=0\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:27.979][12][debug][connection] [source/extensions/transport_sockets/tls/ssl_socket.cc:226] [C67]\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:27.979][12][debug][conn_handler] [source/server/connection_handler_impl.cc:85] [C67] adding to cleanup list\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][connection] [source/extensions/transport_sockets/tls/ssl_socket.cc:226] [C69]\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][connection] [source/common/network/connection_impl.cc:558] [C69] remote close\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][connection] [source/common/network/connection_impl.cc:200] [C69] closing socket: 0\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][connection] [source/extensions/transport_sockets/tls/ssl_socket.cc:298] [C69] SSL shutdown: rc=0\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][connection] [source/extensions/transport_sockets/tls/ssl_socket.cc:226] [C69]\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][http] [source/common/http/conn_manager_impl.cc:1936] [C69][S1118758786695779674] stream reset\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][router] [source/common/router/upstream_request.cc:263] [C69][S1118758786695779674] resetting pool request\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][client] [source/common/http/codec_client.cc:114] [C70] request reset\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][connection] [source/common/network/connection_impl.cc:109] [C70] closing data_to_write=0 type=1\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][connection] [source/common/network/connection_impl.cc:200] [C70] closing socket: 1\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][client] [source/common/http/codec_client.cc:91] [C70] disconnect. resetting 0 pending requests\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][pool] [source/common/http/conn_pool_base.cc:265] [C70] client disconnected, failure reason:\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][conn_handler] [source/server/connection_handler_impl.cc:85] [C69] adding to cleanup list\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.010][13][debug][pool] [source/common/http/conn_pool_base.cc:93] [C70] destroying stream: 0 remaining\r\n\tenvoy.main_proxy.debug_1  | [2020-04-27 06:35:28.065][6][debug][main] [source/server/server.cc:177] flushing stats\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/10955/comments",
+    "author": "LeonSebastianCoimbra",
+    "comments": [
+      {
+        "user": "zuercher",
+        "created_at": "2020-04-27T19:14:08Z",
+        "body": "That log implies the upstream closed it's connection first, but you'd have to show the start of the connection as well to be more certain."
+      },
+      {
+        "user": "zuercher",
+        "created_at": "2020-04-27T23:47:21Z",
+        "body": "C12 is the inbound websocket request and eventually we see \r\n\r\n```\r\nenvoy.main_proxy.debug_1  | [2020-04-27 20:05:16.615][12][debug][connection] [source/common/network/connection_impl.cc:558] [C12] remote close\r\n```\r\n\r\nwhich is the client closing the connection.\r\n\r\nOne thing that was fixed recently is #10811, which removes the `Connection-Length: 0` in the 101 response that Envoy is sending. I know from prior experience that some versions of the Microsoft runtime stack have trouble with that header. You might try with a version of Envoy after that PR."
+      },
+      {
+        "user": "zuercher",
+        "created_at": "2020-04-28T16:54:57Z",
+        "body": "Unfortunately, there aren't really any docs discussion debugging using Envoy logs. In general you can use the `[Cn]` markings to track events related to a downstream connection and then find the related `[Cm]` for the upstream connection. Remote close means the non-Envoy side closed the connection. Local close means it was Envoy. Neither of those is necessarily a problem, but if you aren't expecting the closure, it can help determine the cause."
+      }
+    ]
+  },
+  {
+    "number": 10952,
+    "title": "examples/jaeger-tracing and examples/zipkin-tracing protobuf Bootstrap has unknown fields",
+    "created_at": "2020-04-25T23:05:16Z",
+    "closed_at": "2020-04-28T16:01:00Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/10952",
+    "body": "```\r\n$ cd examples/jaeger-tracing\r\n\r\n$ docker-compose pull\r\n\r\n$ docker-compose build -d\r\n...\r\nfront-envoy_1  | [2020-04-25 23:00:48.737][6][critical][main] [source/server/server.cc:94] error initializing configuration '/etc/front-envoy.yaml': Protobuf message (type envoy.config.bootstrap.v3.Bootstrap reason INVALID_ARGUMENT:(tracing) provider: Cannot find field.) has unknown fields\r\nfront-envoy_1  | [2020-04-25 23:00:48.737][6][info][main] [source/server/server.cc:602] exiting\r\nfront-envoy_1  | Protobuf message (type envoy.config.bootstrap.v3.Bootstrap reason INVALID_ARGUMENT:(tracing) provider: Cannot find field.) has unknown fields\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/10952/comments",
+    "author": "chadm-sq",
+    "comments": [
+      {
+        "user": "chadm-sq",
+        "created_at": "2020-04-25T23:18:12Z",
+        "body": "Same for \"jaeger-native-tracing\" example.\r\n\r\n```\r\nfront-envoy_1  | [2020-04-25 23:17:06.614][10][critical][main] [source/server/server.cc:94] error initializing configuration '/etc/front-envoy.yaml': Protobuf message (type envoy.config.bootstrap.v3.Bootstrap reason INVALID_ARGUMENT:(tracing) provider: Cannot find field.) has unknown fields\r\nfront-envoy_1  | [2020-04-25 23:17:06.614][10][info][main] [source/server/server.cc:602] exiting\r\nfront-envoy_1  | Protobuf message (type envoy.config.bootstrap.v3.Bootstrap reason INVALID_ARGUMENT:(tracing) provider: Cannot find field.) has unknown fields\r\njaeger-native-tracing_front-envoy_1 exited with code 1\r\n```"
+      },
+      {
+        "user": "mk46",
+        "created_at": "2020-04-27T13:29:33Z",
+        "body": "@cmiller-sq I have tested Jaeger-tracing and Zipkin-tracing. it's working for me. Here,  you need to remove all previous pulled images regarding envoy. "
+      }
+    ]
+  },
+  {
+    "number": 9794,
+    "title": "Multiple validation_context's",
+    "created_at": "2020-01-23T08:18:12Z",
+    "closed_at": "2020-01-29T02:11:08Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/9794",
+    "body": "Is there a way to setup multiple validation_context's with Envoy, particularly for TCP traffic not HTTP?\r\n\r\nWe'd like to provide a single URL, and use mTLS w/ ~3-10 other external systems. We can't influence the other systems to set unique headers, domains, SNI, or anything else.\r\n\r\nWe could associate their CA certs with their hostname/IP to match on based on that, or we could eat the cost of trying every cert till one matched.\r\n\r\nOr Is this possible to do at the moment leveraging filter chains?",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/9794/comments",
+    "author": "steeling",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2020-01-26T19:03:15Z",
+        "body": "As long as you can match on hostname/IP I think you can do this with filter chains? cc @lambdai @PiotrSikora "
+      },
+      {
+        "user": "PiotrSikora",
+        "created_at": "2020-01-26T23:16:39Z",
+        "body": "Yes, you could use multiple filter chains to do that, but the cost of matching to a particular certificate is negligible (it's just a quick comparison of hashes), so unless you need/want to segregate traffic from those external systems for some reason (it doesn't sound like you do), the best and easiest solution would be to simply provide `trusted_ca` that contains all the trusted CA certificates or provide multiple valid values in `match_subject_alt_names`."
+      },
+      {
+        "user": "steeling",
+        "created_at": "2020-01-28T03:03:49Z",
+        "body": "can we match on client IP or hostname?\r\n\r\nAll of the traffic will come to a single hostname. At the moment we don't have any influence on enforcing a specific CA to use, so we first request their CA cert with us, and we add it to a list we will verify against"
+      },
+      {
+        "user": "PiotrSikora",
+        "created_at": "2020-01-28T03:17:07Z",
+        "body": "Yes, you can match on the client (source) IP address or subnet.\r\n\r\nYou cannot match on the client's hostname."
+      },
+      {
+        "user": "mattklein123",
+        "created_at": "2020-01-28T16:49:19Z",
+        "body": "> You cannot match on the client's hostname.\r\n\r\nJust to clarify, \"hostname\" is an L7/HTTP concept. You can match on SNI."
+      },
+      {
+        "user": "PiotrSikora",
+        "created_at": "2020-01-28T17:00:29Z",
+        "body": "> Just to clarify, \"hostname\" is an L7/HTTP concept. You can match on SNI.\r\n\r\nHe means client's hostname (reverse DNS of client's IP address), not SNI / `Host` / `:authority`."
+      }
+    ]
+  },
+  {
+    "number": 9138,
+    "title": "Browser getting static files from rewritten URLs instead of matched route",
+    "created_at": "2019-11-26T05:17:37Z",
+    "closed_at": "2019-11-27T06:54:27Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/9138",
+    "body": "*Title*\r\nQuestion: Browser getting static files from rewritten URLs instead of matched route\r\n\r\n*Description*:\r\nCurrently I want Envoy to route to a backend cluster using this endpoint: <some-domain>.com/cluster1.\r\n\r\nThe virtual host config contains the following:\r\n`\r\n              - match:\r\n                  prefix: \"/cluster1/\"\r\n                route:\r\n                  cluster: cluster1\r\n                  prefix_rewrite: \"/\"\r\n`\r\n\r\nThis routes browser's requests to /cluster1 as expected. However, all the static files (js, css...) from this backend is now resolved to root URL. Ex: <some-domain>.com/index.js instead of <some-domain>.com/cluster1/index.js, resulting in 404 error.\r\n\r\nI want to ask if there is a way to configure Envoy to resolve this issue?\r\n\r\nMany thanks.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/9138/comments",
+    "author": "RisingSun777",
+    "comments": [
+      {
+        "user": "zuercher",
+        "created_at": "2019-11-26T21:37:07Z",
+        "body": "Envoy doesn't support rewriting responses.\r\n\r\nIt sounds like the responses from cluster1 contains URLs based on the path of requests sent to cluster1. Perhaps that application could use relative URLs?"
+      }
+    ]
+  },
+  {
+    "number": 8774,
+    "title": "Propagate Cluster.alt_stat_name to RouteEntry",
+    "created_at": "2019-10-25T22:44:30Z",
+    "closed_at": "2019-10-26T04:23:32Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/8774",
+    "body": "We use custom `PassThroughEncoderFilter` which emits some cluster-specific stats.\r\nCurrently we use `streamInfo.routeEntry()->clusterName()` for this purpose, but since Cluster.alt_stat_name is not propagated to RouteEntry we can't achieve consistent logging across different code paths.\r\nWould it make sense to provide cluster's alt_stat_name via RouteEntry?\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/8774/comments",
+    "author": "veshij",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2019-10-25T23:08:22Z",
+        "body": "You can look up the cluster and then get the alt stat name from cluster info right?"
+      }
+    ]
+  },
+  {
+    "number": 8146,
+    "title": "[question] Envoy to fail requests if ext_authz is unavailable?",
+    "created_at": "2019-09-04T08:11:40Z",
+    "closed_at": "2019-09-04T15:50:07Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/8146",
+    "body": "By doing some investigation, looks like this is not supported, but wanted to confirm.\r\nIs it possible to configure Envoy to fail http requests in case ext_authz service is unavailable? This could be useful when one runs cluster of envoys behind L7 LB and LB performs http health checks towards envoy instances. Does envoy support health checking towards ext_authz cluster? Could those maybe be propagated to the envoys health check response? ",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/8146/comments",
+    "author": "nezdolik",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2019-09-04T15:38:30Z",
+        "body": "ext_authz should be a cluster like any other cluster, meaning that when Envoy goes to send a request to the cluster in the filter, it should handle a no healthy hosts failure condition and fail the request. "
+      }
+    ]
+  },
+  {
+    "number": 7748,
+    "title": "Can I use Envoy_log() to print some debug infos or log in the files?",
+    "created_at": "2019-07-29T07:49:27Z",
+    "closed_at": "2019-09-21T00:46:40Z",
+    "labels": [
+      "question",
+      "stale"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/7748",
+    "body": "for title,i want to know how to use this func.thanks,or other way i can debug in the code.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/7748/comments",
+    "author": "hbgongen",
+    "comments": [
+      {
+        "user": "derekargueta",
+        "created_at": "2019-07-29T18:22:00Z",
+        "body": "If you're referring to writing a custom extension then yes, you can use the `ENVOY_LOG` macro to emit your own messages to the Envoy log. The class you log from needs to inherit the `Logger::Loggable` interface with one of the log identifiers in the template. For example:\r\n```\r\nclass MyThing : protected Logger::Loggable<Envoy::Logger::Id::main> {\r\n...\r\n}\r\n```\r\n\r\nTo use the `main` logging identifier."
+      }
+    ]
+  },
+  {
+    "number": 7441,
+    "title": "Trying to add linkopts, Bazel getting in the way...",
+    "created_at": "2019-07-02T00:38:22Z",
+    "closed_at": "2019-07-02T03:04:57Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/7441",
+    "body": "Looks like similar opinions were raised before about Bazel but I am also in the opinion that it is overall a hard ecosystem to navigate.\r\n\r\nSo much so that I am unable to have my project (derived from the `filter-example`) link with an additional system library.\r\n\r\nFor simplicity, let's say it is `curl`. I simply want to link with `libcurl.so`. I don't need to build curl from source (although I tried that and failed to do that with Bazel and there aren't many examples except for `tensorflow` and `googlecartographer/async_grpc` projects), I have it installed on my system.\r\n\r\nI am trying to simply add a `-lcurl` to the `linkopts` but since `envoy_cc_binary` wraps the `cc_binary`, I am unable to specify `linkopts`.\r\n\r\nAny help is appreciated. I feel like this should be rather simple but Bazel is getting in the way. :) ",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/7441/comments",
+    "author": "canselcik",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2019-07-02T02:44:52Z",
+        "body": "Presumably since you are trying to link against a system library, you have private code. You can define your own binary target like so and pass whatever linkops you want. E.g.,\r\n\r\n```\r\nenvoy_cc_binary(\r\n    name = \"envoy\",\r\n    repository = \"@envoy\",\r\n    stamped = True,\r\n    deps = LYFT_CUSTOM_FILTER_CONFIGS + [\r\n        \"@envoy//source/exe:envoy_main_entry_lib\",\r\n    ],\r\n)\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 6950,
+    "title": "Envoy is crashed when try to log if there is no space",
+    "created_at": "2019-05-15T08:30:01Z",
+    "closed_at": "2019-05-16T06:09:45Z",
+    "labels": [
+      "bug",
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/6950",
+    "body": "**Envoy is crashed when try to log if there is no space**\r\n\r\n*Envoy is crashed when try to log if there is no space*: *Enabled access log and if no space left, envoy is crashed immediately*\r\n\r\n*Description*:\r\nI enabled access logs and on load traffic, the log partition can be full in sometimes. In that time, envoy is crashed and the log is like following. The expected behaviour is not crashed and not try to log if no space left.\r\n\r\nThanks in advance\r\nSincerely\r\n\r\n*Logs*:\r\n[2019-05-14 16:41:00.934][6193][critical][assert] [external/envoy/source/common/access_log/access_log_manager_impl.cc:95] assert failure: result.rc_ == static_cast<ssize_t>(slice.len_).\r\n[2019-05-14 16:41:00.934][6193][critical][backtrace] [bazel-out/k8-dbg/bin/external/envoy/source/server/_virtual_includes/backtrace_lib/server/backtrace.h:81] Caught Aborted, suspect faulting address 0x181e\r\n[2019-05-14 16:41:00.934][6193][critical][backtrace] [bazel-out/k8-dbg/bin/external/envoy/source/server/_virtual_includes/backtrace_lib/server/backtrace.h:69] Backtrace (use tools/stack_decode.py to get line\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/6950/comments",
+    "author": "cihankom",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2019-05-15T14:37:38Z",
+        "body": "@cihankom that's a debug assert. It will be compiled out on release builds. IMO it's reasonable to keep that assert in this case. In release builds the data will be dropped."
+      }
+    ]
+  },
+  {
+    "number": 6598,
+    "title": "data-plane-api lack tracing.operation_name: ingress",
+    "created_at": "2019-04-16T07:11:51Z",
+    "closed_at": "2019-04-24T02:40:44Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/6598",
+    "body": "***Title***: *data-plane-api lack tracing.operation_name: ingress*\r\n\r\n***Description*:**\r\n>When I send Ads to all local envoy dynamiclly\uff0cI find that lacking tracing.operation_name: ingress\r\n\r\n***Repro steps*:**\r\n```\r\nimport (  \r\n        ...\r\n    http_conn_manager \"github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2\"\r\n        ...\r\n)\r\n    listenFilterHttpConn.Tracing = &http_conn_manager.HttpConnectionManager_Tracing{\r\n        OperationName:  http_conn_manager.INGRESS,  \r\n        RandomSampling: &_type.Percent{Value: 1.0},\r\n    }\r\n\r\n    listenFilterHttpConnConv, err := util.MessageToStruct(listenFilterHttpConn)\r\n```\r\n\r\n***Config dump*:**\r\nI expect \r\n```\r\n    tracing:\r\n        operation_name: ingress\r\n        random_sampling: 1.0\r\n``` \r\n\r\nbut  in fact, as below\r\n```\r\n    tracing:\r\n        random_sampling: 1.0\r\n```\r\n\r\n\r\n***Guess*:**\r\nI guess\uff0c maybe  \r\n```\r\nOperationName HttpConnectionManager_Tracing_OperationName `protobuf:\"varint,1,opt,name=operation_name,json=operationName,proto3,enum=envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager_Tracing_OperationName\" json:\"operation_name,omitempty\"`\r\n```\r\n`omitempty` cause this promble, becase `http_conn_manager.INGRESS` is 0 in actually. ",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/6598/comments",
+    "author": "chainhelen",
+    "comments": [
+      {
+        "user": "htuch",
+        "created_at": "2019-04-16T15:15:12Z",
+        "body": "@chainhelen that sounds right; is this an actual problem for you or were you curious as to why it wasn't appearing?"
+      },
+      {
+        "user": "htuch",
+        "created_at": "2019-04-23T15:45:10Z",
+        "body": "@chainhelen no, Envoy will fill in the default when the proto is parsed from the wire (or YAML)."
+      }
+    ]
+  },
+  {
+    "number": 6471,
+    "title": "Help with gRPC HTTP / 1.1 reverse bridge: grpc-message mapping.",
+    "created_at": "2019-04-03T13:45:12Z",
+    "closed_at": "2019-05-11T14:14:48Z",
+    "labels": [
+      "question",
+      "stale"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/6471",
+    "body": "**Help with gRPC HTTP / 1.1 reverse bridge.**\r\n\r\n*Title*: *Help with gRPC HTTP / 1.1 reverse bridge: grpc-message mapping.*\r\n\r\n*Description*:\r\nI'm using the gRPC HTTP / 1.1 reverse bridge and I have the next doubt:\r\n\r\nIn case of error, (besides the **grpc-status** \"auto\" map) is there any way to map an error message to the trailer **grpc-message** when my upstream does not understand any gRPC semantics? \r\n\r\nI would like to avoid passing errors in the body and use the standard way.\r\n\r\nMany thanks in advance and excuse my ignorance.\r\n\r\n*Config*:\r\nThis is the config I'm using it and working correctly:\r\n```\r\nadmin:\r\n  access_log_path: /tmp/admin_access.log\r\n  address:\r\n    socket_address:\r\n      protocol: TCP\r\n      address: 127.0.0.1\r\n      port_value: 9901\r\nstatic_resources:\r\n  listeners:\r\n    - name: listener_0\r\n      address:\r\n        socket_address:\r\n          protocol: TCP\r\n          address: 0.0.0.0\r\n          port_value: 10000\r\n      filter_chains:\r\n        - filters:\r\n            - name: envoy.http_connection_manager\r\n              typed_config:\r\n                \"@type\": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager\r\n                stat_prefix: ingress_http\r\n                codec_type: AUTO\r\n                route_config:\r\n                  name: backend\r\n                  virtual_hosts:\r\n                    - name: backend\r\n                      domains: [\"*\"]\r\n                      routes:\r\n                        - match: { prefix: \"/\" }\r\n                          route: { host_rewrite: nginx, cluster: backend, timeout: 59.99s }\r\n                http_filters:\r\n                  - name: envoy.filters.http.grpc_http1_reverse_bridge\r\n                    config:\r\n                      content_type: application/grpc+proto\r\n                      withhold_grpc_frames: true\r\n                  - name: envoy.router\r\n                    typed_config: {}\r\n  clusters:\r\n  - name: backend\r\n    connect_timeout: 59.99s\r\n    type: logical_dns\r\n    dns_lookup_family: v4_only\r\n    lb_policy: round_robin\r\n    load_assignment:\r\n      cluster_name: backend\r\n      endpoints:\r\n        - lb_endpoints:\r\n            - endpoint:\r\n                address:\r\n                  socket_address:\r\n                    address: nginx\r\n                    port_value: 80\r\n```",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/6471/comments",
+    "author": "sp-manuel-jurado",
+    "comments": [
+      {
+        "user": "snowp",
+        "created_at": "2019-04-03T14:30:13Z",
+        "body": "The filter already injects error messages into grpc-message when it receives an unsupported response. Are you talking about being able to respond with a custom message?"
+      },
+      {
+        "user": "sp-manuel-jurado",
+        "created_at": "2019-04-03T14:45:23Z",
+        "body": "@snowp yes, I was referring to custom message error (even the possibility to customize grpc-status too).\r\n\r\nNote: my upstream does not understand any gRPC semantics, I'm using PHP."
+      },
+      {
+        "user": "snowp",
+        "created_at": "2019-04-03T15:21:03Z",
+        "body": "To send a custom message you can just send a header only response (no body) with a header named `grpc-message` with your message. As log as the content-type matches what the filter expects it should just pass through the `grpc-message`.\r\n\r\nFor `grpc-status` we'd have to make some code changes. Making the filter just pass through the status if the upstream provided one sounds reasonable, would that work for you?"
+      },
+      {
+        "user": "sp-manuel-jurado",
+        "created_at": "2019-04-04T10:41:28Z",
+        "body": "Hi @snowp \r\nI've checked grpc-message pass through using your directions and works as expected.\r\n\r\nFor example:\r\n\r\nHTTP/1.1 request/response (within content-type, content-length: 0, grpc-message headers set)\r\n```\r\n*   Trying ::1...\r\n* TCP_NODELAY set\r\n* Connected to localhost (::1) port 10000 (#0)\r\n> POST /TestAPI/TestMethod HTTP/1.1\r\n> Host: localhost:10000\r\n> User-Agent: curl/7.54.0\r\n> Accept: */*\r\n>\r\n< HTTP/1.1 400 Bad Request\r\n< server: envoy\r\n< content-type: application/grpc+proto\r\n< content-length: 0\r\n< x-powered-by: PHP/7.2.15\r\n< grpc-message: custom message for 400 http status code\r\n< cache-control: no-cache, private\r\n< date: Thu, 04 Apr 2019 10:19:12 GMT\r\n< access-control-allow-origin:\r\n< x-envoy-upstream-service-time: 966\r\n<\r\n* Connection #0 to host localhost left intact\r\n```\r\n\r\ngRPC response status (as PHP array, sorry for that. I'm testing with PHP client too)\r\n```\r\n(\r\n    [metadata] => Array\r\n        (\r\n            [:status] => Array\r\n                (\r\n                    [0] => 400\r\n                )\r\n\r\n            [server] => Array\r\n                (\r\n                    [0] => envoy\r\n                )\r\n\r\n            [content-type] => Array\r\n                (\r\n                    [0] => application/grpc\r\n                )\r\n\r\n            [content-length] => Array\r\n                (\r\n                    [0] => 5\r\n                )\r\n\r\n            [x-powered-by] => Array\r\n                (\r\n                    [0] => PHP/7.2.15\r\n                )\r\n\r\n            [grpc-message] => Array\r\n                (\r\n                    [0] => custom message for 400 http status code\r\n                )\r\n\r\n            [cache-control] => Array\r\n                (\r\n                    [0] => no-cache, private\r\n                )\r\n\r\n            [date] => Array\r\n                (\r\n                    [0] => Thu, 04 Apr 2019 10:22:16 GMT\r\n                )\r\n\r\n            [access-control-allow-origin] => Array\r\n                (\r\n                    [0] =>\r\n                )\r\n\r\n            [x-envoy-upstream-service-time] => Array\r\n                (\r\n                    [0] => 1255\r\n                )\r\n\r\n        )\r\n\r\n    [code] => 1\r\n    [details] => Received http2 header with status: 400\r\n)\r\n```\r\n\r\nI can see:\r\n- http2 status (:status) set to 400\r\n- grpc custom message (grpc-message) set to \"custom message for 400 http status code\"\r\nThis is ok and very useful for me.\r\n\r\nBut I miss the grpc-status in metadata. Related to this: \u00bfIs it the standard behaviour of the filter (and only sets the grpc-status trailer when response content is not empty)? Or I'm doing or understanding something wrong.\r\n\r\nRelated to:\r\nsnowp: \"For grpc-status we'd have to make some code changes. Making the filter just pass through the status if the upstream provided one sounds reasonable, would that work for you?\"\r\nI guess this is related to what I said above. The standard mapping would work for me (in that case 11 (400 Bad Request)). If I would want a custom error I could add it into grpc-message using a protocolbuffer serialized as string or checking http2 generic \":status\".\r\n\r\nMany thanks in advance and apologize for the inconveniences.\r\n"
+      },
+      {
+        "user": "sp-manuel-jurado",
+        "created_at": "2019-04-04T10:54:33Z",
+        "body": "Also, I've checked to add grpc-status as response header to do mapping manually and I get the next grpc status:\r\n\r\n```\r\n(\r\n    [metadata] => Array\r\n        (\r\n            [server] => Array\r\n                (\r\n                    [0] => envoy\r\n                )\r\n\r\n            [content-length] => Array\r\n                (\r\n                    [0] => 5\r\n                )\r\n\r\n            [x-powered-by] => Array\r\n                (\r\n                    [0] => PHP/7.2.15\r\n                )\r\n\r\n            [cache-control] => Array\r\n                (\r\n                    [0] => no-cache, private\r\n                )\r\n\r\n            [date] => Array\r\n                (\r\n                    [0] => Thu, 04 Apr 2019 10:46:08 GMT\r\n                )\r\n\r\n            [access-control-allow-origin] => Array\r\n                (\r\n                    [0] =>\r\n                )\r\n\r\n            [x-envoy-upstream-service-time] => Array\r\n                (\r\n                    [0] => 1293\r\n                )\r\n\r\n        )\r\n\r\n    [code] => 11\r\n    [details] => custom message for 400 http status code\r\n)\r\n```\r\n\r\nNow is not added in metadata but is added in code and details.\r\nIs this behaviour correct?\r\nOr I'm doing or understanding something wrong.\r\n\r\nI attach the headers example too (HTTP/1.1 request/response):\r\n\r\n```\r\n*   Trying ::1...\r\n* TCP_NODELAY set\r\n* Connected to localhost (::1) port 10000 (#0)\r\n> POST /TestAPI/TestMethod HTTP/1.1\r\n> Host: localhost:10000\r\n> User-Agent: curl/7.54.0\r\n> Accept: */*\r\n>\r\n< HTTP/1.1 400 Bad Request\r\n< server: envoy\r\n< content-type: application/grpc+proto\r\n< content-length: 0\r\n< x-powered-by: PHP/7.2.15\r\n< grpc-message: custom message for 400 http status code\r\n< grpc-status: 11\r\n< cache-control: no-cache, private\r\n< date: Thu, 04 Apr 2019 10:52:22 GMT\r\n< access-control-allow-origin:\r\n< x-envoy-upstream-service-time: 1411\r\n<\r\n* Connection #0 to host localhost left intact\r\n```"
+      },
+      {
+        "user": "snowp",
+        "created_at": "2019-04-04T13:31:23Z",
+        "body": "Ah yeah, looking over the code again we don't do anything fancy if it's a header only response, so it makes sense that grpc-status is propagated in that case. \r\n\r\nI would expect them to not show up in metadata since they are headers with special meaning in gRPC."
+      }
+    ]
+  },
+  {
+    "number": 5788,
+    "title": "Envoy \"Connection: close\" causes 1s rq_time overhead",
+    "created_at": "2019-01-31T12:05:04Z",
+    "closed_at": "2019-02-01T12:13:44Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/5788",
+    "body": "Given the below configuration:\r\n\r\nRequest with __Connection: close__, causes envoy to delays the sending the tcp (FIN) / closing the socket by 1s.\r\n\r\nEnvoy sends the response data, rightaway (no delay visible in tcpdump / wireshark), the FIN / closing of the connection is the issue.\r\n```bash\r\ntime fortio curl -loglevel=debug -keepalive=false localhost:8080/\r\n```\r\n\r\nRequest without 'Connection: close', works as expected\r\n```bash\r\ntime fortio curl -loglevel=debug localhost:8080/\r\n```\r\n\r\n```yaml\r\n---\r\nnode:\r\n  locality:\r\n    zone: default-zone\r\n\r\nstatic_resources:\r\n  listeners:\r\n  - name: default_listener\r\n    address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 8080\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          stat_prefix: ingress_proxy\r\n          access_log:\r\n            name: envoy.file_access_log\r\n            config:\r\n              path: \"/dev/stdout\"\r\n              format: >\r\n                [%START_TIME%] %PROTOCOL% %REQ(:METHOD)% %REQ(:authority)% %REQ(:PATH)% %RESPONSE_CODE% %RESPONSE_FLAGS%\r\n                %BYTES_RECEIVED%b %BYTES_SENT%b %DURATION%ms \"%DOWNSTREAM_REMOTE_ADDRESS%\" -> \"%UPSTREAM_HOST%\"\r\n          route_config:\r\n            name: \"ingress_routes\"\r\n            virtual_hosts:\r\n              - name: \"local_service\"\r\n                domains:\r\n                  - \"*\"\r\n                routes:\r\n                  - match:\r\n                      prefix: \"/\"\r\n                    route:\r\n                      cluster: \"example\"\r\n          http_filters:\r\n            - name: envoy.router\r\n          http_protocol_options:\r\n            allow_absolute_url: true\r\n\r\n  clusters:\r\n  - name: example\r\n    type: STRICT_DNS\r\n    hosts:\r\n    - socket_address:\r\n        address: 127.0.0.1\r\n        port_value: 9091\r\n    connect_timeout:\r\n      seconds: 1\r\n\r\nadmin:\r\n  access_log_path: \"/dev/null\"\r\n  address:\r\n    socket_address:\r\n      address: 0.0.0.0\r\n      port_value: 9091\r\n```\r\n\r\nThis looks similar to #234, we've noticed unhealthy instances in varnish, when probes had .timeout < 1s.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/5788/comments",
+    "author": "fkowal",
+    "comments": [
+      {
+        "user": "fkowal",
+        "created_at": "2019-01-31T12:37:02Z",
+        "body": "```\r\ntcpdump -nni lo0 -s 0 -A tcp portrange 8080\r\ntcpdump: verbose output suppressed, use -v or -vv for full protocol decode\r\nlistening on lo0, link-type NULL (BSD loopback), capture size 262144 bytes\r\n13:15:10.238945 IP6 ::1.65046 > ::1.8080: Flags [S], seq 1696331147, win 65535, options [mss 16324,nop,wscale 6,nop,nop,TS val 803548502 ecr 0,sackOK,eol], length 0\r\n`..0.,.@....................................e............4....?........\r\n/.-V........\r\n13:15:10.239025 IP6 ::1.8080 > ::1.65046: Flags [S.], seq 2050231525, ack 1696331148, win 65535, options [mss 16324,nop,wscale 6,nop,nop,TS val 803548502 ecr 803548502,sackOK,eol], length 0\r\n`....,.@....................................z4..e........4....?........\r\n/.-V/.-V....\r\n13:15:10.239037 IP6 ::1.65046 > ::1.8080: Flags [.], ack 1, win 6371, options [nop,nop,TS val 803548502 ecr 803548502], length 0\r\n`..0. .@....................................e...z4.......(.....\r\n/.-V/.-V\r\n13:15:10.239045 IP6 ::1.8080 > ::1.65046: Flags [.], ack 1, win 6371, options [nop,nop,TS val 803548502 ecr 803548502], length 0\r\n`.... .@....................................z4..e........(.....\r\n/.-V/.-V\r\n13:15:10.239089 IP6 ::1.65046 > ::1.8080: Flags [P.], seq 1:97, ack 1, win 6371, options [nop,nop,TS val 803548502 ecr 803548502], length 96: HTTP: GET / HTTP/1.1\r\n`..0...@....................................e...z4.............\r\n/.-V/.-VGET / HTTP/1.1\r\nHost: localhost:8080\r\nConnection: close\r\nUser-Agent: fortio.org/fortio-1.3.0\r\n\r\n\r\n13:15:10.239101 IP6 ::1.8080 > ::1.65046: Flags [.], ack 97, win 6370, options [nop,nop,TS val 803548502 ecr 803548502], length 0\r\n`.... .@....................................z4..e........(.....\r\n/.-V/.-V\r\n13:15:10.247298 IP6 ::1.8080 > ::1.65046: Flags [P.], seq 1:4807, ack 97, win 6370, options [nop,nop,TS val 803548510 ecr 803548502], length 4806: HTTP: HTTP/1.1 200 OK\r\n`......@....................................z4..e..............\r\n/.-^/.-VHTTP/1.1 200 OK\r\ncontent-type: text/html; charset=UTF-8\r\ncache-control: no-cache, max-age=0\r\nx-content-type-options: nosniff\r\ndate: Thu, 31 Jan 2019 12:15:10 GMT\r\nserver: envoy\r\nx-envoy-upstream-service-time: 0\r\nconnection: close\r\ntransfer-encoding: chunked\r\n\r\n11b4\r\n<head>\r\n  <title>Envoy Admin</title> etc\r\n</body>\r\n\r\n0\r\n\r\n\r\n13:15:10.247329 IP6 ::1.65046 > ::1.8080: Flags [.], ack 4807, win 6296, options [nop,nop,TS val 803548510 ecr 803548510], length 0\r\n`..0. .@....................................e...z4.......(.....\r\n/.-^/.-^\r\n13:15:11.250726 IP6 ::1.8080 > ::1.65046: Flags [.], ack 97, win 6370, length 0\r\n`......@....................................z4..e...P.......\r\n13:15:11.250767 IP6 ::1.65046 > ::1.8080: Flags [.], ack 4807, win 6296, options [nop,nop,TS val 803549510 ecr 803548510], length 0\r\n`..0. .@....................................e...z4.......(.....\r\n/.1F/.-^\r\n13:15:11.252739 IP6 ::1.8080 > ::1.65046: Flags [F.], seq 4807, ack 97, win 6370, options [nop,nop,TS val 803549512 ecr 803549510], length 0\r\n`.... .@....................................z4..e........(.....\r\n/.1H/.1F\r\n13:15:11.252769 IP6 ::1.65046 > ::1.8080: Flags [.], ack 4808, win 6296, options [nop,nop,TS val 803549512 ecr 803549512], length 0\r\n`..0. .@....................................e...z4.......(.....\r\n/.1H/.1H\r\n13:15:11.252815 IP6 ::1.65046 > ::1.8080: Flags [F.], seq 97, ack 4808, win 6296, options [nop,nop,TS val 803549512 ecr 803549512], length 0\r\n`..0. .@....................................e...z4.......(.....\r\n/.1H/.1H\r\n13:15:11.252866 IP6 ::1.8080 > ::1.65046: Flags [.], ack 98, win 6370, options [nop,nop,TS val 803549512 ecr 803549512], length 0\r\n`.... .@....................................z4..e........(.....\r\n/.1H/.1H\r\n```\r\n\r\nHere is the tcpdump"
+      },
+      {
+        "user": "alyssawilk",
+        "created_at": "2019-01-31T15:56:19Z",
+        "body": "If it's a close due to early response, it's likely ConnectionCloseType::FlushWriteAndDelay which was introduced to address the race described in #2929  \r\n\r\nIf it's not a close due to early response there might be some other corner case triggering the delay.\r\n\r\nIf that's the problem you could fix by adjusting  delayed_close_timeout in your HCM config but depending on how your client handles resets you might reintroduce the race described in that issue\r\n\r\ncc @AndresGuedez "
+      },
+      {
+        "user": "fkowal",
+        "created_at": "2019-02-01T12:13:44Z",
+        "body": "Changing the __delayed_close_timeout__ did helped lowering the delay with the responses.\r\n\r\nThese metrics keep increasing, which I belive is an indication that varnish is not issuing a FIN after receiving the response.\r\n*http.ingress_http.downstream_cx_delayed_close_timeout* and *http.ingress_http.downstream_cx_destroy_local*\r\n\r\nThank you @alyssawilk "
+      }
+    ]
+  },
+  {
+    "number": 5359,
+    "title": "[Question] Meaning of [C~] character included in connection log and stream log etc",
+    "created_at": "2018-12-20T02:41:56Z",
+    "closed_at": "2018-12-20T03:37:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/5359",
+    "body": "*Title*: *[Question] Meaning of [C~] character included in connection log and stream log etc*\r\n\r\n*Description*:\r\nYou could see a character string [C (number)] as follows in Envoy's log. Would you tell this meaning?\r\nI think logs with the same id are logs in the same connection since I recognize it's like a connection id, but is it right?\r\nThanks.\r\n\r\n```\r\n[2018-12-20 01:52:58.930][000011][debug][router] [source/common/router/router.cc:322] [C0][S539228372188944921] router decoding headers:\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/5359/comments",
+    "author": "nakabonne",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2018-12-20T03:30:54Z",
+        "body": "Yes that's right, it's an internal connection ID."
+      }
+    ]
+  },
+  {
+    "number": 5226,
+    "title": "HTTPS front proxy to reroute traffic to http listener - fail with 503",
+    "created_at": "2018-12-05T15:53:01Z",
+    "closed_at": "2018-12-05T20:06:43Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/5226",
+    "body": "HTTPS front proxy to reroute traffic to http listener - fail with 503\r\n\r\n*Description*:\r\n>Try to use Envoy as front proxy to listen HTTPS request and re-route to the HTTP listener. Both listeners are docker instance on the same host. Test client send request from another host via SOAP UI.\r\n\r\nThe Envoy returns 503 error to the SOAP UI. Thr SOAP UI log:\r\n```\r\nWed Dec 05 10:36:36 EST 2018:DEBUG:<< \"HTTP/1.1 503 Service Unavailable[\\r][\\n]\"\r\nWed Dec 05 10:36:36 EST 2018:DEBUG:<< \"content-length: 57[\\r][\\n]\"\r\nWed Dec 05 10:36:36 EST 2018:DEBUG:<< \"content-type: text/plain[\\r][\\n]\"\r\nWed Dec 05 10:36:36 EST 2018:DEBUG:<< \"date: Wed, 05 Dec 2018 15:36:36 GMT[\\r][\\n]\"\r\nWed Dec 05 10:36:36 EST 2018:DEBUG:<< \"server: envoy[\\r][\\n]\"\r\nWed Dec 05 10:36:36 EST 2018:DEBUG:<< \"[\\r][\\n]\"\r\nWed Dec 05 10:36:36 EST 2018:DEBUG:<< \"upstream connect error or disconnect/reset before headers\"\r\n```\r\n\r\n*Envoy docker file*:\r\n```\r\nFROM envoyproxy/envoy-alpine:latest\r\n\r\nADD ./pem/envoy-front-ssl.crt /etc/\r\nADD ./pem/envoy-front-ssl.key /etc/\r\nADD edge.yaml /etc/\r\n\r\nCMD [\"/usr/local/bin/envoy\", \"-c\", \"/etc/edge.yaml\", \"-l\", \"debug\"]\r\n\r\n```\r\n\r\n*Envoy Config yaml file*:\r\n```\r\nstatic_resources:\r\n  listeners:\r\n  - name: listener_0\r\n    address:\r\n      socket_address: { address: 0.0.0.0, port_value: 10000 }\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          stat_prefix: ingress_http\r\n          codec_type: AUTO\r\n          route_config:\r\n            name: local_route\r\n            virtual_hosts:\r\n            - name: local_service\r\n              domains: [\"*\"]\r\n              routes:\r\n              - match:\r\n                  prefix: \"/mock-domain\" # a test for mock-domain\r\n                route:\r\n                  cluster: mock-domain\r\n          http_filters:\r\n          - name: envoy.router\r\n      tls_context:\r\n        common_tls_context:\r\n            #alpn_protocols: \"h2\"\r\n            tls_certificates:\r\n            - certificate_chain: { filename: \"/etc/envoy-front-ssl.crt\" }\r\n              private_key: { filename: \"/etc/envoy-front-ssl.key\" }\r\n  clusters:\r\n  - name: mock-domain\r\n    connect_timeout: 0.25s\r\n    type: strict_dns\r\n    lb_policy: round_robin\r\n    hosts:\r\n    - socket_address:\r\n        address: mock-domain\r\n        port_value: 18080\r\nadmin:\r\n  access_log_path: /tmp/admin_access.log\r\n  address:\r\n    socket_address:\r\n      address: 0.0.0.0\r\n      port_value: 8001\r\n\r\n```\r\n\r\n*Envoy Console Log*:\r\n```\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:207] initializing epoch 0 (hot restart version=10.200.16384.127.options=capacity=16384, num_slots=8209 hash=228984379728933363 size=2654312)\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:209] statically linked extensions:\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:211]   access_loggers: envoy.file_access_log,envoy.http_grpc_access_log\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:214]   filters.http: envoy.buffer,envoy.cors,envoy.ext_authz,envoy.fault,envoy.filters.http.header_to_metadata,envoy.filters.http.jwt_authn,envoy.filters.http.rbac,envoy.grpc_http1_bridge,envoy.grpc_json_transcoder,envoy.grpc_web,envoy.gzip,envoy.health_check,envoy.http_dynamo_filter,envoy.ip_tagging,envoy.lua,envoy.rate_limit,envoy.router,envoy.squash\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:217]   filters.listener: envoy.listener.original_dst,envoy.listener.proxy_protocol,envoy.listener.tls_inspector\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:220]   filters.network: envoy.client_ssl_auth,envoy.echo,envoy.ext_authz,envoy.filters.network.dubbo_proxy,envoy.filters.network.rbac,envoy.filters.network.sni_cluster,envoy.filters.network.thrift_proxy,envoy.http_connection_manager,envoy.mongo_proxy,envoy.ratelimit,envoy.redis_proxy,envoy.tcp_proxy\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:222]   stat_sinks: envoy.dog_statsd,envoy.metrics_service,envoy.stat_sinks.hystrix,envoy.statsd\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:224]   tracers: envoy.dynamic.ot,envoy.lightstep,envoy.tracers.datadog,envoy.zipkin\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:227]   transport_sockets.downstream: envoy.transport_sockets.alts,envoy.transport_sockets.capture,raw_buffer,tls\r\n[2018-12-05 15:36:30.805][000005][info][main] [source/server/server.cc:230]   transport_sockets.upstream: envoy.transport_sockets.alts,envoy.transport_sockets.capture,raw_buffer,tls\r\n[2018-12-05 15:36:30.809][000005][info][main] [source/server/server.cc:272] admin address: 0.0.0.0:8001\r\n[2018-12-05 15:36:30.811][000005][debug][main] [source/server/overload_manager_impl.cc:171] No overload action configured for envoy.overload_actions.stop_accepting_connections.\r\n[2018-12-05 15:36:30.811][000005][debug][main] [source/server/overload_manager_impl.cc:171] No overload action configured for envoy.overload_actions.stop_accepting_connections.\r\n[2018-12-05 15:36:30.811][000005][info][config] [source/server/configuration_impl.cc:51] loading 0 static secret(s)\r\n[2018-12-05 15:36:30.811][000005][info][config] [source/server/configuration_impl.cc:57] loading 1 cluster(s)\r\n[2018-12-05 15:36:30.812][000005][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:818] adding TLS initial cluster mock-domain\r\n[2018-12-05 15:36:30.812][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:1183] starting async DNS resolution for mock-domain\r\n[2018-12-05 15:36:30.813][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 3437 milliseconds\r\n[2018-12-05 15:36:30.813][000005][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:63] cm init: adding: cluster=mock-domain primary=1 secondary=0\r\n[2018-12-05 15:36:30.813][000005][info][config] [source/server/configuration_impl.cc:62] loading 1 listener(s)\r\n[2018-12-05 15:36:30.813][000005][debug][config] [source/server/configuration_impl.cc:64] listener #0:\r\n[2018-12-05 15:36:30.813][000005][debug][config] [source/server/listener_manager_impl.cc:640] begin add/update listener: name=listener_0 hash=10827106893954255580\r\n[2018-12-05 15:36:30.813][000005][debug][config] [source/server/listener_manager_impl.cc:40]   filter #0:\r\n[2018-12-05 15:36:30.813][000005][debug][config] [source/server/listener_manager_impl.cc:41]     name: envoy.http_connection_manager\r\n[2018-12-05 15:36:30.813][000005][debug][config] [source/server/listener_manager_impl.cc:44]   config: {\"codec_type\":\"AUTO\",\"route_config\":{\"name\":\"local_route\",\"virtual_hosts\":[{\"name\":\"local_service\",\"domains\":[\"*\"],\"routes\":[{\"route\":{\"cluster\":\"mock-domain\"},\"match\":{\"prefix\":\"/mock-domain\"}}]}]},\"stat_prefix\":\"ingress_http\",\"http_filters\":[{\"name\":\"envoy.router\"}]}\r\n[2018-12-05 15:36:30.815][000005][debug][config] [source/extensions/filters/network/http_connection_manager/config.cc:312]     http filter #0\r\n[2018-12-05 15:36:30.815][000005][debug][config] [source/extensions/filters/network/http_connection_manager/config.cc:313]       name: envoy.router\r\n[2018-12-05 15:36:30.815][000005][debug][config] [source/extensions/filters/network/http_connection_manager/config.cc:317]     config: {}\r\n[2018-12-05 15:36:30.819][000005][debug][config] [source/server/listener_manager_impl.cc:527] add active listener: name=listener_0, hash=10827106893954255580, address=0.0.0.0:10000\r\n[2018-12-05 15:36:30.819][000005][info][config] [source/server/configuration_impl.cc:95] loading tracing configuration\r\n[2018-12-05 15:36:30.819][000005][info][config] [source/server/configuration_impl.cc:115] loading stats sink configuration\r\n[2018-12-05 15:36:30.819][000005][info][main] [source/server/server.cc:458] starting main dispatch loop\r\n[2018-12-05 15:36:30.819][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 4687 milliseconds\r\n[2018-12-05 15:36:30.819][000009][debug][grpc] [source/common/grpc/google_async_client_impl.cc:41] completionThread running\r\n[2018-12-05 15:36:30.842][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 3437 milliseconds\r\n[2018-12-05 15:36:30.848][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 4375 milliseconds\r\n[2018-12-05 15:36:30.848][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:1190] async DNS resolution complete for mock-domain\r\n[2018-12-05 15:36:30.848][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:1212] DNS hosts have changed for mock-domain\r\n[2018-12-05 15:36:30.848][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:587] initializing secondary cluster mock-domain completed\r\n[2018-12-05 15:36:30.848][000005][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:953] membership update for TLS cluster mock-domain\r\n[2018-12-05 15:36:30.848][000005][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:91] cm init: init complete: cluster=mock-domain primary=0 secondary=0\r\n[2018-12-05 15:36:30.848][000005][info][upstream] [source/common/upstream/cluster_manager_impl.cc:136] cm init: all clusters initialized\r\n[2018-12-05 15:36:30.848][000005][info][main] [source/server/server.cc:430] all clusters initialized. initializing init manager\r\n[2018-12-05 15:36:30.848][000005][info][config] [source/server/listener_manager_impl.cc:910] all dependencies initialized. starting workers\r\n[2018-12-05 15:36:30.849][000011][debug][main] [source/server/worker_impl.cc:98] worker entering dispatch loop\r\n[2018-12-05 15:36:30.849][000011][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:818] adding TLS initial cluster mock-domain\r\n[2018-12-05 15:36:30.849][000011][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:953] membership update for TLS cluster mock-domain\r\n[2018-12-05 15:36:30.849][000012][debug][main] [source/server/worker_impl.cc:98] worker entering dispatch loop\r\n[2018-12-05 15:36:30.849][000012][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:818] adding TLS initial cluster mock-domain\r\n[2018-12-05 15:36:30.849][000012][debug][upstream] [source/common/upstream/cluster_manager_impl.cc:953] membership update for TLS cluster mock-domain\r\n[2018-12-05 15:36:30.849][000013][debug][grpc] [source/common/grpc/google_async_client_impl.cc:41] completionThread running\r\n[2018-12-05 15:36:30.849][000014][debug][grpc] [source/common/grpc/google_async_client_impl.cc:41] completionThread running\r\n[2018-12-05 15:36:35.820][000005][debug][main] [source/server/server.cc:144] flushing stats\r\n[2018-12-05 15:36:35.849][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:1183] starting async DNS resolution for mock-domain\r\n[2018-12-05 15:36:35.850][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 5000 milliseconds\r\n[2018-12-05 15:36:35.852][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 3125 milliseconds\r\n[2018-12-05 15:36:35.864][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 2812 milliseconds\r\n[2018-12-05 15:36:35.875][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 3750 milliseconds\r\n[2018-12-05 15:36:35.876][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:1190] async DNS resolution complete for mock-domain\r\n[2018-12-05 15:36:36.258][000012][debug][main] [source/server/connection_handler_impl.cc:236] [C0] new connection\r\n[2018-12-05 15:36:36.258][000012][debug][connection] [source/common/ssl/ssl_socket.cc:135] [C0] handshake error: 2\r\n[2018-12-05 15:36:36.288][000012][debug][connection] [source/common/ssl/ssl_socket.cc:135] [C0] handshake error: 2\r\n[2018-12-05 15:36:36.288][000012][debug][connection] [source/common/ssl/ssl_socket.cc:135] [C0] handshake error: 2\r\n[2018-12-05 15:36:36.309][000012][debug][connection] [source/common/ssl/ssl_socket.cc:135] [C0] handshake error: 2\r\n[2018-12-05 15:36:36.309][000012][debug][connection] [source/common/ssl/ssl_socket.cc:135] [C0] handshake error: 2\r\n[2018-12-05 15:36:36.321][000012][debug][connection] [source/common/ssl/ssl_socket.cc:124] [C0] handshake complete\r\n[2018-12-05 15:36:36.329][000012][debug][http] [source/common/http/conn_manager_impl.cc:200] [C0] new stream\r\n[2018-12-05 15:36:36.333][000012][debug][http] [source/common/http/conn_manager_impl.cc:529] [C0][S8599161127663960637] request headers complete (end_stream=false):\r\n':authority', '192.168.64.135:10000'\r\n':path', '/mock-domain'\r\n':method', 'POST'\r\n'accept-encoding', 'gzip,deflate'\r\n'content-type', 'text/xml;charset=UTF-8'\r\n'content-length', '799'\r\n'connection', 'Keep-Alive'\r\n'user-agent', 'Apache-HttpClient/4.1.1 (java 1.5)'\r\n\r\n[2018-12-05 15:36:36.334][000012][debug][router] [source/common/router/router.cc:264] [C0][S8599161127663960637] cluster 'mock-domain' match for URL '/mock-domain'\r\n[2018-12-05 15:36:36.334][000012][debug][router] [source/common/router/router.cc:322] [C0][S8599161127663960637] router decoding headers:\r\n':authority', '192.168.64.135:10000'\r\n':path', '/mock-domain'\r\n':method', 'POST'\r\n':scheme', 'http'\r\n'accept-encoding', 'gzip,deflate'\r\n'content-type', 'text/xml;charset=UTF-8'\r\n'content-length', '799'\r\n'user-agent', 'Apache-HttpClient/4.1.1 (java 1.5)'\r\n'x-forwarded-proto', 'https'\r\n'x-request-id', 'aec12380-e00c-4e2a-8085-cc9ef792abc7'\r\n'x-envoy-expected-rq-timeout-ms', '15000'\r\n\r\n[2018-12-05 15:36:36.334][000012][debug][pool] [source/common/http/http1/conn_pool.cc:80] creating a new connection\r\n[2018-12-05 15:36:36.334][000012][debug][client] [source/common/http/codec_client.cc:26] [C1] connecting\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:634] [C1] connecting to 172.19.0.2:18080\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:643] [C1] connection in progress\r\n[2018-12-05 15:36:36.335][000012][debug][pool] [source/common/http/conn_pool_base.cc:20] queueing request due to no available connections\r\n[2018-12-05 15:36:36.335][000012][debug][http] [source/common/http/conn_manager_impl.cc:945] [C0][S8599161127663960637] request end stream\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:525] [C1] delayed connection error: 111\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:183] [C1] closing socket: 0\r\n[2018-12-05 15:36:36.335][000012][debug][client] [source/common/http/codec_client.cc:82] [C1] disconnect. resetting 0 pending requests\r\n[2018-12-05 15:36:36.335][000012][debug][pool] [source/common/http/http1/conn_pool.cc:121] [C1] client disconnected\r\n[2018-12-05 15:36:36.335][000012][debug][router] [source/common/router/router.cc:475] [C0][S8599161127663960637] upstream reset\r\n[2018-12-05 15:36:36.335][000012][debug][http] [source/common/http/conn_manager_impl.cc:1180] [C0][S8599161127663960637] encoding headers via codec (end_stream=false):\r\n':status', '503'\r\n'content-length', '57'\r\n'content-type', 'text/plain'\r\n'date', 'Wed, 05 Dec 2018 15:36:36 GMT'\r\n'server', 'envoy'\r\n\r\n[2018-12-05 15:36:40.821][000005][debug][main] [source/server/server.cc:144] flushing stats\r\n[2018-12-05 15:36:40.877][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:1183] starting async DNS resolution for mock-domain\r\n[2018-12-05 15:36:40.877][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 3437 milliseconds\r\n[2018-12-05 15:36:40.878][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 4375 milliseconds\r\n[2018-12-05 15:36:40.885][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 4375 milliseconds\r\n[2018-12-05 15:36:40.891][000005][debug][upstream] [source/common/network/dns_impl.cc:158] Setting DNS resolution timer for 4375 milliseconds\r\n[2018-12-05 15:36:40.891][000005][debug][upstream] [source/common/upstream/upstream_impl.cc:1190] async DNS resolution complete for mock-domain\r\n\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/5226/comments",
+    "author": "bnlcnd",
+    "comments": [
+      {
+        "user": "taion809",
+        "created_at": "2018-12-05T18:49:09Z",
+        "body": "Hello,\r\nSo here is what I see in your logs\r\n\r\n```\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:634] [C1] connecting to 172.19.0.2:18080\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:643] [C1] connection in progress\r\n[2018-12-05 15:36:36.335][000012][debug][pool] [source/common/http/conn_pool_base.cc:20] queueing request due to no available connections\r\n[2018-12-05 15:36:36.335][000012][debug][http] [source/common/http/conn_manager_impl.cc:945] [C0][S8599161127663960637] request end stream\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:525] [C1] delayed connection error: 111\r\n[2018-12-05 15:36:36.335][000012][debug][connection] [source/common/network/connection_impl.cc:183] [C1] closing socket: 0\r\n[2018-12-05 15:36:36.335][000012][debug][client] [source/common/http/codec_client.cc:82] [C1] disconnect. resetting 0 pending requests\r\n[2018-12-05 15:36:36.335][000012][debug][pool] [source/common/http/http1/conn_pool.cc:121] [C1] client disconnected\r\n[2018-12-05 15:36:36.335][000012][debug][router] [source/common/router/router.cc:475] [C0][S8599161127663960637] upstream reset\r\n```\r\n\r\nThere appears to be a connection refused here, error 111 which IIRC is ECONNREFUSED.\r\n\r\nIf you check the output of the `/clusters` command it will give you the IP:PORT information for the cluster in question.  Double check that the server is actually listening on this port."
+      }
+    ]
+  },
+  {
+    "number": 4651,
+    "title": "jwt-authn exception",
+    "created_at": "2018-10-09T13:13:53Z",
+    "closed_at": "2018-10-09T16:29:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/4651",
+    "body": "**Issue Template**\r\n\r\n*Title*: *jwt-authn exception*\r\n\r\n*Description*:\r\n>Im using the jwt-authn http-filter for validating JWT. Im using the version 2 API reference of envoy and the following envoy image version tag : fdfa5bde3343372ad662a830da0bdc3aea806f4d\r\n\r\n>Im getting following exception : \r\n[critical][main] source/server/server.cc:80] error initializing configuration '/etc/front-envoy.yaml': Didn't find a registered implementation for name: 'envoy.jwt_authn'\r\n\r\n*config*:\r\n```\r\n- name: envoy.jwt_authn\r\n            config:\r\n```\r\n      \r\nAm i using the wrong name ?\r\n\r\nthanks     \r\n\r\n\r\n\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/4651/comments",
+    "author": "githubYasser",
+    "comments": [
+      {
+        "user": "qiwzhang",
+        "created_at": "2018-10-09T16:04:30Z",
+        "body": "It should be:  envoy.filters.http.jwt_authn"
+      }
+    ]
+  },
+  {
+    "number": 4640,
+    "title": "How to run multi envoy process on one linux server",
+    "created_at": "2018-10-08T16:30:21Z",
+    "closed_at": "2018-10-10T14:19:03Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/4640",
+    "body": "*Title*: *One line description*\r\nHow to run multi envoy process on one linux server\r\n\r\n*Description*:\r\nI am not using docker container.\r\nI have the need to want to start two envoy processes on one linux server.\r\n\r\nSteps:\r\n1) create two folder on a centos server\r\n/root/envoy1 and /root/envoy2\r\n2) scp envoy binary (built on centos7) to the server under /root/envoy1 and /root/envoy2\r\n3) Prepare config.yaml files with diff ports \r\n4) Start envoy from folder 1. it works well\r\n/root/envoy1/envoy -c /root/envoy1/config.yaml --service-cluster myapp1 --service-node myapp1 \r\n5) Start envoy from folder 2. Nothing happens. And there is no screen output and log for further information\r\n/root/envoy2/envoy -c /root/envoy2/config.yaml --service-cluster myapp2 --service-node myapp2\r\n\r\nAny suggestion?",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/4640/comments",
+    "author": "huxiaobabaer",
+    "comments": [
+      {
+        "user": "moderation",
+        "created_at": "2018-10-08T16:36:34Z",
+        "body": "@huxiaobabaer from `envoy --help`. Works well and I run multiple Envoy's on a single host.\r\n\r\n```\r\n   --base-id <uint32_t>\r\n     base ID so that multiple envoys can run on the same host if needed\r\n```"
+      },
+      {
+        "user": "huxiaobabaer",
+        "created_at": "2018-10-08T16:43:25Z",
+        "body": "@moderation What is the default value of base id if not specified? TKS"
+      },
+      {
+        "user": "moderation",
+        "created_at": "2018-10-08T16:52:15Z",
+        "body": "I don't believe there is a default. I start with 0 and count up from there. 0 to 4294967295 works."
+      }
+    ]
+  },
+  {
+    "number": 4358,
+    "title": "envoy proxy grpc server over domain not work",
+    "created_at": "2018-09-06T03:06:19Z",
+    "closed_at": "2018-09-07T00:51:24Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/4358",
+    "body": "*Title*: *envoy proxy grpc server over domain not work*\r\n\r\n*Description*:\r\nI use envoy to proxy multi backend grpc services, so i want to use different domain to distinguish different backend grpc service. when change domain from \"*\" to \"grpc.service.com\", It seems that envoy is not working properly, my grpc client get error like this:\r\n```shell\r\nException in thread \"main\" io.grpc.StatusRuntimeException: UNIMPLEMENTED\r\n        at io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:230)\r\n        at io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:211)\r\n        at io.grpc.stub.ClientCalls.blockingUnaryCall(ClientCalls.java:144)\r\n        at com.connect.generate.TimedTaskExecutorGrpc$TimedTaskExecutorBlockingStub.execTimedTask(TimedTaskExecutorGrpc.java:150)\r\n        at com.connect.TimeClient.createTimeTask(TimeClient.java:81)\r\n        at com.connect.TimeClient.main(TimeClient.java:132)\r\n```\r\n\r\nhere is my envoy config file:\r\n```shell static_resources:\r\n  listeners:\r\n  - address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 10000\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          codec_type: auto\r\n          stat_prefix: ingress_http\r\n          route_config:\r\n            name: local_route\r\n            virtual_hosts:\r\n            - name: local_service\r\n              domains:\r\n              - \"grpc.service.com\"\r\n              routes:\r\n              - match:\r\n                  prefix: \"/\"\r\n                  headers:\r\n                  - name: content-type\r\n                    exact_match: application/grpc\r\n                route:\r\n                  cluster: local_service_grpc\r\n          http_filters:\r\n          - name: envoy.router\r\n            config: {}\r\n  clusters:\r\n  - name: local_service_grpc\r\n    connect_timeout: 25s\r\n    type: static\r\n    lb_policy: round_robin\r\n    http2_protocol_options: {}\r\n    hosts:\r\n    - socket_address:\r\n        address: 192.168.201.99\r\n        port_value: 50052\r\nadmin:\r\n  access_log_path: /tmp/admin_access.log\r\n  address:\r\n    socket_address:\r\n      address: 0.0.0.0\r\n      port_value: 9901 ```\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/4358/comments",
+    "author": "inetkiller",
+    "comments": [
+      {
+        "user": "lizan",
+        "created_at": "2018-09-06T15:13:57Z",
+        "body": "Try use domains with port number, i.e. `grpc.service.com:10000`, gRPC Java is always adding port number to `:authority` header. Or you can use `overrideAuthority` when building channel in your gRPC client."
+      }
+    ]
+  },
+  {
+    "number": 4139,
+    "title": "Questions around Lua filter",
+    "created_at": "2018-08-14T01:14:40Z",
+    "closed_at": "2018-08-16T15:22:53Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/4139",
+    "body": "Does the lua filter load required modules on every request ?\r\n\r\nI am trying to write a lua filter that writes the content of incoming requests into kafka or aws-kinesis. I've never used lua before but it looks very simple compared to trying to build a custom envoy filter, but i am not sure if required modules are cached somehow ?\r\n\r\nI only need to have a lua filter sending my requests to an upstream destination in code, can i configure envoy to not route traffic to any destination ?",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/4139/comments",
+    "author": "sirajmansour",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2018-08-14T03:01:18Z",
+        "body": "Code is loaded/JITd once per worker thread and then reused for all requests."
+      }
+    ]
+  },
+  {
+    "number": 3886,
+    "title": "How to verify if LEAST_REQUEST LB policy is working?",
+    "created_at": "2018-07-18T16:33:06Z",
+    "closed_at": "2018-07-23T09:32:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/3886",
+    "body": "This is a question, and not a bug or feature request. If this is not a proper place to ask questions, I can move this somwhere else (I checked SO and Serverfault, but didn't see much traction about Envoy there).\r\n\r\nI'm using Envoy as a Load balancer in front of a service consisting of ~40 nodes. I have 2 nodes running Envoy. I'm using `STRICT_DNS` discovery type, and the proxying works fine without any issues.\r\n\r\nThe upstream service is doing some CPU-intensive processing in the implementation of its endpoint, where the requests are relatively long running, and their duration is pretty varied (anywhere between 300ms-5s).  \r\nBefore using Envoy we were just using a simple round robin load balancer approach, and what we experienced was that the distribution of the CPU-load was very uneven among the nodes, and at any time some nodes were in parallel processing much more requests than some others. I contributed this simply to the randomness of round robin, so this looked like a good candidate to utilize a least connection algorithm instead.\r\n\r\nSo I've put in place Envoy to be able to use the Least Request LB algorithm.  \r\nI started with the LB policy set to `ROUND_ROBIN`, and I wanted to compare it to `LEAST_REQUEST`, so after a while I changed it to `LEAST_REQUEST`, and kept monitoring the upstream cluster.\r\n\r\nI was expecting to get better overall resource utilization, and a more flat distribution of outstanding requests across the upstream nodes.  \r\nOn the other hand, what happens is that I can see absolutely no difference in response times, CPU-usage, or the variance in the distribution of in progress requests among the upstream nodes.  \r\nI can accept if it turns out my assumptions were wrong, but it's hard to believe that switching from Round Robin to Least Requests on the LB level doesn't make *any* observable difference.\r\n\r\nIs there a way for me to \"verify\" if Envoy is really operating in Least Request LB mode? Is there any situation in which Envoy doesn't really do Least Request, but it falls back to Round Robin?\r\n\r\nThis is the configuration I'm using:\r\n\r\n```\r\nadmin:\r\n  access_log_path: /tmp/admin_access.log\r\n  address:\r\n    socket_address: { address: 0.0.0.0, port_value: 9901 }\r\n\r\nstatic_resources:\r\n  listeners:\r\n  - name: listener_0\r\n    address:\r\n      socket_address: { address: 0.0.0.0, port_value: 80 }\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          stat_prefix: ingress_http\r\n          route_config:\r\n            name: local_route\r\n            virtual_hosts:\r\n            - name: local_service\r\n              domains: [\"*\"]\r\n              routes:\r\n              - match: { prefix: \"/\" }\r\n                route: { host_rewrite: my-upstream-domain-name, cluster: service_my_upstream }\r\n          http_filters:\r\n          - name: envoy.router\r\n  clusters:\r\n  - name: service_my_upstream\r\n    connect_timeout: 0.25s\r\n    type: STRICT_DNS\r\n    dns_lookup_family: V4_ONLY\r\n    lb_policy: LEAST_REQUEST\r\n    hosts: [{ socket_address: { address: my-upstream-domain-name, port_value: 80 }}]\r\n```\r\n\r\n(Where `my-upstream-domain-name` is the domain name having the A record for all the upstream nodes.)",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/3886/comments",
+    "author": "markvincze",
+    "comments": [
+      {
+        "user": "markvincze",
+        "created_at": "2018-07-19T14:10:31Z",
+        "body": "One thing I tried now: I replaced the LB policy with an incorrect value (I just added `lb_policy: invalid_policy`), but I didn't receive any errors either on startup or later when sending requests to Envoy, even if I set the logging level to `debug`, so I'm doubting that the `lb_policy` setting is picked up by Envoy. So maybe something is wrong in my config?"
+      },
+      {
+        "user": "mattklein123",
+        "created_at": "2018-07-19T14:31:12Z",
+        "body": "@markvincze yes something seems wrong. Use the `/config_dump` admin endpoint to double check the applied configuration.\r\n\r\nAlso, if you look at per host stats in `/clusters` output it should be pretty clear if it's RR vs. LR, because LR will look a lot more random for `rq_total` vs. the roughly even increasing of RR."
+      },
+      {
+        "user": "markvincze",
+        "created_at": "2018-07-23T09:32:36Z",
+        "body": "@mattklein123 Thanks for the suggestions!  \r\nWith `/config_dump` I could verify that the `LEAST_REQUEST` setting was indeed picked up. And also, when testing it with a dummy CPU-intensive API I created just for testing, I could also verify that the overall performance was improved significantly with `LEAST_REQUEST` compared to `ROUND_ROBIN`. So it seems that it's just that with my real production application, `LEAST_REQUEST` really doesn't bring a noticable improvement."
+      }
+    ]
+  },
+  {
+    "number": 2638,
+    "title": "mTLS and traffic split",
+    "created_at": "2018-02-17T20:08:53Z",
+    "closed_at": "2018-02-21T02:41:18Z",
+    "labels": [
+      "question",
+      "help wanted"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/2638",
+    "body": "# Background\r\n\r\nI am preparing a traffic shift from a web API in a Swarm cluster (let's call it `swarm_api`) to the same API in a Kubernetes cluster (`k8s_api`). The two clusters are on distinct private networks. The API's clients are on the same private network as the Swarm cluster, making requests over HTTP. However, the Kubernetes cluster is isolated (and fully managed by a cloud provider; the nodes' network is abstracted); the connection must therefore be secured.\r\n\r\nMy plan is to add an edge envoy in the Swarm cluster (`swarm_proxy`) to split traffic between `swarm_api` and a second edge envoy in the Kubernetes cluster (`k8s_proxy`), which would route traffic to `k8s_api`. The connection between `swarm_proxy` and `k8s_proxy` must be secured with mutual TLS as it goes through the Internet.\r\n\r\n```\r\nPrivate network 1\r\n                      (swarm_proxy)---HTTP--->(swarm_api)\r\n____________________________|__________________________\r\nInternet                    |\r\n                          HTTPS\r\n____________________________|__________________________\r\nPrivate network 2           |\r\n                            \u2304\r\n                       (k8s_proxy)----HTTP---->(k8s_api)\r\n```\r\n\r\n# What I have so far\r\n\r\n1) One the one hand, I have successfully prototyped a traffic split over HTTP, *without* mTLS:\r\n    ```\r\n    Private network 1\r\n                          (swarm_proxy)---HTTP--->(swarm_api)\r\n    ____________________________|__________________________\r\n    Internet                    |\r\n                              HTTP\r\n    ____________________________|__________________________\r\n    Private network 2           |\r\n                                \u2304\r\n                           (k8s_proxy)----HTTP---->(k8s_api)\r\n    ```\r\n    `swarm_proxy` uses an `http_connection_manager` to split traffic between `swarm_api` and `k8s_proxy`; `k8s_proxy` simply routes traffic to `k8s_api` (see configurations below).\r\n2) On the other hand, I have successfully prototyped simple routing with mTLS:\r\n    ```\r\n    Private network 1\r\n                          (swarm_proxy)\r\n    ____________________________|__________________________\r\n    Internet                    |\r\n                              HTTPS\r\n    ____________________________|__________________________\r\n    Private network 2           |\r\n                                \u2304\r\n                           (k8s_proxy)----HTTP---->(k8s_api)\r\n    ```\r\n    `swarm_proxy` uses a `tcp_proxy` to route traffic to `k8s_proxy`; the envoy _cluster_ adds a `tls_context` including a client certificate; `k8s_proxy` requires TLS with client certificate, then routes traffic to `k8s_api` (see configurations below).\r\n\r\n# Issue\r\n\r\nNow I'm struggling to make both traffic split and mTLS work at the same time: if I try to combine the two approaches in a third prototype, `swarm_proxy` returns 301 Moved Permanently when it routes traffic to `k8s_proxy` (see configurations below).\r\n\r\nIs there something I'm missing / don't understand, or is this a bug?\r\n\r\n# Envoy Configurations\r\n\r\n## Prototype 1: traffic split\r\n\r\n```yaml\r\n# swarm_proxy\r\nstatic_resources:\r\n  listeners:\r\n  - address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 80\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          stat_prefix: ingress\r\n          route_config:\r\n            virtual_hosts:\r\n            - name: api\r\n              domains:\r\n              - \"*\"\r\n              routes:\r\n              - match:\r\n                  prefix: \"/myapi/v1\"\r\n                route:\r\n                  weighted_clusters:\r\n                    runtime_key_prefix: routing.traffic_split.api\r\n                    clusters:\r\n                    - name: swarm_api\r\n                      weight: 50\r\n                    - name: k8s_proxy\r\n                      weight: 50\r\n          http_filters:\r\n          - name: envoy.router\r\n          access_log:\r\n          - name: envoy.file_access_log\r\n            config:\r\n              path: \"/dev/stdout\"\r\n  clusters:\r\n  - name: swarm_api\r\n    type: strict_dns\r\n    hosts:\r\n    - socket_address:\r\n        address: swarm_api\r\n        port_value: 80\r\n    connect_timeout: 1s\r\n  - name: k8s_proxy\r\n    type: strict_dns\r\n    hosts:\r\n    - socket_address:\r\n        address: k8s_proxy # TODO replace with public DNS when implemented\r\n        port_value: 80\r\n    connect_timeout: 1s\r\nadmin:\r\n  access_log_path: \"/dev/stdout\"\r\n  address:\r\n    socket_address:\r\n      address: 0.0.0.0\r\n      port_value: 9901\r\n```\r\n\r\n```yaml\r\n# k8s_proxy\r\nstatic_resources:\r\n  listeners:\r\n  - address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 80\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          stat_prefix: ingress\r\n          route_config:\r\n            virtual_hosts:\r\n            - name: k8s_api\r\n              domains:\r\n              - \"*\"\r\n              routes:\r\n              - match:\r\n                  prefix: \"/myapi/v1\"\r\n                route:\r\n                  cluster: k8s_api\r\n          http_filters:\r\n          - name: envoy.router\r\n          access_log:\r\n          - name: envoy.file_access_log\r\n            config:\r\n              path: \"/dev/stdout\"\r\n  clusters:\r\n  - name: k8s_api\r\n    type: strict_dns\r\n    hosts:\r\n    - socket_address:\r\n        address: k8s_api\r\n        port_value: 80\r\n    connect_timeout: 1s\r\nadmin: {...}\r\n```\r\n\r\n## Prototype 2: mutual TLS\r\n\r\n```yaml\r\n# swarm_proxy\r\nstatic_resources:\r\n  listeners:\r\n  - address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 80\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.tcp_proxy\r\n        config:\r\n          stat_prefix: ingress\r\n          cluster: k8s_proxy\r\n          access_log:\r\n          - name: envoy.file_access_log\r\n            config:\r\n              path: \"/dev/stdout\"\r\n  clusters:\r\n  - name: k8s_proxy\r\n    type: strict_dns\r\n    hosts:\r\n    - socket_address:\r\n        address: k8s_proxy # TODO replace with public DNS when implemented\r\n        port_value: 443\r\n    connect_timeout: 1s\r\n    tls_context:\r\n      common_tls_context:\r\n        validation_context:\r\n          trusted_ca:\r\n            filename: /etc/certs/ca.crt.pem\r\n        tls_certificates:\r\n        - certificate_chain:\r\n            filename: /etc/certs/swarm_proxy.crt.pem\r\n          private_key:\r\n            filename: /etc/certs/swarm_proxy.key.pem\r\nadmin: {...}\r\n```\r\n\r\n```yaml\r\n# k8s_proxy\r\nstatic_resources:\r\n  listeners:\r\n  - address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 443\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          stat_prefix: ingress\r\n          route_config:\r\n            virtual_hosts:\r\n            - name: k8s_api\r\n              domains:\r\n              - \"*\"\r\n              require_tls: ALL\r\n              routes:\r\n              - match:\r\n                  prefix: \"/myapi/v1\"\r\n                route:\r\n                  cluster: k8s_api\r\n          http_filters:\r\n          - name: envoy.router\r\n          access_log:\r\n          - name: envoy.file_access_log\r\n            config:\r\n              path: \"/dev/stdout\"\r\n      tls_context:\r\n        require_client_certificate: true\r\n        common_tls_context:\r\n          validation_context:\r\n            trusted_ca:\r\n              filename: /etc/certs/ca.crt.pem\r\n          tls_certificates:\r\n          - certificate_chain:\r\n              filename: /etc/certs/k8s_proxy.crt.pem\r\n            private_key:\r\n              filename: /etc/certs/k8s_proxy.key.pem\r\n  clusters:\r\n  - name: k8s_api\r\n    type: strict_dns\r\n    hosts:\r\n    - socket_address:\r\n        address: k8s_api\r\n        port_value: 80\r\n    connect_timeout: 1s\r\nadmin: {...}\r\n```\r\n\r\n## Prototype 3: traffic split and mutual TLS (NOT WORKING)\r\n\r\n```yaml\r\n# swarm_proxy\r\nstatic_resources:\r\n  listeners:\r\n  - address:\r\n      socket_address:\r\n        address: 0.0.0.0\r\n        port_value: 80\r\n    filter_chains:\r\n    - filters:\r\n      - name: envoy.http_connection_manager\r\n        config:\r\n          stat_prefix: ingress\r\n          route_config:\r\n            virtual_hosts:\r\n            - name: api\r\n              domains:\r\n              - \"*\"\r\n              routes:\r\n              - match:\r\n                  prefix: \"/myapi/v1\"\r\n                route:\r\n                  weighted_clusters:\r\n                    runtime_key_prefix: routing.traffic_split.api\r\n                    clusters:\r\n                    - name: swarm_api\r\n                      weight: 50\r\n                    - name: k8s_proxy\r\n                      weight: 50\r\n          http_filters:\r\n          - name: envoy.router\r\n          access_log:\r\n          - name: envoy.file_access_log\r\n            config:\r\n              path: \"/dev/stdout\"\r\n  clusters:\r\n  - name: swarm_api\r\n    type: strict_dns\r\n    hosts:\r\n    - socket_address:\r\n        address: swarm_api\r\n        port_value: 80\r\n    connect_timeout: 1s\r\n  - name: k8s_proxy\r\n    type: strict_dns\r\n    hosts:\r\n    - socket_address:\r\n        address: k8s_proxy # TODO replace with public DNS when implemented\r\n        port_value: 443\r\n    connect_timeout: 1s\r\n    tls_context:\r\n      common_tls_context:\r\n        validation_context:\r\n          trusted_ca:\r\n            filename: /etc/certs/ca.crt.pem\r\n        tls_certificates:\r\n        - certificate_chain:\r\n            filename: /etc/certs/swarm_proxy.crt.pem\r\n          private_key:\r\n            filename: /etc/certs/swarm_proxy.key.pem\r\nadmin: {...}\r\n```\r\n\r\n```yaml\r\n# k8s_proxy : same as prototype 2\r\n```",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/2638/comments",
+    "author": "adrienjt",
+    "comments": [
+      {
+        "user": "PiotrSikora",
+        "created_at": "2018-02-21T01:44:44Z",
+        "body": "You need to either add `use_remote_address: true` to `k8s_proxy` or remove `require_tls: ALL` from it.\r\n\r\nIf you're using `use_remote_address: false` (default), then `k8s_proxy` is going to receive and accept `X-Forwarded-Proto: http` from `swarm_proxy` and reject client's HTTP request, since it doesn't fulfill the `require_tls` restriction, which applies to client's HTTP request and not to the connection to `k8s_proxy`, `require_client_certificate: true` is enough to enforce mTLS between the proxies.\r\n\r\nAlso, you should add `use_remote_address: true` to `swarm_proxy`, since it's acting as an edge proxy."
+      }
+    ]
+  },
+  {
+    "number": 2462,
+    "title": "Question on license of envoy 1.3.0 dependencies",
+    "created_at": "2018-01-26T16:24:25Z",
+    "closed_at": "2018-01-30T14:53:52Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/2462",
+    "body": "I've a question on one of the envoy 1.3.0 dependencies: rapidjson \u00a01.1.0 \r\n\r\nIt's license states: \r\n\r\n**_If you have downloaded a copy of the RapidJSON source code from Tencent, please note that RapidJSON source code is licensed under the MIT License, except for the third-party components listed below which are subject to different license terms.\u00a0 Your integration of RapidJSON into your own projects may require compliance with the MIT License, as well as the other licenses applicable to the third-party components included within RapidJSON. To avoid the problematic JSON license in your own projects, it's sufficient to exclude the bin/jsonchecker/ directory, as it's the only code under the JSON license.\r\nA copy of the MIT License is included in this file._** \r\n\r\nSo my question is:  is the bin/jsonchecker/ directory included in the envoy 1.3.0 binary referenced as:\r\n\r\n**_proxy/envoy-1.3.0.tg: \r\nsize:2266298 \r\nobject_id:c10f7dcc-4010-4dfe-460a-250a0e1cde1 \r\nsha: 45d667aa64a876ab857853b112f065a8800d3161_**     ?\r\n\r\nThanks.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/2462/comments",
+    "author": "luisapace",
+    "comments": [
+      {
+        "user": "luisapace",
+        "created_at": "2018-01-29T09:15:23Z",
+        "body": "I'm sorry, but really I do not understand your point... if I've a question on the build of Envoy (not produced by IBM), why do I have to write to IBM instead of the developers of that package that has produced that binary?  Could you please clarify? I've done this several times for other packages and always their developers have answered me. Please let me know if you know the answer to my question or not. Thanks a lot for your time and help. \r\n\r\n\r\n"
+      },
+      {
+        "user": "rshriram",
+        "created_at": "2018-01-29T20:25:52Z",
+        "body": "Short answer: no.\r\nContents of bazel-envoy/external/com_github_tencent_rapidjson/bin/jsonchecker/ are\r\n```\r\nfail1.json   fail13.json  fail17.json  fail20.json  fail24.json  fail28.json  fail31.json  fail5.json   fail9.json   readme.txt   \r\nfail10.json  fail14.json  fail18.json  fail21.json  fail25.json  fail29.json  fail32.json  fail6.json   pass1.json   \r\nfail11.json  fail15.json  fail19.json  fail22.json  fail26.json  fail3.json   fail33.json  fail7.json   pass2.json   \r\nfail12.json  fail16.json  fail2.json   fail23.json  fail27.json  fail30.json  fail4.json   fail8.json   pass3.json   \r\n```\r\n\r\nwhich are not part of envoy binary."
+      }
+    ]
+  },
+  {
+    "number": 1855,
+    "title": "Load balancing and persistent connections",
+    "created_at": "2017-10-13T21:35:01Z",
+    "closed_at": "2017-10-18T17:24:15Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/1855",
+    "body": "Hi! I looked for documentation around this and wasn't able to find anything salient.\r\n\r\nHow does Envoy behave when load balancing persistent HTTP/2 connections to an upstream cluster? Specifically, how does it handle cases where hosts are added or removed to a cluster that uses strict DNS service discovery? Will it rebalance traffic when hosts are added, or will it only balance new connections to new hosts? \r\n\r\nWe're looking to address issues we have with using Kubernetes services to load balance persistent gRPC connections, where we see uneven load balancing behavior that persists after a rolling restart of pod backends.",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/1855/comments",
+    "author": "natetarrh",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2017-10-14T01:09:39Z",
+        "body": "I thought we had docs on this but I can't quickly find them. Will do an update at some point. \r\n\r\nThe answer is that load balancing is at the request level, not the connection level. Traffic will be rebalanced as hosts are added and removed."
+      }
+    ]
+  },
+  {
+    "number": 320,
+    "title": "HTTP2 Load balancing affinity",
+    "created_at": "2017-01-05T16:27:21Z",
+    "closed_at": "2017-01-11T03:51:29Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/320",
+    "body": "This could be a beginner question so I apologise.\r\n\r\nIt was not clear to me in the documentation how HTTP2 load balancing works. \r\n\r\nAs new HTTP2 requests come in from a single client on a HTTP2 connection to a envoty route does each client request continue to communicate with the original backend instance (say 7 of 9) or does each request within a client connection to Envoy get load balanced to all 9 backend instances of a cluster. \r\n\r\nIs this also configurable as I could imagine many architecture scenarios where different affinity makes sense",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/320/comments",
+    "author": "andrewwebber",
+    "comments": [
+      {
+        "user": "mattklein123",
+        "created_at": "2017-01-05T16:53:42Z",
+        "body": "Requests get load balanced to all backends depending on the load balancing policy. Currently we do not support any consistent hashing load balancing policies, however we will support hash based load balancing for HTTP based on a header \"soon\" (~4-6 weeks)."
+      }
+    ]
+  },
+  {
+    "number": 10701,
+    "title": "thrift proxy test driver dependencies",
+    "created_at": "2020-04-08T17:25:22Z",
+    "closed_at": "2022-04-26T00:54:08Z",
+    "labels": [
+      "tech debt",
+      "help wanted"
+    ],
+    "url": "https://github.com/envoyproxy/envoy/issues/10701",
+    "body": "Envoy's thrift proxy network filter uses some python code to generate a variety of requests and responses in the various combinations of thrift transport and protocol that are support. One of the supported protocols, colloquially known as \"ttwitter\", is no longer supported in python and is not compatible with python3, blocking #4552.\r\n\r\nThe actual python3 incompatibility is in the twitter.common.rpc package and involves a type check against `long`, which no longer exists in python3. The fix is simple, but as the package is no longer support I don't expect we'll see an update. \r\n\r\nThis issue enumerates so possible paths forward:\r\n\r\n1. It's fairly simple to patch the library to remove the check for `long`. I think this is reasonable in the short-term.\r\n\r\n2. Bring the unsupported twitter.common.rpc code into the envoyproxy org (not necessarily envoyproxy/envoy), and fix it. I dislike this path because the entire point of using external libraries was to test against a different implementation of the protocol. If the protocol were ever updated (and it does have a versioning provision) we'd be implementing both sides of the integration test.\r\n\r\n3. Thrift supports other languages besides python and it should be possible to rewrite the code in `test/extensions/filters/network/thrift_proxy/driver` in another language. Java seems the mostly likely candidate since it's supported by bazel and has support for all the variations of thrift. I think we'd want to put that code in a new repository (under the envoyproxy org) and treat the entire payload generating structure as an external dependency.\r\n\r\n4. Deprecate ttwitter support and delete usage of the abandoned libraries. I don't have a sense of how much the ttwitter thrift protocol is used in conjunction with Envoy so I don't know how to gauge how painful this would be to end users.\r\n",
+    "comments_url": "https://api.github.com/repos/envoyproxy/envoy/issues/10701/comments",
+    "author": "zuercher",
+    "comments": [
+      {
+        "user": "zuercher",
+        "created_at": "2020-04-08T17:29:17Z",
+        "body": "#10702 implements the first option above."
+      },
+      {
+        "user": "zuercher",
+        "created_at": "2022-04-26T00:54:08Z",
+        "body": "For anyone going across this bug in the future -- we chose option 4 and have deprecated the ttwitter protocol."
+      }
+    ]
+  }
+]

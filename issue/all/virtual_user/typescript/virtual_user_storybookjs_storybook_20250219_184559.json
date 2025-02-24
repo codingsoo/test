@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/storybookjs/storybook/issues/13080",
+    "source": {
+      "issue_number": 13080
+    },
+    "initial_question": {
+      "title": "Angular Storybook: Using a service Dependency Injection in a child component",
+      "body": "### Bug or support request summary\r\nUsing a service DI in a child component that uses data from the same service that was previously initiated by a parent component.\r\n \r\nI expected there to be a way in the story of the child component, to initiate the service with the mockup data i want (before the story rendering) so then the child component can use it as happens in my app.\r\n\r\n### Steps to reproduce\r\nIn my app.component I use the service and send it some data\r\napp.component.ts\r\n\r\n```js\r\n  constructor(\r\n    private transferStateService: TransferStateService,\r\n    private pricingService: PricingService,\r\n  ) {\r\n  }\r\n  async ngOnInit(): Promise<void> {\r\n    const state = this.transferStateService.getState();\r\n    this.pricingService.initPricing(state.pricing, state.currency);\r\n  }\r\n```\r\n\r\nafter using this.pricingService.initPricing(state.pricing, state.currency)  I now have some data in the service.\r\nIn a child component I use the same service:\r\n\r\npricing.component.ts\r\n```js\r\n  constructor(\r\n    private pricingService: PricingService\r\n  ) { }\r\n\r\n  ngOnInit(): void {\r\n    this.pricing = this.pricingService.getPricing();\r\n  }\r\n```\r\n\r\nThe reason I can use this.pricingService.getPricing() is only that in app.component I already passed to the service all the needed data by calling this.pricingService.initPricing(state.pricing, state.currency)\r\n\r\nIn my pricing.component.ts story i want to somehow call the pricingService.initPricing with my mockup data so the when the component story is rendered I can use my service there to receive the data.\r\n\r\nCurrently my pricing.component story: \r\n```js\r\nexport default {\r\n  title: 'core/pricing',\r\n  component: PricingComponent,\r\n  decorators: [\r\n    moduleMetadata({\r\n      imports: [PipesModule, DirectivesModule, BodyModule],\r\n      declarations: [AppComponent]\r\n    })\r\n  ]\r\n} as Meta;\r\n\r\nconst Template: Story<PricingComponent> = (args: PricingComponent) => ({\r\n  component: PricingComponent,\r\n  props: args,\r\n});\r\n\r\nexport const Primary = Template.bind({});\r\nPrimary.args = {\r\n};\r\n```\r\n\r\n### Version\r\n\r\n    \"@storybook/addon-actions\": \"^6.0.26\",\r\n    \"@storybook/addon-essentials\": \"^6.0.26\",\r\n    \"@storybook/addon-links\": \"^6.0.26\",\r\n    \"@storybook/angular\": \"^6.0.26\",\r\n    \"@storybook/storybook-deployer\": \"^2.8.7\",\r\n\r\n    \"@angular/common\": \"~10.0.6\",\r\n    \"@angular/compiler\": \"~10.0.6\",\r\n    \"@angular/core\": \"~10.0.6\","
+    },
+    "satisfaction_conditions": [
+      "Child component must be able to access initialized service data in Storybook",
+      "Service must be initialized with mock data before component rendering",
+      "Service initialization must occur within the Storybook configuration",
+      "Solution must maintain the existing dependency injection pattern"
+    ],
+    "created_at": "2020-11-11T09:11:21Z"
+  }
+]

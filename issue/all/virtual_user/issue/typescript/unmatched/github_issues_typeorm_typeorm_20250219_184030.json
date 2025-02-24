@@ -1,0 +1,193 @@
+[
+  {
+    "number": 4258,
+    "title": "Prevent nullification of missing related entities",
+    "created_at": "2019-06-08T09:25:52Z",
+    "closed_at": "2019-06-22T21:52:44Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/4258",
+    "body": "**Issue type:**\r\n\r\n[x] question\r\n[ ] bug report\r\n[ ] feature request\r\n[ ] documentation issue\r\n\r\n**Database system/driver:**\r\n\r\n[ ] `cordova`\r\n[ ] `mongodb`\r\n[ ] `mssql`\r\n[ ] `mysql` / `mariadb`\r\n[ ] `oracle`\r\n[x] `postgres`\r\n[ ] `cockroachdb`\r\n[ ] `sqlite`\r\n[ ] `sqljs`\r\n[ ] `react-native`\r\n[ ] `expo`\r\n\r\n**TypeORM version:**\r\n\r\n[ ] `latest`\r\n[ ] `@next`\r\n[x] `0.2.17` (or put your version here)\r\n\r\n**Steps to reproduce or a small repository showing the problem:**\r\n\r\nIn our backend system, we face the problem of editing entities with relations by several clients. Given the following scenario:\r\n\r\n\r\n```@Entity(\"game\")\r\nexport class game {\r\n\t...some columns ...\r\n\r\n\t@OneToMany(type => gamelanguagerelation, gamelanguagerelations =>\r\n\tgamelanguagerelations.fk_gameid, { cascade: ['insert', 'update'] })\r\n\tgamelanguagerelations:gamelanguagerelation[];\r\n}\r\n```\r\n\r\nIf one client (user A) now creates a new game and submits this to the backend, a second user (user B) could create a new `gamelanguagerelation` for this game on his side. He will submit this relation within the whole game object to the backend. Then, the user A uses its offline copy of this game to also add a new `gamelanguagerelation` with a new (UUID) primary key. When sending this new relation (also within a game object) to the backend, typeorm tries to nullify the first relation (which was inserted by user B) since it is not part of the entity of user A. This even happens if cascade is only set to insert or update (but not remove). Unfortunately, save operation fails in this case because the foreign key (fk_gameid in gamelanguagerelation) is not nullable. Even if it would succeed, I don't want to 'orphanize' missing relations.\r\n\r\nIs there a way in typeorm to not nullify missing relations in a data set, that gets saved?\r\n\r\nThanks in advance!\r\n",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/4258/comments",
+    "author": "mgreg89",
+    "comments": [
+      {
+        "user": "Kononnable",
+        "created_at": "2019-06-22T14:31:05Z",
+        "body": "Ok, so problem is that you've got an entity which doesn't have actual data and it destroys some of your new data on `save`? You should use `preload` to load an actual state of data or use an query builder(probably even a relationalQueryBuilder)."
+      },
+      {
+        "user": "Kononnable",
+        "created_at": "2019-06-22T21:52:44Z",
+        "body": "`cascade:remove` is pretty complex subject and is discussed in few other issues.\r\n\r\nAs for why it is removed - you're telling typeorm to save a state of an object(an entity). Part of the object is the relation(doesn't matter where it is stored) - you're telling it to set entity as empty table(or at least 'not so full'), so it does that. Cascades do something different - they define if related entity should also be saved - other entity fields, not just state of the relation."
+      }
+    ]
+  },
+  {
+    "number": 3575,
+    "title": "ID gets appended to field name",
+    "created_at": "2019-02-04T15:43:16Z",
+    "closed_at": "2019-02-04T16:20:45Z",
+    "labels": [
+      "question",
+      "comp: relations"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/3575",
+    "body": "**Issue type:**\r\n\r\n[x] question\r\n[ ] bug report\r\n[ ] feature request\r\n[ ] documentation issue\r\n\r\n**Database system/driver:**\r\n\r\n[ ] `cordova`\r\n[ ] `mongodb`\r\n[ ] `mssql`\r\n[x] `mysql` / `mariadb`\r\n[ ] `oracle`\r\n[ ] `postgres`\r\n[ ] `sqlite`\r\n[ ] `sqljs`\r\n[ ] `react-native`\r\n[ ] `expo`\r\n\r\n**TypeORM version:**\r\n\r\n[x] `latest`\r\n[ ] `@next`\r\n[ ] `0.x.x` (or put your version here)\r\n\r\nI have a problem regarding many to one\r\n```ts\r\n@Entity()\r\nexport class Post {\r\n    @PrimaryGeneratedColumn({type: 'int'})\r\n    id: number\r\n    @ManyToOne(type => User, user => user.id)\r\n    @Column({type: 'int'})\r\n    authorId: User\r\n}\r\n```\r\n```ts\r\n@Entity()\r\nexport class User {\r\n    @PrimaryGeneratedColumn({type: 'int'})\r\n    id: number\r\n}\r\n```\r\nWhen I try to get all posts via\r\n```ts\r\nconst posts = await this.postRepository.find({\r\n                       relations: ['authorId']\r\n                       })\r\n```\r\nI get a ER_BAD_FIELD_ERROR with the message: Unknown column 'Post.authorIdId' in 'field list'\r\n<!--\r\n    To answer those questions you need to put \"x\" inside the square brackets, for example:\r\n    [x] `mysql`\r\n    [ ] `postgres`\r\n\r\n    Also, please format your code properly (by taking code blocks into ```ts .... ```)\r\n!>\r\n",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/3575/comments",
+    "author": "Murbal",
+    "comments": [
+      {
+        "user": "vlapo",
+        "created_at": "2019-02-04T16:14:09Z",
+        "body": "You have `ManyToOne` and `Column` defined for one property. if you want to have `authorId` and `author` property in your `Post` entity:\r\n```typescript\r\n@Entity()\r\nexport class Post {\r\n    @PrimaryGeneratedColumn({type: 'int'})\r\n    id: number\r\n\r\n    @Column({type: 'int'})\r\n    authorId: number\r\n\r\n    @ManyToOne(type => User, user => user.id)\r\n    author: User;\r\n}\r\n```\r\nand of course call find like this:\r\n```typescript\r\nconst posts = await this.postRepository.find({\r\n      relations: ['author']\r\n})\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1345,
+    "title": "Is it possible to define (A | B)[] relation?",
+    "created_at": "2017-12-14T17:34:07Z",
+    "closed_at": "2017-12-14T22:57:26Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/1345",
+    "body": "First of all, thank you all for this great package \u2013 it's a breeze \ud83d\ude47\ud83c\udffb\u200d\u2642\ufe0f\r\n\r\nQuestion I have is this.\r\n\r\n```ts\r\n@Entity()\r\nclass A {\r\n  @Column()\r\n  a: string\r\n}\r\n\r\n@Entity()\r\nclass B {\r\n  @Column()\r\n  b: number\r\n}\r\n```\r\n\r\n**how to make such `C`?**\r\n\r\n```ts\r\n@Entity()\r\nclass C {\r\n  @Column(/* ??? */)\r\n  entries: (A | B)[]\r\n}\r\n```",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/1345/comments",
+    "author": "dempfi",
+    "comments": [
+      {
+        "user": "pleerock",
+        "created_at": "2017-12-14T19:52:48Z",
+        "body": "no, its not possible. If you want to bind C with A and B you need to create two relations in C with A and with B"
+      }
+    ]
+  },
+  {
+    "number": 593,
+    "title": "ManyToMany Mysql database only stores one row",
+    "created_at": "2017-06-28T12:16:51Z",
+    "closed_at": "2017-06-29T11:14:00Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/593",
+    "body": "Hello. I have 2 files, Playlist.ts and Song.ts\r\n\r\n```import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable} from \"typeorm\";\r\nimport {Song} from \"./Song\";\r\n@Entity()\r\nexport class Playlist {\r\n\r\n    @PrimaryGeneratedColumn()\r\n    id: number;\r\n\r\n    @Column()\r\n    name: string;\r\n\r\n    @Column()\r\n    users: string;\r\n\r\n    @ManyToMany(type => Song, song => song.playlists, { \r\n        cascadeInsert: true,\r\n        cascadeUpdate: true,\r\n    })\r\n    @JoinTable()\r\n    songs: Song[] =[];\r\n```\r\n\r\n\r\n```import {Entity, Column, PrimaryGeneratedColumn, ManyToMany} from \"typeorm\";\r\nimport {Playlist} from \"./Playlist\";\r\n\r\n@Entity()\r\nexport class Song {\r\n\r\n    @PrimaryGeneratedColumn()\r\n    id: number;\r\n\r\n    @Column()\r\n    name: string;\r\n\r\n    @Column()\r\n    mainArtist: string;\r\n\r\n    @Column()\r\n    allArtists: string;\r\n\r\n    @Column()\r\n    thumbnailURL: string;\r\n\r\n    @ManyToMany(type => Playlist, playlist => playlist.songs, {\r\n        cascadeInsert: true,\r\n        cascadeUpdate: true\r\n    })\r\n    playlists: Playlist[] = [];\r\n}\r\n```\r\n\r\nThen I run this snippet.\r\n\r\n```\r\n var db = req.app.locals.db;\r\n    var params = req.params;\r\n    let newSong = new Song();\r\n      newSong.mainArtist = \"Drake\";\r\n      newSong.allArtists = \"Drake\";\r\n      newSong.name = \"Signs\"\r\n      newSong.thumbnailURL = \"random_url\";\r\n      \r\n    let playlist = await db\r\n    .getRepository(Playlist)\r\n    .findOneById(1);\r\n\r\n    newSong.playlists.push(playlist);\r\n    let songRepository = db.getRepository(Song)\r\n    .save(newSong)\r\n    .then(song => console.log(\"Song has been saved\"))\r\n    .catch(error => console.log(\"Cannot save. Error: \", error));\r\n```\r\n\r\nThe mysql joined table is `playlist_songs_song_playlists`, but there is only one row at a time. It always just adds the latest one. It is like it is overwriting the table. Any ideas why this is happening? I would appreciate the help!\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/593/comments",
+    "author": "AAAstorga",
+    "comments": [
+      {
+        "user": "pleerock",
+        "created_at": "2017-06-28T12:52:50Z",
+        "body": "try to remove intitialization from all your relations, e.g. `songs: Song[] =[];` replace to `songs: Song[];` and assign array manually when you write value. You have such problem because you are loading object without loading its elements and when you save it again with empty array ORM thinks you removed all items from your relation and removes them from the database."
+      }
+    ]
+  },
+  {
+    "number": 577,
+    "title": "Impossible to execute the Quick Start",
+    "created_at": "2017-06-24T17:40:20Z",
+    "closed_at": "2017-06-27T20:00:15Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/577",
+    "body": "Hi everybody,\r\n\r\nI would like to test typeorm with MySQL 2.13.0 on Visual code studio. The version used is 0.1.0-alpha.19. I have copied your following example \r\n\r\n```ts\r\nimport \"reflect-metadata\";\r\nimport {createConnection} from \"typeorm\";\r\nimport {Photo} from \"./entity/Photo\";\r\n\r\ncreateConnection({\r\n    driver: {\r\n        type: \"mysql\",\r\n        host: \"localhost\",\r\n        port: 3306,\r\n        username: \"root\",\r\n        password: \"admin\",\r\n        database: \"test\"\r\n    },\r\n    entities: [\r\n        Photo\r\n    ],\r\n    autoSchemaSync: true,\r\n}).then(connection => {\r\n    // here you can start to work with your entities\r\n}).catch(error => console.log(error));\r\n```\r\nand I have the following message error \r\n\r\nfile: 'file:///d%3A/sandbox/nest-test/src/tests/orm/app.ts'\r\nseverity: 'Erreur'\r\nmessage: 'Argument of type '{ driver: { type: \"mysql\"; host: string; port: number; username: string; password: string; databa...' is not assignable to parameter of type 'ConnectionOptions'.\r\n  Type '{ driver: { type: \"mysql\"; host: string; port: number; username: string; password: string; databa...' is not assignable to type '**MongoConnectionOptions**'.\r\n    Property 'type' is missing in type '{ driver: { type: \"mysql\"; host: string; port: number; username: string; password: string; databa...'.'\r\nat: '20,18'\r\nsource: 'ts'\r\n\r\nI have try to use connectionOptions \r\n\r\nimport \"reflect-metadata\";\r\nimport {createConnection} from \"typeorm\";\r\nimport {Photo} from \"./entity/Photo\";\r\nimport {MysqlConnectionOptions} from \"../../../node_modules/typeorm/driver/mysql/MysqlConnectionOptions.js\";\r\n\r\nconst connectionOptions: MysqlConnectionOptions = {\r\n    driver: {\r\n        type: \"mysql\",\r\n        host: \"localhost\",\r\n        port: 3306,\r\n        username: \"root\",\r\n        password: \"admin\",\r\n        database: \"test\"\r\n    },\r\n    entities: [Photo],\r\n    autoSchemaSync: true\r\n};\r\n\r\nand I have the following message\r\n\r\nfile: 'file:///d%3A/sandbox/nest-test/src/tests/orm/app.ts'\r\nseverity: 'Erreur'\r\nmessage: 'Type '{ driver: { type: \"mysql\"; host: string; port: number; username: string; password: string; databa...' **is not assignable to type 'MysqlConnectionOptions**'.\r\n  Property 'type' is missing in type '{ driver: { type: \"mysql\"; host: string; port: number; username: string; password: string; databa...'.'\r\nat: '7,7'\r\nsource: 'ts'\r\n\r\nI don't understand why it is checking connectionOptions from MongoDb and not MySQL. If there is somebody who can give me an indication, I will be happy.\r\n\r\nThanks in advance.",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/577/comments",
+    "author": "afontange",
+    "comments": [
+      {
+        "user": "pleerock",
+        "created_at": "2017-06-27T12:03:20Z",
+        "body": "Can you please try to extract \"driver\" section into connection options this way:\r\n\r\n```ts\r\ncreateConnection({\r\n        type: \"mysql\",\r\n        host: \"localhost\",\r\n        port: 3306,\r\n        username: \"root\",\r\n        password: \"admin\",\r\n        database: \"test\",\r\n    entities: [\r\n        Photo\r\n    ],\r\n    autoSchemaSync: true,\r\n}).then(connection => {\r\n    // here you can start to work with your entities\r\n}).catch(error => console.log(error));\r\n```"
+      },
+      {
+        "user": "pleerock",
+        "created_at": "2017-06-27T19:59:52Z",
+        "body": "yes you can create `@Index({ unique: true })`, you can put index to class and create composite indices, or you can put in on columns. Also you can mark column as unique: `@Column({ unqiue: true })`"
+      },
+      {
+        "user": "JoshGlazebrook",
+        "created_at": "2017-07-25T04:00:08Z",
+        "body": "Is this an issue of the docs being out of date? I also ran into this.\r\n\r\nEdit: Actually it appears the alpha versions are being published under the latest tag rather than a alpha/beta tag on npm, so these alpha versions are being installed by default for everyone.\r\n\r\nIs there a reason these aren't on a special tag?"
+      },
+      {
+        "user": "pleerock",
+        "created_at": "2017-07-25T11:22:50Z",
+        "body": "actually latest alpha versions overall are much more stable then 0.0.11 version, so I recommend to use it instead. Some of the docs are out of date unfortunately, I'll fix it once I get more free time (or anyone can help me ;))"
+      }
+    ]
+  },
+  {
+    "number": 562,
+    "title": "MySQL column type: Medium/Long Text",
+    "created_at": "2017-06-21T04:57:44Z",
+    "closed_at": "2017-06-21T10:01:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/562",
+    "body": "Hi, does TypeORM support Medium/Long Text column data type for MySQL, Seem it only support Text when I add column with type 'text' or 'json'.",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/562/comments",
+    "author": "brookshi",
+    "comments": [
+      {
+        "user": "pleerock",
+        "created_at": "2017-06-21T07:44:17Z",
+        "body": "what typeorm version are you using?"
+      },
+      {
+        "user": "brookshi",
+        "created_at": "2017-06-21T09:31:51Z",
+        "body": "I'm using 0.0.9."
+      },
+      {
+        "user": "pleerock",
+        "created_at": "2017-06-21T09:45:55Z",
+        "body": "Medium/Long Text is supported only in latest 0.1.0-alpha versions."
+      }
+    ]
+  },
+  {
+    "number": 450,
+    "title": "Saving a relationship",
+    "created_at": "2017-05-02T22:14:30Z",
+    "closed_at": "2017-05-04T18:37:31Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/450",
+    "body": "I'm probably just doing this wrong. I'm trying to add related object to another object through a many2many relationship.\r\n\r\nHere's my scenario:\r\n\r\nUser->hasFriends [User] (many2many)\r\nUser->hasGroups [Group] (many2many)\r\n\r\nWhen i want to add a group to a user I\r\n1) fetch the respective user\r\n2) left join the groups\r\n3) fetch my respective group\r\n4) push my group, user.addGroup(group)\r\n5) persist my user object.\r\n\r\nThis works; but deletes all friend relationships. If I add a friend to my user; all group relationships get deleted.\r\n\r\nHere are my model definitions:\r\n\r\nUser:\r\n\r\n\trequire(\"reflect-metadata\");\r\n\timport {Entity, PrimaryColumn, Column, ManyToMany, JoinTable} from \"typeorm\";\r\n\timport Group from './Group';\r\n\t\r\n\t\r\n\t@Entity()\r\n\texport default class User {\r\n\t\r\n\t    @PrimaryColumn(\"int\", { generated: true })\r\n\t    id = undefined;\r\n\t\r\n\t    @Column(\"string\")\r\n\t    email = \"\";\r\n\t\r\n\t    @Column(\"string\")\r\n\t    firstname = \"\";\r\n\t\r\n\t    @Column(\"string\")\r\n\t    lastname = \"\";    \r\n\t    \r\n\t    @Column(\"string\")\r\n\t    middlename = \"\";\r\n\t    \r\n\t    @Column(\"string\")\r\n\t    password = \"\";\r\n\t    \r\n\t    @Column(\"string\")\r\n\t    salt = \"\";\r\n\t       \r\n\t    \r\n\t    setEmail(email) {\r\n\t\t    this.email = email;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getEmail() {\r\n\t\t    return this.email;\t    \r\n\t    }\r\n\t    \r\n\t    setFirstname(firstname) {\r\n\t\t    this.firstname = firstname;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getFirstname() {\r\n\t\t    return this.firstname;\r\n\t    }\r\n\t    \r\n\t    setLastname(lastname) {\r\n\t\t    this.lastname = lastname;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getLastname() {\r\n\t\t    return this.lastname;\r\n\t    }\r\n\t    \r\n\t    setMiddlename(middlename) {\r\n\t\t    this.middlename = middlename;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getMiddlename() {\r\n\t\t    return this.middlename;\r\n\t    }\r\n\t    \r\n\t    setPassword(password) {\r\n\t\t    this.password = password;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getPassword() {\r\n\t\t    return this.password;\r\n\t    }\r\n\t    \r\n\t    setSalt(salt) {\r\n\t\t    this.salt = salt;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getSalt() {\r\n\t\t    return this.salt;\r\n\t    }\r\n\t    \r\n\t    addFriend(friend) {\r\n\t\t    this.friends.push(friend);\r\n\t    }\r\n\t\r\n\t    getGroups() {\r\n\t\t    return this.groups;\r\n\t    }\r\n\t    \r\n\t    addGroup(group) {\r\n\t\t    this.groups.push(group);\r\n\t    }\r\n\t    \r\n\t    getFriends() {\r\n\t\t    return this.friends;\r\n\t    }\r\n\t    \r\n\t    getFriendsInverse() {\r\n\t\t    return this.friends;\r\n\t    }\r\n\t    \r\n\t\r\n\t\t@ManyToMany(type => User, user => user.friendsInverse, {\r\n\t\t\tcascadeInsert: false,\r\n\t\t\tcascadeUpdate: false,\r\n\t\t})\r\n\t\t@JoinTable()\r\n\t\tfriends = [];\r\n\t\r\n\t\t@ManyToMany(type => User, user => user.friends, {\r\n\t\t\tcascadeInsert: true,\r\n\t\t\tcascadeUpdate: true,\r\n\t\t\tcascadeRemove: false,\r\n\t\t})\r\n\t\tfriendsInverse = [];\r\n\t\t\r\n\t\t\r\n\t    @ManyToMany(type => Group, group => group.users, {\r\n\t        cascadeInsert: true,\r\n\t        cascadeUpdate: true,\r\n\t        cascadeRemove: false\r\n\t    })\r\n\t    groups = [];\r\n\t    \r\n\t    \r\n\t}\r\n\r\n\r\nGroup:\r\n\r\n\trequire(\"reflect-metadata\");\r\n\timport {Entity, PrimaryColumn, Column, ManyToMany, JoinTable} from \"typeorm\";\r\n\timport User from './User';\r\n\t\r\n\t@Entity()\r\n\texport default class Group {\r\n\t\r\n\t    @PrimaryColumn(\"int\", { generated: true })\r\n\t    id = undefined;\r\n\t\r\n\t    @Column(\"string\")\r\n\t    title = \"\";\r\n\t\r\n\t    @Column(\"string\")\r\n\t    description = \"\";\r\n\t\r\n\t    \r\n\t    setTitle(title) {\r\n\t\t    this.title = title;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getTitle() {\r\n\t\t    return this.title;\t    \r\n\t    }\r\n\t    \r\n\t    setDescription(description) {\r\n\t\t    this.description = description;\r\n\t\t    return this;\r\n\t    }\r\n\t    \r\n\t    getDescription() {\r\n\t\t    return this.description;\r\n\t    }\r\n\t\r\n\t\t@ManyToMany(type => User, user => user.groups, {\r\n\t\t\tcascadeInsert: true,\r\n\t        cascadeUpdate: true,\r\n\t        cascadeRemove: true\r\n\t\t})\r\n\t\t@JoinTable()\r\n\t\tusers = [];\r\n\t    \r\n\t    \r\n\t}\r\n\r\n-------\r\n\r\nIs this the expected behaviour?\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/450/comments",
+    "author": "Matt007",
+    "comments": [
+      {
+        "user": "pleerock",
+        "created_at": "2017-05-03T04:40:44Z",
+        "body": "Remove initializations from your model ` = []`. When you load object without friends and there is initialization orm thinks that you have remove all friends from your object and removes them. There is no way it can understand is it just initialized empty array or its empty because all entities were removed."
+      }
+    ]
+  },
+  {
+    "number": 149,
+    "title": "AbstractTable doesnt work in inherited classes",
+    "created_at": "2016-12-25T16:21:16Z",
+    "closed_at": "2016-12-25T18:59:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/typeorm/typeorm/issues/149",
+    "body": "Hi all!\r\nI have problem with AbstractTable decorator. Error:\r\n_MissingPrimaryColumnError: Entity \"Post\" does not have a primary column. Primary column is required to have in all your entities. Use @PrimaryColumn decorator to add a primary column to your entity._\r\nFiles:\r\n**BasePost.ts**:\r\n```\r\nimport {PrimaryGeneratedColumn, Column} from \"typeorm\";\r\nimport {AbstractTable} from \"typeorm\";\r\n\r\n@AbstractTable()\r\nexport class BasePost {\r\n    @PrimaryGeneratedColumn()\r\n    id: number;\r\n\r\n    @Column()\r\n    title: string;\r\n}\r\n```\r\n**Post.ts**:\r\n```\r\nimport {Column, Table} from \"typeorm\";\r\nimport {BasePost} from \"./BasePost\";\r\n\r\n@Table(\"post\")\r\nexport class Post extends BasePost {\r\n    @Column()\r\n    text: string;\r\n}\r\n```\r\n**app.ts**:\r\n```\r\nimport \"reflect-metadata\";\r\nimport { createConnection } from \"typeorm\";\r\nimport { Post } from \"./entities/Post\";\r\n\r\ncreateConnection({\r\n  driver: {\r\n    type: \"postgres\",\r\n    host: \"host\",\r\n    port: 7755,\r\n    username: \"postgres\",\r\n    password: \"pass\",\r\n    database: \"testdatabase\"\r\n  },\r\n  entities: [\r\n    Post\r\n  ],\r\n  autoSchemaSync: true\r\n  }).then(connection => {\r\n    console.log('Good!');\r\n  })\r\n  .catch(reason => {\r\n    console.log(reason);\r\n});\r\n```\r\nWhat is wrong?\r\nNodeJS version: 7.3.0\r\nTypescript version: 2.1.4\r\nTypeORM version: 0.0.5",
+    "comments_url": "https://api.github.com/repos/typeorm/typeorm/issues/149/comments",
+    "author": "CocaColaBear",
+    "comments": [
+      {
+        "user": "pleerock",
+        "created_at": "2016-12-25T18:46:34Z",
+        "body": "Please include `BasePost` in a list of your `entities: [Post, BasePost]`"
+      }
+    ]
+  }
+]

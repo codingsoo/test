@@ -1,0 +1,20 @@
+[
+  {
+    "number": 22,
+    "title": "[Question] What's the differences between `Tag` and `Component` in the framework",
+    "created_at": "2024-10-13T12:25:46Z",
+    "closed_at": "2025-01-11T12:29:26Z",
+    "labels": [],
+    "url": "https://github.com/friflo/Friflo.Engine.ECS/issues/22",
+    "body": "I find that entity is copied fully no matter change(add/remove) tags or components. It seems that component is already sufficient and tag is useless.\r\n\r\nAnd is there plan to implement changing tag more lightly?",
+    "comments_url": "https://api.github.com/repos/friflo/Friflo.Engine.ECS/issues/22/comments",
+    "author": "inmny",
+    "comments": [
+      {
+        "user": "friflo",
+        "created_at": "2025-01-11T12:08:35Z",
+        "body": "The main difference a component can have data a tag not.\r\nThis enables to store tags very efficient.\r\n\r\nAn entity with a specific tag is moved to an `Archetype` containing this tag.\r\nSo no additional \"component\" data is stored when using tags.\r\nAlso when moving entities between archetypes no \"component\" data needs to be copied.\r\nThis makes the use of tags already very \"light\".\r\nDon't see any opportunities to make this even lighter."
+      }
+    ]
+  }
+]

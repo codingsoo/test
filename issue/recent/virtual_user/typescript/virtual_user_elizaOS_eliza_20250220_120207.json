@@ -1,0 +1,52 @@
+[
+  {
+    "id": "https://github.com/elizaOS/eliza/issues/2265",
+    "source": {
+      "issue_number": 2265
+    },
+    "initial_question": {
+      "title": "Log in info safe on character.json file vs .env?",
+      "body": "Just a quick question about the safety of inputting our login information for social media platforms on the files. Is it safe to input them on the character.json file under \"secrets\", or is it better to have them in the .env?\r\n\r\n What if you are running more than one character? Is there a way to add 2 different login info for the same platform (e.g twitter, or discord) in the .env and have them be assigned to different characters.json?"
+    },
+    "satisfaction_conditions": [
+      "Sensitive login credentials must be stored securely outside of character configuration files",
+      "Multiple sets of credentials for the same platform must be uniquely identifiable",
+      "Character configurations must be able to reference their specific credential sets"
+    ],
+    "created_at": "2025-01-13T23:40:29Z"
+  },
+  {
+    "id": "https://github.com/elizaOS/eliza/issues/2035",
+    "source": {
+      "issue_number": 2035
+    },
+    "initial_question": {
+      "title": "How to update to new version release? [v0.1.7-alpha.2] to [v0.1.7]",
+      "body": "I am currently on [v0.1.7-alpha.2] and want to update to the latest version [v0.1.7]. How do i do that?\r\n\r\nDo i use this: git checkout $(git describe --tags --abbrev=0)\r\nAnd then run pnpm install again?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Successfully switches to the target version v0.1.7",
+      "Dependencies are properly updated for the new version",
+      "Build process completes successfully for new version",
+      "Existing configuration files and user data persist through update"
+    ],
+    "created_at": "2025-01-08T21:53:06Z"
+  },
+  {
+    "id": "https://github.com/elizaOS/eliza/issues/1622",
+    "source": {
+      "issue_number": 1622
+    },
+    "initial_question": {
+      "title": "Initial setup based on docs not working",
+      "body": "**Describe the bug**\r\nCant get minimal setup running with OpenAI API as model\r\nError on agent terminal after message being sent via client\r\n\r\n**To Reproduce**\r\n1. clone repo, install deps, build\r\n2. choose openai as model on default tate character file:\r\n`    \"modelProvider\": \"openai\",\r\n    \"settings\": {\r\n        \"voice\": {\r\n            \"model\": \"en_US-male-medium\"\r\n        }\r\n    },\r\n    `\r\n3. Add openai API key to .env `OPENAI_API_KEY=sk-proj-xxx`\r\n4.  `pnpm run start --characters=\"../characters/tate.character.json\"`\r\n5. `pnpm start:client`\r\n6. send message via client\r\n7. receive error on agent terminal:\r\n``\": \\\"The model gpt-4o does not exist or you do not have access to it.\\\",\\n        \\\"type\\\": \\\"invalid_request_error\\\",\\n        \\\"param\\\": null,\\n        \\\"code\\\": \\\"model_not_found\\\"\\n    }\\n}\\n\",\"isRetryable\":false,\"data\":{\"error\":{\"message\":\"The model `gpt-4o` does not exist or you do not have access to it.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"model_not_found\"}}}`\r\n`\r\n\r\n**Expected behavior**\r\n\r\nNo error, use openai API and receive response on client\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "OpenAI API account must have sufficient credits",
+      "Valid OpenAI API key must be properly configured",
+      "Client successfully receives responses from the model",
+      "No model-related error messages appear in terminal"
+    ],
+    "created_at": "2024-12-31T22:35:20Z"
+  }
+]

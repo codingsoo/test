@@ -1,0 +1,37 @@
+[
+  {
+    "id": "https://github.com/ghost1372/DevWinUI/issues/34",
+    "source": {
+      "issue_number": 34
+    },
+    "initial_question": {
+      "title": "'System.TypeLoadException' in DevWinUI.Controls.dll launching app with Win SDK 1.7 Preview 1",
+      "body": "Hi!  I am getting 'System.TypeLoadException' in DevWinUI.Controls.dll launching app with Win SDK 1.7 Preview 1, app won't launch.  Known issue?  Thanks!"
+    },
+    "satisfaction_conditions": [
+      "Application successfully launches without crashing",
+      "Compatible versions of DevWinUI and Windows SDK are used together",
+      "No critical TypeLoadException errors occur in DevWinUI.Controls.dll",
+      "Core application functionality remains operational",
+      "Version consistency is maintained across all related components"
+    ],
+    "created_at": "2025-02-12T21:43:30Z"
+  },
+  {
+    "id": "https://github.com/ghost1372/DevWinUI/issues/10",
+    "source": {
+      "issue_number": 10
+    },
+    "initial_question": {
+      "title": "[Question] Best practice for ThemeService in multi-window application?",
+      "body": "Hi,\r\n\r\nWhen using the ThemeService, it must be initialized with the window as a parameter.  In a multi-window app, should a new ThemeService be created for each window and its settings set to the main application window's settings?  Or should the main window's ThemeService just call .Initialize() on the newly created window?\r\n\r\nAlso, what is the best method for applying changes to the settings (tint color, backdrop) to all open windows?  If the above answer is to create a separate TheemService for each window, should I just apply the settings to each window's ThemeService in a loop?\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Theme settings must be consistently applied across all application windows",
+      "The system must maintain awareness of all active application windows",
+      "Theme management must be centrally coordinated",
+      "New windows must be properly integrated into the theming system upon creation"
+    ],
+    "created_at": "2024-12-07T02:06:40Z"
+  }
+]

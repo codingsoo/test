@@ -1,0 +1,236 @@
+[
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/2147",
+    "source": {
+      "issue_number": 2147
+    },
+    "initial_question": {
+      "title": "Specify model name like \"claude-sonnet-latest\"",
+      "body": "### Issue\n\nI have these options in my config file to use o1-preview as my architect and claude-sonnet as my editor, \r\n\r\no1-preview: true\r\narchitect: true\r\neditor-model: claude-3-5-sonnet-20241022\r\n\r\nthis works, but it'd be great if I could say something like \"claude-sonnet-latest\" instead of that specific date version.  for example, it appears I can use the more generic model name \"gpt-4o\".  I'm guessing this is really just an artifact of how these api's work, but still it'd be nice if aider would abstract over that for me and let me just say somehow in my config \"use the latest, whatever that may be\".  \n\n### Version and model info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Configuration accepts a version-agnostic model identifier"
+    ],
+    "created_at": "2024-10-24T23:28:37Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/1976",
+    "source": {
+      "issue_number": 1976
+    },
+    "initial_question": {
+      "title": "Use a git repo in a different folder",
+      "body": "### Issue\n\nFirst off, thank you for this incredible tool.  It has changed my view of LLM's and made me appreciate them so much more!\r\n\r\nI'd like to use aider from a folder other than my git repo.  `git` itself has an option for this: `-C`.  Does aider have any support for this.\r\n\r\nMy use case is that I'm using direnv from a directory that is not the root of my git repo.  I want to use aider from this dir, too.  I can't just put direnv at the root of my repo because I have multiple different configurations I use for various tasks with this repo.\r\n\r\nWith other tools, there is an environmental variable I can use.  For example, PIPENV_PIPFILE for pipenv and PYTHONPATH.  \n\n### Version and model info\n\nLatest version of aider"
+    },
+    "satisfaction_conditions": [
+      "Aider must be able to operate on a git repository from a working directory outside that repository"
+    ],
+    "created_at": "2024-10-08T16:07:27Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/1834",
+    "source": {
+      "issue_number": 1834
+    },
+    "initial_question": {
+      "title": "Uncaught NotFoundError in utils.py line 8071",
+      "body": "Aider version: 0.58.0\r\nPython version: 3.12.3\r\nPlatform: Linux-6.8.0-45-generic-x86_64-with-glibc2.39\r\nPython implementation: CPython\r\nVirtual environment: Yes\r\nOS: Linux 6.8.0-45-generic (64bit)\r\nGit version: git version 2.43.0\r\n\r\nAn uncaught exception occurred:\r\n\r\n```\r\nTraceback (most recent call last):\r\n  File \"openai.py\", line 907, in completion\r\n    raise e\r\n  File \"openai.py\", line 825, in completion\r\n    self.make_sync_openai_chat_completion_request(\r\n  File \"openai.py\", line 683, in make_sync_openai_chat_completion_request\r\n    raise e\r\n  File \"openai.py\", line 672, in make_sync_openai_chat_completion_request\r\n    raw_response = openai_client.chat.completions.with_raw_response.create(\r\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_legacy_response.py\", line 353, in wrapped\r\n    return cast(LegacyAPIResponse[R], func(*args, **kwargs))\r\n                                      ^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_utils.py\", line 274, in wrapper\r\n    return func(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^\r\n  File \"completions.py\", line 704, in create\r\n    return self._post(\r\n           ^^^^^^^^^^^\r\n  File \"_base_client.py\", line 1268, in post\r\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\r\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_base_client.py\", line 945, in request\r\n    return self._request(\r\n           ^^^^^^^^^^^^^^\r\n  File \"_base_client.py\", line 1049, in _request\r\n    raise self._make_status_error_from_response(err.response) from None\r\nopenai.NotFoundError: Error code: 404 - {'error': {'message': 'The model `o1-mini` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"main.py\", line 1419, in completion\r\n    raise e\r\n  File \"main.py\", line 1372, in completion\r\n    response = openai_o1_chat_completions.completion(\r\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"o1_handler.py\", line 58, in completion\r\n    response = super().completion(\r\n               ^^^^^^^^^^^^^^^^^^^\r\n  File \"openai.py\", line 914, in completion\r\n    raise OpenAIError(\r\nlitellm.llms.OpenAI.openai.OpenAIError: Error code: 404 - {'error': {'message': 'The model `o1-mini` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"aider\", line 8, in <module>\r\n    sys.exit(main())\r\n             ^^^^^^\r\n  File \"main.py\", line 727, in main\r\n    coder.run()\r\n  File \"base_coder.py\", line 730, in run\r\n    self.run_one(user_message, preproc)\r\n  File \"base_coder.py\", line 773, in run_one\r\n    list(self.send_message(message))\r\n  File \"base_coder.py\", line 1208, in send_message\r\n    saved_message = self.auto_commit(edited)\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"base_coder.py\", line 1891, in auto_commit\r\n    res = self.repo.commit(fnames=edited, context=context, aider_edits=True)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"repo.py\", line 110, in commit\r\n    commit_message = self.get_commit_message(diffs, context)\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"repo.py\", line 195, in get_commit_message\r\n    commit_message = simple_send_with_retries(\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"sendchat.py\", line 44, in wrapper\r\n    return decorated_func(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_sync.py\", line 105, in retry\r\n    ret = target(*args, **kwargs)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"sendchat.py\", line 102, in simple_send_with_retries\r\n    _hash, response = send_completion(**kwargs)\r\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"sendchat.py\", line 83, in send_completion\r\n    res = litellm.completion(**kwargs)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"utils.py\", line 1086, in wrapper\r\n    raise e\r\n  File \"utils.py\", line 974, in wrapper\r\n    result = original_function(*args, **kwargs)\r\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"main.py\", line 2847, in completion\r\n    raise exception_type(\r\n          ^^^^^^^^^^^^^^^\r\n  File \"utils.py\", line 8194, in exception_type\r\n    raise e\r\n  File \"utils.py\", line 8071, in exception_type\r\n    raise NotFoundError(\r\nlitellm.exceptions.NotFoundError: litellm.NotFoundError: NotFoundError: OpenrouterException - Error code: 404 - {'error': {'message': 'The model `o1-mini` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}\r\n\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Model access is successfully established",
+      "No NotFoundError exceptions occur during model requests",
+      "Model configuration settings are properly recognized by the system"
+    ],
+    "created_at": "2024-09-30T04:57:30Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/1295",
+    "source": {
+      "issue_number": 1295
+    },
+    "initial_question": {
+      "title": "Q: When adding the output of a command to the chat, if you choose a message is that added in addition to the output or in place of?",
+      "body": "### Issue\n\nI just wanted to clarify an ambiguity on the Y/N/Message prompt you get after you run a command:\r\n\r\n```\r\nAdd the output to the chat?                                                                                                                                                                                                \r\n(Y)es/(n)o/message with instructions:\r\n\r\n```\r\nIf you choose message is that (Y) with message or (n) with message?\r\n\r\nAider aider 0.54.10\r\nModel: --sonnet\n\n### Version and model info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "User must receive clear confirmation that entering a message includes the command output",
+      "The Y/N/message prompt behavior must be accurately explained",
+      "The relationship between message input and output inclusion must be explicitly stated"
+    ],
+    "created_at": "2024-09-02T10:39:13Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/1154",
+    "source": {
+      "issue_number": 1154
+    },
+    "initial_question": {
+      "title": "[Question] How to add context in the chat window without triggering a model response?",
+      "body": "### Issue\n\nHi all!\r\n\r\nI know it is possible to create a file, add it and have that be my \"extra\" context. But sometimes I just want to add a bit of context without going through the hassle of the file stuff. \r\n\r\nI currently do /ask for this, but this seems 1) wasteful 2) the model response may confuse the context I am trying to add.\r\n\r\nIs there a way to add context to the chat history without triggering any model response?\n\n### Version and model info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Context can be added to chat history without triggering model response",
+      "Context addition method is more efficient than creating separate files",
+      "Method works within an IDE/editor integration scenario"
+    ],
+    "created_at": "2024-08-23T08:32:47Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/1129",
+    "source": {
+      "issue_number": 1129
+    },
+    "initial_question": {
+      "title": "\ud83e\udeb2 BUG During reflector ",
+      "body": "### Issue\r\n\r\nI'm error that Only 3 reflector are allowed ? why and how to solve it ? is anyone facing this issue ?\r\n\r\n### Version and model info\r\n\r\nAIDER V.50.1\r\nMODEL : DEEPSEEK"
+    },
+    "satisfaction_conditions": [
+      "Model interaction successfully resumes after clearing context",
+      "Large files are processed without triggering reflector limits",
+      "Code complexity remains manageable for the model"
+    ],
+    "created_at": "2024-08-19T18:09:54Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/1068",
+    "source": {
+      "issue_number": 1068
+    },
+    "initial_question": {
+      "title": "[Bug] \"/add\" command fails with \"--subtree-only\" option when searching for files",
+      "body": "### Issue\n\nWhen using Aider with the `--subtree-only` command line option, the `/add` command fails to add files when only the file name is provided, even though it correctly identifies matching files.\r\n\r\n## Steps to reproduce:\r\n1. Start Aider with the `--subtree-only` option\r\n2. Try to add a file using only its name with the `/add` command\r\n\r\n## Expected behavior:\r\nAider should search for the file within the allowed subtree and ask if I want to add it if found.\r\n\r\n## Actual behavior:\r\nAider identifies matching files but skips them, citing that they match an \"aiderignore spec\".\r\n\r\n## Example interaction:\r\n```\r\n> /add example_file.dart\r\n\r\nSkipping /path/to/project/subtree/example_file.dart that matches aiderignore spec.\r\n```\r\n\r\n## Additional information:\r\n- This behavior only occurs when the `--subtree-only` option is used.\r\n- The error message mentions an \"aiderignore spec\", which seems unrelated to the `--subtree-only` option.\n\n### Version and model info\n\nAider v.0.49.1"
+    },
+    "satisfaction_conditions": [
+      "File matching works with partial filenames",
+      "Clear feedback is provided about file search results",
+      "Tab completion shows available file matches"
+    ],
+    "created_at": "2024-08-13T01:47:44Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/1024",
+    "source": {
+      "issue_number": 1024
+    },
+    "initial_question": {
+      "title": "Do files need to be /drop then /add after a big change in git?",
+      "body": "### Issue\n\nWhen I checkout a commit in git and there is a significant change to a file, does it need to be /drop then /add back in, or is it automatically updated to the latest code?\n\n### Version and model info\n\nAider: latest\r\nLLM: Sonnet 3.5"
+    },
+    "satisfaction_conditions": [
+      "File content matches checked out commit",
+      "No manual file operations required",
+      "Working directory stays synchronized"
+    ],
+    "created_at": "2024-08-07T10:54:36Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/998",
+    "source": {
+      "issue_number": 998
+    },
+    "initial_question": {
+      "title": "deepseek/coder suggests only how to edit the files but doesnt edit it directly. how to make it edit the files and make changes directly on the files?",
+      "body": "### Issue\n\nas titled\n\n### Version and model info\n\nlatest\r\ndeepseek/deepseek-coder"
+    },
+    "satisfaction_conditions": [
+      "The AI model must directly modify files rather than just suggesting changes",
+      "The file editing functionality must work with the deepseek/deepseek-coder model",
+      "Changes must be executable through the aider interface"
+    ],
+    "created_at": "2024-08-04T01:10:35Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/640",
+    "source": {
+      "issue_number": 640
+    },
+    "initial_question": {
+      "title": "Question: Generate new project using Aider?",
+      "body": "### Issue\n\nHello,  \r\nhow can I start new project from scratch using Aider? For example, how can I tell Aider to _\"Generate boilerplate for Chrome extension which will have popup window with one button.\"_ ? \r\n\r\nSuch task requires creation of multiple files. And I want Aider to think of the proper file names, it's content etc. \r\n\r\nThank you. \n\n### Version and model info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Aider must generate multiple files when given a project creation prompt",
+      "Generated files must form a complete, working project structure",
+      "Aider must autonomously determine appropriate file names and content",
+      "Project generation must work in an empty directory",
+      "Generated files must match the project type specified in the prompt"
+    ],
+    "created_at": "2024-06-03T22:01:21Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/601",
+    "source": {
+      "issue_number": 601
+    },
+    "initial_question": {
+      "title": "gpt-4o model context window error",
+      "body": "Thank you for this great program!\r\n\r\nUsing the gpt-4o model to edit a single markdown file, I keep running into the cryptic error below, or variations of the same.  It seems like I should be nowhere near an error situation, but requests fail with this message, saying 7k tokens exceeds the context window size, which it reports as 128k.  Similar writing requests made to any of the gpt-3.5 or gpt-4 models seem to work just fine, although I'd prefer to use the faster, cheaper, and hopefully smarter gtp-4o.\r\n\r\nThe expectation is that the returned text diff would be applied to the files.  The actual result is the error message quoted below.\r\n\r\nAider v0.35.1-dev                                                                                                                                                         \r\nModels: openai/gpt-4o with diff edit format, weak model gpt-3.5-turbo                                                                                                     \r\nGit repo: .git with 8 files                                                                                                                                               \r\nRepo-map: using 1024 tokens                                                                                                                                               \r\n\r\n```\r\nThe chat session is larger than the context window!                                                                     \r\n                                                                                                                                                                          \r\nApproximate context window usage, in tokens:                                                                                                                              \r\n                                                                                                                                                                          \r\n$ 0.0045      902 system messages                                                                                                                                         \r\n$ 0.0059    1,172 chat history    use /clear to clear                                                                                                                     \r\n$ 0.0261    5,227 app.md          use /drop to drop from chat                                                                                                             \r\n$ 0.0009      171 diagrams.md     use /drop to drop from chat                                                                                                             \r\n==================                                                                                                                                                        \r\n$ 0.0374    7,472 tokens total                                                                                                                                            \r\n          120,528 tokens remaining in context window                                                                                                                      \r\n          128,000 tokens max context window size                                                                                                                          \r\n                                                                                                                                                                          \r\nTo reduce token usage:                                                                                                                                                    \r\n - Use /drop to remove unneeded files from the chat session.                                                                                                              \r\n - Use /clear to clear chat history.                \r\n```"
+    },
+    "satisfaction_conditions": [
+      "Alternative processing paths are available"
+    ],
+    "created_at": "2024-05-13T23:23:06Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/547",
+    "source": {
+      "issue_number": 547
+    },
+    "initial_question": {
+      "title": "Files not created / saved",
+      "body": "When asking questions or reporting issues, it is very helpful if you can include:\r\n\r\n- Aider version `aider 0.28.0`\r\n- Model being used (`gpt-4-xxx`, etc) `gpt-3.5-turbo` & `gpt-4-1106-preview`\r\n- Other switches or config settings that are active\r\n\r\n```\r\nAider v0.28.0\r\nModel: gpt-3.5-turbo using whole edit format\r\nGit repo: ../.git with 255 files\r\nRepo-map: using 1024 tokens\r\nUse /help to see in-chat commands, run with --help to see cmd line args\r\n```\r\n\r\nPrompt: `create python hello world file save to h.py`\r\n\r\nAider showed me the content and let me choose if I want to save the file, I pressed enter to choose default answer (y), then I run `/exit` and check if `h.py` was there - it wasn't. \r\n\r\nI don't know why this happened, could you help me please?"
+    },
+    "satisfaction_conditions": [
+      "File is created in the correct directory location",
+      "User is informed about file location behavior",
+      "File creation confirmation is accurate"
+    ],
+    "created_at": "2024-04-11T18:49:22Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/471",
+    "source": {
+      "issue_number": 471
+    },
+    "initial_question": {
+      "title": ".gitignore: .aider* -> .aider.* to preserve .aiderignore by default.",
+      "body": "When asking questions or reporting issues, it is very helpful if you can include:\r\n\r\n```\r\nStarting aider with model gpt-4\r\n\r\nLoading aider:\r\n  remember to use /help for a list of commands\r\n\r\nAider v0.23.0\r\nVSCode terminal detected, pretty output has been disabled.\r\nAdd .aider* to .gitignore (recommended)? n\r\nModel: gpt-4 using diff edit format\r\nGit repo: .git with 16,518 files\r\nWarning: For large repos, consider using an .aiderignore file to ignore irrelevant files/dirs.\r\nRepo-map: using 1024 tokens\r\nAdded Dockerfile to the chat.\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      ".aiderignore file must be able to be tracked in git repository",
+      "Other .aider* files (like logs and temporary files) must be excluded from git tracking",
+      "Configuration must persist across repository usage"
+    ],
+    "created_at": "2024-02-09T01:07:18Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/438",
+    "source": {
+      "issue_number": 438
+    },
+    "initial_question": {
+      "title": "Option to let Aider stage the changes without committing them ?",
+      "body": "I know that there is an option to show the diff in the terminal but IDE's are naturally better suited to show the changes visually. So I wonder if Aider has an **option to stage all changes without committing them unless asked to do so**? That would allow me to check the changes in VSCode to see exactly where and what was changed.\r\n\r\nI've already checked the option list with /help but am not sure if e.g. `--no-auto-commits` would have the desired effect.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Changes made by Aider must be visible in staging area without automatic commit",
+      "Changes must be viewable in IDE's diff interface",
+      "User must retain control over when commits are made"
+    ],
+    "created_at": "2024-01-08T12:50:17Z"
+  },
+  {
+    "id": "https://github.com/Aider-AI/aider/issues/153",
+    "source": {
+      "issue_number": 153
+    },
+    "initial_question": {
+      "title": "Is there a way to exclude the .env file from cTag?",
+      "body": "Hey, maybe this is already done, but I couldn't find anything related to that. What I actually want: I don't want the .env file being mapped and send to OpenAI."
+    },
+    "satisfaction_conditions": [
+      "Git repository functionality remains intact"
+    ],
+    "created_at": "2023-07-26T13:38:45Z"
+  }
+]

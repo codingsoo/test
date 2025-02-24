@@ -1,0 +1,81 @@
+[
+  {
+    "id": "https://github.com/remittor/zapret-openwrt/issues/105",
+    "source": {
+      "issue_number": 105
+    },
+    "initial_question": {
+      "title": "\u041d\u0430\u0441\u0442\u0440\u043e\u0438\u0442\u044c \u0437\u0430\u043f\u0440\u0435\u0442 \u0442\u043e\u043b\u044c\u043a\u043e \u0434\u043b\u044f youtube",
+      "body": "\u041f\u043e\u0434\u0441\u043a\u0430\u0436\u0438\u0442\u0435, \u043f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u043a\u0430\u043a \u043d\u0430\u0441\u0442\u0440\u043e\u0438\u0442\u044c \u0437\u0430\u043f\u0440\u0435\u0442 \u0442\u0430\u043a, \u0447\u0442\u043e\u0431\u044b \u043e\u043d \u0440\u0430\u0431\u043e\u0442\u0430\u043b \u0442\u043e\u043b\u044c\u043a\u043e \u0434\u043b\u044f youtube?\n\n\u0412\u0441\u0435 \u043e\u0441\u0442\u0430\u043b\u044c\u043d\u043e\u0435 \u0431\u0443\u0434\u0435\u0442 \u0438\u0434\u0442\u0438 \u0447\u0435\u0440\u0435\u0437 \u0412\u041f\u041d."
+    },
+    "satisfaction_conditions": [
+      "YouTube traffic is specifically filtered while VPN traffic remains unaffected",
+      "Configuration correctly identifies and processes YouTube-related network traffic",
+      "Network filtering rules maintain VPN functionality for non-YouTube traffic",
+      "Configuration remains functional for both HTTP and HTTPS YouTube connections"
+    ],
+    "created_at": "2025-02-17T15:37:50Z"
+  },
+  {
+    "id": "https://github.com/remittor/zapret-openwrt/issues/66",
+    "source": {
+      "issue_number": 66
+    },
+    "initial_question": {
+      "title": "\u041e\u0448\u0438\u0431\u043a\u0430 \u043f\u0440\u0438 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0438 \u043d\u0430 v70 ",
+      "body": "\u0414\u043e\u0431\u0440\u044b\u0439 \u0434\u0435\u043d\u044c!\r\n\r\n\u041f\u0440\u0438 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0438 \u0441 v69.20241206 \u043d\u0430 v70 \u043f\u043e\u043b\u0443\u0447\u0430\u044e \u043e\u0448\u0438\u0431\u043a\u0443 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0438 \u043f\u0430\u043a\u0435\u0442\u0430\r\n\r\n```\r\nCollected errors:\r\n * pkg_init_from_file: Malformed package file /tmp/upload.ipk.\r\n\u041a\u043e\u043c\u0430\u043d\u0434\u0430 opkg install \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u043b\u0430\u0441\u044c \u0441 \u043a\u043e\u0434\u043e\u043c \u043e\u0448\u0438\u0431\u043a\u0438 255.\r\n```\r\n\r\nOpenWrt 23.05.3 r23809-234f1a2efa \u044f\u0434\u0440\u043e 5.15.150. \u041f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0430 x86/64\r\n\r\n\u0421 \u0447\u0435\u043c \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u0441\u0432\u044f\u0437\u0430\u043d\u043e? \u041f\u0440\u0435\u0434\u044b\u0434\u0443\u0449\u0438\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f \u0443\u0441\u0442\u0430\u043d\u0430\u0432\u043b\u0438\u0432\u0430\u043b\u0438\u0441\u044c \u0431\u0435\u0437 \u043f\u0440\u043e\u0431\u043b\u0435\u043c.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The correct version of the package must be available for the system"
+    ],
+    "created_at": "2025-01-16T10:26:10Z"
+  },
+  {
+    "id": "https://github.com/remittor/zapret-openwrt/issues/50",
+    "source": {
+      "issue_number": 50
+    },
+    "initial_question": {
+      "title": "Unknown package. mips_24kc",
+      "body": "TP-Link TL-WDR4300 v1\r\nOpenWrt 23.05.5 r24106\r\npackage manager \u0443\u043a\u0430\u0437\u044b\u0432\u0430\u0435\u0442, \u0447\u0442\u043e \u0430\u0440\u0445\u0438\u0442\u0435\u043a\u0442\u0443\u0440\u0430 mips_24kc, \u043d\u043e \u043f\u0440\u0438 \u043f\u043e\u043f\u044b\u0442\u043a\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c zapret_70.20250109_mips_24kc.ipk (\u043a\u0430\u043a \u0438 v69 \u0438 v68) \u043f\u043e\u043b\u0443\u0447\u0430\u044e \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0435:\r\n\r\nCollected errors:\r\n * pkg_hash_check_unresolved: cannot find dependency libnfnetlink0 for libnetfilter-queue1\r\n * pkg_hash_fetch_best_installation_candidate: Packages for libnetfilter-queue1 found, but incompatible with the architectures configured\r\n * pkg_hash_check_unresolved: cannot find dependency libcap for zapret\r\n * pkg_hash_check_unresolved: cannot find dependency zlib for zapret\r\n * pkg_hash_fetch_best_installation_candidate: Packages for zapret found, but incompatible with the architectures configured\r\n * opkg_install_cmd: Cannot install package zapret."
+    },
+    "satisfaction_conditions": [
+      "Package repository information must be successfully updated"
+    ],
+    "created_at": "2025-01-10T01:00:28Z"
+  },
+  {
+    "id": "https://github.com/remittor/zapret-openwrt/issues/26",
+    "source": {
+      "issue_number": 26
+    },
+    "initial_question": {
+      "title": "\u041d\u0443\u0436\u043d\u044b \u0431\u0438\u043b\u0434\u044b APK",
+      "body": "\u041d\u0430 OpenWRT SNAPSHOT \u043f\u0435\u0440\u0435\u0448\u043b\u0438 \u043f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e \u043d\u0430 APK. \u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u044b \u0441\u0431\u043e\u0440\u043a\u0438 Zapret \u0434\u043b\u044f APK."
+    },
+    "satisfaction_conditions": [
+      "APK packages for Zapret are available and accessible",
+      "Package installation succeeds despite untrusted source restrictions",
+      "APK files can be transferred to the router's storage",
+      "Both Zapret core and LuCI interface packages are installable"
+    ],
+    "created_at": "2024-11-20T08:19:40Z"
+  },
+  {
+    "id": "https://github.com/remittor/zapret-openwrt/issues/20",
+    "source": {
+      "issue_number": 20
+    },
+    "initial_question": {
+      "title": "\u041e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0435 \u0432\u0435\u0440\u0441\u0438\u0439",
+      "body": "\u041d\u0435 \u043d\u0430\u0448\u0435\u043b \u0432 \u0438\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u0438 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f.\r\n\u041d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 \u043f\u0435\u0440\u0435\u0435\u0437\u0434 \u0441 67 \u0432\u0435\u0440\u0441\u0438\u0438 \u043d\u0430 68 (\u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d\u044b 2 \u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0445 ipk-\u0444\u0430\u0439\u043b\u0430).\r\n\u0420\u0430\u0431\u043e\u0442\u0430\u0435\u0442 \u043b\u0438 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0435 \u0447\u0435\u0440\u0435\u0437 System - Software - Updates? \r\n"
+    },
+    "satisfaction_conditions": [
+      "System update functionality successfully handles IPK package updates",
+      "Update process maintains OpenWRT standards compliance",
+      "Update mechanism works for all installed IPK files",
+      "System's built-in update interface is functional"
+    ],
+    "created_at": "2024-11-12T05:18:03Z"
+  }
+]

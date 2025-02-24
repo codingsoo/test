@@ -1,0 +1,118 @@
+[
+  {
+    "number": 1211,
+    "title": "cline checkpoints results in constant password prompts if commit signing is enabled",
+    "created_at": "2025-01-09T10:17:22Z",
+    "closed_at": "2025-01-09T21:51:48Z",
+    "labels": [],
+    "url": "https://github.com/cline/cline/issues/1211",
+    "body": "### What happened?\n\nOnce I upgraded cline to 3.1.0 I started getting popups about my gpg password after every cline action. This is rather disrupting. The reason is that we sign commits by default and cline creates checkpoint commits using the default git configuration, so it also tries to sign every commit. It would be nice to either have a way to disable checkpoint feature, or prevent git from using global config by setting `GIT_CONFIG_GLOBAL=/dev/null` when calling git to commit the checkpoint.\n\n### Steps to reproduce\n\n1. enable commit signing in the default git config using: `git config --global commit.gpgSign true`. You also need gpg to be configured.\r\n2. try using cline, you should see pop-ups for a password on every step\r\n\r\n\n\n### Relevant API REQUEST output\n\n_No response_\n\n### Operating System\n\nMacOS\n\n### Cline Version\n\n3.1.2\n\n### Additional context\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/cline/cline/issues/1211/comments",
+    "author": "shaydo-deriv",
+    "comments": [
+      {
+        "user": "saoudrizwan",
+        "created_at": "2025-01-09T21:51:49Z",
+        "body": "I just pushed v3.1.4 that disables `gpgSigning` in the shadow git repo. Please LMK if that fixes the issue for you, and feel free to reopen if not."
+      }
+    ]
+  },
+  {
+    "number": 969,
+    "title": "MCP hub not available error",
+    "created_at": "2024-12-20T18:13:43Z",
+    "closed_at": "2024-12-23T02:41:29Z",
+    "labels": [
+      "Bug"
+    ],
+    "url": "https://github.com/cline/cline/issues/969",
+    "body": "### Which API Provider are you using?\r\n\r\nAnthropic\r\n\r\n### Which Model are you using?\r\n\r\nClaude 3.5 Sonnet\r\n\r\n### What happened?\r\n\r\nWhen sending a message to Cline chat, I got a \"API Streaming failed: MCP hub not available\" error.\r\n\r\n### Steps to reproduce\r\n\r\n1. Install Cline for VS Code w/ fresh settings\r\n2. Send a message to Cline chat\r\n3. Get a \"API Streaming failed: MCP hub not available\" error.\r\n\r\n### Relevant API REQUEST output\r\n\r\n_No response_\r\n\r\n### Additional context\r\n\r\nUsing Windows 11 w/ a WSL project open.",
+    "comments_url": "https://api.github.com/repos/cline/cline/issues/969/comments",
+    "author": "SkyfallWasTaken",
+    "comments": [
+      {
+        "user": "saoudrizwan",
+        "created_at": "2024-12-22T05:37:18Z",
+        "body": "I believe restarting VSCode should fix this issue. Someone in the discord mentioned they were using windsurf with cline, updated to the latest and saw this issue, but after quitting and restarting the issue was resolved. Please let me know if this helps"
+      },
+      {
+        "user": "tpdph",
+        "created_at": "2024-12-24T19:30:15Z",
+        "body": "If you move it to the pannel or secondary position it seems to reset as well without having to fully restart"
+      },
+      {
+        "user": "liucclear",
+        "created_at": "2024-12-31T17:01:20Z",
+        "body": "> If you move it to the pannel or secondary position it seems to reset as well without having to fully restart\r\n\r\nmove it and fail again"
+      },
+      {
+        "user": "agileandy",
+        "created_at": "2025-01-22T06:44:34Z",
+        "body": "Trying to run any model through Ollama is failing with a 404.\n\nOllama is serving fine to the cli, and browser. \n"
+      },
+      {
+        "user": "ranedisk",
+        "created_at": "2025-01-27T01:26:32Z",
+        "body": "have the same issue,  i managed to partially fix it w/ the comment above  to \"move the pannel or secondary position\" then nothing happend, restarted it and it then worked but only the deepseek-chat, the reasoner does not work anymore , same issue on another desktop. Still getting this error \" API streaming Failed Cannot read properties of undefined (reading 'type')]\"  with reasoner. Spins for 10m+ and finally get the message above.\n\nMay not be related but i do see deepseek has it's own exetension now for VS, wondering if maybe some modules may have broken.\nI did see another post somewhere having to modify something ( lost that link)"
+      },
+      {
+        "user": "agileandy",
+        "created_at": "2025-01-27T10:47:29Z",
+        "body": "> Trying to run any model through Ollama is failing with a 404.\n> \n> Ollama is serving fine to the cli, and browser.\n\nI've reverted to v3.2 and everything works.\n"
+      },
+      {
+        "user": "Hamza5",
+        "created_at": "2025-02-17T21:44:23Z",
+        "body": "This problem started when I moved Cline from the primary sidebar to the secondary one! (The same sidebar that has Copilot Chat). The solution was to restore Cline to the primary sidebar and then restart VS Code.\n\nThis is really strange because the choice of the sidebar is a UX matter and should not affect the function of Cline."
+      }
+    ]
+  },
+  {
+    "number": 415,
+    "title": "Bug: You might want to check Openrouter Claude 3.5 Sonnet prompt caching in latest version",
+    "created_at": "2024-09-27T19:30:12Z",
+    "closed_at": "2024-10-11T02:20:20Z",
+    "labels": [
+      "Bug"
+    ],
+    "url": "https://github.com/cline/cline/issues/415",
+    "body": "### Which API Provider are you using?\n\nOpenRouter\n\n### Which Model are you using?\n\n Claude 3.5 Sonnet\n\n### What happened?\n\nI could be wrong, but it seems as if prompt caching isn't working like it did in previous versions. I'm spending on tokens much faster, it seems. \n\n### Steps to reproduce\n\n1.Test caching compared to previous versions.\r\n2.\r\n3.\r\n\n\n### Relevant API REQUEST output\n\n_No response_\n\n### Additional context\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/cline/cline/issues/415/comments",
+    "author": "techcow2",
+    "comments": [
+      {
+        "user": "CodemiteX",
+        "created_at": "2024-09-30T16:28:03Z",
+        "body": "Using v1.9.7 of Claude Dev using Sonnet3.5 with OpenRouter.   The Agent has a tendency to remove code blocks that have nothing to do with suggested edits.  The Cache Count seems to rise and bill keeps going up but it acts like it doesn't know what it just did. It keeps apologizing and has to then add in the deleted code it erased. this is costing allot of tokens. I went through the troubleshooting section and tried to address it that way but it seems to happen every time and becomes taxing. Claude Website and OpenAI chat sessions seem to handle it better. This tool has a long way to go to handle existing code bases that more than a few classes.  \r\n\r\nSAMPLE RESPONSE:\r\nI apologize for the oversight. It seems that some methods were accidentally removed or not included in our previous update. Let's add the missing methods back to the BackgroundService.cs file. I'll update the file with the missing methods while keeping our previous changes intact."
+      },
+      {
+        "user": "Shirryon",
+        "created_at": "2024-10-03T02:13:52Z",
+        "body": "Having the same issue. 3.5 Sonnet without caching goes by way too fast. Also, there's no information about the caching itself, compared with the API provided by Claude."
+      },
+      {
+        "user": "saoudrizwan",
+        "created_at": "2024-10-11T02:20:20Z",
+        "body": "v2.0 fixes some issues around openrouter prompt caching. Please give it a try and let me know if you're still seeing problems. Keep in mind that the cache will still break in certain situations: when an image is added to chat, if 5 minutes has passed since the last message, if you hit the context window limit and the extension has to truncate your message history to keep the conversation going."
+      }
+    ]
+  },
+  {
+    "number": 53,
+    "title": "529 Overload Error",
+    "created_at": "2024-08-08T10:23:19Z",
+    "closed_at": "2024-08-08T11:51:43Z",
+    "labels": [],
+    "url": "https://github.com/cline/cline/issues/53",
+    "body": "Hello, \r\n\r\nI'm new to Claude Dev and have this error \"API Request Failed\r\n\r\n529 {\"type\":\"error\",\"error\":{\"type\":\"overloaded_error\",\"message\":\"Overloaded\"}}\"\r\n\r\nI wanted to know if it is a personnal issue or an API issue. (I have 0 token send nad find it wierd)(Newbie developer BTW)\r\n\r\nTHnaks in advance for your project.",
+    "comments_url": "https://api.github.com/repos/cline/cline/issues/53/comments",
+    "author": "hibouyave",
+    "comments": [
+      {
+        "user": "saoudrizwan",
+        "created_at": "2024-08-08T11:51:44Z",
+        "body": "From Anthropic's docs: \"529 - overloaded_error: Anthropic\u2019s API is temporarily overloaded.\" Please try again later or use a different provider (OpenRouter is working fine)"
+      }
+    ]
+  }
+]

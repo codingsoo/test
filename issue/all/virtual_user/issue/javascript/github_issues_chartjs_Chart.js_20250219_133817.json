@@ -1,0 +1,29 @@
+[
+  {
+    "number": 2431,
+    "title": "Docs for adding mixed charts - Line and Bar",
+    "created_at": "2016-05-02T11:32:18Z",
+    "closed_at": "2016-08-10T00:13:13Z",
+    "labels": [
+      "type: bug",
+      "help wanted",
+      "type: documentation"
+    ],
+    "url": "https://github.com/chartjs/Chart.js/issues/2431",
+    "body": "I'm unable to find out the docs in version 2 of Charts.js. \nAny idea how to go about adding mixed charts ?  ( A line and bar graph in the same chart)\n",
+    "comments_url": "https://api.github.com/repos/chartjs/Chart.js/issues/2431/comments",
+    "author": "thelostone-mc",
+    "comments": [
+      {
+        "user": "etimberg",
+        "created_at": "2016-05-02T11:56:11Z",
+        "body": "@adityaanandmc you would do the following:\n\n``` javascript\nvar chartInstance = new Chart(ctx, {\n  data: {\n    datasets: [{\n      // Makes this dataset bars\n      type: 'bar',\n      data: []\n    }, {\n      // Makes this dataset a line\n      type: 'line'\n    }]\n  }\n});\n```\n"
+      },
+      {
+        "user": "thelostone-mc",
+        "created_at": "2016-05-03T18:36:08Z",
+        "body": "@etimberg  That didn't seem to work for me!! -  It didn't display the bar graph, just the line graph\nThis instead did work : \n\n```\nvar chartInstance = new Chart(ctx, {\n  type: 'bar', // Setting this as the default\n  data: {\n    datasets: [{\n      // Makes this dataset bars by default\n      data: []\n    }, {\n      // Makes this dataset a line\n      type: 'line'\n    }]\n  }\n});\n```\n"
+      }
+    ]
+  }
+]

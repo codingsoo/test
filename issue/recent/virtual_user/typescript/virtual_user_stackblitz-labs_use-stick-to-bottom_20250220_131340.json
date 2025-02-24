@@ -1,0 +1,32 @@
+[
+  {
+    "id": "https://github.com/stackblitz-labs/use-stick-to-bottom/issues/12",
+    "source": {
+      "issue_number": 12
+    },
+    "initial_question": {
+      "title": "Add state for \"scrolling to bottom\" ",
+      "body": "I am implementing the ability to stop scrolling when a particular div reaches the top of the viewable area. The stopScroll function is perfect for this. However, I'm finding it would be nice to have a variable that indicates that scrollToBottom is currently executing so if my component re-renders while it's scrolling to the bottom, it doesn't see that my div is outside the scrollable area and stop the scroll. Essentially being able to do:\r\n\r\n```\r\nif(!scrollingToBottom){\r\n   //do logic for stopping scroll\r\n}\r\n```\r\n\r\nThis would also be beneficial for skipping certain actions if the component renders and the initial scroll is executing."
+    },
+    "satisfaction_conditions": [
+      "A way to detect when automatic scrolling is in progress",
+      "Ability to prevent scroll interruption during automatic scrolling",
+      "State information accessible during component rendering"
+    ],
+    "created_at": "2025-01-14T02:49:40Z"
+  },
+  {
+    "id": "https://github.com/stackblitz-labs/use-stick-to-bottom/issues/11",
+    "source": {
+      "issue_number": 11
+    },
+    "initial_question": {
+      "title": "Request for use-stick-to-bottom Support for React 19.0.0",
+      "body": "Hi @samdenty,\r\n\r\nCould you please update `use-stick-to-bottom` to support React 19.0.0? The current version 1.0.42 doesn't meet the peer dependency requirement for this React version.\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Peer dependency requirements are satisfied"
+    ],
+    "created_at": "2024-12-30T00:34:04Z"
+  }
+]

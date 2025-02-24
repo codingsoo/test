@@ -1,0 +1,100 @@
+[
+  {
+    "number": 1533,
+    "title": "Is it possible to createServer without waiting to finish hash checks?",
+    "created_at": "2018-10-26T08:59:37Z",
+    "closed_at": "2018-10-26T13:16:40Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/webtorrent/webtorrent/issues/1533",
+    "body": "F.e. if 10 GB movie is already downloaded, it takes almost a minute to hash torrent and only then i can `torrent. createServer`. If it's a new torrent I can start playback in 10 seconds so it's faster to delete files and start over.\r\nWould it be possible to start `createServer` while hashing is still in progress?",
+    "comments_url": "https://api.github.com/repos/webtorrent/webtorrent/issues/1533/comments",
+    "author": "untitledlt",
+    "comments": [
+      {
+        "user": "SilentBot1",
+        "created_at": "2018-10-26T13:16:40Z",
+        "body": "Hey @untitledlt,\r\n\r\nCould I ask for you to show code examples of what you are talking about?\r\n\r\n>if 10 GB movie is already downloaded, it takes almost a minute to hash torrent and only then i can torrent. createServer\r\n\r\nHow are you adding the already downloaded torrent? Are you calling `client.seed` or `client.add`?\r\n\r\nIf you are sure you have the entire torrent downloaded, you can pass the option `skipVerify: true` in `client.add` to disable verifying downloaded chunks, note if the full file isn't downloaded and this option is set to true, the torrent will think it has all the parts and not continue the partial download.\r\n\r\nAlso seeding via `client.add` will require either another peer to already have the metadata or require the torrent to be added via its metadata (either .torrent or saved `parse-torrent` object) but will allow all verification to be skipped in conjunction with the option `skipVerify`. \r\n\r\nAs this is a question I'm going to close this, but feel free to continue the discussion, I'll be happy to help."
+      },
+      {
+        "user": "untitledlt",
+        "created_at": "2018-10-26T13:53:36Z",
+        "body": "Thanks for an answer!\r\nI'm gonna keep all `.torrent` files in separate folder and i'll add them with `client.add` on every app restart. \r\nNew `.torrent`s will be added the same way while application is running.\r\n\r\nI guess I should store every torrent state to database so i would know which torrent is completed and use `skipVerify: true` for completed ones. Or is there a better way?\r\n\r\nBut still i don't understand when i should use `client.seed` and why it's better than `client.add`?"
+      },
+      {
+        "user": "SilentBot1",
+        "created_at": "2018-10-26T14:14:07Z",
+        "body": "@untitledlt I don't help with `webtorrent-desktop` too much but I believe that is similar to how they handle it. I would recommend taking a look at how `webtorrent-desktop` handles things but the code is complex and not the easiest to read.\r\n\r\n`client.seed` should be used when you want to create a torrent from complete files, this includes creating the .torrent file which needs to generate the hash of each chunk for verification. \r\n\r\n`client.add` should be used when you want to add an existing torrent and don't want to re-generate the metadata (though verifying the integrity of the file against the .torrent file before you start seeding is recommended but takes time).\r\n\r\nHope this helps."
+      },
+      {
+        "user": "untitledlt",
+        "created_at": "2018-10-26T14:19:24Z",
+        "body": "Looks like `client.add` is all i need then.\r\nIs it possible to trigger hash check later if i add torrent with `skipVerify: true`?"
+      },
+      {
+        "user": "SilentBot1",
+        "created_at": "2018-10-26T14:55:40Z",
+        "body": "You can't re-verify the torrent easily after passing `skipVerify` currently. Possibly a option to re-verify a torrent would be something that could be looked into in the future."
+      }
+    ]
+  },
+  {
+    "number": 665,
+    "title": "filesystem paths do not work in the browser",
+    "created_at": "2016-03-10T07:01:40Z",
+    "closed_at": "2016-03-11T03:30:59Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/webtorrent/webtorrent/issues/665",
+    "body": "- WebTorrent version: latest \n- Node.js version: 4.0\n- Browser name/version (if using WebTorrent in the browser): Chrome/Electron\n\nI am unable to seed the torrent file as it throws me an error \"filesystem paths do not work in the browser\". Electron as wrapped file system with path attribute after uploading file. Is there any way to get around this problem.\n",
+    "comments_url": "https://api.github.com/repos/webtorrent/webtorrent/issues/665/comments",
+    "author": "ajainvivek",
+    "comments": [
+      {
+        "user": "feross",
+        "created_at": "2016-03-11T03:30:59Z",
+        "body": "Works fine for me in Electron. You must be changing what `require('fs')` returns somehow. Are you browserify the script? Or using `webtorrent.min.js`? Don't do that -- just use `require('webtorrent')`.\n\nThe error you're seeing comes from this code in `create-torrent`:\n\n``` js\n    if (typeof fs.stat !== 'function') {\n      throw new Error('filesystem paths do not work in the browser')\n    }\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 357,
+    "title": "When seeding a file/folder from disk, don't perform extra copy to /tmp",
+    "created_at": "2015-06-12T14:10:10Z",
+    "closed_at": "2015-06-28T11:38:10Z",
+    "labels": [
+      "help wanted",
+      "area/node",
+      "bug",
+      "good first contribution"
+    ],
+    "url": "https://github.com/webtorrent/webtorrent/issues/357",
+    "body": "Hi !\n\nIf I want to seed a file from (just an example) _/home/me/videos/awesome.webm_ I see that webtorrent copy it as _/tmp/webtorrent/xxx/xxx.webm_. I wanted to know if this was really needed, since the file is already on the disk. \n\nThis could be annoying with big videos (1Go), disk space would rapidly decrease and the seeding would take much time since the disk should copy 1Go before it.\n\nThanks :)\n",
+    "comments_url": "https://api.github.com/repos/webtorrent/webtorrent/issues/357/comments",
+    "author": "Chocobozzz",
+    "comments": [
+      {
+        "user": "ericwooley",
+        "created_at": "2015-06-12T15:08:30Z",
+        "body": "I'm sure feross can enlighten us, but I'll take a stab at the question. From my limited work with the file api, it's not easy to access data from the outside of the web sandbox (by that I mean not possible). So the options would be too keep the data in memory (hope you have a lot!) or write it to disk somewhere you can access.\n"
+      },
+      {
+        "user": "Chocobozzz",
+        "created_at": "2015-06-12T15:10:57Z",
+        "body": "Oh sorry, I forgot an important thing. It's with webtorrent in a node server (_webtorrent-hybrid_).\n\nOf course in a browser I agree there is no many options.\n"
+      },
+      {
+        "user": "feross",
+        "created_at": "2015-06-12T20:31:31Z",
+        "body": "@Chocobozzz You're right, copying to /tmp is not really needed if you're seeding a file that you already have on disk. This is a bug!\n\nPR welcome!\n"
+      },
+      {
+        "user": "feross",
+        "created_at": "2015-06-28T11:39:06Z",
+        "body": "Released as 0.50.1, thanks to a PR from @janza :+1: \n"
+      }
+    ]
+  }
+]

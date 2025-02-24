@@ -1,0 +1,143 @@
+[
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/802",
+    "source": {
+      "issue_number": 802
+    },
+    "initial_question": {
+      "title": "CosyVoice2, \u8c03\u7528 FastAPI \u7684 `inference_zero_shot` \u63a5\u53e3\u540e\uff0c\u751f\u6210\u97f3\u9891\u7684\u97f3\u8272\u53d8\u7c97\u4e86",
+      "body": "**Describe the bug**\r\nCosyVoice1 \u662f\u6b63\u5e38\u7684\uff0c\u4f46\u662fCosyVoice2 \u751f\u6210\u7684\u97f3\u9891\u4e2d\uff0c\u4eba\u7684\u97f3\u8272\u53d8\u7c97\u3002prompt \u97f3\u9891\u548c 1 \u4e2d\u4f7f\u7528\u7684\u662f\u4e00\u6a21\u4e00\u6837\u7684\u3002\r\n\r\n**Expected behavior**\r\nNormal voice quality. \r\n\r\n**Desktop (please complete the following information):**\r\n - OS: Ubuntu 22.04\r\n"
+    },
+    "satisfaction_conditions": [
+      "Audio output maintains expected voice quality without distortion",
+      "Sample rate configuration matches the model's requirements",
+      "Audio output maintains consistent quality across different CosyVoice versions",
+      "Generated audio maintains proper pitch regardless of input audio sample rate"
+    ],
+    "created_at": "2024-12-29T05:19:14Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/616",
+    "source": {
+      "issue_number": 616
+    },
+    "initial_question": {
+      "title": "modify the output sampling rate to 16000hz",
+      "body": "I tried to modify the output sampling rate to 16000hz, but the audio sounds clunky, how should I correctly output 16000Hz."
+    },
+    "satisfaction_conditions": [
+      "Audio output plays at 16000Hz sampling rate"
+    ],
+    "created_at": "2024-11-04T07:34:49Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/601",
+    "source": {
+      "issue_number": 601
+    },
+    "initial_question": {
+      "title": "how does llm model prosody?",
+      "body": "\r\nWhich of the LLM inputs, speech_token or embedding, contains prosody information? Isn\u2019t the speech_feat input for flow_matching supposed to carry prosody information? Does the LLM only focus on reconstructing semantic content, while flow_matching handles the reconstruction of prosody and timbre?"
+    },
+    "satisfaction_conditions": [
+      "The response must clarify the role of LLM in processing prosody information",
+      "The response must define the role of flow_matching in the overall system",
+      "The answer must address the distribution of responsibilities between LLM and flow_matching components"
+    ],
+    "created_at": "2024-10-28T01:58:56Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/219",
+    "source": {
+      "issue_number": 219
+    },
+    "initial_question": {
+      "title": "Why there are different configs between cosyvoice.yaml and cosyvoice.fromscratch.yaml",
+      "body": "I found in cosyvoice.yaml , the llm num_blocks is 14, while that config in cosyvoice.fromscratch.yaml Half reduced, it seems that it will get a smaller model from cosyvoice.fromscratch.yaml. Is that means the cosyvoice.fromscratch.yaml is used to train the smaller model while the cosyvoice.yaml is used to train the cosyvoide-base?"
+    },
+    "satisfaction_conditions": [
+      "Configuration differences between files must be explained in terms of their intended use cases",
+      "Model size differences must be justified by training dataset or model variant requirements"
+    ],
+    "created_at": "2024-07-29T02:41:33Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/190",
+    "source": {
+      "issue_number": 190
+    },
+    "initial_question": {
+      "title": "TypeError: padding() missing 1 required positional argument: 'use_spk_embedding'",
+      "body": "**Describe the bug**\r\nWhen running `bash run.sh` in the training recipe (under `examples/libritts/cosyvoice`), I get the following error: \r\n\r\n``` \r\nTypeError: padding() missing 1 required positional argument: 'use_spk_embedding'\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Configuration file must include the 'use_spk_embedding' parameter",
+      "Parameter value must match the training mode",
+      "Correct embedding type is used based on training mode"
+    ],
+    "created_at": "2024-07-22T15:07:30Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/143",
+    "source": {
+      "issue_number": 143
+    },
+    "initial_question": {
+      "title": "where is the BPE tokenizer model used in CosyVoice",
+      "body": "I read from paper that CosyVocie use BEP to tokenize text inputs. it has a 51886 dict size, but I did not find where to get the BPE model, where can I get it ?"
+    },
+    "satisfaction_conditions": [
+      "Tokenizer model must be correctly identified and accessible",
+      "Token vocabulary size must match the specified 51866 tokens",
+      "Tokenizer source must be compatible with CosyVoice's implementation",
+      "Configuration must align with the actual tokenizer implementation"
+    ],
+    "created_at": "2024-07-15T12:36:17Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/78",
+    "source": {
+      "issue_number": 78
+    },
+    "initial_question": {
+      "title": "\u5982\u679c\u7528WeTextProcessing\u7684\u8bdd\uff0c\u50cf [laughter] \u8fd9\u79cd\u7279\u6b8a\u7b26\u53f7\u8fd8\u53ef\u4ee5\u8bc6\u522b\u51fa\u6765\u5417",
+      "body": "\u60f3\u95ee\u4e00\u4e0b\uff1a\u5982\u679c\u7528WeTextProcessing\u7684\u8bdd\uff0c\u50cf [laughter] \u8fd9\u79cd\u7279\u6b8a\u7b26\u53f7\u8fd8\u53ef\u4ee5\u8bc6\u522b\u51fa\u6765\u5417\uff1f\u611f\u8c22\uff01"
+    },
+    "satisfaction_conditions": [
+      "The correct model variant must be used for special symbol processing"
+    ],
+    "created_at": "2024-07-10T02:31:29Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/71",
+    "source": {
+      "issue_number": 71
+    },
+    "initial_question": {
+      "title": "\u5982\u5f88\u6539\u6210 ip\u8fd0\u884c",
+      "body": " python3 webui.py --port 50000 --model_dir pretrained_models/CosyVoice-300M   \u5982\u4f55\u4fee\u6539\u542f\u52a8\u7684host , \u9ed8\u8ba4\u662f\u672c\u673a\u8bbf\u95ee\uff0c\u5982\u5f88\u6539\u6210IP \u8bbf\u95ee"
+    },
+    "satisfaction_conditions": [
+      "Web interface must be accessible from remote machines on the local network",
+      "Server must accept connections on network interfaces beyond localhost",
+      "Original functionality and port specification must be preserved",
+      "Configuration method must be available through command-line or startup parameters"
+    ],
+    "created_at": "2024-07-09T08:36:35Z"
+  },
+  {
+    "id": "https://github.com/FunAudioLLM/CosyVoice/issues/7",
+    "source": {
+      "issue_number": 7
+    },
+    "initial_question": {
+      "title": "ImportError: cannot import name 'Annotated' from 'pydantic.typing'",
+      "body": "example.py is copied from official example. \r\n\r\n2024-07-05 16:29:50,876 - modelscope - INFO - PyTorch version 2.0.1+cu118 Found.\r\n2024-07-05 16:29:50,876 - modelscope - INFO - Loading ast index from /root/.cache/modelscope/ast_indexer\r\n2024-07-05 16:29:52,012 - modelscope - INFO - Loading done! Current index file version is 1.15.0, with md5 51af4c199ce0493bf05f6e6a4c460b07 and a total number of 980 components indexed\r\ntransformer is not installed, please install it if you want to use related modules\r\nTraceback (most recent call last):\r\n  File \"example.py\", line 1, in <module>\r\n    from cosyvoice.cli.cosyvoice import CosyVoice\r\n  File \"/mnt/bigclass/project/cosyvoice/CosyVoice/cosyvoice/cli/cosyvoice.py\", line 18, in <module>\r\n    from cosyvoice.cli.frontend import CosyVoiceFrontEnd\r\n  File \"/mnt/bigclass/project/cosyvoice/CosyVoice/cosyvoice/cli/frontend.py\", line 23, in <module>\r\n    import inflect\r\n  File \"/mnt/bigclass/anaconda3/envs/cosyvoice/lib/python3.8/site-packages/inflect/__init__.py\", line 77, in <module>\r\n    from pydantic.typing import Annotated\r\nImportError: cannot import name 'Annotated' from 'pydantic.typing' (/mnt/bigclass/anaconda3/envs/cosyvoice/lib/python3.8/site-packages/pydantic/typing.py)\r\n\r\nI update pydantic.typing from 2.7.0 to 2.8.3, still ...\r\nNeed I add transformers to requirements.txt?"
+    },
+    "satisfaction_conditions": [
+      "The Annotated type must be successfully imported and available for use",
+      "Dependencies must be compatible with Python 3.8 environment"
+    ],
+    "created_at": "2024-07-05T08:38:19Z"
+  }
+]

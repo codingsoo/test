@@ -1,0 +1,157 @@
+[
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/479",
+    "source": {
+      "issue_number": 479
+    },
+    "initial_question": {
+      "title": "\u8bf7\u95ee\u5982\u679c\u7b2c\u4e00\u6b21\u626b\u7801\u767b\u9646\u540e\uff0c\u7136\u540e\u624b\u673a\u5fae\u4fe1\u65ad\u7f51\uff0c\u8fd8\u80fd\u7ee7\u7eed\u4f7f\u7528\u5417",
+      "body": "\u8bf7\u95ee\u5982\u679c\u7b2c\u4e00\u6b21\u626b\u7801\u767b\u9646\u540e\u5f00\u59cb\u7fa4\u53d1\u6d88\u606f\uff0c\u7136\u540e\u624b\u673a\u5fae\u4fe1\u65ad\u7f51\uff0c\u8fd8\u80fd\u7ee7\u7eed\u53d1\u9001\u5417\uff0c\u5982\u679c\u6b64\u65f6\u6211\u518d\u626b\u7801\u767b\u5f55web\u5fae\u4fe1\u4f1a\u4e0d\u4f1a\u81ea\u52a8\u5173\u95ed\u4e86\u7b2c\u4e00\u6b21\u7684\u529f\u80fd"
+    },
+    "satisfaction_conditions": [
+      "Message sending functionality continues after phone goes offline",
+      "Program maintains active session until explicitly terminated",
+      "New QR code login terminates previous session"
+    ],
+    "created_at": "2017-08-12T09:12:29Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/445",
+    "source": {
+      "issue_number": 445
+    },
+    "initial_question": {
+      "title": "\u5c0f\u767d\u95ee\u9898  \u5982\u4f55\u4f20ticket\u53c2\u6570\u8fdb\u6765",
+      "body": "api\u5982\u4e0b\r\n```\r\ndef add_friend(self, userName, status=2, verifyContent='', autoUpdate=True):\r\n    ''' add a friend or accept a friend\r\n        for options\r\n            - userName: 'UserName' for friend's info dict\r\n            - status:\r\n                - for adding status should be 2\r\n                - for accepting status should be 3\r\n            - ticket: greeting message\r\n            - userInfo: friend's other info for adding into local storage\r\n        it is defined in components/contact.py\r\n    '''\r\n    raise NotImplementedError()\r\n```\r\n\u6211\u7684\u8c03\u7528\u65b9\u5f0f\u5982\u4e0b\r\n\r\n```\r\nw.add_friend('@888888888888888')\r\n```\r\n\u4f46\u662f\u8fd9\u6837\u5bf9\u65b9\u53ea\u80fd\u6536\u5230\u4e00\u4e2a\u597d\u53cb\u8bf7\u6c42\uff0c\u5982\u679c\u6211\u8981\u53d1\u4e00\u6bb5\u8bf4\u660e \u201c\u6211\u662f\u8c01\u8c01\u8c01\u201d\uff0c\u662f\u5426\u5bf9\u5e94 ticket \u53c2\u6570\uff1f\u5e94\u8be5\u5982\u4f55\u4f20\u53c2\uff1f\r\n\r\n\u8c22\u8c22\r\n"
+    },
+    "satisfaction_conditions": [
+      "Friend request includes a custom greeting message"
+    ],
+    "created_at": "2017-07-12T02:55:32Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/324",
+    "source": {
+      "issue_number": 324
+    },
+    "initial_question": {
+      "title": "itchat\u53ef\u4ee5\u914d\u5408socket\u4f7f\u7528\u5417\uff1f",
+      "body": "itchat\u600e\u6837\u624d\u80fd\u4e0esocket\u670d\u52a1\u540c\u65f6\u8fd0\u884c\uff1f\r\n"
+    },
+    "satisfaction_conditions": [
+      "itchat and socket services must run concurrently",
+      "itchat process must not block other operations"
+    ],
+    "created_at": "2017-04-17T09:19:57Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/198",
+    "source": {
+      "issue_number": 198
+    },
+    "initial_question": {
+      "title": "\u5982\u4f55\u83b7\u5f97\u5f53\u524d\u767b\u9646\u7528\u6237\u7684UserName",
+      "body": "\u76ee\u524d\u901a\u8fc7FromUserName\u83b7\u5f97\u6d88\u606f\u7684\u4e3b\u4eba\uff0c\u4f46\u662f\u5982\u4f55\u5224\u65ad\u8fd9\u4e2aUser\u662f\u5e10\u53f7\u672c\u4eba\u8fd8\u662f\u597d\u53cb\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Must be able to retrieve the current logged-in user's username",
+      "Must access user information from the active session/instance"
+    ],
+    "created_at": "2017-01-03T05:24:24Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/192",
+    "source": {
+      "issue_number": 192
+    },
+    "initial_question": {
+      "title": "\u7fa4\u56fe\u7247\u4e0b\u8f7d",
+      "body": "\u8bf7\u95ee\u5927\u725b\uff0c\u8fd9\u4e2a\u5e93\u80fd\u622a\u83b7\u7fa4\u56fe\u7247\u6d88\u606f\u5417\uff1f\u8fd8\u6709\u7528\u5e93\u767b\u5f55\u540e\u80fd\u5728\u7ebf\u591a\u957f\u65f6\u95f4\uff0c\u80fd\u8bbe\u7f6e\u5417\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Application must be able to receive and process group chat images",
+      "System must maintain persistent login state",
+      "Continuous network connectivity between device and phone"
+    ],
+    "created_at": "2016-12-27T02:53:51Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/174",
+    "source": {
+      "issue_number": 174
+    },
+    "initial_question": {
+      "title": "\u5982\u4f55\u83b7\u5f97\u7fa4\u6210\u5458\u5217\u8868",
+      "body": "\u5982\u4f55\u83b7\u53d6\u4e00\u4e2a\u7fa4\u7684\u6240\u6709\u6210\u5458\u5217\u8868"
+    },
+    "satisfaction_conditions": [
+      "Access to group member information is successfully obtained",
+      "Handles empty member list scenarios appropriately",
+      "Provides mechanism to refresh/update member information",
+      "Returns member information in a structured format"
+    ],
+    "created_at": "2016-12-03T22:40:10Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/96",
+    "source": {
+      "issue_number": 96
+    },
+    "initial_question": {
+      "title": "itchat\u53ef\u4ee5\u901a\u8fc7\u641c\u7d22\u516c\u4f17\u53f7\uff0c\u5bf9\u516c\u4f17\u53f7\u6dfb\u52a0\u5173\u6ce8\u5417",
+      "body": "\u5982\u9898\u3002\u6211\u770b\u66f4\u591a\u7684\u662f\u5173\u4e8e\u6d88\u606f\u548c\u804a\u5929\u7684\u3002\u91cc\u9762\u4e5f\u6709\u4e2a\u6dfb\u52a0\u670b\u53cb\u7684\u65b9\u6cd5\uff0c\u516c\u4f17\u53f7\u4e0d\u77e5\u9053\u662f\u5426\u53ef\u4ee5\u6dfb\u52a0\u5173\u6ce8\u5462\uff1f\uff1f\uff1f\uff1f\n"
+    },
+    "satisfaction_conditions": [
+      "Handle authentication state correctly",
+      "Support for small-scale account following operations",
+      "Work within WeChat web API limitations"
+    ],
+    "created_at": "2016-10-11T01:26:43Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/94",
+    "source": {
+      "issue_number": 94
+    },
+    "initial_question": {
+      "title": "\u5982\u4f55\u4fdd\u5b58\u8bed\u97f3\u8fdb\u6307\u5b9a\u76ee\u5f55\uff1f",
+      "body": "\u5404\u4f4d\u597d\uff0c\n\n\u60f3\u8bf7\u6559\u4e00\u4e0b\u5982\u4f55\u628a\u8bed\u97f3\u6587\u4ef6\u4fdd\u5b58\u8fdb\u6307\u5b9a\u76ee\u5f55\uff1f\n\n\u770b\u4e86\u4e0b\u6587\u6863\u7684handler\u7ae0\u8282\u90e8\u5206\uff0c\u4ee5\u53ca\u6e90\u7801\uff08hclient.py\uff09\uff0c\u662f\u53ea\u80fd\u628a\u8bed\u97f3\u6587\u4ef6\u4fdd\u5b58\u5728python\u811a\u672c\u7684\u8fd0\u884c\u76ee\u5f55\u4e2d\u5417\uff1f\u8fd8\u662f\u53ef\u4ee5\u81ea\u5b9a\u4e49\u5462\uff1f\n\nRegards,\nJackson.\n"
+    },
+    "satisfaction_conditions": [
+      "Voice files can be saved to a user-specified directory path",
+      "Saved files are readable by standard audio players"
+    ],
+    "created_at": "2016-10-07T07:39:52Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/79",
+    "source": {
+      "issue_number": 79
+    },
+    "initial_question": {
+      "title": "\u5728\u83b7\u53d6\u56fe\u7247\u7684\u65f6\u5019\uff0c \u5982\u4f55\u80fd\u83b7\u5f97\u56fe\u7247\u6587\u4ef6 \uff1f",
+      "body": "\u5728\u83b7\u53d6\u56fe\u7247\u7684\u65f6\u5019\uff0c \u5982\u4f55\u80fd\u83b7\u5f97\u56fe\u7247\u6587\u4ef6 \uff1f\n\u5c31\u5982\u4f55\u4e0b\u8f7d\u5230\u76f8\u5e94\u7684\u56fe\u7247\u5462\uff1f\n\n\u56fe\u7247\u6d88\u606f\n\n``` python\nMsgType: 3\nFromUserName: \u53d1\u9001\u65b9ID\nToUserName: \u63a5\u6536\u65b9ID\nMsgId: \u7528\u4e8e\u83b7\u53d6\u56fe\u7247\nContent:\n    <msg>\n        <img length=\"6503\" hdlength=\"0\" />\n        <commenturl></commenturl>\n    </msg>\n```\n\n\u83b7\u5f97msgid \uff0c \u63a5\u4e0b\u6765\u5982\u4f55\u83b7\u5f97\u56fe\u7247\u6587\u4ef6\u672c\u8eab\u5462\uff1f\n"
+    },
+    "satisfaction_conditions": [
+      "Successfully retrieve image file data from message",
+      "Handle WeChat message format correctly",
+      "Save or process retrieved image data",
+      "Maintain message context association"
+    ],
+    "created_at": "2016-09-16T04:20:02Z"
+  },
+  {
+    "id": "https://github.com/littlecodersh/ItChat/issues/68",
+    "source": {
+      "issue_number": 68
+    },
+    "initial_question": {
+      "title": "\u65b0\u5173\u6ce8\uff0c\u65e0\u6cd5\u4e3b\u52a8\u53d1\u9001\u56fe\u7247",
+      "body": "\u4ee3\u7801\u5982\u4e0b\n\n``` python\n    @itchat.msg_register('Friends')\n    def add_friend(msg):\n        itchat.add_friend(**msg['Text']);\n        itchat.get_contract();\n        # return '@img@test.gif';\n        itchat.send_image('@img@test.gif' ,  msg['RecommendInfo']['UserName']);\n```\n\n\u65e0\u8bba\u7528 `send_image`  \u8fd8\u662f `return '@img@test.gif'`\u90fd\u4e0d\u884c\uff0c\u6c42\u6559\n"
+    },
+    "satisfaction_conditions": [
+      "Image sending occurs after friend request acceptance"
+    ],
+    "created_at": "2016-08-23T10:44:37Z"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/xuwd1/wemeet-wayland-screenshare/issues/12",
+    "source": {
+      "issue_number": 12
+    },
+    "initial_question": {
+      "title": "Failed to create screencast session: GDBus.Error:org.freedesktop.portal.Error.InvalidArgument: Unavailable cursor mode 1",
+      "body": "ArchLinux + Hyprland 0.45.0\r\n\r\n\u901a\u8fc7yay \u5b89\u88c5\u4e86 wemeet-wayland-screenshare-git \u5305\u4e4b\u540e\uff0c\u624b\u52a8\u5728bash\u4e2d\u6267\u884c\u4e86 wemeet-wayland-screenshare\r\n\u663e\u793a\u51fa Failed to create screencast session: GDBus.Error:org.freedesktop.portal.Error.InvalidArgument: Unavailable cursor mode 1\r\n\u4e14\u5e76\u6ca1\u6709\u663e\u793a\u51faREADME,md \u4e2d\u6b65\u9aa4\u4e09\u7684\u63d0\u793a\u6846"
+    },
+    "satisfaction_conditions": [
+      "Screen sharing functionality works without cursor mode error",
+      "Package is installed with compatible cursor mode support",
+      "Application launches without GDBus errors"
+    ],
+    "created_at": "2024-12-10T18:42:11Z"
+  }
+]

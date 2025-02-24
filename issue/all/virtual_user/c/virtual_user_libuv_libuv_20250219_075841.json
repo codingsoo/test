@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/libuv/libuv/issues/1652",
+    "source": {
+      "issue_number": 1652
+    },
+    "initial_question": {
+      "title": "How to install after compiling with Ninja?",
+      "body": "In the [instructions](//github.com/libuv/libuv#using-ninja), you only provide how to generate and build with ninja. Actully, how do I install LibUV after building it with ninja? There is no `ninja install`."
+    },
+    "satisfaction_conditions": [
+      "User understands the appropriate build tool for their use case",
+      "Installation method aligns with project deployment needs"
+    ],
+    "created_at": "2017-11-25T18:24:39Z"
+  }
+]

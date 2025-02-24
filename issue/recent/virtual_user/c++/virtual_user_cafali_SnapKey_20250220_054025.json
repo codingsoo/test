@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/cafali/SnapKey/issues/93",
+    "source": {
+      "issue_number": 93
+    },
+    "initial_question": {
+      "title": "smartscreen",
+      "body": "Hi SnapKey Team,\r\n\r\nI've been interested in using SnapKey, but I've encountered a couple of security warnings. SmartScreen flagged it as malicious, and VirusTotal showed one flag. Could you provide any information or assurances regarding these concerns?\r\n\r\nThanks for your help, [ro6axe]"
+    },
+    "satisfaction_conditions": [
+      "Software safety verification method is presented",
+      "Transparency about security implications is maintained"
+    ],
+    "created_at": "2024-10-11T18:07:28Z"
+  }
+]

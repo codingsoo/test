@@ -1,0 +1,27 @@
+[
+  {
+    "number": 723,
+    "title": "Downloading Pretrain models to all folders ",
+    "created_at": "2022-02-03T11:47:01Z",
+    "closed_at": "2022-02-03T14:01:55Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/deezer/spleeter/issues/723",
+    "body": "I have some file in **C:/Users/myfile.mp3 and D:/myfile.mp3 and E:/myfile.mp3** when i try to split it by command prompt like C:\\Users>**spleeter separate -f {filename}/{filename}-{instrument}.{codec} -c \"mp3\" -b \"128\" -o output  -p spleeter:2stems-16kHz -i \"myfile.mp3\"**\r\nD:\\>**spleeter separate -f {filename}/{filename}-{instrument}.{codec} -c \"mp3\" -b \"128\" -o output  -p spleeter:2stems-16kHz -i \"myfile.mp3\"**\r\nE:\\>**spleeter separate -f {filename}/{filename}-{instrument}.{codec} -c \"mp3\" -b \"128\" -o output  -p spleeter:2stems-16kHz -i \"myfile.mp3\"**\r\n\r\n spleeter is downloading pretrain models to all folders like C:/Users/pretrainmodel, D:/pretrainmodel and E:/pretrainmodel so how to avoid/override or link it to one folder like C:/User/pretrainmodels only. using command prompt to working with spleeter",
+    "comments_url": "https://api.github.com/repos/deezer/spleeter/issues/723/comments",
+    "author": "iamsudheerkabeer",
+    "comments": [
+      {
+        "user": "romi1502",
+        "created_at": "2022-02-03T14:00:54Z",
+        "body": "Hi @sudheervdm,\r\nyou can set the `MODEL_PATH` env variable to the folder where you want to store the model, so that `spleeter` will always look in this folder to retrieve the model (or will download it in this folder at the first call).\r\nAlso, be aware that a single call to spleeter with multiple files to separate is more efficient than multiple calls."
+      },
+      {
+        "user": "iamsudheerkabeer",
+        "created_at": "2022-02-03T14:29:28Z",
+        "body": "> Hi @sudheervdm, you can set the `MODEL_PATH` env variable to the folder where you want to store the model, so that `spleeter` will always look in this folder to retrieve the model (or will download it in this folder at the first call). Also, be aware that a single call to spleeter with multiple files to separate is more efficient than multiple calls.\r\n@romi1502 \r\nThanks for your Quick Reply. in my case i  am using command prompt version in my windows system. and also i was installed the python directly and run pip install spleeter for install spleeter in my system. so can you a little bit more explain abouyt your answer. thanks in advance\r\n"
+      }
+    ]
+  }
+]

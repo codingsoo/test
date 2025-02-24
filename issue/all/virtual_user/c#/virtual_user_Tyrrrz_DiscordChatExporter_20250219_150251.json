@@ -1,0 +1,109 @@
+[
+  {
+    "id": "https://github.com/Tyrrrz/DiscordChatExporter/issues/458",
+    "source": {
+      "issue_number": 458
+    },
+    "initial_question": {
+      "title": "Unable to build from a fresh clone",
+      "body": "I'd like to investigate adding support for the relatively new reply feature in Discord (edit: looks like this is already being worked on), but I am unable to get a fresh clone of this project to build. I get the following output:\r\n\r\n```\r\n1>------ Build started: Project: DiscordChatExporter.Domain, Configuration: Debug Any CPU ------\r\n1>CSC : warning CS8032: An instance of analyzer MiniRazor.CodeGen.TemplateClassGenerator cannot be created from C:\\Users\\Andrew\\.nuget\\packages\\minirazor\\2.0.3\\analyzers\\dotnet\\cs\\MiniRazor.CodeGen.dll : Could not load file or assembly 'Microsoft.CodeAnalysis, Version=3.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35' or one of its dependencies. The system cannot find the file specified..\r\n1>C:\\Users\\Andrew\\Documents\\GitHub\\fork\\DiscordChatExporter\\DiscordChatExporter.Domain\\Exporting\\Writers\\HtmlMessageWriter.cs(31,23,31,39): error CS0103: The name 'PreambleTemplate' does not exist in the current context\r\n1>C:\\Users\\Andrew\\Documents\\GitHub\\fork\\DiscordChatExporter\\DiscordChatExporter.Domain\\Exporting\\Writers\\HtmlMessageWriter.cs(40,23,40,43): error CS0103: The name 'MessageGroupTemplate' does not exist in the current context\r\n1>C:\\Users\\Andrew\\Documents\\GitHub\\fork\\DiscordChatExporter\\DiscordChatExporter.Domain\\Exporting\\Writers\\HtmlMessageWriter.cs(73,23,73,40): error CS0103: The name 'PostambleTemplate' does not exist in the current context\r\n1>Done building project \"DiscordChatExporter.Domain.csproj\" -- FAILED.\r\n2>------ Build started: Project: DiscordChatExporter.Gui, Configuration: Debug Any CPU ------\r\n2>Tool 'xamlstyler.console' (version '3.2003.9') was restored. Available commands: xstyler\r\n2>\r\n2>Restore was successful.\r\n2>Processing: .\\App.xaml\r\n2>Processing: .\\Views\\RootView.xaml\r\n2>Processing: .\\Views\\Dialogs\\ExportSetupView.xaml\r\n2>Processing: .\\Views\\Dialogs\\SettingsView.xaml\r\n2>\r\n2>Processed 4 of 4 files.\r\n2>CSC : error CS0006: Metadata file 'C:\\Users\\Andrew\\Documents\\GitHub\\fork\\DiscordChatExporter\\DiscordChatExporter.Domain\\bin\\Debug\\netcoreapp3.1\\DiscordChatExporter.Domain.dll' could not be found\r\n2>Done building project \"DiscordChatExporter.Gui_ypqryfwp_wpftmp.csproj\" -- FAILED.\r\n========== Build: 0 succeeded, 2 failed, 0 up-to-date, 0 skipped ==========\r\n```\r\n\r\nLooks like it has something to do with MiniRazor."
+    },
+    "satisfaction_conditions": [
+      "Project builds successfully when cloned to a path without '#' characters"
+    ],
+    "created_at": "2020-12-16T17:40:19Z"
+  },
+  {
+    "id": "https://github.com/Tyrrrz/DiscordChatExporter/issues/419",
+    "source": {
+      "issue_number": 419
+    },
+    "initial_question": {
+      "title": "Export format changes",
+      "body": "I have been exporting bulk messages on a weekly basis, and processing them in a google sheet that has been specially set up to handle the data directly copied from a .txt file. Unfortunately, the format of the text in those exports keeps changing, causing errors in my spreadsheet down the line. First, it was a bunch of extra header information at the bottom of the file for some reason, and now messages are exported with two carriage returns between each entry. Since my spreadsheet was setup to delete every third line to ready the data for processing, these rather massive format changes are casing significant problems for me.\r\n\r\nThank you for this awesome app."
+    },
+    "satisfaction_conditions": [
+      "Export format is suitable for programmatic consumption"
+    ],
+    "created_at": "2020-11-01T02:13:23Z"
+  },
+  {
+    "id": "https://github.com/Tyrrrz/DiscordChatExporter/issues/371",
+    "source": {
+      "issue_number": 371
+    },
+    "initial_question": {
+      "title": "Are there drawbacks to using a Bot token instead of a User token? ",
+      "body": "Using the Bot is safer since it technically doesn't break Discord's TOS. Is it therefore just a blanket advantage over the User method, or are there drawbacks to using it?\r\n\r\nIf using the API, Bot's are limited to 100 API requests in a short period. Any more and it's classed as spam and can get your access revoked. Does this use the Discord API or does it merely \"read\" the channel like a User might?"
+    },
+    "satisfaction_conditions": [
+      "Rate limit differences between bot and user tokens are accurately identified",
+      "Access limitations for bot tokens vs user tokens are clearly specified",
+      "API usage method is correctly explained for both token types",
+      "Terms of Service compliance implications are addressed"
+    ],
+    "created_at": "2020-08-30T12:29:14Z"
+  },
+  {
+    "id": "https://github.com/Tyrrrz/DiscordChatExporter/issues/201",
+    "source": {
+      "issue_number": 201
+    },
+    "initial_question": {
+      "title": "Situation about this program",
+      "body": "A friend of mine has this program and he told me he could backup my chat, so I gave him the small \"code\" for him needed to search my servers and do that. There's a small chance that he might keep that \"code\" for him to use later and stalk my chats or am I wrong? Can I feel safe about this?"
+    },
+    "satisfaction_conditions": [
+      "Access credentials must be revoked or invalidated",
+      "User must understand the scope of access that was shared"
+    ],
+    "created_at": "2019-08-10T21:07:57Z"
+  },
+  {
+    "id": "https://github.com/Tyrrrz/DiscordChatExporter/issues/166",
+    "source": {
+      "issue_number": 166
+    },
+    "initial_question": {
+      "title": "Example command for getting direct messages",
+      "body": "While the following command works for general server channels, it fails for using the ID of a private message:\r\n`docker run --rm -v ${PWD}:/app/out  tyrrrz/discordchatexporter export -t <token> -c <channel ID> -f PlainText`\r\n\r\nIt gives this error:\r\n```\r\nExporting channel [259474169610240010]... Failed X\r\n\r\nUnhandled Exception: DiscordChatExporter.Core.Services.Exceptions.HttpErrorStatusCodeException: Error HTTP status code: NotFound - NOT FOUND\r\n```\r\n\r\nIs there a specific flag I need to use for direct messages? "
+    },
+    "satisfaction_conditions": [
+      "The correct DM channel ID must be obtained",
+      "The solution must work specifically for direct messages",
+      "The method to obtain the DM channel ID must be accessible to the user"
+    ],
+    "created_at": "2019-04-16T21:17:02Z"
+  },
+  {
+    "id": "https://github.com/Tyrrrz/DiscordChatExporter/issues/99",
+    "source": {
+      "issue_number": 99
+    },
+    "initial_question": {
+      "title": "Finding it impossible to make extractions in to a website format",
+      "body": "Hi! More detail here.\r\n\r\nI've been exporting channels and there has been the issue that it is coming up as file:///C:/Users/NAME/Downloads/DiscordChatExporter/Model%20Hogwarts%20-%20ye-olde-qs.html when it opens in my browser (Opera, also does the same in Internet Explorer)\r\n\r\nI'm not sure if it's supposed to be like that but it is causing problems as it's for a server that needs this sort of thing."
+    },
+    "satisfaction_conditions": [
+      "HTML files must be accessible through a web browser"
+    ],
+    "created_at": "2018-09-22T22:43:03Z"
+  },
+  {
+    "id": "https://github.com/Tyrrrz/DiscordChatExporter/issues/48",
+    "source": {
+      "issue_number": 48
+    },
+    "initial_question": {
+      "title": "Deleted and edited messages",
+      "body": "If somebody deletes or edits their message, will I be able to see the original in the logs after updating the logs?"
+    },
+    "satisfaction_conditions": [
+      "Historical message content must be preserved before changes occur",
+      "Changes between message versions must be detectable",
+      "Original message content must be recoverable after edits/deletions",
+      "Multiple log states must be comparable"
+    ],
+    "created_at": "2018-04-23T11:01:26Z"
+  }
+]

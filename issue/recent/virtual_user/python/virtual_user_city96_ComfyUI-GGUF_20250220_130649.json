@@ -1,0 +1,31 @@
+[
+  {
+    "id": "https://github.com/city96/ComfyUI-GGUF/issues/195",
+    "source": {
+      "issue_number": 195
+    },
+    "initial_question": {
+      "title": "Support for PixArt models please\ud83d\ude4f",
+      "body": "He visto que ComfyUI ahora soporta de forma nativa estos modelos tanto Sigma como Alpha pero el modelo t5 que uso es un Q6 dada la poca capacidad de memoria que tengo, agradecer\u00eda infinitamente que incluyeras la configuraci\u00f3n para este CLIP por favor. Saludos desde la isla de Cuba amigo"
+    },
+    "satisfaction_conditions": [
+      "PixArt models with Q6 CLIP configuration are functional"
+    ],
+    "created_at": "2025-01-04T15:29:15Z"
+  },
+  {
+    "id": "https://github.com/city96/ComfyUI-GGUF/issues/18",
+    "source": {
+      "issue_number": 18
+    },
+    "initial_question": {
+      "title": "12GB VRAM getting OOM with Q8_0, but not in Forge.",
+      "body": "Able to use Forge with default settings to run the Q8_0 variant on a 3060 w 12GB VRAM and 32GB sys RAM.\r\n\r\nBut with this node in Comfy I always get OOM trying to load the models up for inference. Tried --lowvram mode too."
+    },
+    "satisfaction_conditions": [
+      "Model loads successfully without Out of Memory (OOM) errors on 12GB VRAM GPU",
+      "Q8_0 model variant functionality matches Forge behavior"
+    ],
+    "created_at": "2024-08-15T23:32:44Z"
+  }
+]

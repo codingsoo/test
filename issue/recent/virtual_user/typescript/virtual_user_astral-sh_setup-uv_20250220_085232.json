@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/astral-sh/setup-uv/pull/194",
+    "source": {
+      "issue_number": 194
+    },
+    "initial_question": {
+      "title": "Auto activate venv when python-version is set",
+      "body": "Closes: #124"
+    },
+    "satisfaction_conditions": [
+      "Python environment correctly activates for multiple specified Python versions",
+      "UV tool integrates with the system Python installation",
+      "Environment setup maintains compatibility with matrix strategy"
+    ],
+    "created_at": "2024-12-13T20:15:55Z"
+  }
+]

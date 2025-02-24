@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/AdrianPanGithub/HoudiniEngineForUnreal/issues/1",
+    "source": {
+      "issue_number": 1
+    },
+    "initial_question": {
+      "title": "\u542f\u7528\u63d2\u4ef6\u540e\uff0c\u6253\u5305\u5de5\u7a0b\u62a5\u9519",
+      "body": "UATHelper: \u6253\u5305 (Windows): D:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Plugins\\Marketplace\\HoudiniEngineForUnreal-UE5_4\\Source\\HoudiniEngine\\Public\\HoudiniEngineCommon.h(26): Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nUATHelper: \u6253\u5305 (Windows): D:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Plugins\\Marketplace\\HoudiniEngineForUnreal-UE5_4\\Source\\HoudiniEngine\\Public\\HoudiniEngineCommon.h(29): Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nUATHelper: \u6253\u5305 (Windows): D:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Plugins\\Marketplace\\HoudiniEngineForUnreal-UE5_4\\Source\\HoudiniEngine\\Public\\HoudiniEngineCommon.h(32): Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nUATHelper: \u6253\u5305 (Windows): D:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Plugins\\Marketplace\\HoudiniEngineForUnreal-UE5_4\\Source\\HoudiniEngine\\Public\\HoudiniEngineCommon.h(35): Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nPackagingResults: Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nPackagingResults: Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nPackagingResults: Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nPackagingResults: Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module.\r\nUATHelper: \u6253\u5305 (Windows): D:\\Program Files\\Epic Games\\UE_5.4\\Engine\\Plugins\\Marketplace\\HoudiniEngineForUnreal-UE5_4\\Source\\HoudiniEngine\\Public\\HoudiniEngineCommon.h(38): Error: An explicit Category specifier is required for any property exposed to the editor or Blueprints in an Engine module."
+    },
+    "satisfaction_conditions": [
+      "Plugin packaging errors must be resolved",
+      "Plugin must be properly configured for editor-only functionality"
+    ],
+    "created_at": "2024-09-14T15:33:15Z"
+  }
+]

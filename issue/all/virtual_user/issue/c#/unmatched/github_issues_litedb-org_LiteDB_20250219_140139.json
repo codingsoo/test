@@ -1,0 +1,152 @@
+[
+  {
+    "number": 2022,
+    "title": "[QUESTION] How to delete an entry from a collection and update the database?",
+    "created_at": "2021-07-04T08:16:46Z",
+    "closed_at": "2021-07-19T07:53:58Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/litedb-org/LiteDB/issues/2022",
+    "body": "Current code:\r\n\r\n```csharp\r\n/// <summary>\r\n/// Remove entries that are not present in ids\r\n/// </summary>\r\npublic static List<ulong> Trim(List<ulong> ids)\r\n{\r\n    using (var db = new LiteDatabase($\"{AppContext.BaseDirectory}Data.db\"))\r\n    {\r\n        // Get collection\r\n        var col = db.GetCollection<LilyraUser>(\"lilyrausers\");\r\n        // Get list of users\r\n        var users = col.FindAll();\r\n\r\n        // Create return list\r\n        var deleted = new List<ulong>();\r\n        // Foreach user in the database..\r\n        foreach (var user in users)\r\n        {\r\n            // If the user id isn't present in \"ids\"\r\n            if (!ids.Contains(user.Id))\r\n            {\r\n                // Delete\r\n                deleted.Add(user.Id);\r\n                col.Delete(user.Id);\r\n            }\r\n        }\r\n\r\n        // Return deleted ids;\r\n        return deleted;\r\n    };\r\n}\r\n```\r\n\r\nNo matter how many times i run the function, it keeps returning 30 entries (in my use case).\r\nSo I can only assume they're not actually being deleted.\r\n\r\nEdit: I think I know why, it's updating the collection variable but it's not actually updating the database itself, not sure how to do that though.\r\n\r\nAm I doing something wrong?\r\nThank you.",
+    "comments_url": "https://api.github.com/repos/litedb-org/LiteDB/issues/2022/comments",
+    "author": "NotAkitake",
+    "comments": [
+      {
+        "user": "lbnascimento",
+        "created_at": "2021-07-07T18:12:39Z",
+        "body": "@Akitakek By any chance, are the ids of these 30 remaining entries greater than `long.MaxValue` (9223372036854775807)?"
+      },
+      {
+        "user": "NotAkitake",
+        "created_at": "2021-07-07T18:23:58Z",
+        "body": "```\r\n180574360459935745, 191169158807814144, 207358761671720960, 223736077788119040, 242683787882790912, 285890131955548160, 320530192709844992, 364501380762959872, 376141189415436289, 394299162834763777, 425740125717397515, 496752341857468416, 539820622121795635, 617752993441382464, 632494262931423242, 639233686574858278, 670483337713811476, 692316673096679465, 704735068068905031, 726141314177171506, 740791396901978242, 764339672356225064, 771708394591354922, 807434479332229153, 814518777026445336, 816723378072977490, 834820140923093032, 853321652200013846, 855706831970893834, 858834073962545183\r\n```\r\n\r\nThese are the IDs it's trying to delete but can't.\r\nSo I guess the response to that is no, because they're one less digit than the max."
+      },
+      {
+        "user": "lbnascimento",
+        "created_at": "2021-07-08T13:54:43Z",
+        "body": "@Akitakek LiteDB does not natively suport `UInt64`, but it supports `Int64` and `Double`. What is happening is that C# is implicitly casting the id to `Double` when you call `col.Delete(...)`, and apparently `Double` is losing precision at such magnitudes (just try `Convert.ToDouble(180574360459935745).ToString(\"N0\")` and you'll see it becomes 180574360459936000). Why C# is opting to implicitly cast it to `Double` instead of `Int64` is beyond me.\r\n\r\nThe easiest fix would be to simply change your id field to `Int64` (given that's how LiteDB will store your `UInt64` anyway). If that is not possible, you must be careful to always explicitly cast your `UInt64` to `Int64` when using any method that takes a `BsonValue` as id."
+      },
+      {
+        "user": "NotAkitake",
+        "created_at": "2021-07-11T14:35:39Z",
+        "body": "> \r\n> \r\n> @Akitakek LiteDB does not natively suport `UInt64`, but it supports `Int64` and `Double`. What is happening is that C# is implicitly casting the id to `Double` when you call `col.Delete(...)`, and apparently `Double` is losing precision at such magnitudes (just try `Convert.ToDouble(180574360459935745).ToString(\"N0\")` and you'll see it becomes 180574360459936000). Why C# is opting to implicitly cast it to `Double` instead of `Int64` is beyond me.\r\n> \r\n> The easiest fix would be to simply change your id field to `Int64` (given that's how LiteDB will store your `UInt64` anyway). If that is not possible, you must be careful to always explicitly cast your `UInt64` to `Int64` when using any method that takes a `BsonValue` as id.\r\n\r\nBut how come that it works for essentially everything else I've used it for with litedb, just not col.Delete(), doesn't make much sense to me?\r\nI'll try the casting in this function at least, and see if that fixes it and report on it."
+      }
+    ]
+  },
+  {
+    "number": 1817,
+    "title": "File in use issues in V5",
+    "created_at": "2020-09-15T15:52:57Z",
+    "closed_at": "2020-09-17T17:07:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/litedb-org/LiteDB/issues/1817",
+    "body": "I am using LiteDB in a simple desktop app that uses 2 shared db files on an EMC Isilon (CIFS and NFS) file share.\r\n\r\nI upgraded to V5 recently, largely to use LiteDB Studio and for a couple of features like DeleteMany.\r\n\r\nNow my users are continually getting transient \"file in use\" errors trying the read or update the files. Error msgs include.\r\n\r\n\"The process cannot access the file .. because it is being used by another process\"\r\n\"Access to the path is denied\"\r\n\r\nAll LiteDB access is done inside Using blocks. I do a db.Commit() after each transaction.\r\n\r\nI  open/connected to  the file in LiteDB Studio and queried it using Direct mode. When I disconnect I got the \"Access to the path is denied\" error. Next time I tried in Shared mode and got the access denied just trying to connect to file.\r\n\r\nThe locked condition seems to persist for an indeterminant period of time even when no one accesses the file.\r\n\r\nHas anyone seen this behavior and/or have a way to work around it?\r\n\r\nI am having a hard time determining if is enviornmental or something I am doing wrong.\r\n\r\nI never saw this in the same environment in 18 months of using LiteDB V4.",
+    "comments_url": "https://api.github.com/repos/litedb-org/LiteDB/issues/1817/comments",
+    "author": "chucksullivancvs",
+    "comments": [
+      {
+        "user": "chucksullivancvs",
+        "created_at": "2020-09-15T16:42:51Z",
+        "body": "Also, I notice that a file with the same name as the data.db file with \"-log.db\" appended to it. If I rename or delete the -log file the file lock seems to clear. I understand this to be the temp transaction file and should be cleaned up automatically which apparently is not happening.\r\n\r\nWould it be \"safe\" to check for and delete this file as a mitigation? Or might that cause more problems than it solves?\r\n"
+      },
+      {
+        "user": "lbnascimento",
+        "created_at": "2020-09-16T14:31:50Z",
+        "body": "@chucksullivancvs LiteDB v5.0.x does not support network shares. This is because the Shared mode uses an OS-wide mutex to synchronize file access, which obviously doesn't work over the network. v4 used file locks, which are implemented by network file systems, but it has problems of its own.\r\n\r\nI suggest you stay at v4 until we release v5.1, which will use lock files to synchronize file access and, therefore, should work with network shares."
+      },
+      {
+        "user": "chucksullivancvs",
+        "created_at": "2020-09-16T20:38:18Z",
+        "body": "@lbnascimento - thx. i gone ahead and downgraded to 4.1.4. was pretty easy. just had to get rid ofthe Commit() and rewrite the DeleteMany. So far so good on that. new issue though I will post seperately"
+      }
+    ]
+  },
+  {
+    "number": 1758,
+    "title": "Object Property List(of Object) - .contains not working",
+    "created_at": "2020-07-16T21:38:45Z",
+    "closed_at": "2020-07-18T19:00:26Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/litedb-org/LiteDB/issues/1758",
+    "body": "Consider the below:\r\n\r\n```\r\npublic class mRom\r\n\tpublic property Name as String\r\nend class\r\n\r\npublic class mGames\r\n\t<BsonRef(\"mRoms\")>\r\n\tpublic property AllRoms as List(of mRom)\r\nend class\r\n\r\nugame = db.Collections.mGames.Include(Function(x) x.AllRoms).FindById(ssGameId)\r\nIf Not ugame.AllRoms.Contains(rom) Then ugame.AllRoms.Add(rom)\r\n```\r\n\r\nThis is to review AllRoms and add `rom` to the list if an instance of `rom` isn't already in the list. HOwever, I get duplicate entries. \r\n\r\nThe `.Contains` function never detects the presence of `rom`, even if it is already in the collection. \r\n\r\nWhat am I doing wrong?",
+    "comments_url": "https://api.github.com/repos/litedb-org/LiteDB/issues/1758/comments",
+    "author": "stigzler",
+    "comments": [
+      {
+        "user": "lbnascimento",
+        "created_at": "2020-07-17T14:39:05Z",
+        "body": "A few comments: \r\n\r\n1. Your classes don't have id fields. It is strongly recommended for all classes to be inserted in a LiteDB collection to have id fields (I don't even know how you're using `FindById` without it).\r\n\r\n2. You're using `BsonRef`, which is used to indicate that a subobject (or a list of subobjects) is to be stored in another collection. This creates a reference, which is resolved upon retrieval. However, you still have to manually insert the real objects in the referenced collection. In your example, you would have to insert `rom` to the collection of roms, add it to `ugame.AllRoms` and then update `ugame` in the games collection.\r\n\r\n3. You may run into problems due to the `Contains` method using the default equality, which is reference equality. You could either override the `Equals` method in your class or change it to `Any`: `ugame.AllRoms.Any(Function(x) x.Name = rom.Name)`"
+      }
+    ]
+  },
+  {
+    "number": 1563,
+    "title": "[QUESTION]Index values must have less than 255 bytes after upgrate to v5",
+    "created_at": "2020-03-13T07:10:07Z",
+    "closed_at": "2020-03-16T06:29:51Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/litedb-org/LiteDB/issues/1563",
+    "body": "I updates library to version 5.\r\nWhen I open a database created in version 4 with upgrade=true flag I get an error\r\n\"Index key must be less than 255 bytes\"\r\nIn the documentation is written for v4, \"Index values must have at most 512 bytes\"\r\nFor v5 \"Index values must have less than 255 bytes\"\r\nI have a lot of clients who will lose data, because it is impossible to update the database\r\nWhat can be done",
+    "comments_url": "https://api.github.com/repos/litedb-org/LiteDB/issues/1563/comments",
+    "author": "ambyte",
+    "comments": [
+      {
+        "user": "lbnascimento",
+        "created_at": "2020-03-13T18:51:52Z",
+        "body": "@ambyte Are there any custom indexes in the datafile (that is, an index over a field other than `_id`)?\r\n\r\nIf the error is happening on a custom index, I might create a way to upgrade the datafile without the indexes, which would circumvent the limitation. However, if the error is happening on an id index, I'm not sure what could be done (and index keys shouldn't be this long anyway, it would hurt performance a lot)."
+      }
+    ]
+  },
+  {
+    "number": 454,
+    "title": "File stored in FileStorage but not updating",
+    "created_at": "2017-02-04T08:45:56Z",
+    "closed_at": "2017-02-04T22:14:10Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/litedb-org/LiteDB/issues/454",
+    "body": "I am trying to write and updating the file. While creating a new file, it is working fine but when i update the file by calling Upload method with with memoryStream, The original get file empty in FileStorage instead of updating.\r\n\r\nI also tried to delete and re-create the file but that has the same behavior. following is my code, please tell me if i am missing something.\r\n\r\n```\r\nprivate void Write(byte[] buffer, int index, int len, bool isFirstWrite)\r\n{\r\n\tvar fsinfo = _db.FileStorage.FindById(_name);\r\n\tif (fsinfo != null)\r\n\t{\r\n\t\tMemoryStream memoryStream = new MemoryStream();\r\n\r\n\t\tConsole.WriteLine($\"{fsinfo.Id} already exist with lenth of {fsinfo.Length}\");\r\n\t\tfsinfo.CopyTo(memoryStream);\r\n\t\t//memoryStream.Position = memoryStream.Length;\r\n\t\tmemoryStream.Position = index;\r\n\t\tConsole.WriteLine($\"MemorySteam lenth: {memoryStream.Length} before writing\");\r\n\t\tmemoryStream.Write(buffer, 0, len);\r\n\t\tmemoryStream.Flush();\r\n\t\t//_db.FileStorage.Delete(_name);\r\n\t\tConsole.WriteLine($\"MemorySteam lenth: {memoryStream.Length} after writing and flush\");\r\n\t\tfsinfo = _db.FileStorage.Upload(_name, _name, memoryStream);\r\n\t\tmemoryStream.Close();\r\n\t\tConsole.WriteLine($\"{_name} lenth {fsinfo.Length} after flush\");\r\n\t}\r\n\telse\r\n\t{\r\n\t\tusing (LiteFileStream fileStream = _db.FileStorage.OpenWrite(_name, _name))\r\n\t\t{\r\n\t\t\tConsole.WriteLine($\"Opened a new file:{_name} to write.\");\r\n\t\t\tfileStream.Write(buffer, 0, len);\r\n\t\t\tfileStream.Flush();\r\n\t\t\tConsole.WriteLine($\"{_name} lenth {fileStream.Length} after flush\");\r\n\t\t}\r\n\t}\r\n}\r\n```",
+    "comments_url": "https://api.github.com/repos/litedb-org/LiteDB/issues/454/comments",
+    "author": "sheryever",
+    "comments": [
+      {
+        "user": "mbdavid",
+        "created_at": "2017-02-04T11:37:27Z",
+        "body": "Hi @sheryever, try position you MemoryStream to 0 before call Upload method. LiteDB doesnt touch in start position. If you write on MemoryStream and flush(), position in on end and when you call Upload there is no more bytes to write."
+      }
+    ]
+  },
+  {
+    "number": 252,
+    "title": "Exception running example",
+    "created_at": "2016-08-06T12:46:05Z",
+    "closed_at": "2016-08-22T21:53:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/litedb-org/LiteDB/issues/252",
+    "body": "Hello all, \nIm facing some troubles runnig your simple example, when I reach the foreach loop\nCan you help me please?\n\n```\n  using (var db = new LiteDatabase(@\"C:\\Temp\\MyData.db\")) {\n    // Get a collection (or create, if doesn't exist)\n    var col = db.GetCollection<Customer>(\"customers\");\n\n    // Create your new customer instance\n    var customer = new Customer\n      {\n      Name = \"John Doe\",\n      Phones = new string[] { \"8000-0000\", \"9000-0000\" },\n      IsActive = true\n      };\n\n    // Insert new customer document (Id will be auto-incremented)\n    col.Insert(customer);\n\n    // Update a document inside a collection\n    customer.Name = \"Joana Doe\";\n\n    col.Update(customer);\n\n    // Index document using document Name property\n    col.EnsureIndex(x => x.Name);\n\n    // Use LINQ to query documents\n    var results = col.Find(x => x.Name.StartsWith(\"Jo\"));\n\n    foreach (Customer item in results) {\n\n      }\n```\n\nException:\n\nLiteDB.LiteException was unhandled\n  ErrorCode=202\n  HResult=-2146233088\n  Message=Failed to create instance for type 'LiteDBTestConsole.Program+Customer' from assembly 'LiteDBTestConsole.Program+Customer, LiteDBTestConsole, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'. Checks if the class has a public constructor with no parameters\n  Source=LiteDB\n  StackTrace:\n       em LiteDB.Reflection.CreateInstance(Type type)\n       em LiteDB.BsonMapper.Deserialize(Type type, BsonValue value)\n       em LiteDB.BsonMapper.ToObject(Type type, BsonDocument doc)\n       em LiteDB.BsonMapper.ToObject[T](BsonDocument doc)\n       em LiteDB.LiteCollection`1.<Find>d__34.MoveNext()\n       em LiteDBTestConsole.Program.Main(String[] args)\n       em System.AppDomain._nExecuteAssembly(RuntimeAssembly assembly, String[] args)\n       em System.AppDomain.ExecuteAssembly(String assemblyFile, Evidence assemblySecurity, String[] args)\n       em Microsoft.VisualStudio.HostingProcess.HostProc.RunUsersAssembly()\n       em System.Threading.ThreadHelper.ThreadStart_Context(Object state)\n       em System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)\n       em System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)\n       em System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)\n       em System.Threading.ThreadHelper.ThreadStart()\n  InnerException: \n",
+    "comments_url": "https://api.github.com/repos/litedb-org/LiteDB/issues/252/comments",
+    "author": "nmfpacheco",
+    "comments": [
+      {
+        "user": "mbdavid",
+        "created_at": "2016-08-06T12:59:09Z",
+        "body": "Hi @nmfpacheco, is you Customer class a public class (no inner class) with a public constructor with no parameter?\n"
+      },
+      {
+        "user": "jotalanusse",
+        "created_at": "2021-04-27T04:24:54Z",
+        "body": "I hate to bump old issues, but i just can't make this work...\r\n```java\r\npublic class Audio\r\n    {\r\n        public Guid Id { get; }\r\n        public string Path { get; }\r\n\r\n        public Audio(Guid id, string path)\r\n        {\r\n            Id = id;\r\n            Path = path;\r\n        }\r\n    }\r\n\r\npublic class Sound\r\n    {\r\n        public Guid Id { get; }\r\n        [BsonField(\"audio\")]\r\n        [BsonRef(\"audio\")]\r\n        public Audio Audio { get; set; }\r\n\r\n        public Sound(Guid id, Audio audio)\r\n        {\r\n            Id = id;\r\n            Audio = audio;\r\n        }\r\n    }\r\n\r\nILiteCollection<Sound> soundCollection = db.GetCollection<Sound>(\"sound\");\r\n\r\nsoundCollection.Insert(new Sound(Guid.NewGuid(), new Audio(Guid.NewGuid(), \"path1\")));\r\nsoundCollection.Insert(new Sound(Guid.NewGuid(), new Audio(Guid.NewGuid(), \"path2\")));\r\n\r\nList<Sound> allSounds = new List<Sound>();\r\nallSounds.AddRange(soundCollection.FindAll().ToList());\r\n```\r\n\r\nException:\r\n\r\n```\r\nPrism.Ioc.ContainerResolutionException\r\n  HResult=0x80131500\r\n  Message=An unexpected error occurred while resolving 'SoundMod.ViewModels.MainWindowViewModel'\r\n  Source=Prism.Unity.Wpf\r\n  StackTrace:\r\n   at Prism.Unity.UnityContainerExtension.Resolve(Type type, ValueTuple`2[] parameters)\r\n   at Prism.Unity.UnityContainerExtension.Resolve(Type type)\r\n   at Prism.PrismInitializationExtensions.<>c.<ConfigureViewModelLocator>b__0_0(Object view, Type type)\r\n   at Prism.Mvvm.ViewModelLocationProvider.AutoWireViewModelChanged(Object view, Action`2 setDataContextCallback)\r\n   at Prism.Mvvm.ViewModelLocator.AutoWireViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)\r\n   at System.Windows.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e)\r\n   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)\r\n   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)\r\n   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry& newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)\r\n   at System.Windows.DependencyObject.SetValueCommon(DependencyProperty dp, Object value, PropertyMetadata metadata, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType, Boolean isInternal)\r\n   at System.Windows.DependencyObject.SetValue(DependencyProperty dp, Object value)\r\n   at Prism.Mvvm.ViewModelLocator.SetAutoWireViewModel(DependencyObject obj, Nullable`1 value)\r\n   at Prism.Common.MvvmHelpers.AutowireViewModel(Object viewOrViewModel)\r\n   at Prism.PrismApplicationBase.Initialize()\r\n   at Prism.PrismApplicationBase.InitializeInternal()\r\n   at Prism.PrismApplicationBase.OnStartup(StartupEventArgs e)\r\n   at System.Windows.Application.<.ctor>b__1_0(Object unused)\r\n   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)\r\n   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)\r\n   at System.Windows.Threading.DispatcherOperation.InvokeImpl()\r\n   at System.Windows.Threading.DispatcherOperation.InvokeInSecurityContext(Object state)\r\n   at MS.Internal.CulturePreservingExecutionContext.CallbackWrapper(Object obj)\r\n   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)\r\n--- End of stack trace from previous location ---\r\n   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\n   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)\r\n   at System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)\r\n   at MS.Internal.CulturePreservingExecutionContext.Run(CulturePreservingExecutionContext executionContext, ContextCallback callback, Object state)\r\n   at System.Windows.Threading.DispatcherOperation.Invoke()\r\n   at System.Windows.Threading.Dispatcher.ProcessQueue()\r\n   at System.Windows.Threading.Dispatcher.WndProcHook(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)\r\n   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)\r\n   at MS.Win32.HwndSubclass.DispatcherCallbackOperation(Object o)\r\n   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)\r\n   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)\r\n   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)\r\n   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)\r\n   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)\r\n   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)\r\n   at System.Windows.Threading.Dispatcher.PushFrame(DispatcherFrame frame)\r\n   at System.Windows.Threading.Dispatcher.Run()\r\n   at System.Windows.Application.RunDispatcher(Object ignore)\r\n   at System.Windows.Application.RunInternal(Window window)\r\n   at System.Windows.Application.Run()\r\n   at SoundMod.App.Main()\r\n\r\n  This exception was originally thrown at this call stack:\r\n    System.Linq.Expressions.Expression.New(System.Type)\r\n    LiteDB.Reflection.CreateClass(System.Type)\r\n    LiteDB.Reflection.CreateInstance(System.Type)\r\n\r\nInner Exception 1:\r\nResolutionFailedException: Resolution failed with error: Exception has been thrown by the target of an invocation.\r\n\r\nFor more detailed information run Unity in debug mode: new UnityContainer().AddExtension(new Diagnostic())\r\n\r\nInner Exception 2:\r\nTargetInvocationException: Exception has been thrown by the target of an invocation.\r\n\r\nInner Exception 3:\r\nLiteException: Failed to create instance for type 'SoundMod.Sound' from assembly 'SoundMod.Sound, SoundMod, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'. Checks if the class has a public constructor with no parameters.\r\n\r\nInner Exception 4:\r\nArgumentException: Type 'SoundMod.Sound' does not have a default constructor (Parameter 'type')\r\n```\r\n\r\nI also tried using `[BsonCtor]` on the Sound constructor but I really don't know what might be causing this error. Any help is really appreciated!\r\n\r\nEDIT:\r\n\r\nSo the problem seems to be that the constructor of Sound has Audio as a parameter, so how can I make it work?\r\nHow can I make LiteDB return a List<Sound> that also retrieves and generates from the DB the Audio object each Sound object contains?"
+      }
+    ]
+  }
+]

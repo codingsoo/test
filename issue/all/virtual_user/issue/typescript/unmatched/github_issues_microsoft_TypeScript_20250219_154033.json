@@ -1,0 +1,877 @@
+[
+  {
+    "number": 60245,
+    "title": "Type of a generic is not narrowed",
+    "created_at": "2024-10-16T17:50:28Z",
+    "closed_at": "2024-10-20T01:32:39Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/60245",
+    "body": "### \ud83d\udd0e Search Terms\n\ngeneric narrowed class instance enum\n\n### \ud83d\udd57 Version & Regression Information\n\n- This is the behavior in every version I tried, and I reviewed the FAQ for entries about narrowed.\n\n\n### \u23ef Playground Link\n\n_No response_\n\n### \ud83d\udcbb Code\n\n```ts\nenum Tag {\n  A,\n  B,\n  C,\n}\n\ninterface InterfaceByTag {\n  [Tag.A]: {\n    type: string;\n  };\n  [Tag.B]: {\n    type: number;\n  };\n  [Tag.C]: {\n    type: boolean;\n  };\n}\n\nclass C<\n  T extends Tag = Tag,\n> {\n  tag: T;\n  type: InterfaceByTag[T][\"type\"];\n\n  constructor(tag: T, type: InterfaceByTag[T][\"type\"]) {\n    this.tag = tag;\n    this.type = type;\n  }\n}\n\nconst tagIsA = new C(Tag.A, \"string\");\nconst tagIsAError = new C(Tag.A, 123);\n\nfunction test(instance: C) {\n  switch (instance.tag) {\n    case Tag.A: {\n      const type = instance.type; // should get string, but get string | number | boolean.\n      break;\n    }\n    case Tag.B: {\n      const type = instance.type; // Same as above\n      break;\n    }\n    case Tag.C: {\n      const type = instance.type; // Same as above\n      break;\n    }\n  }\n}\n```\n\n\n### \ud83d\ude41 Actual behavior\n\nIt is not narrowed in the switch statement. In all case, the type of `instance.type` is `string | number | boolean`.\n\n### \ud83d\ude42 Expected behavior\n\nI think the specific type has been identified In the switch statement. What I expected:\n```ts\n  switch (instance.tag) {\n    case Tag.A: {\n      const type = instance.type; // string\n      break;\n    }\n    case Tag.B: {\n      const type = instance.type; // number\n      break;\n    }\n    case Tag.C: {\n      const type = instance.type; // boolean\n      break;\n    }\n  }\n```\n\n### Additional information about the issue\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/60245/comments",
+    "author": "Nlicro",
+    "comments": [
+      {
+        "user": "MartinJohns",
+        "created_at": "2024-10-16T17:54:43Z",
+        "body": "This is working as intended. You do not specify the type parameter for `C` in your `test` function, so it falls back to the default `Tag`. That means the type is `C<Tag>`, which results in the type `{ tag: Tag, type: string | number | boolean }`. This is not a union type that can be narrowed."
+      },
+      {
+        "user": "MartinJohns",
+        "created_at": "2024-10-16T18:34:46Z",
+        "body": "> you misunderstood it.\n\nI did not. The type of `instance` is `C<Tag>`, which results in the type `{ tag: Tag, type: string | number | boolean }`. It's **not** the type `{ tag: Tag.A, type: string } | { tag: Tag.B, type: number } | { tag: Tag.C, type: boolean }`, so it can't be narrowed the way you expect it to. It's perfectly valid to have the value `{ tag: Tag.A, type: true }` assigned to `C<Tag>`."
+      },
+      {
+        "user": "MartinJohns",
+        "created_at": "2024-10-17T06:22:11Z",
+        "body": "This approach is unsafe, as it does not align with your types. Again, `{ tag: tag.A, type: true }` is a perfectly valid assignment to the type `C`, but using your `isTagA` type guard it would wrongly assume the type of `type` is `string`, when it's actually `boolean`.\n\nYou seem to wrongly assume that `InterfaceByTag[T][\"type\"]` is a type depending on what's assigned to `tag`, but that's not the case. The type depends on whatever `T` is, which can be a union type as well - and actually is a union type when your type argument defaults to `Tag`.\n\nYou need to use a union of the types you want:\n- `C<Tag.A> | C<Tag.B> | C<Tag.C>`, which results in `{ tag: Tag.A, type: string } | { tag: Tag.A, type: number } | { tag: Tag.C, type: boolean }`\n- **not** `C<Tag>` or `C` (they're the same), which results in `{ tag: Tag, type: string | number | boolean }`\n\nYou could use a helper type and make use of distributive conditional types to get a union based on your tags: `type AllTagC<T extends Tag> = T extends Tag ? C<T> : never`  \nThen use it: `function test(instance: AllTagC<Tag>) { ... }`\n\nIt's crucial to understand what structure your types actually look like."
+      }
+    ]
+  },
+  {
+    "number": 56224,
+    "title": "Types not generated/working with AMD module",
+    "created_at": "2023-10-26T10:08:53Z",
+    "closed_at": "2023-10-27T18:26:56Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/56224",
+    "body": "### Acknowledgement\n\n- [X] I acknowledge that issues using this template may be closed without further explanation at the maintainer's discretion.\n\n### Comment\n\nWhen using AMD modules and working in VSCode, type declarations are not being picked up for modules that load dependencies using an array passed to the define function, but they are working for modules that load dependencies using `require('./module-path')`\r\n\r\nIn a simple project structured like this:\r\n\r\n```\r\napp\r\n    |app.js\r\n    |lib.js\r\n    |lib.d.ts\r\n```\r\nThe file `lib.js` contains this:\r\n\r\n```\r\ndefine('lib', function() {\r\n    return {\r\n        libTest: (msg) => {\r\n            console.log('lib is working!', msg);\r\n            return true;\r\n        },\r\n    }\r\n});\r\n```\r\nThe file `lib.d.ts` looks like this:\r\n\r\n```\r\n/** @name declaration test */\r\nexport module './lib';\r\n/** @name libTest */\r\nexport function libTest(msg: string): boolean;\r\n```\r\nThe declarations from `lib.d.ts` are correctly picked up in `app.js` with this and Intellisense works as expected, pulling info from `lib.d.ts`:\r\n\r\n```\r\nconst lib = require('./lib');\r\nlib.libTest(); // hovering pointer on 'libTest' shows \"function libTest(msg: string): boolean \\n @name -- libTest\" and hovering on 'lib' shows \"@name -- declaration test\"\r\n```\r\nThe declarations also work as expected if `app.js` looks like this instead:\r\n\r\n```\r\ndefine(function() {\r\n    const lib = require('./lib');\r\n    lib.libTest(); // hovering pointer on 'libTest' shows \"function libTest(msg: string): boolean \\n @name -- libTest\" and hovering on 'lib' shows \"@name -- declaration test\"\r\n});\r\n```\r\nHowever, the declarations **do not work** at all when the code in `app.js` looks like this:\r\n\r\n```\r\ndefine(['lib'], function(lib) {\r\n    lib.libTest(); // hovering pointer on either 'lib' or 'libTest' just shows \"any\"\r\n});\r\n```\r\nWhy are the declarations from the `lib.d.ts` file working as expected for the first two variations of `app.js`, but not the third variation which uses an array of dependencies?\r\n\r\nAdditionally, if I delete the `lib.d.ts` file and try to have the compiler generate the declarations automatically (using `\"declaration\": true, \"emitDeclarationOnly\": true` in tsconfig) the tsc command completes successfully, but the generated d.ts file is completely empty",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/56224/comments",
+    "author": "ts-lover",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2023-10-26T16:31:23Z",
+        "body": "JS module inference only works for calls to the `require` function; it doesn't support AMD `define` calls."
+      },
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2023-10-27T16:53:19Z",
+        "body": "You'd have to write it with \"normal\" TS syntax and transpile to AMD format for it to be recognized"
+      }
+    ]
+  },
+  {
+    "number": 56160,
+    "title": "tsc target did not work expectedly when compile ES2022 to ES2015",
+    "created_at": "2023-10-20T07:59:04Z",
+    "closed_at": "2023-10-23T01:26:29Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/56160",
+    "body": "### \ud83d\udd0e Search Terms\n\ntarget  ES2022  ES2015\n\n### \ud83d\udd57 Version & Regression Information\n\nTS 4.5\r\n\n\n### \u23ef Playground Link\n\n_No response_\n\n### \ud83d\udcbb Code\n\nnpx tsc --target es5 index.ts --outFile indexout.js\r\n\r\n\r\nindex.ts:\r\nconst arr = [1, 2, 3, 4, 5];\r\narr.at(1); // 2\n\n### \ud83d\ude41 Actual behavior\n\nindexout.js:\r\n\r\nconst arr = [1, 2, 3, 4, 5];\r\narr.at(1); // 2\n\n### \ud83d\ude42 Expected behavior\n\nArray.at is a new feature in ES2022\r\nThe target is ES5, the output js should not include Array.at\r\nso the indexout.js can not work on the old browser.\n\n### Additional information about the issue\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/56160/comments",
+    "author": "turtleinspace1",
+    "comments": [
+      {
+        "user": "MartinJohns",
+        "created_at": "2023-10-20T08:07:34Z",
+        "body": "TypeScript will only downlevel newer syntax. If the function you're trying to call does not exist at your runtime it's your responsibility to polyfill it."
+      }
+    ]
+  },
+  {
+    "number": 47084,
+    "title": "warning: Experimental support for decorators is a feature that is subject to change in a future release",
+    "created_at": "2021-12-09T09:29:46Z",
+    "closed_at": "2021-12-10T08:45:57Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/47084",
+    "body": "# Bug Report\r\n\r\n<!--\r\n  Please fill in each section completely. Thank you!\r\n-->\r\n\r\n### \ud83d\udd0e Search Terms\r\n\r\nExperimental  decorators\r\n\r\n### \ud83d\udd57 Version & Regression Information\r\n\r\nmonaco: v0.30.1\r\ntypescript: 3.2.4\r\n\r\n\r\n### \ud83d\udcbb Code\r\nplaygroud code:\r\nmonaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({\r\n\tnoSemanticValidation: true,\r\n\tnoSyntaxValidation: false\r\n});\r\n\r\n// compiler options\r\nmonaco.languages.typescript.javascriptDefaults.setCompilerOptions({\r\n\ttarget: monaco.languages.typescript.ScriptTarget.ES2015,\r\n        experimentalDecorators: true,\r\n\tallowNonTsExtensions: true\r\n});\r\n\r\n\r\nvar jsCode = [\r\n    'import { Injectable } from \\'@angular/core\\';',\r\n    'import { ApplicationParamService } from \\'@farris/command-services\\';',\r\n    'import { HttpClient, HttpHeaders } from \\'@angular/common/http\\';',\r\n    '@Injectable()',\r\n    'export class List1FrmWebcmpService {',\r\n        'constructor(private obj: ApplicationParamService, private http:HttpClient) {',\r\n            'this.obj.parseParams;',\r\n        '}',\r\n        'private get() { }',\r\n        'set() { }',\r\n    '}'\r\n].join('\\n');\r\n\r\nmonaco.editor.create(document.getElementById('container'), {\r\n\tvalue: jsCode,\r\n\tlanguage: 'typescript'\r\n});\r\n\r\n### \ud83d\ude41 Actual behavior\r\n\r\n'List1FrmWebcmpService' has underline&warning ' Experimental support for decorators is a feature that is subject to change in a future release. Set the 'experimentalDecorators' option in your 'tsconfig' or 'jsconfig' to remove this warning '\r\n\r\n### \ud83d\ude42 Expected behavior\r\n'experimentalDecorators: true' option not wok,how to remove this warning?\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/47084/comments",
+    "author": "chenqiangkobe",
+    "comments": [
+      {
+        "user": "MartinJohns",
+        "created_at": "2021-12-09T09:57:20Z",
+        "body": "Did you mean to set `typescriptDefaults` instead of `javascriptDefaults`? Regardless, this doesn't seem to be an issue with TypeScript itself.\r\n\r\n> typescript: 3.2.4\r\n\r\nAre you really using a version released on 3. January **2019**? The latest version is 4.5.2."
+      }
+    ]
+  },
+  {
+    "number": 29411,
+    "title": "Function return value types not inferred in some cases",
+    "created_at": "2019-01-14T20:52:32Z",
+    "closed_at": "2019-01-15T17:54:18Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/29411",
+    "body": "**TypeScript Version:**  3.3.0-dev.20190112\r\n\r\n**Search Terms:** function return type\r\n\r\n**Code**\r\n See code below which has a function returning a Promise<HelloInterface | undefined>\r\nThe calling code only infers the type to be HelloInterface.\r\n\r\n```ts\r\nclass Example1 {\r\n  public testFunction1(): void {\r\n    this.getResponse().then((value: HelloInterface) => {  // Expected tsc to infer this to be value: HelloInterface | undefined \r\n\r\n      console.log(value.property1);  // Potential runtime error as value can be undefined.\r\n    });\r\n  }\r\n\r\n  private getResponse(): Promise<HelloInterface | undefined> {\r\n    return Promise.resolve({ \"property1\": \"value1\" });\r\n  }\r\n}\r\n\r\ninterface HelloInterface {\r\n  \"property1\": string;\r\n}\r\n\r\n```\r\n\r\n**Expected behavior:**\r\n1) value should have inferred type as HelloInterface | undefined. \r\nThis will force me to handle the case where it is undefined in the caller.\r\n\r\n**Actual behavior:**\r\nvalue has type HelloInterface\r\nThere will be a runtime error when we access say value.property1 when value is undefined.\r\n\r\n**Playground Link:** \r\nPaste above code in vscode editor. \r\nI would expect vscode editor to indicate an error for value possibly being undefined.\r\n\r\n** Other Observations **\r\n The same works if the function return type is say Promise<HelloInterface | string>\r\n It appears this is seen when we have 'undefined' as one of the return value types.\r\n\r\n**Related Issues:**\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/29411/comments",
+    "author": "psavur",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2019-01-14T21:53:26Z",
+        "body": "Sounds like you have `strictNullChecks` off - enable this option to have TS check for `null` / `undefined` values"
+      },
+      {
+        "user": "psavur",
+        "created_at": "2019-01-14T23:26:34Z",
+        "body": "@RyanCavanaugh  strictNullChecks are on.\r\nI updated the code example above to be more clear.\r\n\r\n"
+      },
+      {
+        "user": "ajafff",
+        "created_at": "2019-01-15T07:42:24Z",
+        "body": "And do you have `strictFunctionTypes` enabled?"
+      }
+    ]
+  },
+  {
+    "number": 29097,
+    "title": "error TS2304: Cannot find name 'EventListenerOrEventListenerObject' (and others)",
+    "created_at": "2018-12-19T14:32:15Z",
+    "closed_at": "2018-12-19T19:47:08Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/29097",
+    "body": "This is a duplicate of #21922, but that one has been fixed in 2.8. Maybe the DT entry for electron needs updating. In this case this issue would be obsolete.\r\n\r\n**TypeScript Version:**  3.3.0-dev.20181219\r\n\r\n**Search Terms:**\r\n\r\n**Code**\r\n\r\n```ts\r\n// any code using electron, both with obsolete @types/electron or types included in electron.\r\n```\r\n\r\n**Expected behavior:**\r\n\r\nNo errors\r\n\r\n**Actual behavior:**\r\n\r\n```\r\ntsc --noEmit\r\n\r\nnode_modules/electron/electron.d.ts:3675:116 - error TS2304: Cannot find name 'ReadableStream'.\r\n\r\n3675     interceptStreamProtocol(scheme: string, handler: (request: InterceptStreamProtocolRequest, callback: (stream?: ReadableStream | StreamProtocolResponse) => void) => void, completion?: (error: Error) => void): void;\r\n                                                                                                                        ~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:3744:114 - error TS2304: Cannot find name 'ReadableStream'.\r\n\r\n3744     registerStreamProtocol(scheme: string, handler: (request: RegisterStreamProtocolRequest, callback: (stream?: ReadableStream | StreamProtocolResponse) => void) => void, completion?: (error: Error) => void): void;\r\n                                                                                                                      ~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:4200:11 - error TS2304: Cannot find name 'ReadableStream'.\r\n\r\n4200     data: ReadableStream;\r\n               ~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:6535:38 - error TS2304: Cannot find name 'HTMLElementEventMap'.\r\n\r\n6535     addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;\r\n                                          ~~~~~~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:6535:102 - error TS2304: Cannot find name 'HTMLElementEventMap'.\r\n\r\n6535     addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;\r\n                                                                                                          ~~~~~~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:6536:46 - error TS2304: Cannot find name 'EventListenerOrEventListenerObject'.\r\n\r\n6536     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;\r\n                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:6537:41 - error TS2304: Cannot find name 'HTMLElementEventMap'.\r\n\r\n6537     removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;\r\n                                             ~~~~~~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:6537:105 - error TS2304: Cannot find name 'HTMLElementEventMap'.\r\n\r\n6537     removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, useCapture?: boolean): void;\r\n                                                                                                             ~~~~~~~~~~~~~~~~~~~\r\n\r\nnode_modules/electron/electron.d.ts:6538:49 - error TS2304: Cannot find name 'EventListenerOrEventListenerObject'.\r\n\r\n6538     removeEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;\r\n                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n\r\n[EDIT: removed irrelevant errors]\r\n```\r\n**Playground Link:** <!-- A link to a TypeScript Playground \"Share\" link which demonstrates this behavior -->\r\n\r\n**Related Issues:** #21922",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/29097/comments",
+    "author": "mutech",
+    "comments": [
+      {
+        "user": "weswigham",
+        "created_at": "2018-12-19T18:17:09Z",
+        "body": "`EventListenerOrEventListenerObject` is definitely still used in the `DOM` lib file - are you compiling with `noLib` or without the dom lib?"
+      },
+      {
+        "user": "weswigham",
+        "created_at": "2018-12-19T18:58:23Z",
+        "body": "Yeah, I can only repro these errors if the `dom` lib isn't in the build. Does your `lib` compiler option include `dom`?"
+      },
+      {
+        "user": "mutech",
+        "created_at": "2018-12-19T19:47:08Z",
+        "body": "You're right, `dom` was missing. I split the compilation for main and renderer parts and removed `dom` for the main part. Didn't realize tha the d.ts is the same for node/chrome. Sorry for the noise."
+      }
+    ]
+  },
+  {
+    "number": 28593,
+    "title": "Classes cannot satisfy Constructor<Itself> bound",
+    "created_at": "2018-11-18T21:28:08Z",
+    "closed_at": "2018-11-19T18:41:55Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/28593",
+    "body": "<!-- Please try to reproduce the issue with `typescript@next`. It may have already been fixed. -->\r\n**TypeScript Version:**  3.2.0-dev.201xxxxx\r\n\r\n<!-- Search terms you tried before logging this (so others can find this issue more easily) -->\r\n**Search Terms:** generics mixin classes interfaces constructor\r\n\r\n**Code**\r\n\r\n```ts\r\ntype Constructor<T> = new(...args: any[]) => T;\r\n\r\ninterface XInterface {}\r\nfunction make<T extends Constructor<XInterface>>(Base: T) {\r\n    return class extends Base implements XInterface {}\r\n}\r\n\r\n// This is ok.\r\nclass X extends make(Function) { }\r\n\r\n// But this fails.\r\nclass X2 extends make(Function) implements Constructor<XInterface> { }\r\n```\r\n\r\n**Expected behavior:** \r\nCode should compile\r\n\r\n**Actual behavior:**\r\nCompiler error: X2 provides no match for signature `new(...args: any[]) => XInterface`\r\n\r\n\r\n--- \r\n\r\n**Edit 1:**\r\nLooks like even something more basic like \r\n\r\n```ts\r\nclass Y implements XInterface, Constructor<XInterface> {}\r\n```\r\n\r\nfails to compile. This makes it difficult to chain together a set of mixin extending through another mixin function. \r\n\r\n**Edit 2**\r\n\r\nLooks like even the simplest case of\r\n\r\n```ts\r\nclass Y implements Constructor<Y>\r\n```\r\n\r\nfails.",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/28593/comments",
+    "author": "prasannavl",
+    "comments": [
+      {
+        "user": "weswigham",
+        "created_at": "2018-11-19T18:29:30Z",
+        "body": "@prasannavl the `implements` clause constrains the instance shape of a class - the constructor signature of a class is associate with its static side (it returns the instance), therefore isn't constrainable via `implements`.\r\n\r\n```ts\r\nclass X2 extends make(Function) implements Constructor<XInterface> { }\r\n```\r\nis saying the class X2 extends a `Constructor<XInterface>` and its instance is a `Constructor<XInterface>` - meaning that when you say `new X2()`, the result is something you can use `new` on and get an `XInterface`, which is, ofc, not the case here."
+      }
+    ]
+  },
+  {
+    "number": 21096,
+    "title": "Issue with generic extension of object with index signature that returns functions",
+    "created_at": "2018-01-09T17:19:58Z",
+    "closed_at": "2018-01-09T21:03:58Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/21096",
+    "body": "**TypeScript Version:**  2.7.0-dev.20180109\r\n\r\nHi. I ran into this issue trying to assign a class to a generic type that takes in T which extends an index signature type [s:string]:Function. The same issue happens with index sig [s:string]:new(..._)=>any\r\n\r\n**Code**\r\n\r\n```ts\r\nclass C {\r\n}\r\n\r\ntype Test<T extends {[s:string]:Function}> = {};\r\n\r\nconst t:Test<{c:C}> = { //error\r\n\tc:C,\r\n};\r\n\r\ntype Test2 = {\r\n\t[s:string]:Function\r\n}\r\n\r\nconst f:Test2 = {c:C}; //fine\r\n```\r\n\r\n**Expected behavior:**\r\nI should be able to assign {c:C} to the generic type\r\n\r\n**Actual behavior:**\r\n\r\nerror: \r\n\r\nError:(6, 14) TS2344: Type '{ c: C; }' does not satisfy the constraint '{ [s: string]: Function; }'.\r\n  Property 'c' is incompatible with index signature.\r\n    Type 'C' is not assignable to type 'Function'.\r\n      Property 'apply' is missing in type 'C'.\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/21096/comments",
+    "author": "dontsave",
+    "comments": [
+      {
+        "user": "mhegazy",
+        "created_at": "2018-01-09T18:26:10Z",
+        "body": "i think you meant `Test<{c:typeof C}>` there. `C` refers to the instance type of `C`, `typeof C` refers to the type of the constructor function for `C`."
+      }
+    ]
+  },
+  {
+    "number": 18761,
+    "title": "Cannot find types in sub-project",
+    "created_at": "2017-09-26T07:23:08Z",
+    "closed_at": "2017-09-27T03:23:02Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/18761",
+    "body": "**TypeScript Version:**  2.5.2\r\n\r\n**Code**\r\n```js\r\n// [1]\r\n// tsconfig.json\r\n{\r\n    \"compilerOptions\": {\r\n      \"allowJs\": true,\r\n      \"sourceMap\": true,\r\n      \"declaration\": false,\r\n      \"skipLibCheck\": true,\r\n      \"noImplicitAny\": false,\r\n      \"strictNullChecks\": false,\r\n      \"module\": \"es2015\",\r\n      \"moduleResolution\": \"node\",\r\n      \"target\": \"es5\",\r\n      \"typeRoots\": [\r\n        \"node_modules/@types\"\r\n      ],\r\n      \"lib\": [\r\n        \"dom\",\r\n        \"es5\",\r\n        \"scripthost\",\r\n        \"es2015\"\r\n      ]\r\n    },\r\n    \"include\": [\r\n      \"types/**/*.d.ts\",\r\n      \"src/**/*.ts\"\r\n    ],\r\n    \"exclude\": [\r\n      \"node_modules\"\r\n    ]\r\n  }\r\n```\r\n\r\n```ts\r\n// git-submodule/src/index.ts\r\nDate.prototype.format = function () {\r\n    return 90; // Just for demo\r\n};\r\nconst date = new Date();\r\nconst format = date.format();\r\nexport default format;\r\n\r\n// git-submodule/types/custom.d.ts\r\ninterface Date {\r\n    format(): number;\r\n}\r\n\r\n// git-submodule/tsconfig.json // see above [1]\r\n\r\n// src/index.ts\r\nimport Sub from '../git-submodule/src/index';\r\n\r\n// src/tsconfig.json // see above [1]\r\n```\r\n\r\nthen, run `tsc` in root directory.\r\n\r\n**Expected behavior:**\r\nNo errors.\r\n\r\n**Actual behavior:**\r\n```\r\n// errors\r\ngit-submodule/src/index.ts(1,16): error TS2339: Property 'format' does not exist on type 'Date'.\r\ngit-submodule/src/index.ts(6,21): error TS2339: Property 'format' does not exist on type 'Date'.\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/18761/comments",
+    "author": "Aqours",
+    "comments": [
+      {
+        "user": "ghost",
+        "created_at": "2017-09-26T14:38:43Z",
+        "body": "TypeScript won't look at the `tsconfig.json` for imported modules. So it won't know that in `git-submodule` you had a `tsconfig.json` that included the types.\r\nIf you need to expose types from a package, you should reference them from its `index` in some way, such as with `/// <reference path=\"./types/custom.d.ts\" />.`\r\nIn this case, you could also not bother with putting types in a separate file and just do:\r\n```ts\r\ndeclare global {\r\n    interface Date {\r\n        format(): number;\r\n    }\r\n}\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 17802,
+    "title": "\"TS6143 --allowJs is not set\" error but only on one setup",
+    "created_at": "2017-08-15T11:06:33Z",
+    "closed_at": "2017-08-22T08:47:59Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/17802",
+    "body": "**TypeScript Version:**  2.2\r\n\r\nWe have several machines with the same Angular 2 + ASP.NET Core 1.6 project on them. All of the setups are similar as far as we can say and one of those VS.NET setups is having this error on build and we couldn't figure out what's different/missing:\r\n\r\n```\r\nError\tTS6143\tBuild:Module './src/common' was resolved to 'D:/MyProject/node_modules/@angular/common/src/common.js', but '--allowJs' is not set.\r\nD:\\MyProject\\node_modules\\@angular\\common\\index.d.ts\t13\t\r\n```\r\n\r\nThe same project builds and runs fine on other setups. Here's what they all have common:\r\n\r\n- VS.NET 2017 15.2\r\n- TypeScript 2.2\r\n- .NET SDK 1.0.4\r\n\r\n`tsconfig.json` is in the root folder of the project.\r\n\r\n**tsconfig.json:**\r\n\r\n```\r\n{\r\n  \"compilerOptions\": {\r\n    \"target\": \"es5\",\r\n    \"module\": \"commonjs\",\r\n    \"moduleResolution\": \"node\",\r\n    \"sourceMap\": true,\r\n    \"emitDecoratorMetadata\": true,\r\n    \"experimentalDecorators\": true,\r\n    \"lib\": [ \"es2015\", \"dom\" ],\r\n    \"suppressImplicitAnyIndexErrors\": true\r\n  },\r\n  \"exclude\": [\r\n    \"node_modules\",\r\n    \"wwwroot/Application/Models/Custom/**/*\",\r\n    \"wwwroot/Application/Models/Generator/**/*\",\r\n    \"wwwroot/Application/**/*.js\",\r\n    \"wwwroot/Application/**/*.js.map\"\r\n  ]\r\n}\r\n```\r\n\r\nWhat could be wrong with this problematic machine?",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/17802/comments",
+    "author": "deastr",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2017-08-16T18:42:36Z",
+        "body": "Seems like you must have different node_modules folder contents. Try setting up a package-lock.json and making sure you have identical NPM modules installed"
+      },
+      {
+        "user": "deastr",
+        "created_at": "2017-08-22T08:47:59Z",
+        "body": "Yes the problem was incomplete node_modules folder. We cleared cache, node_modules and restore clean and it works now."
+      }
+    ]
+  },
+  {
+    "number": 17775,
+    "title": "Enum Error after Using tsc --target a.ts. ",
+    "created_at": "2017-08-14T12:46:07Z",
+    "closed_at": "2017-08-15T01:15:18Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/17775",
+    "body": "enum DoorState\r\n{\r\nOpen, Closed, Ajar\r\n}\r\nsave as 2_a.ts\r\nCompile using tsc --target es6 2_a.ts\r\nRun using node 2_a.js\r\nResult::\r\nUnexpected reserved word.\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/17775/comments",
+    "author": "ybchoo",
+    "comments": [
+      {
+        "user": "ikatyang",
+        "created_at": "2017-08-14T13:34:12Z",
+        "body": "I guess you might execute the wrong file, e.g. `node 2_a.ts`, otherwise can you share your TS/Node version and generated `2_a.js`?"
+      }
+    ]
+  },
+  {
+    "number": 17645,
+    "title": "async  can use it at Typescript?",
+    "created_at": "2017-08-07T02:24:13Z",
+    "closed_at": "2017-08-07T03:05:53Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/17645",
+    "body": "async function getStockPriceByName(name) {\r\n  return name;\r\n}\r\n\r\n\r\nerror TS2468: Cannot find global value 'Promise'.\r\ntest.ts(1,16): error TS2705: An async function or method in ES5/\r\nES3 requires the 'Promise' constructor.  Make sure you have a de\r\nclaration for the 'Promise' constructor or include 'ES2015' in y\r\nour `--lib` option.\r\n\r\n\r\n{\r\n    \"compilerOptions\": {\r\n        \"target\": \"es5\",\r\n        \"experimentalDecorators\": true,\r\n         \"lib\": [\r\n      \"dom\",\r\n      \"es5\",\r\n       \"es6\"\r\n    ]\r\n    }\r\n}",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/17645/comments",
+    "author": "JLBear",
+    "comments": [
+      {
+        "user": "ikatyang",
+        "created_at": "2017-08-07T02:46:40Z",
+        "body": "You have to specify your `tsconfig.json` for `tsc` so that TS can pick up your configs.\r\n\r\n```sh\r\ntsc -p path/to/your/tsconfig.json\r\n```\r\n\r\n`tsc test.ts` is considered using default settings."
+      }
+    ]
+  },
+  {
+    "number": 16935,
+    "title": "Compiler API transpile type cast code wrong.",
+    "created_at": "2017-07-05T03:12:16Z",
+    "closed_at": "2017-07-05T06:35:49Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/16935",
+    "body": "**TypeScript Version:**  2.3.4 \r\n\r\n**Code**\r\n- compiler api invoke\r\n```ts\r\nimport * as ts from \"typescript\";                                                                                                                                                       \r\nfunction _go_transpileModule(script: string): string {\r\n    let result = ts.transpileModule(script, {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES5}}); \r\n    return result.outputText;\r\n}  \r\n```\r\nI call _go_transpileModule method in myself embed v8 engine application, not node.js.\r\n\r\n- ts source code\r\n```ts\r\nfunction sqlDemo() {                                           \r\n                                                               \r\n    try {                                                      \r\n        let s = db.sql();                                      \r\n        let records = <Object[]>s.exec('select * from script');\r\n                                                               \r\n        records.forEach((r) => printRecord(r));                \r\n                                                               \r\n        for (let i = 0; i < records.length; i++) {             \r\n            printRecord(records[i]);                           \r\n        }                                                      \r\n                                                               \r\n        s.exec(\"update script set id = 1111 where id = 1;\");   \r\n    } catch (error) {                                          \r\n        console.log(error.name, error.message);                \r\n    }                                                          \r\n}                       \r\n\r\n```\r\n\r\n- the javascript code after transpiled\r\n```js\r\nfunction sqlDemo() {\r\n    try {\r\n        var s = db.sql();\r\n        var records = <Object />, _a =  > s.exec('select * from script');\r\n        records.forEach(function (r) { return printRecord(r); });\r\n        for (var i = 0; i < records.length; i++) {\r\n            printRecord(records[i]);\r\n        }\r\n        s.exec(\"update script set id = 1111 where id = 1;\");\r\n    }\r\n    catch (error) {\r\n        console.log(error.name, error.message);\r\n    }\r\n}\r\n```\r\n\r\n**Expected behavior:**\r\n\r\neverything is ok.\r\n\r\n**Actual behavior:**\r\n\r\nbut the follow code:\r\n```ts\r\n<Object[]>\r\n```\r\n has been translated to \r\n```js\r\n<Object />, _a =  >\r\n```\r\n\r\nHow can I solve this problem?\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/16935/comments",
+    "author": "saibing",
+    "comments": [
+      {
+        "user": "ikatyang",
+        "created_at": "2017-07-05T03:44:05Z",
+        "body": "It seems something might be wrong with your `jsx` config, can you give a try with\r\n\r\n```js\r\ntranspileOptions = {compilerOptions: {jsx: ts.JsxEmit.None, /* ... */}, /* ... */}\r\n``` \r\n\r\nor \r\n\r\n```js\r\ntranspileOptions = {fileName: 'something.ts', /* ... */}\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 15994,
+    "title": "Control flow type narrowing doesn't work",
+    "created_at": "2017-05-22T15:24:34Z",
+    "closed_at": "2017-05-22T16:00:06Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/15994",
+    "body": "**TypeScript Version:**  2.3.2\r\n\r\n**Code**\r\n\r\n```ts\r\ntype JoinModels<A, K extends string, B> = A & {\r\n    [k in K]: B;\r\n};\r\n\r\ninterface User {\r\n    username: string;\r\n}\r\n\r\ninterface Post {\r\n    title: string;\r\n}\r\n\r\ntype UserWithPosts = JoinModels<User, \"posts\", Post[]> | null;\r\n\r\nlet userWithPosts: UserWithPosts = null;\r\nif (userWithPosts == null) {\r\n    console.log(userWithPosts.posts[0].title);\r\n}\r\n```\r\n\r\n**Expected behavior:**\r\n`userWithPosts` should be narrowed to null;\r\n\r\n**Actual behavior:**\r\nNo error occurs",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/15994/comments",
+    "author": "CurlerRoo",
+    "comments": [
+      {
+        "user": "blakeembrey",
+        "created_at": "2017-05-22T15:32:21Z",
+        "body": "@pc-lover If you enable `strictNullChecks`, this should work as expected. Without it, there is no `null` or `undefined` types used. Do you have an expected behaviour without `strictNullChecks` enabled?"
+      }
+    ]
+  },
+  {
+    "number": 15264,
+    "title": "No --target es2016 support on VS2017?",
+    "created_at": "2017-04-19T05:31:15Z",
+    "closed_at": "2017-04-19T08:41:20Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/15264",
+    "body": "**TypeScript Version:**  2.1.5.0 (VS2017)\r\n\r\n**Code**\r\n\r\n```xml\r\n  <PropertyGroup Label=\"Configuration\" Condition=\"'$(Configuration)|$(Platform)'=='Release|AnyCPU'\">\r\n    <TypeScriptTarget>ES2016</TypeScriptTarget>\r\n    <TypeScriptNoImplicitAny>true</TypeScriptNoImplicitAny>\r\n    <TypeScriptOutFile>js/app.js</TypeScriptOutFile>\r\n  </PropertyGroup>\r\n```\r\n\r\n**Expected behavior:**\r\n\r\nIt should compile\r\n\r\n**Actual behavior:**\r\n\r\n`Build:Cannot find name '(every type in lib.d.ts e.g. Document)'`",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/15264/comments",
+    "author": "saschanaz",
+    "comments": [
+      {
+        "user": "DanielRosenwasser",
+        "created_at": "2017-04-19T07:45:51Z",
+        "body": "I think this is related to #14401. Can you try adding `\"lib\": [\"es2016\", \"dom\"]`?"
+      }
+    ]
+  },
+  {
+    "number": 14687,
+    "title": "TS2300: Duplicate identifier",
+    "created_at": "2017-03-16T13:22:43Z",
+    "closed_at": "2017-04-21T16:30:50Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/14687",
+    "body": "**TypeScript Version:**  2.2.1\r\n\r\n```\r\n{\r\n\t\"compilerOptions\": {\r\n\t\t\"typeRoots\": [\r\n\t\t\t\"./node_modules/@types\",\r\n\t\t\t\"./types\"\r\n\t\t],\r\n\r\n\t\t\"outDir\": \"cache/\",\r\n\r\n\t\t\"types\": [\r\n\t\t\t\"debug\",\r\n\t\t\t\"deepmerge\",\r\n\t\t\t\"imap\",\r\n\t\t\t\"faker\",\r\n\t\t\t\"minimist\",\r\n\t\t\t\"mocha\",\r\n\t\t\t\"nodemailer\",\r\n\t\t\t\"node\",\r\n\t\t\t\"request\",\r\n\t\t\t\"webdriverio\"\r\n\t\t],\r\n\r\n\t\t\"lib\": [\r\n\t\t\t\"es2017\",\r\n\t\t\t\"scripthost\",\r\n\t\t\t\"webworker\",\r\n\t\t\t\"dom\"\r\n\t\t],\r\n\r\n\t\t\"target\": \"es2017\",\r\n\t\t\"module\": \"commonjs\",\r\n\t\t\"moduleResolution\": \"node\",\r\n\t\t\"noImplicitAny\": false,\r\n\r\n\t\t\"declaration\": false,\r\n\t\t\"allowJs\": true,\r\n\r\n\t\t\"emitDecoratorMetadata\": true,\r\n\t\t\"experimentalDecorators\": true,\r\n\t\t\"sourceMap\": true\r\n\t},\r\n\r\n\t\"exclude\": [\r\n\t\t\"./config.js\",\r\n\t\t\"./config.local.js\",\r\n\t\t\"./node_modules\",\r\n\t\t\"./utils\",\r\n\t\t\"./tasks\",\r\n\t\t\"./files\",\r\n\t\t\"./cache\"\r\n\t]\r\n}\r\n```\r\n\r\n```\r\n\u279c tsc\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14171,14): error TS2300: Duplicate identifier 'EventListenerOrEventListenerObject'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14897,6): error TS2300: Duplicate identifier 'AlgorithmIdentifier'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14898,6): error TS2300: Duplicate identifier 'BodyInit'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14920,6): error TS2300: Duplicate identifier 'IDBKeyPath'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14929,6): error TS2300: Duplicate identifier 'RequestInfo'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14930,6): error TS2300: Duplicate identifier 'USVString'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14934,6): error TS2300: Duplicate identifier 'IDBValidKey'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14935,6): error TS2300: Duplicate identifier 'BufferSource'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(72,5): error TS2403: Subsequent variable declarations must have the same type.  Variable 'source' must be of type 'Window', but here has type 'any'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(367,5): error TS2375: Duplicate number index signature.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(398,14): error TS2403: Subsequent variable declarations must have the same type.  Variable 'srcElement' must be of type 'Element', but here has type 'any'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(446,5): error TS2375: Duplicate number index signature.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(715,14): error TS2403: Subsequent variable declarations must have the same type.  Variable 'source' must be of type 'Window', but here has type 'any'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1096,14): error TS2403: Subsequent variable declarations must have the same type.  Variable 'responseXML' must be of type 'Document', but here has type 'any'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1684,14): error TS2300: Duplicate identifier 'EventListenerOrEventListenerObject'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1710,13): error TS2403: Subsequent variable declarations must have the same type.  Variable 'onmessage' must be of type '(this: Window, ev: MessageEvent) => any', but here has type '(this: DedicatedWorkerGlobalScope, ev: MessageEvent) => any'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1715,13): error TS2403: Subsequent variable declarations must have the same type.  Variable 'location' must be of type 'Location', but here has type 'WorkerLocation'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1716,13): error TS2403: Subsequent variable declarations must have the same type.  Variable 'onerror' must be of type 'ErrorEventHandler', but here has type '(this: DedicatedWorkerGlobalScope, ev: ErrorEvent) => any'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1718,13): error TS2403: Subsequent variable declarations must have the same type.  Variable 'self' must be of type 'Window', but here has type 'WorkerGlobalScope'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1724,13): error TS2403: Subsequent variable declarations must have the same type.  Variable 'navigator' must be of type 'Navigator', but here has type 'WorkerNavigator'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1743,6): error TS2300: Duplicate identifier 'AlgorithmIdentifier'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1744,6): error TS2300: Duplicate identifier 'BodyInit'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1745,6): error TS2300: Duplicate identifier 'IDBKeyPath'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1746,6): error TS2300: Duplicate identifier 'RequestInfo'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1747,6): error TS2300: Duplicate identifier 'USVString'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1748,6): error TS2300: Duplicate identifier 'IDBValidKey'.\r\n/usr/local/lib/node_modules/typescript/lib/lib.webworker.d.ts(1749,6): error TS2300: Duplicate identifier 'BufferSource'.\r\n```\r\n\r\nI see these errors with `lib.webworker`",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/14687/comments",
+    "author": "monolithed",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2017-03-16T15:26:10Z",
+        "body": "You can't target `webworker` and `dom` at the same time -- these are mutually exclusive, and have different types for certain global variables. You'll need two separate compilations, one for the code which runs in your webworker threads, and one for code which runs in the DOM"
+      },
+      {
+        "user": "monolithed",
+        "created_at": "2017-03-16T20:14:59Z",
+        "body": "```\r\n/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts(14171,14): error TS2300: Duplicate identifier 'EventListenerOrEventListenerObject'.\r\n```\r\n\r\nUsually such error messages are not informative. It would be nice to print something like:\r\n\r\n> You can't target webworker and dom at the same time -- these are mutually exclusive, and have different types for certain global variables. You'll need two separate compilations, one for the code which runs in your webworker threads, and one for code which runs in the DOM\r\n\r\n\ud83d\ude09"
+      }
+    ]
+  },
+  {
+    "number": 13861,
+    "title": "Unsafe coercion from \"any type\" to {}",
+    "created_at": "2017-02-03T10:32:00Z",
+    "closed_at": "2017-02-03T18:57:18Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/13861",
+    "body": "**TypeScript Version:**  2.1.5 and 2.2.0-dev.20170201\r\nUsing --noImplicitAny and --strictNullChecks\r\n\r\n**Code**\r\n\r\n```ts\r\nfunction doItWithAnObject<A extends {}>(a: A) {\r\n  a.toString()\r\n}\r\n\r\nfunction doItWithAnything<B>(b: B) {\r\n  doItWithAnObject(b)\r\n}\r\n\r\ndoItWithAnything(null)\r\ndoItWithAnything(undefined)\r\n```\r\n\r\n**Expected behavior:**\r\n`doItWithAnything` should not compile because it calls `doItWithAnObject` with something that is potentially not an object.\r\n\r\n**Actual behavior:**\r\nNo compilation error. Runtime errors.\r\n\r\nPerhaps related: If I have an abstract type A, and I narrow it down to A minus null minus undefined, it isn't considered as an object.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/13861/comments",
+    "author": "AlexGalays",
+    "comments": [
+      {
+        "user": "mhegazy",
+        "created_at": "2017-02-03T18:15:05Z",
+        "body": "if you want to exclude `null` and `undefined`, give the generic type parameter a constraint for `{}`. if you want to further exclude primitives, give it a constraint `object`. otherwise, it goes to the top type, i.e. `{} | null | undefined`"
+      },
+      {
+        "user": "ikokostya",
+        "created_at": "2017-02-03T19:25:24Z",
+        "body": "> if you want to exclude null and undefined, give the generic type parameter a constraint for {}\r\n\r\nBut it already done for `doItWithAnObject` function:\r\n\r\n```ts\r\nfunction doItWithAnObject<A extends {}>(a: A) {\r\n  a.toString();\r\n}\r\ndoItWithAnObject(null); // Error: Argument of type 'null' is not assignable to parameter of type '{}'\r\n```\r\n\r\nWhy compiler doesn't check this inside `doItWithAnything` function?\r\n\r\n```ts\r\nfunction doItWithAnything<B>(b: B) {\r\n  doItWithAnObject(b); // No errors, but argument \"b\" has \"null\" type here\r\n}\r\ndoItWithAnything(null);\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 13581,
+    "title": "tsc doesn't resolve module specified in the typeRoots",
+    "created_at": "2017-01-19T18:17:36Z",
+    "closed_at": "2017-04-21T16:56:05Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/13581",
+    "body": "**TypeScript Version:**  2.1.5\r\n\r\nI have the following directory structure:\r\n```\r\ntsconfig.json\r\na.ts\r\nnode_modules\r\n|--- custom\r\n     |--- rembo\r\n           |---index.d.ts\r\n```\r\n\r\nThe content of `index.d.ts` is the following:\r\n```\r\nexport declare class Rembo {\r\n    name: string;\r\n}\r\n```\r\n\r\nI reference this module in `a.ts`:\r\n`import {Rembo} from 'rembo';`\r\n\r\nThe `package.json` is the following:\r\n```\r\n{\r\n  \"compilerOptions\": {\r\n    \"moduleResolution\": \"node\",\r\n    \"module\": \"es6\",\r\n    \"target\": \"es6\",\r\n    \"typeRoots\": [\r\n      \"node_modules/custom\"\r\n    ]\r\n  }\r\n}\r\n```\r\nThe problem is that `rembo` module can't be resolved. When compiled, I get the following result:\r\n\r\n`$ tsc --traceResolution`\r\n\r\n```\r\n======== Resolving type reference directive 'rembo', containing file 'D:/Projects/typescript/__inferred type names__.ts', root directory 'D:/Projects/typescript/node_modules/custom'. ========\r\nResolving with primary search path 'D:/Projects/typescript/node_modules/custom'\r\nFile 'D:/Projects/typescript/node_modules/custom/rembo/package.json' does not exist.\r\nFile 'D:/Projects/typescript/node_modules/custom/rembo/index.d.ts' exist - use it as a name resolution result.\r\nResolving real path for 'D:/Projects/typescript/node_modules/custom/rembo/index.d.ts', result 'D:/Projects/typescript/node_modules/custom/rembo/index.d.ts'\r\n======== Type reference directive 'rembo' was successfully resolved to 'D:/Projects/typescript/node_modules/custom/rembo/index.d.ts', primary: true. ========\r\na.ts(3,21): error TS2307: Cannot find module 'rembo'.\r\n```\r\n\r\nI don't understand why the error, since it reports then:\r\n\r\n> Type reference directive 'rembo' was **successfully** resolved to 'D:/Projects/typescript/node_modules/custom/rembo/index.d.ts', primary: true.\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/13581/comments",
+    "author": "maxkoretskyi",
+    "comments": [
+      {
+        "user": "mhegazy",
+        "created_at": "2017-01-19T22:49:50Z",
+        "body": "TypeRoots is useful for global declarations, things that you do not `import`, e.g. node definition file. when the compiler starts it loads all files under `typeRoots` and adds them in the global scope.\r\n\r\nSeems like this is not what you are looking for, what you need is [Path mapping](www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping):\r\n\r\n```ts\r\n{\r\n  \"compilerOptions\": {\r\n    \"moduleResolution\": \"node\",\r\n    \"module\": \"es6\",\r\n    \"target\": \"es6\",\r\n    \"baseUrl\": \"./\",\r\n    \"paths\": {\r\n      \"*\" : [\"node_modules/custom/*\"]\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nThis tells the compiler to look under `<baseUrl>/node_modules/custom` for any import it sees."
+      },
+      {
+        "user": "gdamjan",
+        "created_at": "2017-02-10T00:27:35Z",
+        "body": "What if the node_modules including node_modules/@types are outside the source directory alltogether?\r\n\r\n```\r\nSRC=$HOME/Pojects/demo\r\nDEST=/tmp/build\r\n\r\nln -s $SRC/package.json $DEST/package.json\r\ncd $DEST\r\nnpm install\r\n\r\ncd $SRC\r\ntsc --outDir $DEST/build --typeRoots $DEST/???\r\n```\r\nthis doesn't work\r\n\r\n\r\n\r\n\r\n(ts 2.1.6)"
+      },
+      {
+        "user": "mhegazy",
+        "created_at": "2017-02-10T00:47:46Z",
+        "body": "`paths` is relative to the `baseUrl` and not the `projectRoot`. so you can make the `baseUrl` whatever you want."
+      }
+    ]
+  },
+  {
+    "number": 13197,
+    "title": "support of native async/await is missing ",
+    "created_at": "2016-12-28T10:29:16Z",
+    "closed_at": "2016-12-30T18:08:40Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/13197",
+    "body": "\r\n**TypeScript Version:**  2.1.1 / nightly (2.2.0-dev.201xxxxx)\r\n\r\n**Code**\r\n\r\n```ts\r\n\r\nasync function f() {\r\n let value = await anotherAsyncFunction()\r\n  ....\r\n}\r\n```\r\n\r\n**Expected behavior:**\r\nIf target type is set to ES7 (which it currently doesn't even support) it should leave the above code _as is_, since the current versions of Node already support it (and it is much easier to debug, too).\r\n\r\n**Actual behavior:**\r\n1. Currently it generates the __awaiter code and uses yield, etc.\r\n1. There's no support for target type es7\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/13197/comments",
+    "author": "dharmax",
+    "comments": [
+      {
+        "user": "alitaheri",
+        "created_at": "2016-12-28T10:42:09Z",
+        "body": "@dharmax es doesn't follow that versioning semantic anymore. use `es2017`."
+      },
+      {
+        "user": "blakeembrey",
+        "created_at": "2016-12-28T15:53:35Z",
+        "body": "@dharmax it's still behind a flag, try `node --harmony-async-await`."
+      }
+    ]
+  },
+  {
+    "number": 12005,
+    "title": "TS is incorrectly disallowing a variable assignment.",
+    "created_at": "2016-11-02T20:25:10Z",
+    "closed_at": "2016-11-03T16:14:46Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/12005",
+    "body": "**TypeScript Version:**  2.0.3 \r\n\r\n**Code**\r\n\r\nAll of the code in this issue can be run in the playground.\r\n\r\nThe following gives this compile error: **\"Type 'EntityInstance' is not assignable to type 'EntityInstance'.\"**\r\n\r\n```ts\r\nexport class EntityInstance {\r\n    public deleted = false;\r\n    private children = new EntityArray<EntityInstance>();\r\n\r\n    getChildren(): EntityArray<EntityInstance> {\r\n        return this.children;\r\n    }\r\n}\r\n\r\nexport class ExtendedInstance extends EntityInstance {\r\n    public anotherProperty = true;\r\n\r\n    getChildren(): EntityArray<ExtendedInstance> {\r\n        return super.getChildren() as EntityArray<ExtendedInstance>;\r\n    }\r\n}\r\n\r\nlet ei = new ExtendedInstance();\r\nei.getChildren()[0].anotherProperty = false;\r\n\r\nexport class EntityArray<EntityInstance> extends Array<EntityInstance> {\r\n\r\n    delete(index?: number) {\r\n        let ei = new EntityInstance();\r\n        ei = this.splice( index, 1 )[0];\r\n        ei.deleted = true;\r\n    }\r\n}\r\n\r\n```\r\n\r\n**Expected behavior:**\r\n\r\nThis should be allowed.  It appears that TS thinks that EntityInstance as specified in \"EntityArray<EntityInstance>\" is a different type from EntityInstance.  The former EntityInstance doesn't appear to have type information.  For example, if I rewrite the delete() as follows there is an error because TS doesn't know about the 'deleted' property:\r\n\r\n```ts\r\n    delete(index?: number) {\r\n        let ei = this.splice( index, 1 )[0];\r\n        ei.deleted = true;\r\n    }\r\n```\r\n\r\n**Actual behavior:** \r\n\r\nTS raises compile error.\r\n\r\n**More notes:**\r\n\r\nI could define EntityArray without the <> (which then correctly determines the types in delete) but then I lose type information when I call ExtendedInstance.getChildren().  For example, the above code fails when rewitten as:\r\n\r\n```ts\r\nexport class EntityInstance {\r\n    public deleted = false;\r\n    private children = new EntityArray();\r\n\r\n    getChildren(): EntityArray {\r\n        return this.children;\r\n    }\r\n}\r\n\r\nexport class ExtendedInstance extends EntityInstance {\r\n    public anotherProperty = true;\r\n\r\n    getChildren(): EntityArray {\r\n        return super.getChildren();\r\n    }\r\n}\r\n\r\nlet ei = new ExtendedInstance();\r\nei.getChildren()[0].anotherProperty = false;\r\n\r\nexport class EntityArray extends Array<EntityInstance> {\r\n\r\n    delete(index?: number) {\r\n        let ei = new EntityInstance();\r\n        ei = this.splice( index, 1 )[0];\r\n        ei.deleted = true;\r\n    }\r\n}\r\n```\r\n\r\nI can get by the original error by casting to <any> in the delete method but who wants to do that in Typescript?\r\n\r\n```ts\r\ndelete(index?: number) { \r\n    let ei = this.splice( index, 1 )[0] as any; \r\n    ei.deleted = true; \r\n}\r\n```",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/12005/comments",
+    "author": "DeegC",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-11-02T21:53:33Z",
+        "body": ">  It appears that TS thinks that EntityInstance as specified in \"EntityArray<EntityInstance>\" is a different type from EntityInstance\n\nIt is. You declared a type parameter that shadowed the name:\n\n``` ts\nclass EntityArray<EntityInstance> extends Array<EntityInstance> {\n```\n\nYou probably meant to write\n\n``` ts\nclass EntityArray extends Array<EntityInstance> {\n```\n"
+      },
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-11-02T21:54:42Z",
+        "body": "Or perhaps this:\n\n``` ts\nclass EntityArray<T extends EntityInstance> extends Array<T> {\n```\n"
+      },
+      {
+        "user": "aluanhaddad",
+        "created_at": "2016-11-03T15:59:48Z",
+        "body": "Shadowing is, for better or worse, a part of JavaScript that is fairly ubiquitous. Of course these are types, not Java Script values but it makes sense that the same naming rules would apply. Maybe just displaying that it's a type parameter in the error message would be helpful.\n"
+      },
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-11-03T16:14:46Z",
+        "body": "It's kind of necessary to allow type name shadowing, otherwise we wouldn't be able to safely add things to the global namespace without the risk of a breaking change.\n\nThere's perhaps a suggestion lurking here which is that our error messages should do something (I don't know what) if we ever issue a message like \"Cannot assign X to X\" where both X's have identical spelling. I mean ideally you'd see something like \"Cannot assign X (Type Parameter) to X (Interface)\", but it's hard to guess if even that would cover all the cases.\n"
+      },
+      {
+        "user": "aluanhaddad",
+        "created_at": "2016-11-04T11:17:05Z",
+        "body": "> There's perhaps a suggestion lurking here which is that our error messages should do something (I don't know what) if we ever issue a message like \"Cannot assign X to X\" where both X's have identical spelling. I mean ideally you'd see something like \"Cannot assign X (Type Parameter) to X (Interface)\", but it's hard to guess if even that would cover all the cases.\n\n@RyanCavanaugh I was going to suggest this at first but there are a lot of lenses via which to look at a type so it could become ambiguous, or a just a best guess, in a lot of cases. \n\nMaybe a simpler, higher value option would be to do something like\n\n``` scala\ngiven Types A and B over assignment\nwhere not A assignable to B\nreport IncompatableAssignementOfIdenticallyNamedTypesDiagnostic\nwhen A name is B name\notherwise report IncompatibleTypesDiagnostic\n```\n\nSo it would say something like **\"Type 'B' is not assignable to type 'A'. (note that they are _not_ same Declaration)\"**\n"
+      },
+      {
+        "user": "DeegC",
+        "created_at": "2016-11-05T20:17:36Z",
+        "body": "Would it be possible to make it illegal for the name of a generic type to shadow a previously defined type?  I'm obviously no TS expert (yet!) but I can't think of a reason one would need to shadow a currently existing type.  The error message could be something like \"Generic type name 'EntityInstance' not allowed because it would shadow an existing type.'\n\nThat would potentially break some current client code; if that's forbidden maybe make it a warning?\n"
+      }
+    ]
+  },
+  {
+    "number": 10363,
+    "title": "\"A class must be declared after its base class\" on classes in different directories",
+    "created_at": "2016-08-16T07:02:48Z",
+    "closed_at": "2016-08-16T07:08:25Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/10363",
+    "body": "**TypeScript Version:**  master branch\n\n**Repro**\n1. Create a new JavaScript->Windows->Universal->Blank App project\n2. Add directories and empty files as following:\n   \n   ```\n   (App name)\n   |>sources\n   |    |>cats\n   |    |    |>elephants\n   |    |    | foo.ts\n   |    | bar.ts\n   \n   sources/cats/elephants/foo.ts\n   sources/cats/bar.ts\n   ```\n3. Write codes as following:\n   \n   ``` ts\n   // In sources/cats/elephants/foo.ts:\n   class Foo extends Bar {\n   }\n   \n   // In sources/cats/bar.ts:\n   class Bar {\n   }\n   ```\n4. Open project properties and set \"Combine JavaScript output into file\" to \"js/app.js\"\n5. Unload project\n6. Reload project\n\n**Expected behavior:**\n\nCompiler should automatically make a proper order for the classes\n\n**Actual behavior:** \n\n``` ts\nclass Foo extends Bar {\n//                ~~~\n//                A class must be declared after its base class.\n}\n```\n\n**Workaround:**\n\nRename \"foo.ts\" to \"a.ts\".\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/10363/comments",
+    "author": "saschanaz",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-08-16T07:05:55Z",
+        "body": "The compiler doesn't figure out what the \"right\" order of files is based on class dependencies or anything else. The usual methods are available: have a `_reference.ts`, use `/// <reference` directives, or use a module loader (if applicable)\n"
+      }
+    ]
+  },
+  {
+    "number": 9243,
+    "title": "a class cannot extend events node module",
+    "created_at": "2016-06-18T06:11:48Z",
+    "closed_at": "2016-06-18T18:17:01Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/9243",
+    "body": "**TypeScript Version:** \n\n1.8.10\n\n**Code**\n\n``` ts\n/// <reference path=\"./../../../typings/index.d.ts\" />\nimport {EventEmitter} from \"events\";\nclass _req extends EventEmitter {\n    constructor() {\n        super();\n    }\n    emit() {\n        super.emit(\"test\")\n    }\n}\nconst a = new _req();\na.on(\"test\", _ => {\n    console.log(\"test was called\");\n})\na.emit();\n```\n\n**Expected behavior:**\ncompile with no errors \n**Actual behavior:** \ni got the error telling me \n\n```\nts/core/request/index.ts(3,7): error TS2415: Class '_req' incorrectly extends base class 'EventEmitter'.\n  Types of property 'emit' are incompatible.\n    Type '() => void' is not assignable to type '(event: string, ...args: any[]) => boolean'.\n      Type 'void' is not assignable to type 'boolean'.\n```\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/9243/comments",
+    "author": "ta3pks",
+    "comments": [
+      {
+        "user": "kitsonk",
+        "created_at": "2016-06-18T06:56:05Z",
+        "body": "This isn't an issue with TypeScript.  This is basic stuff.  You should read the error and fix it.\n\nThe method you are extending does not match the contract of the underlying class.  As the error says, your extended `emit` is of type `() => void`, but the method you are extending is of type `(event: string, ...args: any[]) => boolean` and the need to be compatible, so at the very least `emit` need to return a boolean value.\n\nFor basic questions like these, StackOverflow, Gitter or IRC are better places to ask.\n"
+      }
+    ]
+  },
+  {
+    "number": 5877,
+    "title": "Incorrect function return type: expected it to match generic type parameter",
+    "created_at": "2015-12-02T00:33:12Z",
+    "closed_at": "2015-12-02T00:45:29Z",
+    "labels": [
+      "By Design",
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/5877",
+    "body": "I may just be abusing the type system here, but there's no warnings or errors, so I have to assume it should work. I'm trying to dispatch a command to a registered handler and return the result, which should be of the type specified by the command.\n\nQuestion is, why is the result always of type object, when the type parameter is clearly a string? Is this a bug or known limitation, and if so, is it a bug that there is no error or warning here?\n\n``` typescript\ninterface Command<T>\n{\n}\n\nclass TestCommand implements Command<string>\n{\n}\n\nfunction dispatch<T>(command: Command<T>): T\n{\n    let result: any = \"Result of executing the command handler\";\n\n    return result as T;\n}\n\nlet result = dispatch(new TestCommand());\n// Why is result of type object? I expected it to be a string.\n```\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/5877/comments",
+    "author": "thomas-darling",
+    "comments": [
+      {
+        "user": "mhegazy",
+        "created_at": "2015-12-02T00:45:29Z",
+        "body": "The problem is that `T` is never manifested in the object, and since it is a structural type system, setting `T` to a string without using it has no impact on the inference. if you add a property `p: T` to your interface, your result should be of type `T`, in this case, `string` as you would expect.\n"
+      }
+    ]
+  },
+  {
+    "number": 5057,
+    "title": "jake local fails",
+    "created_at": "2015-10-01T18:55:28Z",
+    "closed_at": "2015-11-13T06:28:38Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/5057",
+    "body": "Hi,\n  since I have a few issues with tsx inside vs, I would like to use the latest language service instead of the packaged one to see if something is different.\n  I updated my typescript clone and launched **jake local** (I have already done this in the last months) but this time fails:\n  if I run from a command shell I obtain this error message\n\n> jake aborted.\n> Error: Cannot find module 'tslint'\n>    at Function.Module._resolveFilename (module.js:336:15)\n>    at Function.Module._load (module.js:278:25)\n> (See full trace by running task with --trace)\n\nif I run from powershell\n\n> module.js:338\n>    throw err;\n>          ^\n> Error: Cannot find module 'lru-cache'\n>    at Function.Module._resolveFilename (module.js:336:15)\n>    at Function.Module._load (module.js:278:25)\n>    at Module.require (module.js:365:17)\n>    at require (module.js:384:17)\n>    at D:\\GitHub\\typescript\\node_modules\\jake\\node_modules\\filelist\\node_modules\\minimatch\\minimatch.js:35:11\n>    at Object.<anonymous> (D:\\GitHub\\typescript\\node_modules\\jake\\node_modules\\filelist\\node_modules\\minimatch\\minimatch.js:1057:3)\n>    at Module._compile (module.js:460:26)\n>    at Object.Module._extensions..js (module.js:478:10)\n>    at Module.load (module.js:355:32)\n>    at Function.Module._load (module.js:310:12)\n\nThis is the first time I see something similar. Am I missing something?\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/5057/comments",
+    "author": "lucamorelli",
+    "comments": [
+      {
+        "user": "danquirk",
+        "created_at": "2015-10-01T19:15:51Z",
+        "body": "Run 'npm install' to update the necessary dependencies.\n"
+      },
+      {
+        "user": "DanielRosenwasser",
+        "created_at": "2015-10-01T21:29:30Z",
+        "body": "@weswigham does `&&` execute conditionally in PowerShell?\n"
+      },
+      {
+        "user": "weswigham",
+        "created_at": "2015-10-01T22:07:35Z",
+        "body": "`&&` was removed from powershell as a valid deliminator recently, I think. You have to use `;` instead.\n"
+      },
+      {
+        "user": "weswigham",
+        "created_at": "2015-10-01T22:23:05Z",
+        "body": "Cross-shell compatibility has never been easy... ahh... `|` I believe is supported on most shells, which could work if everything that needs to be run doesn't care about the output of the prior process...\n"
+      },
+      {
+        "user": "weswigham",
+        "created_at": "2015-10-01T22:26:30Z",
+        "body": "@DanielRosenwasser But his question why why it worked in powershell but not in cmd, so I'm not sure it's important.\n"
+      },
+      {
+        "user": "DanielRosenwasser",
+        "created_at": "2015-10-01T22:29:04Z",
+        "body": "This means that PowerShell wasn't explicitly failing even though `tslint` wasn't present.\n"
+      },
+      {
+        "user": "weswigham",
+        "created_at": "2015-10-01T22:54:07Z",
+        "body": "Looking at his stack traces, the different is that in powershell he was never even able to load `jake` from the local node_modules dir whereas in `cmd` he had at least gotten `jake` installed and started to read the jakefile before it got to the missing tslint dependency.\n"
+      },
+      {
+        "user": "weswigham",
+        "created_at": "2015-10-01T22:54:45Z",
+        "body": "I don't see anything there that would have anything to do with a `&&` at all.\n"
+      },
+      {
+        "user": "weswigham",
+        "created_at": "2015-10-01T23:01:18Z",
+        "body": "@DanielRosenwasser Also, TIL `;` is a valid separator in bash. I've always used `&&`.\n"
+      }
+    ]
+  },
+  {
+    "number": 4192,
+    "title": "Bug: code repeated in my cordova appBundle.js",
+    "created_at": "2015-08-06T18:33:46Z",
+    "closed_at": "2015-08-06T21:02:52Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/4192",
+    "body": "With Visual Studio 2015 RTM, In my cordova project, the compiled appBundle.js is repeating code at the end of the file, and doesn't repeat it sequentially.  For example, in the following example, debugMode is false when I use it in my project code, but it should be true.\n\nHere is a simplified example of what happens : \n\nFile config.ts\n\n```\nvar debugMode: boolean = false;\ndebugMode = true;\nvar enableWindowLog: boolean = false;\nvar configMode: string = \"\"\n\nif (debugMode) {\n    enableWindowLog = true;\n    configMode = \"-dev\";\n}\n```\n\nFile index.ts\n\n```\n//My app code\n```\n\nCompiled appBundle.js\n\n```\nvar debugMode = false;\ndebugMode = true;\nvar enableWindowLog = false;\nvar configMode = \"\";\nif (debugMode) {\n    enableWindowLog = true;\n    configMode = \"-dev\";\n}\n\n// My project code compiled\n\nvar debugMode = false;\nvar enableWindowLog = false;\nvar configMode = \"\";\nvar debugMode = false;\ndebugMode = true;\nvar enableWindowLog = false;\nvar configMode = \"\";\nif (debugMode) {\n    enableWindowLog = true;\n    configMode = \"-dev\";\n}\nvar debugMode = false;\ndebugMode = true;\nvar enableWindowLog = false;\nvar configMode = \"\";\nif (debugMode) {\n    enableWindowLog = true;\n    configMode = \"-dev\";\n}\nvar debugMode = false;\ndebugMode = true;\nvar enableWindowLog = false;\nvar configMode = \"\";\nif (debugMode) {\n    enableWindowLog = true;\n    configMode = \"-dev\";\n}\nvar debugMode = false;\ndebugMode = true;\nvar enableWindowLog = false;\nvar configMode = \"\";\nif (debugMode) {\n    enableWindowLog = true;\n    configMode = \"-dev\";\n}\nvar debugMode = false;\nvar enableWindowLog = false;\nvar configMode = \"\";\n```\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/4192/comments",
+    "author": "NGumby",
+    "comments": [
+      {
+        "user": "danquirk",
+        "created_at": "2015-08-06T19:31:42Z",
+        "body": "Can you share the actual compiler invocation command that's causing this? (presumably in the Output window)\n"
+      },
+      {
+        "user": "NGumby",
+        "created_at": "2015-08-06T20:36:35Z",
+        "body": "1>Target \"PreComputeCompileTypeScript\" in file \"C:\\Program Files (x86)\\MSBuild\\Microsoft\\VisualStudio\\v14.0\\TypeScript\\Microsoft.TypeScript.targets\" from project \"D:\\CompuSport\\trunk\\CS Cordova\\CS.Cordova\\CS.Cordova.jsproj\" (target \"CompileTypeScript\" depends on it):\n1>Using \"VsTsc\" task from assembly \"C:\\Program Files (x86)\\MSBuild\\Microsoft\\VisualStudio\\v14.0\\TypeScript\\TypeScript.tasks.dll\".\n1>Task \"VsTsc\"\n1>  C:\\Program Files (x86)\\Microsoft SDKs\\TypeScript\\1.5\\tsc.exe --project \"D:\\CompuSport\\trunk\\CS Cordova\\CS.Cordova\\scripts\" COMPUTE_PATHS_ONLY\n1>Done executing task \"VsTsc\".\n\nhere is my tsconfig.json\n\n```\n{\n    \"compilerOptions\": { \n        \"noImplicitAny\": false,\n        \"noEmitOnError\": true,\n        \"removeComments\": false,\n        \"sourceMap\": false,\n        \"out\": \"www/scripts/appBundle.js\",\n        \"target\": \"es5\"\n    }\n}\n```\n"
+      },
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2015-08-06T20:46:18Z",
+        "body": "I'm guessing what's happening is that the Cordova project system, or something else (maybe a source code control tool?), is mirroring config.ts to some other locations in the project folder. `tsconfig` without a file will pick up all .ts files, recursively, in its containing folder. Can you verify that only the two .ts files that you expect to be there exist in the project folder?\n"
+      }
+    ]
+  },
+  {
+    "number": 3405,
+    "title": "Cannot find module during runtests",
+    "created_at": "2015-06-07T07:06:16Z",
+    "closed_at": "2015-06-08T20:36:30Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/3405",
+    "body": "Put these two files under tests/cases/compiler, and run `jake runtests tests=Blade`\n\n**BladeMaterial.ts**\n\n``` ts\n//@module: amd\n\n/**\n * The base blade material class.\n */\nexport default class BladeMaterial {\n    stiffness: number\n    hardness: number\n    constructor(public name: string) {\n    }\n}\n```\n\n**BladeCompositeMaterial.ts**\n\n``` ts\n//@module: amd\n\nimport BladeMaterial from \"BladeMaterial\";\n\n/**\n * Composite material for blade.\n */\nexport default class BladeCompositeMaterial extends BladeMaterial {\n    constructor(public name: string) {\n        super(name);\n    }\n}\n```\n\nThe **BladeCompositeMaterial.ts** fails with TS2307: Cannot find module 'BladeMaterial`.\n\nI tap into `program.getSourceFile` and add:\n\n``` ts\nconsole.log(`${fileName}, hasProperty(...) => ${hasProperty(filesByName, fileName)}, filesByName: ${filesByName[fileName]}`);\n```\n\ni.e.\n\n``` ts\n\nfunction getSourceFile(fileName: string) {\n    fileName = host.getCanonicalFileName(normalizeSlashes(fileName));\n    console.log(`${fileName}, hasProperty(...) => ${hasProperty(filesByName, fileName)}, filesByName: ${filesByName[fileName]}`);\n    return hasProperty(filesByName, fileName) ? filesByName[fileName] : undefined;\n}\n```\n\nthe output result of `jake runtests tests=Blade` shows the order of the file matters:\ntests/cases/compiler/bladematerial.ts, hasProperty(...) => true, filesByName: undefined\ntests/cases/compiler/bladematerial.d.ts, hasProperty(...) => true, filesByName: undefined\ntests/cases/bladematerial.ts, hasProperty(...) => true, filesByName: undefined\ntests/cases/bladematerial.d.ts, hasProperty(...) => true, filesByName: undefined\ntests/bladematerial.ts, hasProperty(...) => true, filesByName: undefined\ntests/bladematerial.d.ts, hasProperty(...) => true, filesByName: undefined\nbladematerial.ts, hasProperty(...) => true, filesByName: undefined\nbladematerial.d.ts, hasProperty(...) => true, filesByName: undefined\n\n  \u2024\u2024\u2024\u2024\u2024\u2024\u2024\u2024\u2024tests/cases/compiler/bladematerial.ts, hasProperty(...) => true, filesByName: [object Object]\ntests/cases/compiler/bladematerial.ts, hasProperty(...) => true, filesByName: [object Object]\ntests/cases/compiler/bladematerial.ts, hasProperty(...) => true, filesByName: [object Object]\n\nThe caller of `program.getSourceFile()` which creates this problem is in checker.ts: 882, in function `resolveExternalModuleName`: `sourceFile = forEach(supportedExtensions, extension => host.getSourceFile(fileName + extension));`\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/3405/comments",
+    "author": "unional",
+    "comments": [
+      {
+        "user": "DanielRosenwasser",
+        "created_at": "2015-06-07T18:52:19Z",
+        "body": "Tests in `compiler` and conformance` are independent of one another. If I recall correctly, you can make a multifile test in one file as so:\n\n``` TypeScript\n// @filename: BladeMaterial.ts\nexport function blah() {\n}\n\n// @filename: BladeCompositeMaterial\nimport { blah } from \"BladeMaterial\";\n```\n\nLet us know if that helps.\n"
+      }
+    ]
+  },
+  {
+    "number": 2712,
+    "title": "Question about importing js file in typescript fashion",
+    "created_at": "2015-04-10T17:52:58Z",
+    "closed_at": "2015-04-10T19:26:19Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/2712",
+    "body": "I am trying to import an existing javascript source file(not a 3rd party module) into my typescript file using `import ... = require()` syntax with no success. Could you please help me point out anything I did wrong in the following isolated example?\n\nadd.js\n\n``` javascript\nmodule.exports = function (n1, n2) {\n    return n1 + n2;\n};\n```\n\nadd.d.ts\n\n``` typescript\ndeclare module \"add\" {\n    function add(n1: number, n2: number): number;\n    export = add;\n}\n```\n\nmain.ts\n\n``` typescript\n/// <reference path='node.d.ts' />\n/// <reference path='add.d.ts' />\nimport add = require('./add');\nconsole.log(add(1, 2));\n```\n\nWhen I try to compile `main.ts`, I got the following error:\n\n```\nerror TS2306: File 'add.d.ts' is not an external module.\n```\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/2712/comments",
+    "author": "ericlu88",
+    "comments": [
+      {
+        "user": "mhegazy",
+        "created_at": "2015-04-10T18:16:02Z",
+        "body": "Since you defclared add as an ambient module, in your consumtion file, main.ts do not use relative paths.\n\n``` ts\n/// <reference path='node.d.ts' />\n/// <reference path='add.d.ts' />\nimport add = require('add');\nconsole.log(add(1, 2));\n```\n"
+      },
+      {
+        "user": "ericlu88",
+        "created_at": "2015-04-10T18:21:33Z",
+        "body": "@mhegazy This works with the compiler, but the generated js file will have `var add = require(add)`, which is incorrect module loading code for node. Node will error at runtime:\n\n```\nError: Cannot find module 'add'\n    at Function.Module._resolveFilename (module.js:336:15)\n    at Function.Module._load (module.js:278:25)\n    at Module.require (module.js:365:17)\n    at require (module.js:384:17)\n    at Object.<anonymous> (/Users/EricLu/Documents/Temp/main.js:3:11)\n    at Module._compile (module.js:460:26)\n    at Object.Module._extensions..js (module.js:478:10)\n    at Module.load (module.js:355:32)\n    at Function.Module._load (module.js:310:12)\n    at Function.Module.runMain (module.js:501:10)\n```\n"
+      },
+      {
+        "user": "mhegazy",
+        "created_at": "2015-04-10T18:35:45Z",
+        "body": "if you want to use relative path in the import, you will need:\n1. put the add.d.ts next to add.js\n2. define the file as an external module:\n\n```\n// add.d.ts\ndeclare function add(n1: number, n2: number): number;\nexport = add;\n```\n\ni.e. loose the \"declare module \"add\"\" part.\n\n#### more details:\n\nThere are two ways to define declarations for a .js module:\n\n1  using `declare module \"foo\"` and then you can have multiple module definitions in the same file:\n\n``` ts\n\n// mydefinitions.d.ts\ndeclare module \"mod1\" {\n    export var x = 0;\n}\n\ndeclare module \"mod2\" {\n    export var y = 0;\n}\n\ndeclare module \"mod3\" {\n    export var z = 0;\n}\n```\n\nand consuming them would have to be using absolute names:\n\n``` ts\n// main.ts\n\n/// <reference path=\"myDefintions.d.ts\" />\nimport * as mod1 from \"mod1\";\nimport mod2 = require(\"mod2\");\nimport {z} from \"mod3\";\n```\n\n2 alternatively you can define as a file, where the name of the file is the name of the module\n\n``` ts\n// myModule.d.ts\n\ndeclare var m = 0;\nexport = m;\n```\n\nand consume it as a normal .ts module:\n\n``` ts\nimport m = require(\"./myModule\");\nm.toString();\n```\n"
+      },
+      {
+        "user": "canmrt",
+        "created_at": "2015-06-29T09:51:47Z",
+        "body": "How can I import a javascript file which consists of several modules with a single d.ts file by using relative paths?\n\nExample:\n\n``` js\n// bundle.js\ndefine('alert/alert', [\n    'require',\n    'exports'\n], function (require, exports) {\n    var Alert = function () {\n        function Alert() {\n        }\n        Alert.prototype.alert = function (message) {\n            alert(message);\n        };\n        return Alert;\n    }();\n    exports.Alert = Alert;\n});\ndefine('log/log', [\n    'require',\n    'exports'\n], function (require, exports) {\n    var Log = function () {\n        function Log() {\n        }\n        Log.prototype.log = function (message) {\n            console.log(message);\n        };\n        return Log;\n    }();\n    exports.Log = Log;\n});\ndefine('bundle', [\n    'require',\n    'exports',\n    'alert/alert',\n    'log/log'\n], function (require, exports, alert_1, log_1) {\n    exports.Alert = alert_1.Alert;\n    exports.Log = log_1.Log;\n});\n```\n\n``` js\n// bundle.d.ts\ndeclare module 'alert/alert' {\n    export class Alert {\n        alert(message: string): void;\n    }\n\n}\ndeclare module 'log/log' {\n    export class Log {\n        log(message: string): void;\n    }\n\n}\ndeclare module 'bundle' {\n    import { Alert as _Alert } from 'alert/alert';\n    import { Log as _Log } from 'log/log';\n    export var Alert: typeof _Alert;\n    export var Log: typeof _Log;\n\n}\n```\n"
+      },
+      {
+        "user": "mhegazy",
+        "created_at": "2015-06-29T18:43:49Z",
+        "body": "@canmrt add a /// <reference to your bundle.d.ts and then import your modules by name. e.g.:\n\n``` ts\nimport { Log } from \"log/log\";\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 2135,
+    "title": "Import statement causes problem with external module ",
+    "created_at": "2015-02-25T10:32:56Z",
+    "closed_at": "2015-02-26T05:11:18Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/2135",
+    "body": "I'm trying to write a tool for `Typescript`. Though I got some problem:\n\nIn scanner.ts:\n\n``` typescript\n/// <reference path=\"../../typings/node/node.d.ts\" />\n/// <reference path=\"../../typings/typescript/typescript.d.ts\" />\n/// <reference path=\"types.ts\" />\n\nimport ts = require(\"typescript\");\n\nmodule pp {\n    var textToToken: Map<AnnotationSyntaxKind> = {\n        \"@\": AnnotationSyntaxKind.AtsignToken,\n        \"@if\": AnnotationSyntaxKind.IfKeyword,\n        \"@endif\": AnnotationSyntaxKind.EndIfKeyword,\n        \"@requires\": AnnotationSyntaxKind.RequiresKeyword\n    }\n}\n```\n\nIn types.ts:\n\n``` typescript\nmodule pp {\n    export interface Map<T> {\n        [index: string]: T;\n    }\n\n    export const enum AnnotationSyntaxKind {\n        AtsignToken,\n        IfKeyword,\n        EndIfKeyword,\n        RequiresKeyword\n    }\n}\n```\n\nThis setup will yield:\n\n```\nsrc/preprocessor/scanner.ts(8,22): error TS2314: Generic type 'Map<K, V>' requires 2 type argument(s).\nsrc/preprocessor/scanner.ts(9,14): error TS2304: Cannot find name 'AnnotationSyntaxKind'.\nsrc/preprocessor/scanner.ts(10,16): error TS2304: Cannot find name 'AnnotationSyntaxKind'.\nsrc/preprocessor/scanner.ts(11,19): error TS2304: Cannot find name 'AnnotationSyntaxKind'.\nsrc/preprocessor/scanner.ts(12,22): error TS2304: Cannot find name 'AnnotationSyntaxKind'.\n```\n\nBut when I remove this line of code in scanner.ts:\n\n``` typescript\nimport ts = require(\"typescript\");\n```\n\nEverything works fine.\n\nWhat have I done wrong?\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/2135/comments",
+    "author": "tinganho",
+    "comments": [
+      {
+        "user": "danquirk",
+        "created_at": "2015-02-25T19:25:10Z",
+        "body": "Adding an `import` like that to scanner makes it an external module. This means everything inside it is in a new scope and the things from internal modules in other files are no longer accessible. Generally you do not want to mix internal and external modules.\n"
+      },
+      {
+        "user": "tinganho",
+        "created_at": "2015-02-25T20:58:11Z",
+        "body": "@danquirk how do I achieve what I want to achieve then?\n\nI want to re-use some of the values in typescript like the enum `ts.SyntaxKind` in `scanner.ts`\n"
+      },
+      {
+        "user": "mhegazy",
+        "created_at": "2015-02-25T23:46:48Z",
+        "body": "in your external module do not add module pp, and refer to Map as pp.Map.\n"
+      }
+    ]
+  },
+  {
+    "number": 958,
+    "title": "Support prototype extension of built-in types",
+    "created_at": "2014-10-24T21:48:08Z",
+    "closed_at": "2014-10-24T23:24:37Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/958",
+    "body": "I can extend the `String` interface like so:\n\n``` ts\ninterface String {\n  upper(): String;\n}\n```\n\nI would expect that I could then do:\n\n``` ts\nString.prototype.upper = String.prototype.toUpperCase;\n```\n\nOr:\n\n``` ts\nString.prototype.upper = String.prototype.upper || function() {\n  return this.toUpperCase();\n};\n```\n\nOr even this:\n\n``` ts\nvar foo: String = 'bar'; // Type 'String' is missing property 'upper' from type 'String'.\n```\n\nIt would be nice if the `string` keyword would, of course, accommodate this change as well.\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/958/comments",
+    "author": "jednano",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2014-10-24T22:04:22Z",
+        "body": "All the code you wrote compiles without error.\n\nDid you write `interface String {` inside a module (internal or external)? That would declare a new type instead of extending the existing one.\n"
+      }
+    ]
+  },
+  {
+    "number": 19761,
+    "title": "Class 'AnotherProductService' incorrectly implements interface 'ProductService'.",
+    "created_at": "2017-11-06T09:58:29Z",
+    "closed_at": "2017-11-07T02:54:00Z",
+    "labels": [
+      "Suggestion",
+      "Help Wanted",
+      "Domain: Error Messages"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/19761",
+    "body": "I create a project with angular/cli , when I try used service, I get an error.\r\n-----\r\n\r\n**TypeScript Version:**  2.4.2\r\n**Angular CLI Version:** 1.5.0\r\n**NPM Version:** 5.0.3\r\n**Node.js Version:**  8.1.0\r\n**OS Version:**  Winwods 10 Professional Edition x64\r\n---------\r\n**Code**\r\n\r\n```ts\r\nimport { Injectable } from '@angular/core';\r\nimport { LoggerService } from './logger.service';\r\n\r\n\r\n@Injectable()\r\nexport class ProductService {\r\n\r\n  constructor(private logger: LoggerService) { }\r\n\r\n  getProduct(): Product {\r\n    this.logger.log('getProduct function');\r\n    return new Product(0, 'iphone7', 5899, 'apple phone');\r\n  }\r\n}\r\n\r\nexport class Product {\r\n\r\n  constructor(\r\n    public id: number,\r\n    public title: string,\r\n    public price: number,\r\n    public desc: string\r\n  ) {\r\n\r\n  }\r\n}\r\n```\r\n-------------\r\n```ts\r\nimport { Injectable } from '@angular/core';\r\nimport { Product, ProductService } from './product.service';\r\n\r\n@Injectable()\r\nexport class AnotherProductService implements ProductService {\r\n\r\n  getProduct(): Product {\r\n    return new Product(1, 'sunsumg7', 4899, 'sunsumg phone');\r\n  }\r\n\r\n  constructor() { }\r\n\r\n}\r\n```\r\n------------\r\n```ts\r\nimport { Injectable } from '@angular/core';\r\n\r\n@Injectable()\r\nexport class LoggerService {\r\n\r\n  constructor() { }\r\n\r\n  log(message: string) {\r\n    console.log(message);\r\n  }\r\n\r\n}\r\n```\r\n----------------\r\n```ts\r\nimport { BrowserModule } from '@angular/platform-browser';\r\nimport { NgModule } from '@angular/core';\r\n\r\nimport { AppComponent } from './app.component';\r\nimport { Product1Component } from './product1/product1.component';\r\nimport { ProductService } from './shared/product.service';\r\nimport { Product2Component } from './product2/product2.component';\r\nimport { LoggerService } from './shared/logger.service';\r\n\r\n@NgModule({\r\n  declarations: [\r\n    AppComponent,\r\n    Product1Component,\r\n    Product2Component\r\n  ],\r\n  imports: [\r\n    BrowserModule\r\n  ],\r\n  providers: [ProductService, LoggerService],\r\n  bootstrap: [AppComponent]\r\n})\r\nexport class AppModule { }\r\n```\r\n------\r\n\r\n**Expected behavior:**\r\n- If it is work, the Product where be get and show on the html.\r\n--------------\r\n\r\n**Actual behavior:**\r\n- I get an error.\r\n```\r\nERROR in src/app/shared/another-product.service.ts(5,14): error TS2420: Class 'AnotherProductService' incorrectly implements interface 'ProductService'.Property 'logger' is missing in type 'AnotherProductService'.\r\n\r\n```",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/19761/comments",
+    "author": "dingziyang",
+    "comments": [
+      {
+        "user": "ghost",
+        "created_at": "2017-11-06T15:24:11Z",
+        "body": "You probably meant `extends` instead of `implements`.\r\nYou can never `implement` a class with private members, so we should probably improve the error message here."
+      },
+      {
+        "user": "dingziyang",
+        "created_at": "2017-11-07T01:47:08Z",
+        "body": "@andy-ms I understand what you main. Everything in interface must be public. \r\nBut, I'm sure I use implements here. Because I downloaded a study video, the teacher is doing this and it's worked. He also used Angular4 and TypeScript. \r\n**Oh! It drives me crazy!**"
+      },
+      {
+        "user": "ghost",
+        "created_at": "2017-11-07T02:08:33Z",
+        "body": "It is possible to \"implement\" a class -- but it means treating the class as an interface, so you'll have to create an implementation of every one of its members.\r\nHowever, if the class you're implementing has a private member, it's impossible to implement.\r\n```ts\r\nclass A {\r\n\tprivate x: number;\r\n}\r\n// Error: Types have separate declarations of a private property 'x'.\r\nclass B implements A {\r\n\tprivate x: number;\r\n}\r\n```\r\n\r\nIt's correct that we give you this error message, because if `B implements A`, you would expect to be able to assign a `B` to an `A`, but you can't assign anything to a class with a private member unless it's derived from that class via `extends`. So the error message should just tell you that instead of telling you to implement a property that you can't possibly implement.\r\n\r\nIn your case, if you really don't intend to use `extends`, you must define an interface and have both classes implement that."
+      }
+    ]
+  },
+  {
+    "number": 11205,
+    "title": "Union Type made of two types of arrays fails to provide all array's methods",
+    "created_at": "2016-09-28T09:05:56Z",
+    "closed_at": "2016-12-30T22:28:16Z",
+    "labels": [
+      "Bug",
+      "Fixed",
+      "Help Wanted",
+      "Domain: lib.d.ts"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/11205",
+    "body": "**TypeScript Version:**  1.8.0 / TypeScript playground\n\n**Code**\n\n``` ts\nlet x1: number[];\nlet x2: number[][];\nx1.splice(1, 1); // OK\nx2.splice(1, 1); // OK\nlet x: number[] | number[][];\nx.splice(1, 1); // Error: Supplied parameters do not match any signature of call target.\n```\n\n**Expected behavior:**\nTS tutorial states: \n\n>  If we have a value that has a union type, we can only access members that are common to all types in the union.\n\nSince both `x1: number[];` and `x2: number[][]` have `splice` method with two params, I expect the union of these two types also to have this method.\n\n**Actual behavior:** \nCompiler reports an error:  Supplied parameters do not match any signature of call target. However, it allows using another overload of `splice` function:\n\n``` ts\nlet x: number[] | number[][];\nx.splice(1); // OK\n```\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/11205/comments",
+    "author": "OleksandrNechai",
+    "comments": [
+      {
+        "user": "kitsonk",
+        "created_at": "2016-09-28T09:54:10Z",
+        "body": "Yes, essentially it is the same, the subtle difference is that when matching the signature, it is matching one that it cannot union the overload:\n\n``` typescript\ninterface Array<T> {\n    splice(start: number): T[];\n    splice(start: number, deleteCount: number, ...items: T[]): T[];\n}\n```\n\nIt cannot union the type of the `...items: T[]` argument, therefore it causes an error.  Technically if there was anther overload, the code above would work, up until the point where you added arguments that you needed to insert:\n\n``` typescript\ninterface Array<T> {\n    splice(start: number): T[];\n    splice(start: number, deleteCount: number): T[];\n    splice(start: number, deleteCount: number, ...items: T[]): T[];\n}\n```\n\nBut it is better to have `(number | number[])[]` in the first place as mentioned in the issue you referenced.\n"
+      },
+      {
+        "user": "OleksandrNechai",
+        "created_at": "2016-09-28T10:46:13Z",
+        "body": "> But it is better to have  (number | number[])[]  in the first place\n\nWell, then this code does not compile:\n\n``` ts\nlet x: (string[] | number[])[]\nx.forEach(e => e.splice(1, 1)); // The same error\n```\n\nUnfortunately I have both cases in my code. Whatever way I choose to describe my types I get this error :-(.\n"
+      },
+      {
+        "user": "kitsonk",
+        "created_at": "2016-09-28T12:41:15Z",
+        "body": "This will work, but I suspect this is not what you want:\n\n``` typescript\nlet x: (string | number)[][]\nx.forEach(e => e.splice(1, 1));\n```\n\nAs I suspect you want an array of array of all numbers or an array of arrays of all strings.\n\nThe other option would be to help TypeScript along:\n\n``` typescript\nlet x: (string[] | number[])[];\nx.forEach((e: any[]) => e.splice(1, 1));\n```\n"
+      },
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-09-28T16:38:37Z",
+        "body": "I think we should rewrite the signatures to be\n\n```\ninterface Array<T> {\n    splice(start: number, deleteCount?: number): T[];\n    splice(start: number, deleteCount: number, ...items: T[]): T[];\n}\n```\n\nwith the observation that generic types should have signatures split according to their input use of their type parameters\n"
+      }
+    ]
+  },
+  {
+    "number": 6326,
+    "title": "Union returntype with void must return a value",
+    "created_at": "2016-01-02T22:53:01Z",
+    "closed_at": "2016-01-25T23:12:40Z",
+    "labels": [
+      "Suggestion",
+      "Fixed",
+      "Spec",
+      "Help Wanted",
+      "Good First Issue"
+    ],
+    "url": "https://github.com/microsoft/TypeScript/issues/6326",
+    "body": "I have a method declared as `stop(): void|Promise<void> {}` which get the error\n\n> A function whose declared type is neither 'void' nor 'any' must return a value\n\nAs void is a valid return type I would expect that to be fully valid code. Specifying only void is working.\n",
+    "comments_url": "https://api.github.com/repos/microsoft/TypeScript/issues/6326/comments",
+    "author": "Pajn",
+    "comments": [
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-01-04T05:19:56Z",
+        "body": "Proposing changing spec section 6.3\n\n> An explicitly typed function whose return type isn't the Void or the Any type must have at least one return statement somewhere in its body\n\nto\n\n> An explicitly typed function whose return type isn't _the Void type, the Any type, or a union type containing the Void or Any type as a constituent_ must have at least one return statement somewhere in its body\n"
+      },
+      {
+        "user": "DanielRosenwasser",
+        "created_at": "2016-01-04T05:35:51Z",
+        "body": "That still doesn't actually cover `Promise<void>` on its own though.\n"
+      },
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-01-04T05:38:26Z",
+        "body": "Not sure I understand the comment\n"
+      },
+      {
+        "user": "DanielRosenwasser",
+        "created_at": "2016-01-04T05:48:35Z",
+        "body": "The change you're proposing doesn't permit an async function whose return type annotation is `Promise<void>` to have no return statements.\n"
+      },
+      {
+        "user": "Pajn",
+        "created_at": "2016-01-04T07:25:26Z",
+        "body": "It would be nice if Promise<void> didn't require a return statement in an async function. However for the issue I had the already proposed change would be enough.\n"
+      },
+      {
+        "user": "masaeedu",
+        "created_at": "2016-01-15T17:26:27Z",
+        "body": "@RyanCavanaugh Regarding:\n\n> An explicitly typed function whose return type isn't the Void type, the Any type, or a union type containing the Void **or Any type as a constituent** must have at least one return statement somewhere in its body\n\nIsn't the emphasized part redundant? The following already compiles:\n\n```\nfunction f(): number | any {\n}\n```\n\nI think the union resolution already recognizes that all types are subtypes of `any`, so any union involving `any` is just `any`.\n"
+      },
+      {
+        "user": "RyanCavanaugh",
+        "created_at": "2016-01-15T17:50:37Z",
+        "body": "I think that's an implementation side effect of the compiler. The spec doesn't specify that `number | any` is equivalent to the Any type, though.\n"
+      }
+    ]
+  }
+]

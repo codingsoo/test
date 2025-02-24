@@ -1,0 +1,120 @@
+[
+  {
+    "id": "https://github.com/preactjs/preact/issues/2812",
+    "source": {
+      "issue_number": 2812
+    },
+    "initial_question": {
+      "title": "How does one modify child props in Preact?",
+      "body": "I couldn\u2019t find anywhere in the docs how to modify props of child components.\r\n\r\nIn my case, if the parent component `<Modal padding={true}>` has a `padding: true` prop, I\u2019d like one of its children `<ModalContent>` to automatically also be assigned a `padding: true` prop as well (but not to some of `<Modal>`\u2019s other children).\r\n\r\n```js\r\nconst Modal = ({ padding, ...props }) => {\r\n  return (\r\n    <div {...{ padding }}>\r\n      {/* How does one conditionally modify prop of the `ModalContent` child to include `padding: true` */}\r\n      {props.children}\r\n    </div>\r\n  )\r\n}\r\n\r\nexport default Modal\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Child component must receive parent's padding prop value",
+      "Selective prop inheritance must be possible",
+      "Component composition must remain functional",
+      "Props must propagate through nested component structures"
+    ],
+    "created_at": "2020-10-31T21:55:16Z"
+  },
+  {
+    "id": "https://github.com/preactjs/preact/issues/1522",
+    "source": {
+      "issue_number": 1522
+    },
+    "initial_question": {
+      "title": "Video player in Preact",
+      "body": "Is there a Video Player component we can use for Preact like in React? I found some in my search but they didn't seem to be used too often.  Can you direct me to one that you recommend? I would like to create an onclick to a button that will open a modal with a video. Thank you! "
+    },
+    "satisfaction_conditions": [
+      "React video player components must be usable within Preact",
+      "Build process must handle React component integration",
+      "Package dependency warnings should not affect functionality"
+    ],
+    "created_at": "2019-04-08T06:46:38Z"
+  },
+  {
+    "id": "https://github.com/preactjs/preact/issues/1263",
+    "source": {
+      "issue_number": 1263
+    },
+    "initial_question": {
+      "title": "Prefixing event handlers (a-la onWebkitAnimationEnd)",
+      "body": "The following works great for browsers that don't need a prefix, but fails for browsers that do.\r\n\r\n`<div onAnimationEnd={this.onAnimationEnd} />`\r\n\r\n\r\nWhat is the best way to handle this for browsers that need the `webkit` prefix for this event?"
+    },
+    "satisfaction_conditions": [
+      "Event handler must work in browsers requiring webkit prefix",
+      "Event handler must work in browsers without prefix requirements",
+      "Event must be properly captured regardless of event name casing",
+      "Event bubbling behavior must be preserved",
+      "Solution must work within React/Preact component syntax"
+    ],
+    "created_at": "2018-11-30T17:23:34Z"
+  },
+  {
+    "id": "https://github.com/preactjs/preact/issues/1105",
+    "source": {
+      "issue_number": 1105
+    },
+    "initial_question": {
+      "title": "External API methods for a component",
+      "body": "First up, let me say I'm an old school Javascript person; Preact (and React) is new to me, so if I'm talking rubbish, feel free to shoot me down :).\r\n\r\nBasically what I'm looking to be able to do is define methods on a class I am creating (extending `preact.Component`) and then use those methods. Defining them is easy - using them, not so much. In plain Javascript I'd just do `new ClassName()`, but in Preact you use the `render` function, which returns a DOM node.\r\n\r\nI found #955 which relates to this and using the solution there I can get my instance and call its methods:\r\n\r\n```js\r\n\tlet instance;\r\n\tlet ref = c => { instance = c; };\r\n\tpreact.render(<Menu ref={ref} />, menu.parent[0], menu[0] );\r\n\t\r\n\t// Then sometime later - after a socket update with new menu items:\r\n\tinstance.data( ... );\r\n```\r\n\r\nThat feels really messy and doesn't feel like the right way of doing it with Preact. Its a lot of messing around just to get the class instance (rather than `let instance = new Menu()`).\r\n\r\nIs there a better way of doing this? Should I in fact be passing the `data` in as a property to a new `preact.render(<Menu...)` call? Does that reuse the old instance (it looks like a factory method, so I'm guessing not).\r\n\r\nI guess I'm just haven't a little trouble knowing what the right way to do it would be and meshing that with my old school way of thinking!"
+    },
+    "satisfaction_conditions": [
+      "Component must be able to receive and respond to updated data after initial render",
+      "Component instance state/identity must be preserved across updates",
+      "Updates must trigger appropriate re-rendering of the component",
+      "Solution must integrate with external data sources in a maintainable way",
+      "Component must be accessible from parent/container code"
+    ],
+    "created_at": "2018-05-17T15:07:37Z"
+  },
+  {
+    "id": "https://github.com/preactjs/preact/issues/425",
+    "source": {
+      "issue_number": 425
+    },
+    "initial_question": {
+      "title": "how to get e.keycode or e.which from event",
+      "body": "how to get e.keycode or e.which from event (tried using preact | preact + preact-compat)\r\n\r\n```\r\nimport { h, Component } from 'preact';\r\n\r\nexport default class Comp extends Component {\r\n\tconstructor(props) {\r\n\t\tsuper(props);\r\n\t\tthis.handleChange = this.handleChange.bind(this);\r\n\t}\r\n\r\n        handleChange(e) {\r\n\t\tconsole.log(e.which);   // undefined\r\n       }\r\n\trender() {\r\n\t\treturn (\r\n\t\t\t<input type=\"text\" onInput={this.handleChange}/>\r\n\t\t);\r\n\t}\r\n}\r\n\r\n/*\r\nevent object contains\r\nEvent {\r\n   bubbles: true\r\n   cancelBubble:false\r\n   cancelable:false\r\n   composed:false\r\n   currentTarget:null\r\n   defaultPrevented:false\r\n   eventPhase:0\r\n   isTrusted:true\r\n   path:Array[13]\r\n   returnValue:true\r\n   srcElement:input\r\n   target:input\r\n   timeStamp:5857.87\r\n   type:\"change\"\r\n   __proto__:Event\r\n}\r\n/*\r\n\r\n\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Event handler must be properly bound to the component"
+    ],
+    "created_at": "2016-12-01T08:48:17Z"
+  },
+  {
+    "id": "https://github.com/preactjs/preact/issues/268",
+    "source": {
+      "issue_number": 268
+    },
+    "initial_question": {
+      "title": "Question: Rendering (inserting) before instead of appending",
+      "body": "Maybe I've missed something. If `render` is the proper way to generate code with Preact, I can't seem to figure out the proper way to generate and insert code out-of-order. What I mean: `render` appends.\n\nFor example:\n\n``` js\nrender(<div>Post 1: Hello World</div>, document.body);\nrender(<div>Post 2: Blah Blah</div>, document.body);\n```\n\nWhich outputs:\n\n``` html\n<div>Post 1: Hello World</div>\n<div>Post 2: Blah Blah</div>\n```\n\nI want this instead:\n\n``` html\n<div>Post 2: Blah Blah</div>\n<div>Post 1: Hello World</div>\n```\n\nOther than the obvious (switching the order), or inserting proxy elements that I target instead, what should I be doing in the 2nd line so it goes before the 1st element; Or specifically, so it inserts at the top of `document.body` instead of the bottom?\n\nThanks.\n"
+    },
+    "satisfaction_conditions": [
+      "New posts must appear at the top of the display list",
+      "Display must update automatically when new posts are received",
+      "Existing posts must remain visible after new posts are added",
+      "The display order must be maintainable across updates",
+      "The solution must handle dynamic content updates"
+    ],
+    "created_at": "2016-08-14T16:06:33Z"
+  },
+  {
+    "id": "https://github.com/preactjs/preact/issues/166",
+    "source": {
+      "issue_number": 166
+    },
+    "initial_question": {
+      "title": "Gulp/Browserify integration",
+      "body": "Hi,\n\nI love the idea, but I'm not sure how to get it to compile jsx for preact.\n\nThis is my gulp task:\n\n``` javascript\ngulp.task('scripts', function() {\n    var b = browserify({\n            \"entries\": ['app/js/app.js'],\n            transform: [babelify]\n        });\n\n    return b.bundle()\n        .pipe(source('app.min.js'))\n        .pipe(buffer())\n        .pipe(sourcemaps.init({loadMaps: true}))\n            .on('error', gutil.log)\n        .pipe(sourcemaps.write('../maps/js'))\n        .pipe(gulp.dest('dist/js'))\n        .pipe(notify(\"Built JS!\"));\n});\n```\n\nIf I added `reactify` to the transforms, it compiled, but transformed my code into `React.createElement`.\n\nI'm obviously way off course. What's the right way to do this?\n"
+    },
+    "satisfaction_conditions": [
+      "JSX code successfully compiles for Preact",
+      "Build system correctly processes JSX with appropriate pragma",
+      "Build process integrates with Gulp workflow",
+      "Transformed output is compatible with Preact's virtual DOM implementation"
+    ],
+    "created_at": "2016-05-29T18:05:51Z"
+  }
+]

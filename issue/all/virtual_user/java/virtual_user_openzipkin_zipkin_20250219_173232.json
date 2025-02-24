@@ -1,0 +1,33 @@
+[
+  {
+    "id": "https://github.com/openzipkin/zipkin/issues/1621",
+    "source": {
+      "issue_number": 1621
+    },
+    "initial_question": {
+      "title": "Zipkin UI + Elasticsearch: NoSuchMethodError: zipkin.Endpoint$Builder.parseIp",
+      "body": "I'm using Zipkin with Spring Boot. Storing events in Elasticsearch works fine, but when I want to display them with the Zipkin UI, I run into the following error:\r\n\r\n```\r\nException in thread \"OkHttp Dispatcher\" java.lang.NoSuchMethodError: zipkin.Endpoint$Builder.parseIp(Ljava/lang/String;)Z\r\n        at zipkin.storage.elasticsearch.http.JsonAdapters$3.fromJson(JsonAdapters.java:145)\r\n        at zipkin.storage.elasticsearch.http.JsonAdapters$3.fromJson(JsonAdapters.java:133)\r\n        at com.squareup.moshi.JsonAdapter$2.fromJson(JsonAdapter.java:128)\r\n        at zipkin.storage.elasticsearch.http.JsonAdapters$4.fromJson(JsonAdapters.java:199)\r\n        at zipkin.storage.elasticsearch.http.JsonAdapters$4.fromJson(JsonAdapters.java:164)\r\n        at zipkin.storage.elasticsearch.http.JsonAdapters$1.fromJson(JsonAdapters.java:82)\r\n        at zipkin.storage.elasticsearch.http.JsonAdapters$1.fromJson(JsonAdapters.java:38)\r\n        at zipkin.storage.elasticsearch.http.internal.client.SearchResultConverter.convert(SearchResultConverter.java:57)\r\n        at zipkin.storage.elasticsearch.http.internal.client.SearchResultConverter.convert(SearchResultConverter.java:26)\r\n        at zipkin.storage.elasticsearch.http.internal.client.HttpCall$CallbackAdapter.onResponse(HttpCall.java:106)\r\n        at okhttp3.RealCall$AsyncCall.execute(RealCall.java:135)\r\n        at okhttp3.internal.NamedRunnable.run(NamedRunnable.java:32)\r\n        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)\r\n        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n        at java.lang.Thread.run(Thread.java:748)\r\n```\r\n\r\nMy Gradle file looks like this:\r\n\r\n```\r\napply plugin: 'org.springframework.boot'\r\n\r\n\r\njar {\r\n\tbaseName = 'zipkin'\r\n\tversion = '1.0'\r\n}\r\n\r\n\r\ndependencies {\r\n\tcompile(\r\n\t\t\t'org.springframework.boot:spring-boot-starter',\r\n\t\t\t\"net.logstash.logback:logstash-logback-encoder:${logbackEncoderVersion}\",\r\n\t\t\t'org.springframework.boot:spring-boot-starter-security',\r\n\t\t\t'org.springframework.boot:spring-boot-starter-actuator',\r\n\t\t\t'org.jolokia:jolokia-core',\r\n\t\t\t\"io.zipkin.java:zipkin-server:${zipkinVersion}\",\r\n\t\t\t\"io.zipkin.java:zipkin-autoconfigure-storage-elasticsearch-http:${zipkinVersion}\",\r\n\t\t\t\"io.zipkin.java:zipkin-autoconfigure-ui:${zipkinVersion}\"\r\n\t)\r\n}\r\n\r\n\r\ndependencyManagement {\r\n\timports {\r\n\t\tmavenBom \"org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}\"\r\n\t}\r\n}\r\n\r\nspringBoot {\r\n    executable = true\r\n}\r\n```\r\n\r\nWith the variables:\r\n\r\n```\r\nspringBootVersion = '1.5.4.RELEASE'\r\nspringCloudVersion = 'Dalston.SR1'\r\nlogbackEncoderVersion = '4.10'\r\nzipkinVersion = '1.26.0'\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Elasticsearch storage integration must remain functional"
+    ],
+    "created_at": "2017-06-17T23:32:16Z"
+  },
+  {
+    "id": "https://github.com/openzipkin/zipkin/issues/1137",
+    "source": {
+      "issue_number": 1137
+    },
+    "initial_question": {
+      "title": "what's the meaning \"88%\"  of  this sentence: mysql-ycfsolr_inno 88% .",
+      "body": "_9.000ms 9 spans\nmysql-ycfsolr_inno **88%**\nmysql-ycfsolr_inno x4 3ms ycf-search x5 3ms_\n\nabove content show on zipkin  find a trace page\n\nquestion\uff1a\nwhat's the meaning \"88%\"  of  this sentence: mysql-ycfsolr_inno 88% .   thanks\uff01\n"
+    },
+    "satisfaction_conditions": [
+      "The percentage value represents a proportion of the total trace duration",
+      "The percentage relates to the mysql-ycfsolr_inno service specifically",
+      "The explanation must be consistent with Zipkin's trace visualization format",
+      "The value must be interpretable in the context of a distributed trace"
+    ],
+    "created_at": "2016-06-21T10:35:36Z"
+  }
+]

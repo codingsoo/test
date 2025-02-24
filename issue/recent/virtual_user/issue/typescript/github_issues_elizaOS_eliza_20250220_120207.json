@@ -1,0 +1,77 @@
+[
+  {
+    "number": 2265,
+    "title": "Log in info safe on character.json file vs .env?",
+    "created_at": "2025-01-13T23:40:29Z",
+    "closed_at": "2025-01-16T22:48:47Z",
+    "labels": [
+      "bug"
+    ],
+    "url": "https://github.com/elizaOS/eliza/issues/2265",
+    "body": "Just a quick question about the safety of inputting our login information for social media platforms on the files. Is it safe to input them on the character.json file under \"secrets\", or is it better to have them in the .env?\r\n\r\n What if you are running more than one character? Is there a way to add 2 different login info for the same platform (e.g twitter, or discord) in the .env and have them be assigned to different characters.json?",
+    "comments_url": "https://api.github.com/repos/elizaOS/eliza/issues/2265/comments",
+    "author": "sonatonagems",
+    "comments": [
+      {
+        "user": "ggindev",
+        "created_at": "2025-01-15T02:37:43Z",
+        "body": "> I have same problems, I want to add Twitter accounts in the .env and assign them to different characters. now I have to solve this question by myself\r\n\r\n\r\nSure, you can add more variables for the additional characters in the `.env` and then reference them in the character file like so:\r\n```\r\n...\r\n    \"secrets\": {\r\n      \"TWITTER_TOKEN\": \"${CHARACTER8_TWITTER_TOKEN}\", \r\n```"
+      }
+    ]
+  },
+  {
+    "number": 2035,
+    "title": "How to update to new version release? [v0.1.7-alpha.2] to [v0.1.7]",
+    "created_at": "2025-01-08T21:53:06Z",
+    "closed_at": "2025-01-09T14:53:00Z",
+    "labels": [
+      "Need Feedback"
+    ],
+    "url": "https://github.com/elizaOS/eliza/issues/2035",
+    "body": "I am currently on [v0.1.7-alpha.2] and want to update to the latest version [v0.1.7]. How do i do that?\r\n\r\nDo i use this: git checkout $(git describe --tags --abbrev=0)\r\nAnd then run pnpm install again?\r\n",
+    "comments_url": "https://api.github.com/repos/elizaOS/eliza/issues/2035/comments",
+    "author": "sonatonagems",
+    "comments": [
+      {
+        "user": "ai16z-demirix",
+        "created_at": "2025-01-08T22:31:54Z",
+        "body": "@sonatonagems Yes, you need to check out desired version, run pnpm install and don't forget to run pnpm build before running."
+      },
+      {
+        "user": "sonatonagems",
+        "created_at": "2025-01-08T23:12:50Z",
+        "body": "@ai16z-demirix i see. So then we have to create a character file and re-add env setting again on the new version?\r\n"
+      },
+      {
+        "user": "ai16z-demirix",
+        "created_at": "2025-01-09T10:38:13Z",
+        "body": "@sonatonagems Your .env file will persist since it is ignored by git. Your character files will also persist. "
+      }
+    ]
+  },
+  {
+    "number": 1622,
+    "title": "Initial setup based on docs not working",
+    "created_at": "2024-12-31T22:35:20Z",
+    "closed_at": "2025-01-01T10:41:54Z",
+    "labels": [
+      "bug"
+    ],
+    "url": "https://github.com/elizaOS/eliza/issues/1622",
+    "body": "**Describe the bug**\r\nCant get minimal setup running with OpenAI API as model\r\nError on agent terminal after message being sent via client\r\n\r\n**To Reproduce**\r\n1. clone repo, install deps, build\r\n2. choose openai as model on default tate character file:\r\n`    \"modelProvider\": \"openai\",\r\n    \"settings\": {\r\n        \"voice\": {\r\n            \"model\": \"en_US-male-medium\"\r\n        }\r\n    },\r\n    `\r\n3. Add openai API key to .env `OPENAI_API_KEY=sk-proj-xxx`\r\n4.  `pnpm run start --characters=\"../characters/tate.character.json\"`\r\n5. `pnpm start:client`\r\n6. send message via client\r\n7. receive error on agent terminal:\r\n``\": \\\"The model gpt-4o does not exist or you do not have access to it.\\\",\\n        \\\"type\\\": \\\"invalid_request_error\\\",\\n        \\\"param\\\": null,\\n        \\\"code\\\": \\\"model_not_found\\\"\\n    }\\n}\\n\",\"isRetryable\":false,\"data\":{\"error\":{\"message\":\"The model `gpt-4o` does not exist or you do not have access to it.\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"model_not_found\"}}}`\r\n`\r\n\r\n**Expected behavior**\r\n\r\nNo error, use openai API and receive response on client\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/elizaOS/eliza/issues/1622/comments",
+    "author": "uleeeeee",
+    "comments": [
+      {
+        "user": "freddymercury",
+        "created_at": "2024-12-31T23:49:17Z",
+        "body": "@uleeeeee does your openAI account have credit? I get similar error responses when I have no credit in my openAI account."
+      },
+      {
+        "user": "uleeeeee",
+        "created_at": "2025-01-01T10:41:54Z",
+        "body": "> @uleeeeee does your openAI account have credit? I get similar error responses when I have no credit in my openAI account.\r\n\r\nProblem was probably related to that. I added another 10$ credits, created new API key and now it works. Thanks!"
+      }
+    ]
+  }
+]

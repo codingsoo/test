@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/awslabs/git-remote-s3/issues/6",
+    "source": {
+      "issue_number": 6
+    },
+    "initial_question": {
+      "title": "not executing with native install but working in .venv - on Windows",
+      "body": "After installing git-remote-s3 with pip I had this issue when trying to clone :\r\n\r\n```\r\ngit clone s3://xxx/git-remote_xxx-iiot-cdk/\r\n```\r\n```\r\nCloning into 'git-remote_xxx-iiot-cdk'...\r\ngit: 'remote-s3' is not a git command. See 'git --help'.\r\n\r\nThe most similar command is\r\n        remote-fd\r\nfatal: remote helper 's3' aborted session\r\n``` \r\n\r\nBut it worked in a random python environment. \r\n\r\nAlso if I add the ./venv/Scripts that contains the git-remote-s3.exe to my Path, I can clone from anywhere, but it will probably stop working if I ever delete the python environment I took the git-remote-s3.exe from. "
+    },
+    "satisfaction_conditions": [
+      "S3 repository cloning must execute successfully"
+    ],
+    "created_at": "2024-10-21T15:06:43Z"
+  }
+]

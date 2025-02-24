@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/apache/arrow-java/issues/465",
+    "source": {
+      "issue_number": 465
+    },
+    "initial_question": {
+      "title": "Deep copy a VectorSchemaRoot?",
+      "body": "### Describe the enhancement requested\r\n\r\nI'm writing a convertor method to convert a base64 encoded byte array into Arrow batches and returns it to the user.\r\n\r\n```java\r\npublic List<VectorSchemaRoot> readArrowBatches(String rows, BufferAllocator allocator) {\r\n    final List<VectorSchemaRoot> batches = new ArrayList<>();\r\n    final byte[] data = Base64.getDecoder().decode(rows);\r\n    final ByteArrayInputStream stream = new ByteArrayInputStream(data);\r\n    try (final ArrowStreamReader reader = new ArrowStreamReader(stream, allocator)) {\r\n        while (reader.loadNextBatch()) {\r\n            batches.add(new Table(reader.getVectorSchemaRoot()).toVectorSchemaRoot());\r\n        }\r\n    } catch (IOException e) {\r\n        throw new UncheckedIOException(e);\r\n    }\r\n    return batches;\r\n}\r\n```\r\n\r\nSince `ArrowStreamReader` replace the batch referred by `getVectorSchemaRoot` in each iteration, I have to do a deepcopy of VectorSchemaRoot every time.\r\n\r\nCurrently, I use Table's method as a workaround, but wonder if `VectorSchemaRoot` deserves a `copy` method, or I implement such a typically use case in a wrong way."
+    },
+    "satisfaction_conditions": [
+      "Each VectorSchemaRoot batch must be independently accessible after creation",
+      "Memory resources must be properly managed through the allocator",
+      "Schema information must be preserved for each batch",
+      "Intermediate resources must be properly closed/released"
+    ],
+    "created_at": "2024-12-24T12:29:02Z"
+  }
+]

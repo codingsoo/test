@@ -1,0 +1,791 @@
+[
+  {
+    "id": "https://github.com/lovell/sharp/issues/4302",
+    "source": {
+      "issue_number": 4302
+    },
+    "initial_question": {
+      "title": "11 vulnerabilities (4 moderate, 7 high)",
+      "body": "Running `npm install sharp` on macOS 15.1 using node 20.17.0 warns about vulnerabilities. Any plans to resolve these?\r\n\r\n```\r\nnpm install sharp --save-dev\r\n\r\nadded 8 packages, removed 70 packages, and audited 1139 packages in 17s\r\n\r\n193 packages are looking for funding\r\n  run `npm fund` for details\r\n\r\n11 vulnerabilities (4 moderate, 7 high)\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Package installation completes without vulnerability warnings when installing sharp in isolation",
+      "Security audit of sharp's direct dependencies shows zero vulnerabilities",
+      "Clear distinction between project-wide and package-specific vulnerability scans"
+    ],
+    "created_at": "2024-12-20T10:28:56Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/4295",
+    "source": {
+      "issue_number": 4295
+    },
+    "initial_question": {
+      "title": "Changing exif data question",
+      "body": "Hi, could you please explain how to change ExifImageWidth and ExifImageHeight? I use withMetadata() and Ideally I want to copy all metadata except ExifImageWidth, ExifImageHeight. ImageHeight and ImageWidth copied too and it's not correct when I change orientation. Please help."
+    },
+    "satisfaction_conditions": [
+      "Original metadata is preserved except for specified dimension fields"
+    ],
+    "created_at": "2024-12-13T19:31:47Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/3729",
+    "source": {
+      "issue_number": 3729
+    },
+    "initial_question": {
+      "title": "How to resize images when composite",
+      "body": "I am trying to merge images using 'sharp'.\r\nThere are 6 images, size is 1536x1536px.\r\n\r\nThe size of the combined image will be 1536x9216.\r\nI would like to know how to write a merged image to be reduced to 256x1536.\r\n\r\nindex.ts\r\n```typescript\r\nimport sharp from \"sharp\";\r\n\r\nasync function main() {\r\n\r\n  const imagePaths = [\"images/1.jpeg\", \"images/2.jpeg\", \"images/3.jpeg\",\"images/4.jpeg\", \"images/5.jpeg\", \"images/6.jpeg\"];\r\n  const outputImgWidth = 1536;\r\n  const outputImgHeight = 9216;\r\n \r\n    let totalHeight = 0;\r\n    const compositeParams = imagePaths.map(image => {\r\n      const top = totalHeight;\r\n      totalHeight += outputImgWidth;\r\n      \r\n      return {\r\n        input: image,\r\n        gravity: \"northwest\",\r\n        left: 0,\r\n        top: top\r\n      };\r\n    });\r\n  \r\n    await sharp({\r\n      create: {\r\n        width: outputImgWidth,\r\n        height: outputImgHeight,\r\n        channels: 4,\r\n        background: { r: 255, g: 255, b: 255, alpha: 0 }\r\n      }\r\n    })\r\n      .composite(compositeParams);\r\n      .toFile(`preview.jpg`,(err, info)=>{\r\n          if(err){ throw err }\r\n          console.log(info)\r\n        });\r\n}\r\n\r\nmain().then();\r\n``` \r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "All 6 source images must be properly combined vertically"
+    ],
+    "created_at": "2023-07-19T04:51:07Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/3696",
+    "source": {
+      "issue_number": 3696
+    },
+    "initial_question": {
+      "title": "Is it possible to access trim offsets for all sides and not just top and left?",
+      "body": "## Question about an existing feature\r\n\r\n### What are you trying to achieve?\r\n\r\nFor my specific use case I need to have access to the size that was trimmed from all sides and not just top and left (trimOffsetTop, trimOffsetLeft) returned by the trim method.\r\n\r\nThe main reason is that I need to save the original position that the actual content had within the transparent background in its original canvas, so that I'm able to \"recreate\" the image if needed for example, by repositioning the content in a different canvas later.\r\n\r\nIn my cases there is no guarantee the top/bottom transparent space are equal, and the same applies to left/right as well.\r\n\r\nIs it possible to achieve this with sharp right now? I could not find any related issues or discussions and I'm yet to read through the source code.\r\n\r\nSomething tells me I should be able to achieve this without sharp, before trimming, but I didn't want to come up with a solution that acts different than the `trim` and end up with inconsistent saved data vs output.\r\n\r\nThanks!\r\n"
+    },
+    "satisfaction_conditions": [
+      "Must provide trim offset values for all four sides of the image (top, bottom, left, right)",
+      "Calculated offset values must match the actual trimming performed by sharp's trim operation",
+      "Must preserve information about the original content position within the transparent background",
+      "Must work with asymmetrical transparent spaces"
+    ],
+    "created_at": "2023-06-12T18:44:45Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/3403",
+    "source": {
+      "issue_number": 3403
+    },
+    "initial_question": {
+      "title": "How do I output multiple resized images in multiple formats?",
+      "body": "So far I have been able to figure out how to take in an image and output multiple sizes, like so:\r\n\r\n```js\r\nconst sharp = require('sharp')\r\n\r\nconst image = `beach`;\r\nconst format = `jpg`;\r\n\r\nconst resize = size => sharp(`${image}.jpg`)\r\n  .resize({ width: size })\r\n  .toFile(__dirname + `/processed/${image}-${size}.${format}`)\r\n;\r\n\r\nPromise\r\n  .all([2160, 1920, 1440, 1080, 720, 480, 320].map(resize))\r\n  .then(() => {\r\n    console.log('Image resizing is complete.');\r\n  });\r\n```\r\n\r\n...and it works just fine.\r\n\r\nNow I want to be able to output multiple formats of each resized image as well (`avif` is the preferred choice, but `jpg` is the fallback kind of thing), but can't figure it out...\r\n\r\nI've tried this so far:\r\n\r\n```js\r\nconst sharp = require('sharp')\r\n\r\nconst image = `beach`;\r\nconst format = [`jpg`, `avif`]\r\n\r\nconst resize = size => sharp(`${image}.jpg`)\r\n  .resize({ width: size })\r\n  .toFile(__dirname + `/processed/${image}-${size}.${format[0]}`)\r\n  .toFile(__dirname + `/processed/${image}-${size}.${format[1]}`)\r\n;\r\n\r\nPromise\r\n  .all([2160, 1920, 1440, 1080, 720, 480, 320].map(resize))\r\n  .then(() => {\r\n    console.log('Image resizing is complete.');\r\n  });\r\n```\r\n\r\n...but it seems that I cannot chain two `toFile`'s together?\r\n\r\nBeen googling around but have not found anything yet...\r\n\r\nAny help is greatly appreciated, thank you XD"
+    },
+    "satisfaction_conditions": [
+      "Multiple output sizes of the same image are generated",
+      "All file outputs are generated in the correct directory with appropriate naming",
+      "Operations are handled asynchronously and properly resolved"
+    ],
+    "created_at": "2022-10-11T01:19:02Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/3299",
+    "source": {
+      "issue_number": 3299
+    },
+    "initial_question": {
+      "title": "How sharpness works with multi-page PDFs?",
+      "body": "Hi,\r\nFirst of all, thank you for this library, it's really great!\r\n\r\nI'm wondering how is the sharpness calculated for PDF file?\r\n\r\nFor example, I have a PDF file with a few pages inside, I read it with `sharp` and convert to one large image. \r\nWhen I check it for the sharpness, what will I get: some average value for all the pages, minimal sharpness of the most blurred page or something else?\r\n\r\nSorry if there is an answer somewhere, couldn't find it.\r\nBest regards!"
+    },
+    "satisfaction_conditions": [
+      "Must provide a way to measure sharpness across all pages combined",
+      "Must support individual page sharpness measurement",
+      "Must clarify how combined sharpness is calculated",
+      "Must work with PDF input format",
+      "Must return numerical sharpness values"
+    ],
+    "created_at": "2022-07-20T15:12:38Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/3089",
+    "source": {
+      "issue_number": 3089
+    },
+    "initial_question": {
+      "title": "Reducing memory usage",
+      "body": "### What are you trying to achieve?\r\nI'm processing batches of 200-400MB TIFF files on an instance with 1GB of memory. It is occasionally not enough. I'm trying to understand what I can do better to manage memory.\r\n\r\n### Have you searched for similar questions?\r\nYes, I've landed on #138 and related issues regarding streaming. But I'm not sure if this is the best approach.\r\n\r\nMy use case requires me to clone and downsample the entire image to be analyzed. I then use the analysis results for processing the full-size image. If I am to change the file to a stream, I may not be able to split it into two parts (one, downsized, for analysis and one for processing).\r\n\r\nI currently start the instance on `node:14-alpine` container with `--optimize_for_size --max_old_space_size=320 --gc_interval=50`. Other than streaming, I'm also considering adding an artificial delay between jobs to ensure that the memory has time to empty out.\r\n\r\nI would really appreciate some guidance here. Thank you so much!\r\n\r\n### Are you able to provide a minimal, standalone code sample that demonstrates this question?\r\n```javascript\r\n\r\n// create a reduced-size image sample\r\nconst data = await sharp(image).clone().resize(500).toBuffer();\r\n\r\n// this object will store values that will be used for full-size image manipulation\r\nconst prescriptions = {};\r\n\r\n// determine values for full-size image manipulation\r\nconst channelNames = [\"red\", \"green\", \"blue\"];\r\nconst prescriptionsCalculators = channelNames.map(async (channel) => {\r\n  const forAnalysis = await sharp(data)\r\n  .extractChannel(channel)\r\n  .toColorspace(\"b-w\")\r\n  .blur(1)\r\n  .toBuffer();\r\n\r\n  const stats = await sharp(forAnalysis).stats();\r\n  const { channels } = stats;\r\n\r\n  const range = [channels[0].min, channels[0].max];\r\n  const linear = levels(range[0], range[1]);\r\n\r\n  prescriptions[channel] = { linear, range };\r\n  return await linear;\r\n});\r\nawait Promise.all(prescriptionsCalculators);\r\n\r\n// use the above data to process full-size image\r\nconst channels = {};\r\nconst channelEffects = channelNames.map(async (channel) => {\r\n  const result = sharp(reversed)\r\n    .extractChannel(channel)\r\n    .toColorspace(\"b-w\")\r\n    .linear(...prescriptions[channel].linear)\r\n    .toBuffer();\r\n  channels[channel] = result;\r\n  return result;\r\n});\r\nawait Promise.all(channelEffects);\r\n\r\n// reassemble channels into RGB\r\nconst positive = sharp(await channels[\"red\"]).joinChannel([\r\n  await channels[\"green\"],\r\n  await channels[\"blue\"],\r\n]);\r\n\r\nreturn positive;\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Ability to perform two-phase image processing (downsample analysis followed by full-size processing)",
+      "Maintains ability to extract and process individual color channels",
+      "Supports concurrent processing of multiple channels"
+    ],
+    "created_at": "2022-02-11T19:20:45Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/2975",
+    "source": {
+      "issue_number": 2975
+    },
+    "initial_question": {
+      "title": "pipeline await and toBuffer",
+      "body": "I am trying to pipe an input stream to a sharp pipeline and get a buffer out of it.\r\nTo be able to handle the input stream errors, i thought i could do this:\r\n\r\n```\r\nconst sharp = require('sharp');\r\nconst pipeline = require('util').promisify(require('stream').pipeline);\r\nconst got = require('got');\r\n\r\nasync function getThumbnailBuffer(uri) {\r\n\tconst pil = sharp().resize({\r\n\t\tfit: \"inside\",\r\n\t\theight: 64\r\n\t}).toFormat('webp', {\r\n\t\tquality: 50\r\n\t});\r\n\tconst pipe = await pipeline(got.stream(uri), pil);\r\n\tconst buf = await pil.toBuffer();\r\n\treturn buf; // i know i can return pil.toBuffer(), i do this to show where we wait\r\n};\r\n```\r\n\r\nhowever that doesn't work - `await pipeline` doesn't return when no error is thrown.\r\nOn the other hand, it correctly (meaning `try { await getThumbnailBuffer(url); }` works) throws an error (from got.stream) when there is one.\r\n\r\nI also tried this but toBuffer is not a stream, so it can't work:\r\n```\r\n\treturn await pipeline(got.stream(uri), pil.toBuffer());\r\n```\r\n\r\nInstead i had to do that:\r\n\r\n```\r\nconst sharp = require('sharp');\r\nconst pipeline = require('util').promisify(require('stream').pipeline);\r\nconst got = require('got');\r\n\r\nmodule.exports = async function (uri) {\r\n\tconst pil = sharp().resize({\r\n\t\tfit: \"inside\",\r\n\t\theight: 64\r\n\t}).toFormat('webp', {\r\n\t\tquality: 50\r\n\t});\r\n\tlet toBuff;\r\n\tsetTimeout(async () => {\r\n\t\ttoBuff = pil.toBuffer();\r\n\t});\r\n\tawait pipeline(got.stream(uri), pil);\r\n\tconst buf = await toBuff;\r\n\treturn buf; // i know i can return toBuff, i do this to show where we wait\r\n};\r\n```\r\n\r\nthis works and also catches (in a way compatible with async/await) errors.\r\nHowever it's ugly.\r\nIt's hard to tell if it comes from\r\n- node\r\n- got\r\n- sharp\r\nbut right now i'm inclined to think the need to call \"toBuffer\" to trigger the stream is odd.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Successfully processes input stream to output buffer",
+      "Properly handles input stream errors",
+      "Completes stream processing before returning buffer",
+      "Works with Sharp's duplex stream nature"
+    ],
+    "created_at": "2021-11-15T18:59:31Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/2853",
+    "source": {
+      "issue_number": 2853
+    },
+    "initial_question": {
+      "title": "sharp.format.avif returns undefined",
+      "body": "I am using latest version of sharp (0.29.0) and I noticed that ``sharp.format.avif`` returns undefined. Would you please investigate?\r\n\r\nBest regards,\r\nAngel Kiryazov"
+    },
+    "satisfaction_conditions": [
+      "AVIF format information is accessible through the API",
+      "Documentation or response clarifies the relationship between AVIF and HEIF formats",
+      "Format information includes input/output capabilities",
+      "Format information is queryable programmatically"
+    ],
+    "created_at": "2021-08-20T12:53:17Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/2776",
+    "source": {
+      "issue_number": 2776
+    },
+    "initial_question": {
+      "title": "PNG to JPEG: how to keep high quality",
+      "body": "Hello ! \r\n\r\nI'm trying to convert PNG image buffer to a JPEG image buffer.\r\nIt's working but I have a quality loss when I'm displaying the JPEG from Buffer.\r\n\r\nHere my simple code to convert PNG to JPEG:\r\n```javascript\r\nformatted = await sharp(pngImgBuffer)\r\n      .toFormat('jpeg')\r\n      .jpeg({ quality: 100, chromaSubsampling: '4:4:4', force: true })\r\n      .toBuffer(); // JPEG buffer\r\n```\r\n\r\nAnd the reading part (with resize):\r\n```javascript\r\nresized = await sharp(jpegImgBuffer)\r\n      .resize(width, height)\r\n      .toFormat('jpeg')\r\n      .jpeg({ quality: 100, chromaSubsampling: '4:4:4', force: true })\r\n      .toBuffer();\r\n```\r\n\r\nIs there something wrong in my code ? Or something else to do to improve the quality of the result ?"
+    },
+    "satisfaction_conditions": [
+      "User understands that quality loss is inherent in PNG to JPEG conversion",
+      "Image conversion successfully completes without errors",
+      "If lossless quality is required, an alternative lossless format must be used",
+      "JPEG output quality settings are maximized if using JPEG"
+    ],
+    "created_at": "2021-06-30T15:19:13Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/2718",
+    "source": {
+      "issue_number": 2718
+    },
+    "initial_question": {
+      "title": " VipsJpeg: Corrupt JPEG data: premature end of data segment",
+      "body": "I am trying to resize an array of images here is my code:\r\nconst Sharp = require('sharp');\r\nconst fs = require('fs');\r\n\r\nconst transformer = Sharp().resize(300);\r\n\r\n\r\nconst addFoto = async (request, h) => {\r\n  const fotos = [].concat(request.payload.fotoFile);\r\n  const smallerFotos = Promise.all(fotos.map(async (foto) => {\r\n    const writeStream = fs.createWriteStream(foto.hapi.filename);\r\n    return foto.pipe(transformer).pipe(writeStream);\r\n  }));\r\nthe code works when the array length is one\r\nbut fails when more than file is in the array \r\nfiles are jpeg\r\nthanks\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple images can be processed concurrently without corruption",
+      "Each image transformation maintains data integrity",
+      "Image processing resources are properly isolated between files",
+      "Output images are successfully resized to specified dimensions",
+      "All image streams complete writing without premature termination"
+    ],
+    "created_at": "2021-05-16T18:24:59Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/2638",
+    "source": {
+      "issue_number": 2638
+    },
+    "initial_question": {
+      "title": "Metadata before and after Resize",
+      "body": "Hello, \r\n\r\nIs possible to get both metada from image resized in a single step ?\r\nIn other words, two metadata for same image, before and after resize, in a single step.\r\n\r\nTo get metadata after resize I use :\r\n\r\n```\r\n    sharp(imageBuffer)                              \r\n    \t.resize(800, 900, {                                           \r\n    \t\tfit: 'inside',                                              \r\n    \t\twithoutEnlargement: true                                    \r\n    \t})\r\n        .jpeg({ quality: 80 })\r\n    \t.toBuffer({ resolveWithObject: true })\r\n    \t.then(data => {\r\n               console.log(data);\r\n \t    })\r\n    \t.catch(err => {if (err) \r\n    \t{\r\n    \t    console.log(err);\r\n    \t    throw err;\r\n    \t}\r\n    });\r\n```\r\n\r\nTo get metada before resize I use `.metadata()`.\r\n\r\nBut how to get both metadata in a single step ?"
+    },
+    "satisfaction_conditions": [
+      "Both pre-resize and post-resize image metadata must be retrievable in a single operation",
+      "Pre-resize metadata must include original image properties",
+      "Post-resize metadata must reflect the resized image properties",
+      "The operation must work with the sharp image processing library",
+      "The solution must handle the same image buffer input"
+    ],
+    "created_at": "2021-03-25T08:32:38Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/2442",
+    "source": {
+      "issue_number": 2442
+    },
+    "initial_question": {
+      "title": "Webp vs. JPEG sizes?",
+      "body": "I am a newbie for image processing.  To my understanding, webp is supposed to have smaller size than jpeg.  However, from my experiment, this is not the case after converting to both format using Sharp.\r\n\r\nI am actually getting smaller sizes when converting to JPEG.  \r\nHere is my configurations:\r\n```\r\nsharp().resize({ width: 300 }).jpeg({ quality: 100 })\r\nsharp().resize({ width: 300 }).webp({ lossless: true })\r\n```\r\nOriginal PNG size is 937 KB.\r\nConverted JPEG is 408.7 KB\r\nConverted WEBP is 584.9 KB\r\n\r\nFor resized smaller images are the same result.  \r\nAm I missing something or this is expected?\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Image dimensions remain as specified"
+    ],
+    "created_at": "2020-11-15T21:45:42Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/2184",
+    "source": {
+      "issue_number": 2184
+    },
+    "initial_question": {
+      "title": "Can't compress a 24 bit jpg to an 8 bit jpg",
+      "body": "What are you trying to achieve?\r\ncompress a 24 bit jpg to an 8 bit jpg\r\n\r\nHave you searched for similar feature requests?\r\nyes, couldn't find anything\r\n\r\nWhat would you expect the API to look like?\r\n\r\nawait sharp(in).depth(8).toFile(out);\r\n\r\nWhat alternatives have you considered?\r\npngquant but it's only for png files\r\n\r\nIs there a sample image that helps explain?\r\nno"
+    },
+    "satisfaction_conditions": [
+      "Output remains in JPEG format"
+    ],
+    "created_at": "2020-04-27T07:50:22Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1940",
+    "source": {
+      "issue_number": 1940
+    },
+    "initial_question": {
+      "title": "Get metadata from resized/modified image.",
+      "body": "What are you trying to achieve?\r\nI want to get width, height and size in file system from a resized image. I've tried using the `metadata` method, but it gives me information about the original image, not the resized image. I wonder if that is possible without having to re-open the image after storing it.\r\n\r\nHave you searched for similar questions?\r\nYes :)\r\n\r\nAre you able to provide a standalone code sample that demonstrates this question?\r\n```\r\n// Resize the image.\r\nvar transform = await sharp().resize(resizeOptions).jpeg({ quality: 90 }).toFormat('jpg')\r\nfile.stream.pipe(transform)\r\n\r\n// Save the image on the file system.\r\nawait Drive.disk('spaces').put(path, transform, {\r\n  ACL: 'public-read',\r\n  ContentType: 'image/jpg'\r\n})\r\n\r\n// Get image metadata\r\nconst metadata = await transform.metadata()\r\nconsole.log(metadata) // This gives me the original image metadata\r\n```\r\n\r\nAre you able to provide a sample image that helps explain the question?\r\nI don't believe it is necessary.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Works with image transformation streams"
+    ],
+    "created_at": "2019-10-28T02:20:55Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1930",
+    "source": {
+      "issue_number": 1930
+    },
+    "initial_question": {
+      "title": "Build against a more recent ilmbase?",
+      "body": "Upon updating Arch Linux, Sharp has missing libraries:\r\n\r\n```\r\nldd node_modules/sharp/build/Release/sharp.node\r\nlibIlmImf-2_3.so.24 => not found\r\nlibImath-2_3.so.24 => not found\r\nlibHalf.so.24 => not found\r\nlibIex-2_3.so.24 => not found\r\nlibIexMath-2_3.so.24 => not found\r\nlibIlmThread-2_3.so.24 => not found\r\n```\r\n\r\nFiles like the following are now present:\r\n/usr/lib/libIlmImf-2_4.so.24\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Missing library dependencies must be resolvable by the system",
+      "Library version compatibility must be maintained"
+    ],
+    "created_at": "2019-10-22T09:43:18Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1902",
+    "source": {
+      "issue_number": 1902
+    },
+    "initial_question": {
+      "title": "Extract after extract",
+      "body": "Is it possible?\r\n\r\nI have one image and want to exctract region one after one.\r\n\r\n````\r\nconst image = () => sharp(data).extract({\r\n          left: paddingLeft,\r\n          top: paddingTop,\r\n           width: W,\r\n          height: H\r\n       });\r\n\r\nimage().toFile(destination);\r\nimage().extract({ \r\nleft: pleft, \r\ntop: pTop,\r\n width: pw, height: ph\r\n            }).toFile(destination2);\r\n````\r\n\r\nbut second instans do not see the first extract(). It crops original image.\r\n\r\n  "
+    },
+    "satisfaction_conditions": [
+      "Sequential image extractions must be performed on the output of previous extractions",
+      "Intermediate image data must be preserved between extractions",
+      "Each extraction operation must produce valid image data that can be used as input for subsequent operations"
+    ],
+    "created_at": "2019-10-05T13:37:02Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1779",
+    "source": {
+      "issue_number": 1779
+    },
+    "initial_question": {
+      "title": "code only seems to work if intermediate file is used?",
+      "body": "I have a chunk of code as follows:\r\n\r\n```\r\n      var img = sharp(path)\r\n  \r\n      // Extract the grayscale channel?\r\n      // and save as 'newGrey.png'\r\n      var grey = img.extractChannel(0)\r\n      await grey.toColorspace(\"b-w\")\r\n(1)        .toFile(\"newGrey-\"+ client.clientID + client.counter +\".png\")\r\n\r\n      // Load new alpha and join\r\n      let filename = 'transparencies/'+client.rasterConfig.transparency+'.png'\r\n      //console.log(filename)\r\n(2)      await sharp('newGrey-'+ client.clientID + client.counter + '.png')\r\n        .toColorspace(\"b-w\")\r\n        .joinChannel(filename)\r\n        .toBuffer((err, data, info) => { \r\n\r\n```\r\n\r\nThis code works.  \r\n\r\nBut as you can see, I'm basically writing the file to a temp image at point (1), then reload that same temp image at point (2).  This seems totally like it should be redundant.  But if I remove the toFile at (1) and the load at (2), I don't get the same resultant image.\r\n\r\nWhat am I misunderstanding here?\r\n\r\nThanks\r\n"
+    },
+    "satisfaction_conditions": [
+      "Image data must be preserved between channel operations",
+      "Grayscale channel extraction must be completed before channel joining",
+      "Image dimensions and format consistency must be maintained"
+    ],
+    "created_at": "2019-07-04T16:41:18Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1778",
+    "source": {
+      "issue_number": 1778
+    },
+    "initial_question": {
+      "title": "Usage with Axios?",
+      "body": "I'm currently trying to download an image using Axios and then resize the result and save it locally via Node in a GraphQL resolver.\r\n\r\nThis is the block of code I'm working with:\r\n```javascript\r\naxios.get(url)\r\n                .then((response) => {\r\n                    const { set, collector_number } = response.data;\r\n                    const sourceUrl = response.data.image_uris.border_crop;\r\n                    const filename = `${set}/${collector_number}.png`;\r\n                    axios.get(sourceUrl, { responseType: 'arraybuffer' })\r\n                        .then((res) => {\r\n                            console.log(`Resizing Image!`)\r\n                            sharp(res)\r\n                                .resize(226, 321)\r\n                                .toFile(`../cardimg/${filename}`)\r\n                                .then(() => {\r\n                                    console.log(`Image downloaded and resized!`)\r\n                                })\r\n                                .catch((err) => {\r\n                                    console.log(`Couldn't process: ${err}`);\r\n                                })\r\n                        })\r\n                })\r\n```\r\n\r\nWhen I execute the code (via GraphQL Mutation), it throws an error saying that states `Input file is missing`.\r\n\r\nNot sure if it's misuse of Axios, or if I'm doing something wrong with Sharp.\r\n\r\nAny suggestions?   I was originally worried that I needed to mess with the format of the response coming from the HTTP request, but from what I can gather, I'm doing it correctly.  \r\n\r\nThanks in advance!\r\n\r\nI've used `console.log` to ensure that it's definitely grabbing an image and the URL is correct, so that's already been tested, so the `sourceUrl` is indeed grabbing an image, I'm just not sure how to properly do anything -with-  the data that I'm grabbing."
+    },
+    "satisfaction_conditions": [
+      "Image data must be in a format compatible with Sharp processing",
+      "Response type must be properly handled for binary data",
+      "Successful image download confirmation"
+    ],
+    "created_at": "2019-07-04T14:39:06Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1695",
+    "source": {
+      "issue_number": 1695
+    },
+    "initial_question": {
+      "title": "How to skip images unsupported format",
+      "body": "Hi\r\n\r\n\r\nI am getting the **Input file contains unsupported image format** Error. How can I skip images that supposedly are not the correct format?\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Program successfully identifies image file formats before processing",
+      "Program continues execution when encountering unsupported images",
+      "Program only processes intended image formats"
+    ],
+    "created_at": "2019-05-11T03:21:15Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1675",
+    "source": {
+      "issue_number": 1675
+    },
+    "initial_question": {
+      "title": "Upgrading from 0.21.3 to 0.22.1 leads to: \"undefined symbol: cairo_tag_end\" - When using LD_PRELOAD with Electron",
+      "body": "### What is the output of running `npx envinfo --binaries --languages --system --utilities`?\r\n\r\n```\r\n  System:\r\n    OS: Linux 4.10 Linux Mint 18.3 (Sylvia)\r\n    CPU: (2) x64 Intel(R) Core(TM) i5-4690K CPU @ 3.50GHz\r\n    Memory: 1.16 GB / 3.84 GB\r\n    Container: Yes\r\n    Shell: 4.3.48 - /bin/bash\r\n  Binaries:\r\n    Node: 10.15.1 - /usr/bin/node\r\n    Yarn: 1.13.0 - /usr/bin/yarn\r\n    npm: 6.4.1 - /usr/bin/npm\r\n  Utilities:\r\n    Make: 4.1 - /usr/bin/make\r\n    GCC: 5.4.0 - /usr/bin/gcc\r\n    Git: 2.7.4 - /usr/bin/git\r\n  Languages:\r\n    Bash: 4.3.48 - /bin/bash\r\n    Perl: 5.22.1 - /usr/bin/perl\r\n    Python: 2.7.12 - /usr/bin/python\r\n    Ruby: 2.3.1 - /usr/bin/ruby\r\n\r\n```\r\n\r\n### What are the steps to reproduce?\r\n\r\n`cross-env LD_PRELOAD=./node_modules/sharp/vendor/lib/libz.so electron [some args]`\r\n\r\n### What is the expected behaviour?\r\n\r\nLD_PRELOAD magically fixes everything like it did with `Sharp@0.21.3`, if that's possible.\r\n\r\n### Are you able to provide a standalone code sample, without other dependencies, that demonstrates this problem?\r\n\r\nYes I believe so. If a fix or workaround aren't immediately apparent, I think I can put together a repo for this. This doesn't seem to be reproducible though when using LD_PRELOAD on a machine with `zlib@1.2.11` already installed though, so actually such a repo might have OS level requirements to reproduce.\r\n\r\n### Are you able to provide a sample image that helps explain the problem?\r\n\r\nThings don't get that far.\r\n\r\n### Other info\r\n\r\n**Electron** 4.1.5\r\n\r\nLove the prebuilt images for Electron 4 and 5! I found some references to this error on the web, but nothing that seemed to point me towards anything actionable"
+    },
+    "satisfaction_conditions": [
+      "Electron application successfully loads without 'undefined symbol: cairo_tag_end' error",
+      "Required shared library dependencies are properly resolved at runtime",
+      "Solution works with system's existing library ecosystem"
+    ],
+    "created_at": "2019-04-28T00:05:07Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1642",
+    "source": {
+      "issue_number": 1642
+    },
+    "initial_question": {
+      "title": "Detecting whether withoutEnlargement is fired or not",
+      "body": "## What are you trying to achieve?\r\nI am trying to create a set of sizes under the original size.  \r\n\r\nThe withoutEnlargement option works in that it does not scale up the image, however, ideally there would be a flag or something when doing toFile/toBuffer to say that the image was larger than the original image. \r\n\r\nThe problem I have at the moment is that I'm doing the following;\r\n\r\n```js\r\nsharp(tmpFilePath)\r\n        .resize(width, null, {\r\n          withoutEnlargement: true\r\n        })\r\n        .toFile(thumbPath)\r\n        .then((a) => {\r\n// Upload file to GCS\r\n});\r\n```\r\n\r\nAnd I would like to NOT create the new file in GCS if it is just the same as the original size, that way I don't have a file called '2000-image.jpg' when the width is actually 1500.\r\n\r\nIs there something I'm missing, or an extra callback parameter or something that would allow me to know in the `then` function so I could decide not to upload it. \r\n\r\n## Have you searched for similar questions?\r\nYes\r\n\r\n## Are you able to provide a standalone code sample that demonstrates this question?\r\nNot immediately, but I can if needed.\r\n\r\n## Are you able to provide a sample image that helps explain the question?\r\nAny image under the size you're trying to resize to. \r\n"
+    },
+    "satisfaction_conditions": [
+      "Solution must detect when image resizing was skipped due to withoutEnlargement",
+      "Information about final image dimensions must be accessible after resize operation",
+      "Solution must allow conditional file upload based on resize results",
+      "Solution must work within an asynchronous processing chain"
+    ],
+    "created_at": "2019-04-04T15:35:22Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1635",
+    "source": {
+      "issue_number": 1635
+    },
+    "initial_question": {
+      "title": "resize() after composite() cause error",
+      "body": "Hi,\r\n\r\nThere is a wierd issue when Im trying to `resize()` after `composite()`, the source is:\r\n\r\n```javascript\r\nsharp({\r\n    create: {\r\n        width: 789,\r\n        height: 789,\r\n        channels: 4,\r\n        background: '#bfff00'\r\n    }\r\n}).png().composite([{ input: content }]).resize(192).toBuffer((err, data) => {\r\n    if (err)\r\n        return callback(err);\r\n    this.emitFile(target, data);\r\n    callback(null, '');\r\n});\r\n```\r\n\r\nAnd it halted with *Image to composite must have same dimensions or smaller*.\r\n\r\nIf I deleted `.resize(192)`, it works fine.\r\n\r\nIf I deleted `.png()`, the same error would be occurred again."
+    },
+    "satisfaction_conditions": [
+      "The final output image must be successfully resized to 192 pixels",
+      "The composite operation must complete without dimension-related errors",
+      "The PNG format output must be preserved",
+      "The background color and initial dimensions must be maintained during composition",
+      "The entire image processing pipeline must complete without halting"
+    ],
+    "created_at": "2019-03-29T17:33:36Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1584",
+    "source": {
+      "issue_number": 1584
+    },
+    "initial_question": {
+      "title": "Resize -> extract -> rotate leads to no rotate",
+      "body": "We have the following code:\r\n```js\r\nsharp()\r\n  .resize(600, 600)\r\n  .extract({ width: 200, height: 50, left: 0, top: 0 })\r\n  .rotate(90);\r\n```\r\n\r\nResult should be 50x200 however, it is 200x50 (rotate not applied).\r\n\r\nWhen we do `resize` in a different instance, then the result is 50x200 as expected:\r\n```js\r\nconst instance1 = sharp().resize(600, 600);\r\n  \r\nconst instance2 = sharp()\r\n  .extract({ width: 200, height: 50, left: 0, top: 0 })\r\n  .rotate(90);\r\n\r\ninstance1.pipe(instance2);\r\n```\r\n\r\nIs this an expected behaviour? If yes, what's the reason for this?\r\n\r\nSharp version: 0.21.3"
+    },
+    "satisfaction_conditions": [
+      "Image dimensions after processing must be 50x200",
+      "Operations must maintain correct sequential processing order"
+    ],
+    "created_at": "2019-02-19T13:28:44Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1461",
+    "source": {
+      "issue_number": 1461
+    },
+    "initial_question": {
+      "title": "store an image 2 times",
+      "body": "I have to resize an image 2 times and store it in different files\r\nand most importantly i want them to be Promise based so i can await them\r\n\r\ncurrently i use this method which i doubt to be correct:\r\n\r\n```\r\nawait sharp(my_file)\r\n\t.jpeg({quality: 90, chromaSubsampling: '4:4:4'})\r\n\t.resize(200, 200)\r\n\t.toFile('200x200.jpg', (err, info) => {}); // save\r\n\r\nawait sharp(my_file)\r\n\t.jpeg({quality: 90, chromaSubsampling: '4:4:4'})\r\n\t.resize(40, 40)\r\n\t.toFile('40x40.jpg', (err, info) => {}); // save\r\n```\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Two different sized versions of the same image are successfully saved to separate files",
+      "The image processing operations return Promises that can be awaited",
+      "Image quality settings are preserved across both resized versions",
+      "Both resize operations can be performed without blocking each other"
+    ],
+    "created_at": "2018-11-15T15:19:36Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1449",
+    "source": {
+      "issue_number": 1449
+    },
+    "initial_question": {
+      "title": "GLib-GObject-WARNING and GLib-GObject-CRITICAL",
+      "body": "Although my code executes fine and generates the file 100%, I am getting the following error messages:\r\n\r\n```\r\n(sharp:157048): GLib-GObject-WARNING **: 21:49:04.120: invalid uninstantiatable type '(null)' in cast to 'GObject'\r\n\r\n(sharp:157048): GLib-GObject-CRITICAL **: 21:49:04.120: g_object_set_qdata: assertion 'G_IS_OBJECT (object)' failed\r\n```\r\n\r\nMy code is as follow:\r\n\r\n```\r\nvar sharpImg = sharp('file1.png');\r\nsharpImg.metadata().then(function (metadata) {\r\n\tvar origWidth = metadata.width;\r\n\tvar origHeight = metadata.height;\r\n\treturn sharpImg.resize(Math.round(origWidth / 2), Math.round(origHeight / 2));\r\n}).then(function (data) {\r\n\tdata.toFile('file2.png', function (err, info) {\r\n\t\t// Done with err == null (No errors here)\r\n\t});\r\n});\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Image processing operations complete successfully",
+      "Sharp library version compatibility is verified"
+    ],
+    "created_at": "2018-11-06T20:47:20Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1415",
+    "source": {
+      "issue_number": 1415
+    },
+    "initial_question": {
+      "title": "Possible buffer memory leak on fedora/centos systems ",
+      "body": "I'm writing a application to index large amount of images.\r\n\r\nI'm getting large RSS (1.5 - 2gb after few hundred images) usage and it' is not going down. Heap is about 70mb.\r\n\r\nIf I run this code on my machine the RSS will just keep on growing.\r\n\r\ncurrent system: Fedora release 28 (Twenty Eight)\r\n http_parser: '2.8.0',\r\n  node: '10.1.0',\r\n  v8: '6.6.346.27-node.6',\r\n  uv: '1.20.2',\r\n  zlib: '1.2.11',\r\n  ares: '1.14.0',\r\n  modules: '64',\r\n  nghttp2: '1.29.0',\r\n  napi: '3',\r\n  openssl: '1.1.0h',\r\n  icu: '61.1',\r\n  unicode: '10.0',\r\n  cldr: '33.0',\r\n  tz: '2018c' \r\n\r\n\r\n```\r\nconst sharp = require('sharp');\r\nconst path = require('path');\r\nconst fs = require('fs');\r\nconst async = require('async');\r\nsharp.cache(false);\r\n\r\n\r\nconst filePath  = process.argv.pop();\r\n\r\n\r\nfunction createArray(len){\r\n  const array = [];\r\n\r\n  for (let i = 0; i < len; i++){\r\n    array.push(i);\r\n  }\r\n\r\n  return array;\r\n}\r\n\r\nconst arr = createArray(10000);\r\n\r\nconst sourceBuffer = fs.readFileSync(filePath);\r\n\r\nasync function resize(source){\r\n  const image = sharp(source).toBuffer();\r\n  source = null;\r\n  return image;\r\n}\r\n\r\nfunction logMemory(){\r\n  const pr = process.memoryUsage();\r\n  const logObject = {};\r\n  for (let key in pr){\r\n    logObject[key] =  parseInt((pr[key] / 1024 / 1024).toFixed(0));\r\n  }\r\n\r\n  console.log(logObject)\r\n\r\n}\r\n\r\nasync.forEachLimit(arr, 1, async function (i){\r\n  let resizedImage = await resize(sourceBuffer);\r\n\r\n  resizedImage = null;\r\n  logMemory();\r\n}, function (err){\r\n\r\n  console.log('done', err)\r\n  setTimeout(logMemory, 3000)\r\n})\r\n```\r\n\r\nThe image is 24mb TIFF image\r\n\r\nusage is : node test.js 'file.tiff'"
+    },
+    "satisfaction_conditions": [
+      "Memory usage remains stable during image processing",
+      "Application successfully processes large TIFF images",
+      "Memory usage stays within acceptable production limits",
+      "Sustained operation without memory-related crashes"
+    ],
+    "created_at": "2018-10-18T14:29:43Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1397",
+    "source": {
+      "issue_number": 1397
+    },
+    "initial_question": {
+      "title": "when I map data with code, both png and jpeg are converted with a white background though I have a condition to only do that when output ext is  jpeg or jpg",
+      "body": "I'm trying to convert a transparent logo to jpg and png.  As you can see in my code below, I check to see if the file output ext is jpeg or jpg and if it is, it change the background to white and flatten it. \r\n\r\nFor some strange reason, when I map data with function, both png and jpeg are converted with a white background though I have a condition to only do that when output ext is  jpeg or jpg\r\n\r\n\r\n\r\n\r\n```\r\nlet local_file = '/tmp/output/295aadfd-f837-4ffb-b3a0-4a407cca54e0.png'\r\n\r\nlet data = [[700,\r\n    null,\r\n    'width',\r\n    '/tmp/output/295aadfd-f837-4ffb-b3a0-4a407cca54e0_10',\r\n    'png'],\r\n    [700,\r\n        null,\r\n        'width',\r\n        '/tmp/output/295aadfd-f837-4ffb-b3a0-4a407cca54e0_10',\r\n        'jpg'],\r\n    [1000,\r\n        null,\r\n        'width',\r\n        '/tmp/output/295aadfd-f837-4ffb-b3a0-4a407cca54e0_10',\r\n        'png'],\r\n    [1000,\r\n        null,\r\n        'width',\r\n        '/tmp/output/295aadfd-f837-4ffb-b3a0-4a407cca54e0_10',\r\n        'jpg']]\r\n\r\n\r\nPromise.all(data.map(convert_image_sharp(local_file))).then(() => {\r\n                    console.log('image convert done');\r\n                });\r\n\r\n\r\n```\r\n\r\n\r\n```\r\nfunction convert_image_sharp(image_path) {\r\n    let image = sharp(image_path);\r\n    return data => image\r\n        .metadata()\r\n        .then(function (metadata) {\r\n            let inputs = beatify_input(data);\r\n            if (inputs['crop']) {\r\n                image.extract(inputs['crop'][0], inputs['crop'][1], inputs['crop'][2], inputs['crop'][3])\r\n            }\r\n            image.resize(inputs['width'], inputs['height']);\r\n            if (['jpg', 'jpeg'].includes(inputs['ext'])){\r\n                console.log(inputs['ext']);\r\n                image.background('white');\r\n                image.flatten();\r\n            }\r\n            return image.toFile(inputs['write_path']);\r\n        })\r\n\r\n}\r\n\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "JPEG/JPG outputs must have white backgrounds"
+    ],
+    "created_at": "2018-10-01T16:15:39Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1367",
+    "source": {
+      "issue_number": 1367
+    },
+    "initial_question": {
+      "title": "How to close the file?",
+      "body": "sharp('input.jpg')\r\n\r\nThe file is always locked\r\nUnable to delete\r\nHow to close an object?\r\n"
+    },
+    "satisfaction_conditions": [
+      "File handle is released after processing",
+      "File becomes available for deletion",
+      "Solution works with Sharp image processing library"
+    ],
+    "created_at": "2018-09-04T07:32:03Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1292",
+    "source": {
+      "issue_number": 1292
+    },
+    "initial_question": {
+      "title": "Remove alpha channel from png output",
+      "body": "Hi I try to compose an `icon.png` (with 4 channels) onto a background.\r\nRight now my solution is like this\r\n```js\r\nconst icon = sharp('icon.png').resize(size)\r\nsharp({ create: { width, height, background, channels: 4 } })\r\n  .overlayWith(await icon.toBuffer())\r\n  .toFile('output.png')\r\n```\r\n\r\nNow I sometimes need to remove the alpha channel from the `output.png`,\r\nI tried using `.flatten()` but the output image still has 4 channels.\r\nIt only worked when I also `.flatten()` the `icon` but then I get problems with the overlay.\r\n\r\nIs there a solution for this or do I have thought error somewhere?\r\nThank you for your help."
+    },
+    "satisfaction_conditions": [
+      "Final output image must have 3 channels (RGB) without alpha",
+      "Overlay composition must be performed with full transparency support",
+      "Alpha channel removal must occur after overlay composition",
+      "Output must be a valid PNG file"
+    ],
+    "created_at": "2018-07-11T14:35:08Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1280",
+    "source": {
+      "issue_number": 1280
+    },
+    "initial_question": {
+      "title": "Metadata not updated after rotate()",
+      "body": "If I have a file of dimensions 1999x1124, exif orientation=8, and I run it through sharp:\r\n```js\r\nsharp(file).rotate().metadata().then(metadata => console.log(metadata))\r\n```\r\nI get the original metadata.  I would have expected to see the new dimensions: (1124x1999)  I tried inserting `sharp.cache(false)` after rotating, but that had no effect.\r\n\r\nI suspect this is because the metadata function works \"without decoding any compressed image data,\" and it would need to read the buffer in order to redetermine it?  This seems broken to me.  Shouldn't the rotate() function update whatever source it's pulling this metadata from?\r\n\r\nPerhaps one non-breaking solution to this could be accepting a second options argument to the rotate method with a \"resolveWithObject\" flag that would work just like toBuffer, resolving an additional data object containing the new size after rotation.  I don't particularly like this idea design-wise, just brainstorming.\r\n\r\nMy use-case is, I need to resize an overlay image down to match the *rotated* image, prior to applying it.  I've had to resort to calling toBuffer twice: once to just fetch the dimensions, and then again after applying the overlay.  It's just really ugly and inefficient.  Here's the simplified version:\r\n```js\r\nfunction applyOverlay(file, overlayFile) {\r\n    return sharp(file)\r\n        .rotate()\r\n        .toBuffer({resolveWithObject: true})\r\n        .then(async ({data, info}) => {\r\n            const newWidth  = info.width;\r\n            const newHeight = info.height;\r\n\r\n            const overlay = await sharp(overlayFile)\r\n                .resize(newWidth, newHeight)\r\n                .max()\r\n                .toBuffer();\r\n\r\n            return sharp(data)\r\n                .overlayWith(overlay)\r\n                .toBuffer();\r\n        });\r\n}\r\n```\r\nIf there's some easier way to do this that I'm missing, by all means let me know where I've gone wrong.  Thanks!"
+    },
+    "satisfaction_conditions": [
+      "Correct dimensions must be determined after image rotation",
+      "Solution must handle EXIF orientation metadata correctly",
+      "Dimensions must be obtainable without multiple image processing operations",
+      "Performance must be maintained by avoiding unnecessary image decoding"
+    ],
+    "created_at": "2018-06-28T03:44:35Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1210",
+    "source": {
+      "issue_number": 1210
+    },
+    "initial_question": {
+      "title": "Error: The specified procedure could not be found.",
+      "body": "I have two Electron projects using sharp. I have a small testing project for testing sharp but it gave me an initialization DLL error at first. The commands I used were these and it got fixed.\r\n\r\n```\r\nnpm install --save-dev electron-rebuild\r\nnpm install sharp\r\n.\\node_modules\\.bin\\electron-rebuild.cmd\r\n```\r\nI can use sharp now and tested it with some code which generated cropped output from the original image.\r\n\r\n```\r\nsharp('input.jpg')\r\n  .resize(300, 200)\r\n  .toFile('output.jpg', function(err) {\r\n  });\r\n```\r\n\r\nThe bigger project (electron-builder/yarn) where I want to implement sharp gives me this error. \r\n```\r\nError: The specified procedure could not be found.\r\n  \\\\?\\C:\\Users\\Noblesse\\Documents\\GitHub\\desktop-gen-electron - kopie\\node_modules\\sharp\\build\\Release\\sharp.node\r\n      at process.module.(anonymous function) [as dlopen] (ELECTRON_ASAR.js:172:20)\r\n      at Object.Module._extensions..node (module.js:598:18)\r\n      at Object.module.(anonymous function) [as .node] (ELECTRON_ASAR.js:172:20)\r\n      at Module.load (module.js:503:32)\r\n      at tryModuleLoad (module.js:466:12)\r\n      at Function.Module._load (module.js:458:3)\r\n      at Module.require (module.js:513:17)\r\n      at require (internal/module.js:11:18)\r\n      at Object.<anonymous> (C:\\Users\\Noblesse\\Documents\\GitHub\\desktop-gen-electron - kopie\\node_modules\\sharp\\lib\\constructor.js:10:15)\r\n      at Object.<anonymous> (C:\\Users\\Noblesse\\Documents\\GitHub\\desktop-gen-electron - kopie\\node_modules\\sharp\\lib\\constructor.js:256:3)\r\n```\r\n\r\nI use the yarn way in this one but it doesn't work. There certainly is sharp.node in sharp/build/release/.\r\n```\r\nyarn add --dev electron-rebuild\r\nyarn add sharp\r\n.\\node_modules\\.bin\\electron-rebuild.cmd\r\n```"
+    },
+    "satisfaction_conditions": [
+      "No dependency conflicts exist between sharp and other image processing libraries",
+      "Sharp module successfully loads and initializes in the Electron environment",
+      "Image processing operations execute without DLL-related errors"
+    ],
+    "created_at": "2018-04-27T09:48:02Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1179",
+    "source": {
+      "issue_number": 1179
+    },
+    "initial_question": {
+      "title": "ForceSet deprecation warnings in v8 while building",
+      "body": "I'm getting many of these in various files with the latest version of node:\r\n```\r\n  CXX(target) Release/obj.target/sharp/src/utilities.o\r\nIn file included from ../../nan/nan.h:192:0,\r\n                 from ../src/utilities.cc:19:\r\n../../nan/nan_maybe_43_inl.h: In function 'Nan::Maybe<bool> Nan::ForceSet(v8::Local<v8::Object>, v8::Local<v8::Value>, v8::Local<v8::Value>, v8::PropertyAttribute)':\r\n../../nan/nan_maybe_43_inl.h:112:73: warning: 'v8::Maybe<bool> v8::Object::ForceSet(v8::Local<v8::Context>, v8::Local<v8::Value>, v8::Local<v8::Value>, v8::PropertyAttribute)' is deprecated: Use CreateDataProperty / DefineOwnProperty [-Wdeprecated-declarations]\r\n   return obj->ForceSet(isolate->GetCurrentContext(), key, value, attribs);\r\n                                                                         ^\r\nIn file included from /root/.node-gyp/9.10.1/include/node/v8.h:26:0,\r\n                 from /root/.node-gyp/9.10.1/include/node/node.h:63,\r\n                 from ../src/utilities.cc:18:\r\n/root/.node-gyp/9.10.1/include/node/v8.h:3165:29: note: declared here\r\n                 Maybe<bool> ForceSet(Local<Context> context, Local<Value> key,\r\n                             ^\r\n/root/.node-gyp/9.10.1/include/node/v8config.h:318:3: note: in definition of macro 'V8_DEPRECATED'\r\n   declarator __attribute__((deprecated(message)))\r\n   ^~~~~~~~~~\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "No ForceSet deprecation warnings appear during build",
+      "Package builds successfully with current Node.js version",
+      "Compatible package version is used"
+    ],
+    "created_at": "2018-04-04T06:58:10Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1136",
+    "source": {
+      "issue_number": 1136
+    },
+    "initial_question": {
+      "title": "Throw error on problem",
+      "body": "Some problematic files (e.g. a `.png` file that is accidentally a `.html` file because a download didn't 404 but 302 to html) cause `sharp` to hang indefinitely.\r\n\r\nI think this should throw an Error in stead.\r\n\r\n```javascript\r\ntry {\r\n\tsharp(src, {failOnError: true})\r\n\t\t.resize(width, height)\r\n\t\t.background(bg)\r\n\t\t.embed()\r\n\t\t.toFile(dest, cb)\r\n}\r\ncatch (err) {\r\n\t// Never fires\r\n\tconsole.error(err.stack)\r\n\tcb()\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Error handling must successfully catch errors from invalid image files",
+      "Asynchronous operations must be handled appropriately",
+      "System must not hang indefinitely on invalid files",
+      "Error information must be accessible for logging or handling"
+    ],
+    "created_at": "2018-02-23T14:29:38Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1084",
+    "source": {
+      "issue_number": 1084
+    },
+    "initial_question": {
+      "title": "Alpine: which dependencies are unnecessary at runtime?",
+      "body": "It doesn't work on the alpine-based docker image when I delete the vips-dev."
+    },
+    "satisfaction_conditions": [
+      "Build-time dependencies can be safely removed"
+    ],
+    "created_at": "2018-01-04T15:54:13Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1057",
+    "source": {
+      "issue_number": 1057
+    },
+    "initial_question": {
+      "title": "Using overlayWith before a rotate call throws an error",
+      "body": "I'm working on a project where I need to extract a piece of an image and then mask the extracted image with a polygon shape and then rotate it. I am using an SVG string buffer as the mask.\r\n\r\nWhen I run this line of code with rotate() I get an error:\r\n\"Overlay image must have same dimensions or smaller\"\r\n\r\n```\r\nsharp(imageData)\r\n    .extract({left: left, top: top, width: width, height: height})\r\n    .overlayWith(mask, {cutout: true})\r\n    .flip(isMirrored)\r\n    .rotate(rotation)\r\n    .png()\r\n    .toFile(filePath);\r\n```\r\n\r\nWhen I run it without the rotate call, it runs without error. I am not sure if this is an actual bug or if I may be doing something wrong. I am assuming that the overlayWith is happening after the rotation and that may be what is causing the error.\r\n\r\nI also want to thank you for creating this library. It is brilliant!"
+    },
+    "satisfaction_conditions": [
+      "Image operations must be performed in the correct sequence to maintain mask dimensions",
+      "All requested image transformations (extract, mask, flip, rotate) must be successfully applied",
+      "No 'Overlay image must have same dimensions' error occurs",
+      "Final output is saved as a PNG file at the specified path"
+    ],
+    "created_at": "2017-12-09T08:22:44Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1052",
+    "source": {
+      "issue_number": 1052
+    },
+    "initial_question": {
+      "title": "Create folder with `.toFile`?",
+      "body": "If the folder doesn't exist `sharp` throws me an error\r\nIs there's a way to sharp to create such folder if it doesn't exist?\r\n\r\n```js\r\n.toFile(`./public/uploads/${'resize-' + req.body.file}`)\r\n```\r\n```\r\nError: vips__file_open_write: unable to open file \"./public/uploads/greyscale-67badcb0-8a98-4126-828a-4e9fe152979b.jpeg\" for writing\r\nunix error: No such file or directory\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Target directory exists before file write operation",
+      "Solution handles asynchronous operations appropriately",
+      "Directory creation is performed only when necessary"
+    ],
+    "created_at": "2017-12-04T16:02:11Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/1049",
+    "source": {
+      "issue_number": 1049
+    },
+    "initial_question": {
+      "title": "Multiple operations doesn't work",
+      "body": "Hello. I am trying to resize and then grayscale image, but console gives me an error\r\n\r\n```js\r\nsharp(req.file.buffer)\r\n    .resize(800)\r\n    .toFile(`./public/uploads/${'resize-' + req.body.file}`)\r\n    .grayscale()\r\n    .toFile(`./public/uploads/${'grayscale-' + req.body.file}`)\r\n```\r\n\r\nIs it possible? Or this savings should be separate operations?"
+    },
+    "satisfaction_conditions": [
+      "Two distinct image files are successfully created in the target directory",
+      "Image processing operations complete without errors",
+      "First output image maintains original color while being resized",
+      "Second output image is both resized and converted to grayscale",
+      "Image processing operations handle asynchronous execution correctly"
+    ],
+    "created_at": "2017-11-30T19:56:54Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/997",
+    "source": {
+      "issue_number": 997
+    },
+    "initial_question": {
+      "title": "how to get metadata width and height after trim",
+      "body": "Is there a way to get width and height metadata after trim?\r\n\r\n```\r\nlet transform = sharp()\r\n    .trim()\r\n    .metadata()\r\n    .then(function(metadata) {\r\n        console.log(metadata)\r\n    })\r\n\r\nreturn readableStream\r\n            .pipe(transform)\r\n```\r\n\r\nThis doesn't seem to work\r\n\r\n\r\nThanks"
+    },
+    "satisfaction_conditions": [
+      "Image dimensions after trim operation must be accessible",
+      "Dimension information must be available before subsequent image operations",
+      "Image processing pipeline must maintain data flow",
+      "Dimension values must reflect post-trim state"
+    ],
+    "created_at": "2017-10-18T20:59:25Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/808",
+    "source": {
+      "issue_number": 808
+    },
+    "initial_question": {
+      "title": "how to get metadata of output image?",
+      "body": "the current example only get input image metadata, not output, if the input image's size is 1200x1200, we get  `{width: 1200, height: 1200, ...}` not `{width: 400, height: ?, ...}`\r\n\r\n\r\n```js\r\n      const sharpInstance = sharp(buf).resize(400);\r\n      const resizedBuf = await sharpInstance.toBuffer();\r\n      const metadata = await sharpInstance.metadata();\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Metadata is accessible after image transformations"
+    ],
+    "created_at": "2017-05-16T15:21:49Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/688",
+    "source": {
+      "issue_number": 688
+    },
+    "initial_question": {
+      "title": "Error: extract_area: bad extract area",
+      "body": "Hello, I'm using 512x512 image. First I resize it then extract and expecting readable stream data but it shows me \"Error: extract_area: bad extract area\" error.\r\nHere's the code;\r\n\r\n```\r\ntest2(x, y, zoom) {\r\n        const width = 500;\r\n        const height = 500;\r\n\r\n        return this.image\r\n            .metadata()\r\n            .then((metadata) => {\r\n                var resizedWidth = metadata.width * zoom;\r\n                var resizedHeight = metadata.height * zoom;\r\n                var left = parseInt(resizedWidth * x);\r\n                var top = parseInt(resizedHeight * y);\r\n                return this.image\r\n                    .resize(resizedWidth, resizedHeight)\r\n                    .extract({left: left, top: top, width: width, height: height})\r\n                    .jpeg()\r\n                    .resize(500);\r\n            });\r\n}\r\n```\r\nThanks."
+    },
+    "satisfaction_conditions": [
+      "Image extraction coordinates must be valid relative to the resized image dimensions",
+      "Image transformations must be applied in a sequence that preserves intended dimensions",
+      "Image orientation must be correctly handled",
+      "Final output must maintain specified target dimensions"
+    ],
+    "created_at": "2017-01-19T13:00:31Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/636",
+    "source": {
+      "issue_number": 636
+    },
+    "initial_question": {
+      "title": "Advice Needed: How to create deep zoom image if I already have tiles?",
+      "body": "If I had a single large .tif, my understanding is that I could create a Deep Zoom image from this single large file quite easily by using the `tile` method\r\n\r\nHowever, my large image is already split up into a regular grid of non-overlapping tiles. One approach would be to stitch this array of tiles into a single large .tif first. If I were to go that approach, I'm not sure that `sharp` has a method to stitch so many files, and if it did, I'm not sure that it exposes a way to do it without needing to have the entire final image in memory at some point. I'd love to be wrong on both of these points!\r\n\r\nEssentially, I need to treat these tiles as the full-resolution image somehow, and then have the images further split and compressed to generate the various resolutions necessary for the Deep Zoom format. Do you have any advice on how to go about this with Sharp?\r\n\r\nMany thanks.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple image tiles must be combined into a single cohesive image",
+      "The solution must preserve the spatial relationships between tiles"
+    ],
+    "created_at": "2016-11-27T19:51:53Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/625",
+    "source": {
+      "issue_number": 625
+    },
+    "initial_question": {
+      "title": "Mysticism: sharp reacalls old type-related buffer from somewhere?",
+      "body": "My app uploads jpg/png files (type is restricted in app) to server, source image is saved to certain path (it works).\r\nThen I apply following resize routine:\r\n\r\n ```\r\n//Processing logo\r\n              sharp(logoPath + '/logo_upload')\r\n                .resize(640,120)\r\n                .max()\r\n                .toFormat('jpeg')\r\n                .toFile(logoPath + '/logo.jpg', function(err, info) {\r\n                  if (err) {console.error(err); throw (err)}\r\n                  console.log('120 info: ', info)\r\n                });\r\n```\r\n\r\nThe issue is **very** strange:\r\n1) I upload \"1.jpg\", sharp works - 1.jpg image resized/saved, no problem\r\n2) upload \"2.png\", sharp works as well -  image resized/saved (always under the same name - logo.jpg)\r\n3) upload \"3.jpg\", sharp resizes and saves \"1.jpg\" content (WTF?! from where?) \r\nAfter that no matter what I upload (source file logo_upload changes every time - I double-checked) - sharp output stays the same, \"1.jpg\" ((\r\nVersions: sharp - 0.16.2, node - 4.4.5\r\n\r\nGuys, what I'm doing wrong? What to consider to check in approach?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Each new image upload must be processed independently of previous uploads",
+      "Output image must reflect the current input image content",
+      "Cache-related settings must prevent persistence of previous image data",
+      "Image processing pipeline must maintain consistent behavior across multiple file uploads"
+    ],
+    "created_at": "2016-11-15T10:15:57Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/585",
+    "source": {
+      "issue_number": 585
+    },
+    "initial_question": {
+      "title": "Resizing image with larger dimension and size",
+      "body": "Like to have some suggestions regarding the issue i'm facing currently.\n\nWe are allowing image upload and user can choose larger dimension images and large in size.\n\nAs of now  we are giving some fixed dimension to resize. is there a way to figure out  preferred  `height` and `width`  which to be resized based on the image we upload.\n\n```\nex  var dim1 = getPrefferedSize(4000,5500)  // 1024, 1400\nex  var dim2 = getPrefferedSize(2040,1500)  // 904, 720\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Image dimensions are automatically reduced while maintaining aspect ratio",
+      "Output dimensions can be determined using a percentage/ratio of the input dimensions",
+      "Original larger images can be uploaded but are automatically resized during processing",
+      "Resizing logic works for different input image dimensions"
+    ],
+    "created_at": "2016-09-26T19:01:52Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/528",
+    "source": {
+      "issue_number": 528
+    },
+    "initial_question": {
+      "title": "How to prevent crash on unhandled errors when using streams?",
+      "body": "Hi,\n\nwhat is the recommended way of preventing a crash of the application if I'm using sharp as follows and the buffer data is undefined or has unsupported image data in it?\nThe 'error' event is not being fired in this case. Do I need to incorporate a try/catch block somehow?\n\n``` js\nvar pipeline = sharp()\n.on('error', err => console.log('error'))\n.pipe(fs.createWriteStream('filename.jpg'));\n\nvar readStream = new stream.PassThrough();\nreadStream.end(someBuffer);\n\nreadStream.pipe(pipeline);\n```\n\nWhen `someBuffer` is undefined, I get this error and the app crashes.\n\n```\n     Error: Input file is missing or of an unsupported image format\n        at Error (native)\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Error events must be properly captured when invalid image data is processed",
+      "Stream pipeline must maintain proper error propagation",
+      "Error handler must receive notification when invalid image data is processed"
+    ],
+    "created_at": "2016-07-25T21:06:32Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/328",
+    "source": {
+      "issue_number": 328
+    },
+    "initial_question": {
+      "title": "preinstall: cache build folders for faster ci tests",
+      "body": "currently, on circleci, compiling libvips with the preinstall.sh script takes 2 minutes, which is more than 50% of the entire test. it takes so long because it's compiling libvips from source.\n\nan optimization would be to check whether the cache folders already exist (ex. `vips-8.1.1`) and simplify install it, skipping the rest of the script. this would make installations much faster.\n\nof course, in your CI test suite, you have to add the cache folder to your config.\n\nany thoughts or ideas on this?\n"
+    },
+    "satisfaction_conditions": [
+      "CI build time is significantly reduced from the current 2-minute compilation time",
+      "Installation process is compatible with the CI environment"
+    ],
+    "created_at": "2015-12-22T22:08:15Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/181",
+    "source": {
+      "issue_number": 181
+    },
+    "initial_question": {
+      "title": "Set image resolution (dpi)",
+      "body": "I think that my search skills are failing me...\n\nIs it possible to manually set the desired dpi of an image?\n\nI have a set of big TIFFs at 300 dpi and I would like to convert them into 300 dpi and 72 dpi JPEGs, is it possible?\n\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Image dimensions are appropriately scaled to maintain equivalent visual representation at different DPI settings",
+      "Solution addresses the relationship between DPI and actual pixel dimensions"
+    ],
+    "created_at": "2015-03-19T10:23:24Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/119",
+    "source": {
+      "issue_number": 119
+    },
+    "initial_question": {
+      "title": "Perf question",
+      "body": "First of all, thank you for the great binding.  \nPlease help.  I'm not sure if I'm doing something wrong.  Libvip and sharp is great for processing one image at a time.  But when I have lots concurrent requests, it doesn't seem to perform on the same level as graphics magick.  \nHere's my sample code \n\n```\nvar util = require('util');\nvar fs = require('fs');\nvar Promise = require('es6-promise').Promise;\nvar _ = require('underscore');\nvar sharp = require('sharp');\n\nvar totalTime = 0;\nvar count = 100;\n\n// concurrency does not help\n//sharp.concurrency(32);\n\nvar originalImage = fs.readFile('./lib/test.jpg', function(err, data) {\n    var promises = [];\n    if(err) {\n        return console.log(' ERROR in reading file ' + err);\n    }\n    for(var i = 0; i < count; i++ ) {\n        promises[i] = sharpResize(data, _.random(400) + 1, _.random(400) + 1);\n    }\n\n    Promise.all(promises)\n    .then(function() {\n        console.log('  Final avg time is ' + totalTime / count);\n    }).catch(function(err) {\n        console.log('  Final ERROR ' + err);\n    });\n});\n\nfunction sharpResize(data, width, height) {\n    return new Promise(function (resolve, reject) {\n        var start = Date.now();\n        var counter = sharp.counters();\n        console.log('  counter stats ' + util.inspect(counter));\n        var stats = sharp.cache();\n        console.log('  cache stats ' + util.inspect(stats));\n\n        var pipeline = sharp(data)\n        .resize(width, height)\n        .embed()\n        .toBuffer(function sharpDone(err, buffer, info) {\n            var timeDelta = (Date.now() - start);\n            if (err) {\n                return reject('failed ' + err);\n            }\n            console.log(' success time ' + timeDelta.toFixed(0));\n            totalTime += timeDelta;\n            resolve(buffer);\n        });\n    });\n}\n```\n\nand this is my output\nsuccess time 143\n success time 147\n success time 147\n success time 168\n...\n...\nsuccess time 2926\nsuccess time 2930\nsuccess time 2943\nsuccess time 2949\n  Final avg time is 1542.15\n\nThe queue stacks up, and the number of working process doesn't really get past 4 (even if I increase the concurrency value).  (I'm on a 8 core Mac laptop).  \nSo, am I missing something?  \n\nThank you.  (btw.. I'm not sure if this is the place to ask question)\n"
+    },
+    "satisfaction_conditions": [
+      "Concurrent image processing tasks execute in parallel",
+      "System resources (CPU cores) are fully utilized",
+      "Thread pool configuration allows desired concurrency level",
+      "Per-task resource allocation is optimized"
+    ],
+    "created_at": "2014-11-18T08:18:50Z"
+  },
+  {
+    "id": "https://github.com/lovell/sharp/issues/104",
+    "source": {
+      "issue_number": 104
+    },
+    "initial_question": {
+      "title": "Is HTML5 Canvas DataURL format Supported?",
+      "body": "Hi Guys,\n\nI am trying to find a solution where I convert an image upload on the front-end into a data string format, which is essentially a base64 style string, using HTML5 Canvas API.\n\nI then send  this string to the back-end. What I wanted to ask is if there is a way for me to use the 'sharp' library so that it can load and process this data string so I can perform some operations (mainly resize in to new images).\n\nIs this possible?\n"
+    },
+    "satisfaction_conditions": [
+      "Front-end must successfully convert image to base64 string format",
+      "Back-end must be able to process received base64 image data",
+      "Image processing operations (particularly resizing) must work with the received data",
+      "Processed image must be returnable to front-end in a displayable format"
+    ],
+    "created_at": "2014-10-20T16:56:56Z"
+  }
+]

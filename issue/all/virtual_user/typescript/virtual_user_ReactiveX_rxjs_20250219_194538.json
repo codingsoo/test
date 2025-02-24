@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/ReactiveX/rxjs/issues/540",
+    "source": {
+      "issue_number": 540
+    },
+    "initial_question": {
+      "title": "Comprehensive marble tests for concatMap",
+      "body": "(I didn't find tests for concatMap, maybe we should have it)\n"
+    },
+    "satisfaction_conditions": [
+      "Scheduler behavior must be documented and consistent",
+      "Test coverage must include error scenarios in nested observables",
+      "Behavior differences between versions must be intentional and documented"
+    ],
+    "created_at": "2015-10-15T14:03:47Z"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "number": 4265,
+    "title": "Change DLL override to Native",
+    "created_at": "2024-09-15T10:51:00Z",
+    "closed_at": "2024-09-15T12:37:38Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/doitsujin/dxvk/issues/4265",
+    "body": "Hi Folks,\r\n\r\ndo i have to perform a DLL override for:\r\n\r\n- d3d8\r\n- d3d9\r\n- d3d10core\r\n- d3d11\r\n- dxgi\r\n\r\nAs far as i remember i had to to this some years ago. I wonder why this is not mentioned in the Readme.md?\r\n\r\nGreetings,\r\nJ.",
+    "comments_url": "https://api.github.com/repos/doitsujin/dxvk/issues/4265/comments",
+    "author": "jotkah",
+    "comments": [
+      {
+        "user": "doitsujin",
+        "created_at": "2024-09-15T10:59:12Z",
+        "body": "Yes, it is necessary. I don't know why this was removed from the README, probably an oversight but we definitely used to mention it at *some* point."
+      }
+    ]
+  }
+]

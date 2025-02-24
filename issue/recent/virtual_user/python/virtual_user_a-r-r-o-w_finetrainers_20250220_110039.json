@@ -1,0 +1,35 @@
+[
+  {
+    "id": "https://github.com/a-r-r-o-w/finetrainers/issues/111",
+    "source": {
+      "issue_number": 111
+    },
+    "initial_question": {
+      "title": "Why Batch size 4 training is much slower than Batch size 1 training under deepspeed yaml",
+      "body": "### System Info / \u7cfb\u7d71\u4fe1\u606f\n\nThis part is correct, everything works.\n\n### Information / \u95ee\u9898\u4fe1\u606f\n\n- [X] The official example scripts / \u5b98\u65b9\u7684\u793a\u4f8b\u811a\u672c\n- [ ] My own modified scripts / \u6211\u81ea\u5df1\u4fee\u6539\u7684\u811a\u672c\u548c\u4efb\u52a1\n\n### Reproduction / \u590d\u73b0\u8fc7\u7a0b\n\nI am using 8 A800 GPUS to train the cogvideo 5b model sft, and I realize the training speed is slower when I set batch size to 4 compared with when I set batch size equal to 1. Below is an example of the speed difference. I am using the deepspeed setup to help training.\r\n\r\nGPU train 4 batch 8 gpu:\r\nSteps:   0%|\u258f                                                                                                                                                          | 18/20000 [23:57<403:54:45, 72.77s/it, loss=0.0777, lr=2.25e-6]\r\ntrain 1 batch 8 gpu:\r\nSteps:   0%|\u258f                                                                                                                                                           | 17/20000 [07:43<119:15:51, 21.49s/it, loss=0.118, lr=2.13e-6]\r\n\r\n\n\n### Expected behavior / \u671f\u5f85\u8868\u73b0\n\nShouldn't it be the other way around, the training should be faster with batch size 4? Maybe it is because of the cpu offload option in the deepspeed?"
+    },
+    "satisfaction_conditions": [
+      "Total computation time per step increases proportionally with batch size",
+      "Total samples processed must be considered when comparing training speeds",
+      "Training time comparison must normalize for equivalent sample coverage",
+      "Memory management strategy impacts training speed"
+    ],
+    "created_at": "2024-12-04T02:00:58Z"
+  },
+  {
+    "id": "https://github.com/a-r-r-o-w/finetrainers/issues/101",
+    "source": {
+      "issue_number": 101
+    },
+    "initial_question": {
+      "title": "does sft training  need  consider   vae.config.invert_scale_latents       1.5 I2V",
+      "body": "### System Info / \u7cfb\u7d71\u4fe1\u606f\r\n\r\ndiffusers                 0.32.0.dev0  \r\n\r\n### Information / \u95ee\u9898\u4fe1\u606f\r\n\r\n- [ ] The official example scripts / \u5b98\u65b9\u7684\u793a\u4f8b\u811a\u672c\r\n- [X] My own modified scripts / \u6211\u81ea\u5df1\u4fee\u6539\u7684\u811a\u672c\u548c\u4efb\u52a1\r\n\r\n### Reproduction / \u590d\u73b0\u8fc7\u7a0b\r\n\r\n(1)When testing, the determination of whether to multiply or divide by the vae_scaling_factor_image is based on the vae.config.invert_scale_latents parameter. \r\n        if not self.vae.config.invert_scale_latents:\r\n            image_latents = self.vae_scaling_factor_image * image_latents\r\n        else:\r\n            # This is awkward but required because the CogVideoX team forgot to multiply the\r\n            # scaling factor during training :)\r\n            image_latents = 1 / self.vae_scaling_factor_image * image_latents\r\n\r\nwhy is it that when invert_scaling_latents is set to true, it divides by the VAE scaling factor instead of not multiplying? The latent representations of the images differ by a square when this parameter is true versus false.?\r\n\r\n(2) In my case\uff0cthe SFT training process did not handle this parameter, resulting in darker test outputs. \r\nThe impact of the first frame image is becoming increasingly insignificant.\r\n\r\n### Expected behavior / \u671f\u5f85\u8868\u73b0\r\n\r\nNormal brightness\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "VAE scaling factor handling matches training configuration",
+      "Output video maintains expected brightness levels",
+      "Latent space scaling is mathematically consistent"
+    ],
+    "created_at": "2024-11-28T06:31:26Z"
+  }
+]

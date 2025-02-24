@@ -1,0 +1,136 @@
+[
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/3567",
+    "source": {
+      "issue_number": 3567
+    },
+    "initial_question": {
+      "title": "onChange gets fired even no change is made (i.e. if I put it out of focus without any changes made)",
+      "body": "#### Do you want to request a _feature_ or report a _bug_?\r\n\r\n*Bug*\r\n\r\n#### What's the current behavior?\r\n\r\n`onChange` gets fired even if I don't make any changes on editable text. For example, if I put focus on editable text, make no changes and immediately click out of it,  'onChange' callback is triggered. How can I prevent this behavior? \r\nIt's problem because every `onChange` re-renders my component where editable text is located and I don't want this additional re-render.\r\n\r\n#### What's the expected behavior?\r\n\r\nSlate version (npm packages):\r\n _\"slate\": \"*\",_\r\n_\"slate-history\": \"*\",_\r\n_\"slate-react\": \"*\",_\r\n\r\nBrowser: Chrome / Safari / Firefox / Edge\r\nOS: Mac\r\n"
+    },
+    "satisfaction_conditions": [
+      "Component only re-renders when actual content changes occur",
+      "Editor maintains expected functionality while preventing unwanted re-renders",
+      "Solution can differentiate between selection changes and content changes"
+    ],
+    "created_at": "2020-03-29T22:45:46Z"
+  },
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/2049",
+    "source": {
+      "issue_number": 2049
+    },
+    "initial_question": {
+      "title": "Schema normalization doesn't seem to work as outlined in the changelog",
+      "body": "I'm trying to update my schema, but it seems like the _only_ method for matching that works is to write rules exactly like this:\r\n\r\n```javascript\r\nconst schemaRules = {\r\n  blocks: {\r\n    list_item: {\r\n      nodes: [\r\n        { match: { type: 'paragraph' } },\r\n        { match: { type: 'ol_list' } },\r\n        { match: { type: 'ul_list' } },\r\n      ],\r\n      normalize: (change, error) => {\r\n        //  Some code\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nTrying something like this has no effect:\r\n\r\n```javascript\r\nconst schemaRules = {\r\n  blocks: {\r\n    list_item: {\r\n      nodes: [{ type: 'paragraph' }, { type: 'ol_list' }, { type: 'ul_list' }],\r\n      normalize: (change, error) => {\r\n        //  Some code\r\n      }\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nI tried with the property name `node` and `nodes` but no effect. Am I doing something wrong here? More examples would be great!"
+    },
+    "satisfaction_conditions": [
+      "Schema rules must properly validate node types within list items",
+      "Match objects must be correctly structured in the schema definition",
+      "Schema must handle multiple allowed node types in a single rule"
+    ],
+    "created_at": "2018-08-07T23:22:25Z"
+  },
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/1036",
+    "source": {
+      "issue_number": 1036
+    },
+    "initial_question": {
+      "title": "Horizontal Rules in markup?",
+      "body": "Should a < hr > tag/dividing line that contains no children be implemented as a mark or as a block with custom behavior?\r\n\r\nNot quite sure how to tackle this, so I would appreciate any input."
+    },
+    "satisfaction_conditions": [
+      "Horizontal rule must be implemented as a block-level element",
+      "Element must be treated as void/empty",
+      "Element must be selectable within the editor",
+      "Element must be removable",
+      "Visual state must reflect selection status"
+    ],
+    "created_at": "2017-08-29T00:26:31Z"
+  },
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/739",
+    "source": {
+      "issue_number": 739
+    },
+    "initial_question": {
+      "title": "Use removeNodeByKey on the last node breaks editor's state",
+      "body": "Hello! Not sure if this is intended or not but if you remove the last node in a editor's state with `removeNodeByKey` the editor state became unworkable, the documents nodes became an empty `List` and I got a warning and an error in console every time I try to type something in the editor:\r\n\r\n`Warning: An object was passed to a Node method instead of a `key` string. This was previously supported, but is being deprecated because it can have a negative impact on performance. The object in question was: null`\r\n\r\nand the error:\r\n\r\n`Uncaught Error: Invalid `key` argument! It must be either a block, an inline, a text, or a string. You passed: \"null\".`"
+    },
+    "satisfaction_conditions": [
+      "Editor state remains functional after last node removal",
+      "Document structure maintains valid state when empty",
+      "No console errors or warnings about invalid keys appear",
+      "Editor maintains ability to accept new input",
+      "Document state handles empty content gracefully"
+    ],
+    "created_at": "2017-04-21T09:18:23Z"
+  },
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/695",
+    "source": {
+      "issue_number": 695
+    },
+    "initial_question": {
+      "title": "Selecting actual \"typed content\" when rendered content is selected.",
+      "body": "Let's say I type `(c)` and convert it to \u00a9. Or, maybe I convert `:)` to \ud83d\ude04 .\r\nIs it possible to get actual typed content when I selected rendered content. So, selecting the emoji should give me `:)`. \r\n\r\nEssentially mapping selection/cursor position from rendered content to typed content.\r\n\r\nIs something like that possible?"
+    },
+    "satisfaction_conditions": [
+      "System must maintain a mapping between original typed content and rendered content",
+      "Original typed content must be retrievable when rendered content is selected",
+      "System must handle inline transformations without losing context",
+      "Context-sensitive rendering must be supported"
+    ],
+    "created_at": "2017-03-30T13:05:14Z"
+  },
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/641",
+    "source": {
+      "issue_number": 641
+    },
+    "initial_question": {
+      "title": "Uncaught TypeError: node.getRanges is not a function",
+      "body": "```\r\nconst firstNode = state.document.nodes.get(0);\r\n\r\nstate.transform().removeTextByKey(firstNode.key, 0, 3);\r\n```\r\n\r\nThrows \"Uncaught TypeError: node.getRanges is not a function\" at \"Object.Transforms.removeTextOperation\" at line 250\r\n\r\nIt seems like the node doesn't have a getRanges function.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Text removal operation must execute without type errors",
+      "State transformation must complete successfully"
+    ],
+    "created_at": "2017-03-02T15:31:43Z"
+  },
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/266",
+    "source": {
+      "issue_number": 266
+    },
+    "initial_question": {
+      "title": "Schema rules question: Validation against a node's parents",
+      "body": "Hello again, now with a real question.\n\nI am implementing a validation rule for lists with a classic structure, a parent `list-block` that can contains only a list of `item-block`:\n\n```\nlist-block\n    [\n        item-block\n    ]    \n```\n\nI can easily validate a `list-block` node's children to be `item-blocks`. But I am not sure **how to validate that any `item-blocks` is a descendant of a `list-block`**.\n\nI could make a global rule that looks for orphan `item-block` across the whole document, like this:\n\n``` js\nconst ITEM_BLOCK_RULE = {\n    // Apply rule to all blocks\n    match: function matchAllBlock () ...,\n\n    validate: function (block) {\n        // If the block is not a list-block,\n        // but has an orphan item-block as child,\n        // invalidate.\n    },\n\n    normalize: ... // remove orphan item-blocks\n}\n```\n\nBut I instinctively would like to implement a rule like this:\n\n``` js\nconst ITEM_BLOCK_RULE = {\n    match: function matchItemBlock () ...,\n\n    // Extra <document> parameter\n    validate: function (node, document) {\n        // Use the document reference to check that node's parent\n        // is a list-block\n    },\n\n    normalize: ... // remove the item-block if it is orphan\n}\n```\n\nDo you think it would make sense to pass a reference to the document as parameter to `validate` ? This would help to implement these kind of context sensitive rules.\n\nThanks for the awesome work.\n"
+    },
+    "satisfaction_conditions": [
+      "Parent-child relationship validation must be enforced between list-block and item-block nodes",
+      "Validation performance must be maintained at scale",
+      "Orphan item-blocks must be detectable",
+      "Invalid parent-child relationships must be correctable",
+      "Validation must work within the existing schema rules framework"
+    ],
+    "created_at": "2016-08-24T07:49:24Z"
+  },
+  {
+    "id": "https://github.com/ianstormtaylor/slate/issues/222",
+    "source": {
+      "issue_number": 222
+    },
+    "initial_question": {
+      "title": "Capability to disable console.log statements.",
+      "body": "They are useful when debugging slate, but they get in the way when I attempt to debug other parts of my system.  Being able to toggle them would be great.\n"
+    },
+    "satisfaction_conditions": [
+      "Debug output can be selectively enabled/disabled",
+      "Debug statements from different parts of the system can be filtered independently",
+      "Debug settings persist across sessions"
+    ],
+    "created_at": "2016-08-04T12:07:29Z"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "number": 1567,
+    "title": "BUG: NATS throws exceptions when custom consumer configurations are set",
+    "created_at": "2024-07-24T12:36:10Z",
+    "closed_at": "2024-07-29T02:44:34Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/1567",
+    "body": "# Configuration\r\n\r\nIn my Program.cs, I have CAP configured like so:\r\n\r\n```cs\r\nbuilder.Services.AddCap(o =>\r\n{\r\n    o.UseEntityFramework<NotificationDataContext>(opt => opt.Schema = \"Outbox\");\r\n    o.UseNATS(opt =>\r\n    {\r\n        var natsUrl = builder.Configuration.GetValue<string>(\"NatsSettings:Url\")!;\r\n\r\n        opt.Servers = natsUrl;\r\n        opt.StreamOptions = strOpts =>\r\n        {\r\n            strOpts.WithRetentionPolicy(NATS.Client.JetStream.RetentionPolicy.Limits);\r\n            strOpts.WithStorageType(NATS.Client.JetStream.StorageType.File);\r\n            strOpts.WithDuplicateWindow(NATS.Client.Internals.Duration.OfMinutes(1));\r\n            strOpts.WithDiscardPolicy(NATS.Client.JetStream.DiscardPolicy.Old);\r\n\r\n            strOpts.Build();\r\n        };\r\n\r\n        opt.ConsumerOptions = consOpts =>\r\n        {\r\n            consOpts.WithBackoff(\r\n                NATS.Client.Internals.Duration.OfSeconds(5),\r\n                NATS.Client.Internals.Duration.OfSeconds(30),\r\n                NATS.Client.Internals.Duration.OfMinutes(1),\r\n                NATS.Client.Internals.Duration.OfMinutes(2),\r\n                NATS.Client.Internals.Duration.OfMinutes(5),\r\n                NATS.Client.Internals.Duration.OfMinutes(10)\r\n            );\r\n\r\n            consOpts.WithAckPolicy(NATS.Client.JetStream.AckPolicy.Explicit);\r\n            consOpts.WithDeliverPolicy(NATS.Client.JetStream.DeliverPolicy.All);\r\n            consOpts.WithReplayPolicy(NATS.Client.JetStream.ReplayPolicy.Instant);\r\n        };\r\n    });\r\n});\r\n```\r\n\r\nI have an interface and class:\r\n\r\n**IUserService:**\r\n\r\n```cs\r\npublic interface IUserService\r\n{\r\n    Task HandleEvent(DateTime time);\r\n}\r\n```\r\n\r\n**UserService:**\r\n\r\n```cs\r\npublic class UserService: IUserService\r\n{\r\n    [CapSubscribe(\"test.show.time\")]\r\n    public async Task HandleEvent(DateTime time)\r\n    {\r\n        Console.WriteLine(\"message time is:\" + time);\r\n    }\r\n}\r\n```\r\n\r\nThese are both registered as scoped services.\r\n\r\n```cs\r\nservices.AddScoped<IUserService, UserService>();\r\n```\r\n\r\n# How To Reproduce\r\n\r\n1. Using Docker, start a new nats server:\r\n`docker run -it -p 4222:4222 -p 8222:8222 -p 8080:8080 --name nats -d nats:2.10.14 -js -m 8222`.\r\n\r\n2. Set `natsUrl` in `Program.cs` to `\"nats://localhost:4222\"`.\r\n\r\n3. Start the application. \r\n4. Close the application.\r\n5. Start the application again. This exception should appear in the terminal: \r\n\r\n**Error Log:**\r\n```text  \r\nNATS.Client.NATSJetStreamClientException: [SUB-90016] Existing consumer cannot be modified. [AckWait]\r\n   at NATS.Client.JetStream.JetStream.CreateSubscription(String userSubscribeSubject, PushSubscribeOptions pushSubscribeOptions, PullSubscribeOptions pullSubscribeOptions, String queueName, EventHandler`1 userHandler, Boolean autoAck, PullMessageManager pmmInstance)\r\n   at NATS.Client.JetStream.JetStream.PushSubscribeAsync(String subject, String queue, EventHandler`1 handler, Boolean autoAck, PushSubscribeOptions options)\r\n   at DotNetCore.CAP.NATS.NATSConsumerClient.Subscribe(IEnumerable`1 topics)\r\n```\r\n\r\n# Expected Behaviour\r\n\r\nAn exception should not be thrown here because the consumer configuration is not changing. If I don't provide a custom consumer configuration, no exception is thrown on application restart.\r\n",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/1567/comments",
+    "author": "henrychris",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2024-07-25T14:29:03Z",
+        "body": "In the NATS Server, the BackOff option overrides the AckWait option, ignoring the AckWait settings. This can cause an inconsistency between the NATS client configuration and the server configuration, leading to exceptions when the application restarts. Since CAP internally provides a default value for AckWait, you need to reset the AckWait option to avoid configuration comparison issues.\r\n\r\n```\r\nconsOpts.WithBackoff(\r\n    NATS.Client.Internals.Duration.OfSeconds(5),\r\n    NATS.Client.Internals.Duration.OfSeconds(30),\r\n    NATS.Client.Internals.Duration.OfMinutes(1),\r\n    NATS.Client.Internals.Duration.OfMinutes(2),\r\n    NATS.Client.Internals.Duration.OfMinutes(5),\r\n    NATS.Client.Internals.Duration.OfMinutes(10)\r\n);\r\nconsOpts.WithAckWait(null);    // add this line !!!!\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 110,
+    "title": "\u6309\u7167\u6307\u5bfc\u793a\u4f8b\uff0c\u5728SubscriberService \u4e2d\u8fdb\u884c\u6d88\u606f\u5904\u7406",
+    "created_at": "2018-04-16T03:05:34Z",
+    "closed_at": "2018-04-16T03:19:32Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnetcore/CAP/issues/110",
+    "body": "  public interface ISubscriberService\r\n    {\r\n        void CheckReceivedMessage(dynamic model);\r\n    }\r\n\r\n\r\n    public class SubscriberService : ISubscriberService, ICapSubscribe\r\n    {\r\n        [CapSubscribe(\"capdemo.values.getmethodevent\")]\r\n        public void CheckReceivedMessage(dynamic model)\r\n        {\r\n            Console.WriteLine($\"[capdemo.values.getmethodevent] message received: Id:{model.Id}  Time:{model.Time}  Message:{model.Message} \");\r\n        }\r\n    }\r\n     services.AddTransient<ISubscriberService, SubscriberService>();\r\n     \u6d88\u8d39\u8005\u4e0d\u4f1a\u83b7\u53d6\u4e0d\u5230\u6d88\u606f\u5462\uff1f\r\n\u540c\u6837\u7684\u4ee3\u7801\uff0c\u5982\u679c\u653e\u5728Controller\u4e2d\uff0c\u5c31\u80fd\u591f\u6267\u884c\r\n     ///// <summary>\r\n        ///// \u5b9a\u4e49\u6d88\u606f\u6d88\u8d39\u8005\r\n        ///// </summary>\r\n        ///// <param name=\"model\"></param>\r\n        [NonAction]\r\n        [CapSubscribe(\"capdemo.values.getmethodevent\")]\r\n        public void ReceiveMessage(dynamic model)\r\n        {\r\n          Console.WriteLine($\"[capdemo.values.getmethodevent] message received: Id:{model.Id}  Time:{model.Time}  Message:{model.Message} \");\r\n       }\r\n\r\n\u8bf7\u95ee\u662f\u6211\u54ea\u91cc\u8bbe\u7f6e\u6ca1\u5bf9\u4e48\uff1f\r\n",
+    "comments_url": "https://api.github.com/repos/dotnetcore/CAP/issues/110/comments",
+    "author": "crashsol",
+    "comments": [
+      {
+        "user": "yang-xiaodong",
+        "created_at": "2018-04-16T03:15:45Z",
+        "body": "` services.AddTransient<ISubscriberService, SubscriberService>();` \u7684\u987a\u5e8f\uff0c\u9700\u8981\u5728 services.AddCap\u4e4b\u524d\uff0c\u8bf7\u68c0\u67e5"
+      }
+    ]
+  }
+]

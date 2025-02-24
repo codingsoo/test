@@ -1,0 +1,38 @@
+[
+  {
+    "number": 87,
+    "title": "NotImplementedError: Cannot copy out of meta tensor; no data!",
+    "created_at": "2024-10-13T20:46:45Z",
+    "closed_at": "2024-10-14T02:12:40Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/87",
+    "body": "```python\r\nimport torch\r\nfrom PIL import Image\r\nfrom pyramid_dit import PyramidDiTForVideoGeneration\r\nfrom diffusers.utils import load_image, export_to_video\r\nfrom accelerate import Accelerator, cpu_offload\r\n\r\ntorch.cuda.set_device(0)\r\nmodel_dtype, torch_dtype = 'bf16', torch.bfloat16   # Use bf16 (not support fp16 yet)\r\n\r\nmodel = PyramidDiTForVideoGeneration(\r\n    'PATH',                                         # The downloaded checkpoint dir\r\n    model_dtype,\r\n    model_variant='diffusion_transformer_768p',     # 'diffusion_transformer_384p'\r\n)\r\n\r\nmodel.vae.enable_tiling()\r\nmodel.enable_sequential_cpu_offload()\r\n\r\nprompt = \"A dog walking on the beach.\"\r\n\r\nwith torch.no_grad(), torch.cuda.amp.autocast(enabled=True, dtype=torch_dtype):\r\n    frames = model.generate(\r\n        prompt=prompt,\r\n        num_inference_steps=[20, 20, 20],\r\n        video_num_inference_steps=[10, 10, 10],\r\n        height=768,     \r\n        width=1280,\r\n        temp=31,                    # temp=16: 5s, temp=31: 10s\r\n        guidance_scale=9.0,         # The guidance for the first frame, set it to 7 for 384p variant\r\n        video_guidance_scale=5.0,   # The guidance for the other video latent\r\n        output_type=\"pil\",\r\n        save_memory=True,           # If you have enough GPU memory, set it to `False` to improve vae decoding speed\r\n    )\r\n\r\nexport_to_video(frames, \"./text_to_video_sample.mp4\", fps=24)\r\n```\r\n\r\nWith this config it says:\r\n\r\n```\r\nTraceback (most recent call last):\r\n  File \"text.py\", line 22, in <module>\r\n    frames = model.generate(\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\utils\\_contextlib.py\", line 115, in decorate_context\r\n    return func(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\pyramid_dit_for_video_gen_pipeline.py\", line 586, in generate\r\n    prompt_embeds, prompt_attention_mask, pooled_prompt_embeds = self.text_encoder(prompt, device)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\hooks.py\", line 166, in new_forward\r\n    output = module._old_forward(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\modeling_text_encoder.py\", line 138, in forward\r\n    prompt_embeds, prompt_attention_mask, pooled_prompt_embeds = self.encode_prompt(input_prompts, 1, clip_skip=None, device=device)\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\modeling_text_encoder.py\", line 113, in encode_prompt\r\n    pooled_prompt_embed = self._get_clip_prompt_embeds(\r\n  File \"C:\\Users\\cross\\Downloads\\Pyramid-Flow\\pyramid_dit\\modeling_text_encoder.py\", line 98, in _get_clip_prompt_embeds\r\n    prompt_embeds = text_encoder(text_input_ids.to(device), output_hidden_states=True)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\transformers\\models\\clip\\modeling_clip.py\", line 1216, in forward\r\n    text_outputs = self.text_model(\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\transformers\\models\\clip\\modeling_clip.py\", line 699, in forward\r\n    hidden_states = self.embeddings(input_ids=input_ids, position_ids=position_ids)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1518, in _wrapped_call_impl\r\n    return self._call_impl(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1527, in _call_impl\r\n    return forward_call(*args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\hooks.py\", line 161, in new_forward\r\n    args, kwargs = module._hf_hook.pre_forward(module, *args, **kwargs)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\hooks.py\", line 356, in pre_forward\r\n    return send_to_device(args, self.execution_device), send_to_device(\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\utils\\operations.py\", line 186, in send_to_device\r\n    {\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\utils\\operations.py\", line 187, in <dictcomp>\r\n    k: t if k in skip_keys else send_to_device(t, device, non_blocking=non_blocking, skip_keys=skip_keys)\r\n  File \"C:\\Users\\cross\\miniconda3\\envs\\pyramid\\lib\\site-packages\\accelerate\\utils\\operations.py\", line 158, in send_to_device\r\n    return tensor.to(device, non_blocking=non_blocking)\r\nNotImplementedError: Cannot copy out of meta tensor; no data!\r\n```\r\n\r\nWhat is wrong?",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/87/comments",
+    "author": "dillfrescott",
+    "comments": [
+      {
+        "user": "Ednaordinary",
+        "created_at": "2024-10-13T21:29:10Z",
+        "body": "This seems to be a by-product of trying to sequential offload when cpu_offloading is not enabled. Adding `cpu_offloading=True` to the generation call should fix this. I'll make a PR to make it the default when sequential is enabled."
+      }
+    ]
+  },
+  {
+    "number": 14,
+    "title": "Setup instructions ",
+    "created_at": "2024-10-10T13:18:45Z",
+    "closed_at": "2024-10-10T15:57:18Z",
+    "labels": [],
+    "url": "https://github.com/jy0205/Pyramid-Flow/issues/14",
+    "body": "I create a new conda env on a Ubuntu 24 linux \r\nconda create --name pyramid python=3.10\r\n\r\nDid a git clone of this project and then ran pip install -r requirements.txt\r\nAnd it throws errors that it can't find a compatible scipy package and tries to build one and fail. \r\n\r\nDo you have alternate setup instructions?\r\n\r\nThanks,\r\nAsh\r\n",
+    "comments_url": "https://api.github.com/repos/jy0205/Pyramid-Flow/issues/14/comments",
+    "author": "AshD",
+    "comments": [
+      {
+        "user": "feifeiobama",
+        "created_at": "2024-10-10T13:24:44Z",
+        "body": "Thank you for your interest in our project. We are using a Python version of 3.8.10, perhaps re-running the commands with `conda create --name ENV_NAME python==3.8.10` will solve the problem."
+      }
+    ]
+  }
+]

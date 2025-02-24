@@ -1,0 +1,304 @@
+[
+  {
+    "id": "https://github.com/caolan/async/issues/1724",
+    "source": {
+      "issue_number": 1724
+    },
+    "initial_question": {
+      "title": "help converting old async 2.6.2 callback to new async/await 3.2.0",
+      "body": "I am trying to convert old async 2.6.2 codebase (node v8) which is written with callbacks to new async/await 3.2.0 with node v12\r\n\r\nAs examples with async/await for 3.2.0 are unavailable I am having hard time converting the old codebase, can somebody help me convert below example code to newer version?\r\n\r\n```\r\n//2.6.2\r\nvar async = require('async'); \r\nvar fs = require('fs');\r\n\r\nvar taskObj = {\r\n    task1: \"test1\",\r\n    task2: \"test2\"\r\n};\r\n\r\nasync.series([\r\n    function (cb) {\r\n        async.eachOf(taskObj, function (item, key, cbe) {\r\n            console.log(\"working on key: \" + key);\r\n            someAsyncFunction1(item, key, cbe);\r\n        }, cb);\r\n    },\r\n    function (cb) {\r\n        async.parallel([\r\n            function(cbp){\r\n                console.log(\"working on sp1 in parallel\");\r\n                someAsyncFunction2(taskObj, \"sp1\", cbp);\r\n            },\r\n            function(cbp){\r\n                console.log(\"working on sp2 in parallel\");\r\n                someAsyncFunction3(taskObj, \"sp2\", cbp);\r\n            }\r\n        ], cb);\r\n    }\r\n], function (error) {\r\n    console.log('done');\r\n});\r\n\r\nfunction someAsyncFunction1(item, key, callback) {\r\n    fs.writeFile( key + \"-sAF1.txt\", JSON.stringify(item), callback);\r\n}\r\n\r\nfunction someAsyncFunction2(item, key, callback) {\r\n    fs.writeFile( key + \"-sAF2.txt\", JSON.stringify(item), callback);\r\n}\r\n\r\nfunction someAsyncFunction3(item, key, callback) {\r\n    fs.writeFile( key + \"-sAF3.txt\", JSON.stringify(item), callback);\r\n}\r\n```\r\n\r\nBelow note is taken from async v3 docs but I am not sure, do we need to use ```async.asyncify()```  for converting above code?\r\n\r\n> We can only detect native async functions, not transpiled versions (e.g. with Babel). Otherwise, you can wrap async functions in async.asyncify().\r\n\r\nNot sure how to write this without callbacks\r\n\r\n```\r\n//3.2.0\r\nvar async = require('async'); \r\nvar fs = require('fs');\r\n\r\nvar taskObj = {\r\n    task1: \"test1\",\r\n    task2: \"test2\"\r\n};\r\n\r\nawait async.series([\r\n    await async.eachOf(taskObj, async (item, key) => {\r\n        someAsyncFunction1(item, key, ?)\r\n    }),\r\n    await async.parallel([\r\n    await someAsyncFunction1(item, key, ?),\r\n    await someAsyncFunction1(item, key, ?)\r\n    ])\r\n], function(error){\r\n    console.log('done');\r\n});\r\n\r\nfunction someAsyncFunction1(item, key, ?) {\r\n    fs.writeFile( key + \"-sAF1.txt\", JSON.stringify(item), ?);\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Sequential execution of tasks is maintained",
+      "Parallel execution within the second task is preserved",
+      "Object iteration handles all properties",
+      "Asynchronous nature of operations is preserved"
+    ],
+    "created_at": "2020-08-28T04:20:37Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1693",
+    "source": {
+      "issue_number": 1693
+    },
+    "initial_question": {
+      "title": "Missed callback detection",
+      "body": "This is a general question about methods to diagnose scenarios in which an async based waterfall or other control flow does not complete. \r\n\r\nBackground is that we have a Job framework periodically running job definitions, which are just AMD modules exposing a method that executes an async based control flow, and over time we're noticing that some of these jobs sometimes do not complete - they do not crash or otherwise fail - they simply never report success or failure - and the circumstances are not directly repeatable but seem to depend on external factors like network or database load etc. \r\n\r\nOur working hypothesis is that there is some error pathway in our job definition in which a callback is never called etc, and I'm looking for techniques or any built in facilities that might help diagnose these scenarios, ie is there anything like a waterfall or other control flow timeout option etc? "
+    },
+    "satisfaction_conditions": [
+      "Must detect when async operations fail to complete",
+      "Must handle non-deterministic scenarios"
+    ],
+    "created_at": "2019-10-21T17:03:24Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1543",
+    "source": {
+      "issue_number": 1543
+    },
+    "initial_question": {
+      "title": "transform processes input in parallel",
+      "body": "<!--\r\nThis template is for bug reports. If you are reporting a bug, please continue on. If you are here for another reason (such as a feature request, change, or question) you can disregard this template\r\n-->\r\n\r\n**What version of async are you using?**\r\nasync 2.6.1.\r\n\r\n**Which environment did the issue occur in (Node version/browser version)**\r\nNode.js v8.11.2.\r\n\r\n**What did you do? Please include a minimal reproducable case illustrating issue.**\r\n\r\n```js\r\nconst async = require('async');\r\n\r\nfunction delay(cb) {\r\n  setTimeout(cb, Math.floor(Math.random() * 20));\r\n}\r\n\r\nfunction exerciseTransform(times, cb) {\r\n  console.info(`Running transform ${times} times...`);\r\n  async.times(times, (n, nextTime) =>\r\n    async.transform([1, 2, 3, 4, 5], [], (acc, item, index, next) =>\r\n      delay(() => { acc.push(item); next(); }), nextTime),\r\n    (err, results) => { console.info(results); cb(); });\r\n}\r\n\r\nfunction exerciseReduce(times, cb) {\r\n  console.info(`Running reduce ${times} times...`);\r\n  async.times(times, (n, nextTime) =>\r\n    async.reduce([1, 2, 3, 4, 5], [], (memo, item, next) =>\r\n      delay(() => { memo.push(item); next(null, memo); }), nextTime),\r\n    (err, results) => { console.info(results); cb(); });\r\n}\r\n\r\nasync.series([\r\n  async.apply(exerciseTransform, 5),\r\n  async.apply(exerciseReduce, 5),\r\n], () => {});\r\n```\r\n\r\n**What did you expect to happen?**\r\nBecause transform is a relative of reduce, I would expect it to process the input array serially.\r\n\r\n**What was the actual result?**\r\nTransform processes the input array in parallel.\r\n\r\n```\r\nRunning transform 5 times...\r\n[ [ 3, 1, 5, 4, 2 ],\r\n  [ 1, 3, 4, 2, 5 ],\r\n  [ 2, 4, 5, 3, 1 ],\r\n  [ 1, 4, 5, 3, 2 ],\r\n  [ 4, 5, 2, 1, 3 ] ]\r\nRunning reduce 5 times...\r\n[ [ 1, 2, 3, 4, 5 ],\r\n  [ 1, 2, 3, 4, 5 ],\r\n  [ 1, 2, 3, 4, 5 ],\r\n  [ 1, 2, 3, 4, 5 ],\r\n  [ 1, 2, 3, 4, 5 ] ]\r\n```\r\n\r\nI'm not sure if anyone might depend on the current behavior, so maybe this is really a request for a transformSeries function."
+    },
+    "satisfaction_conditions": [
+      "Array elements must be processed in parallel by transform function",
+      "Order preservation must be handled by the iteratee function if needed",
+      "Transform function must maintain distinct behavior from reduce"
+    ],
+    "created_at": "2018-06-10T05:00:06Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1493",
+    "source": {
+      "issue_number": 1493
+    },
+    "initial_question": {
+      "title": "How can I remove a task from the queue after a certain time?",
+      "body": "Hi,\r\n\r\nI'd like to remove a task from the queue after a certain time, but for some reason the `remove` method of the `Queue` object is never called. Here's my code:\r\n\r\n```js\r\nconst Queue = require('async/queue');\r\n\r\nconst q = new Queue((data, callback) => {\r\n    setTimeout(() => {\r\n        console.log('working');\r\n        callback();\r\n    }, 3000);\r\n}, 1);\r\n\r\nlet data = {id: 1};\r\n\r\nq.push(data, () => {\r\n    console.log('inside callback');\r\n});\r\n\r\n// works -- the task is removed from the queue\r\n// q.remove((worker) => {\r\n//     console.log('inside worker test', worker.data.id);\r\n//     if (worker.data.id == 1) {\r\n//         console.log('removing 1');\r\n//         return true;\r\n//     }\r\n//     return false;\r\n// });\r\n\r\n// doesn't work -- the test function never gets executed\r\nsetTimeout(() => {\r\n    console.log('inside setTimeout');\r\n    q.remove((worker) => {\r\n        console.log('inside worker test', worker.data.id);\r\n        if (worker.data.id == 1) {\r\n            console.log('removing 1');\r\n            return true;\r\n        }\r\n        return false;\r\n    });\r\n}, 1);\r\n```\r\n\r\nAs you can see above, `q.remove` is never called when it's inside a timeout, but works fine when it's outside. Is it because the worker has already started and cannot be removed even though the callback hasn't been called yet?\r\n\r\nMy node version is 8.8.1 and async version is 2.5.0."
+    },
+    "satisfaction_conditions": [
+      "Task removal must be successful when the task is still in the queue (not yet processing)",
+      "System must correctly distinguish between queued and processing tasks",
+      "Task removal timing must be coordinated with queue processing cycle"
+    ],
+    "created_at": "2017-11-06T22:29:27Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1478",
+    "source": {
+      "issue_number": 1478
+    },
+    "initial_question": {
+      "title": "Support question - read remaining number of tasks in async.queue",
+      "body": "I am using async.queue like so:\r\n\r\n```js\r\nconst q = async.queue((task, cb => task(cb));\r\n```\r\n\r\nHow can I find out during debugging how many tasks remain on the queue (and maybe how many have completed?)?\r\n\r\nI used `util.inspect()` to get the properties on the queue\r\n\r\n```\r\n { _tasks: DLL { tail: null, head: null, length: 0 },\r\n  concurrency: 3,\r\n  payload: 1,\r\n  saturated: [Function: noop],\r\n  unsaturated: [Function: noop],\r\n  buffer: 0.75,\r\n  empty: [Function: noop],\r\n  drain: [Function],\r\n  error: [Function: noop],\r\n  started: false,\r\n  paused: false,\r\n  push: [Function: push],\r\n  kill: [Function: kill],\r\n  unshift: [Function: unshift],\r\n  remove: [Function: remove],\r\n  process: [Function: process],\r\n  length: [Function: length],\r\n  running: [Function: running],\r\n  workersList: [Function: workersList],\r\n  idle: [Function: idle],\r\n  pause: [Function: pause],\r\n  resume: [Function: resume] }\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Ability to retrieve current queue length",
+      "Ability to check number of running tasks",
+      "Method to modify drain callback behavior",
+      "Access to queue internal state"
+    ],
+    "created_at": "2017-09-30T18:59:23Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1474",
+    "source": {
+      "issue_number": 1474
+    },
+    "initial_question": {
+      "title": "async.reflect -> error.message is undefined",
+      "body": "<!--\r\nThis template is for bug reports. If you are reporting a bug, please continue on. If you are here for another reason (such as a feature request, change, or question) you can disregard this template\r\n-->\r\n\r\n**What version of async are you using?**\r\n2.5.0\r\n\r\n**Which environment did the issue occur in (Node version/browser version)**\r\nNode 6.11.1\r\n\r\n**What did you do? Please include a minimal reproducable case illustrating issue.**\r\n```\r\nasync.series([\r\n    async.reflect(callback => callback(null, 'one')),\r\n    async.reflect(callback => callback(new Error('bad stuff happened'))),\r\n    async.reflect(callback => callback(null, 'two'))\r\n  ],\r\n  (err, results) => {\r\n    console.log(results[1].message)\r\n  });\r\n```\r\n\r\n**What did you expect to happen?**\r\noutput should be `bad stuff happened`\r\n\r\n**What was the actual result?**\r\noutput is `undefined`\r\n\r\nasync without `async.reflect`:\r\n\r\n```\r\nasync.series([\r\n    callback => callback(null, 'one'),\r\n    callback => callback(new Error('bad stuff happened')),\r\n    callback => callback(null, 'two')\r\n  ],\r\n  (err, results) => {\r\n    console.log(err.message)\r\n  });\r\n```\r\nOutput contains `bad stuff happened`"
+    },
+    "satisfaction_conditions": [
+      "Error message must be accessible from the reflected result object",
+      "Reflected error results must maintain the original error information",
+      "Results array must contain both successful and error results without breaking execution",
+      "Error object structure must be consistent across all reflected error results"
+    ],
+    "created_at": "2017-09-22T20:11:35Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1387",
+    "source": {
+      "issue_number": 1387
+    },
+    "initial_question": {
+      "title": "How can use implicit args in auto and autoinject ",
+      "body": "\r\nHi,\r\nHow can i use implicit args list for auto and autoinject.\r\nI use async 2.1.5 and nodeJs 4.2.6\r\n\r\neg:\r\n\r\nvar args = [ 'arg1', 'arg2', 'arg3' ] ,\r\n      funcList = {\r\n                 arg1: function(cb){ cb(null,'xyz')  },\r\n                 arg2: function(cb){ cb(null,'xyz')  },\r\n                 arg3: function(cb){ cb(null,'xyz')  }\r\n            }\r\n\r\nfuncList[ 'arg4' ] = [args, function( r, cb ){\r\n     // use or change  r[ args[0] ] or r[ args[1] ] ...\r\n}]\r\n\r\nasync.auto(funcList, callback);\r\n\r\nat the run time i get Error: async.auto task `arg4` has a non-existent dependency `arg1, arg2, arg3` in arg1, arg2, arg3"
+    },
+    "satisfaction_conditions": [
+      "Task dependencies must exist in the funcList object",
+      "Task results must be accessible via the results object in dependent tasks"
+    ],
+    "created_at": "2017-03-18T06:47:22Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1337",
+    "source": {
+      "issue_number": 1337
+    },
+    "initial_question": {
+      "title": "Control Flow times - RangeError: Maximum call stack size exceeded",
+      "body": "Async v2.1.4 / Node v4.1.1\r\n\r\nRunning the code from the documentation with a large n (1500) for **times(n, iteratee, callback)**:\r\n\r\n```javascript\r\nvar async = require('async');\r\n\r\n// Pretend this is some complicated async factory\r\nvar createUser = function(id, callback) {\r\n    callback(null, {\r\n        id: 'user' + id\r\n    });\r\n};\r\n\r\n// generate 5 users\r\nasync.times(1500, function(n, next) {\r\n    createUser(n, function(err, user) {\r\n        next(err, user);\r\n    });\r\n}, function(err, users) {\r\n    console.log(users.length)\r\n});\r\n```\r\n\r\nI get:\r\n\r\n```bash\r\nRangeError: Maximum call stack size exceeded\r\n      at forEach (test/disk-test.js:49:7)\r\n      at node_modules/async/dist/async.js:1008:9\r\n      at replenish (node_modules/async/dist/async.js:882:17)\r\n      at iterateeCallback (node_modules/async/dist/async.js:867:17)\r\n      at node_modules/async/dist/async.js:840:16\r\n      at node_modules/async/dist/async.js:1010:13\r\n```\r\n\r\nBefore in version v1.5.x, I was able to create testing arrays of 250K but with this version I can only create max 1400.\r\n\r\nIs there a better way to do it?\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Each item must be processed asynchronously"
+    ],
+    "created_at": "2016-12-06T10:24:25Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1313",
+    "source": {
+      "issue_number": 1313
+    },
+    "initial_question": {
+      "title": "Setting up Event Handlers using Async",
+      "body": "I'm having trouble using async in one of my integration tests that involves event handlers. The problem is that the event handler needs to be set up (with a reference to an async provided callback) before the event is emitted. However the event handler code needs an extra callback right away. \n\nHere is a simplified example showing the problem:\n\n``` javascript\nasync.auto({\n  // This needs to run first, but it will finish second\n  event: [(next) => {\n    emitter.once('awesome', next);\n  }],\n\n  // This needs to finish near the end\n  checkResults: ['event', (results, next) => {\n    assert(results.event.status == 200);\n    assert(results.event.msg == 'cool');\n\n    // Do other async stuff...\n    somethingAsync(next);\n  }],\n\n  // This has to start second, but before the first one finishes\n  emit: ['event', (results, next) => {\n    event.emit('awesome', {msg: 'cool'}, next);\n  }],\n\n  checkEmit: ['emit', (results, next) => {\n    // some sort of check that can be async\n  },\n], done);\n```\n\n`event` has to start first, but won't finish until the `emit` occurs. `emit` needs to wait for `event` to start, but not finish (aka just set up the handler). Thus this won't finish.\n\nIs there a way to do this with the current async library? (in a clean manner)\n\nHeres a solution I would like, assuming this could be implemented in async\n\n``` javascript\nasync.auto({\n  listen: [(next, done) => {\n    client.on(done);\n    return next();\n  },\n\n  ...\n}, callback);\n```\n\nI could use parallel, running the emitters and the listeners (of which there can be multiple in a test) as an array of tasks. Taking the results, and running the checks as a second part. However, technically parallel isn't required to kick-off the tasks in order (though it likely will). Also, the code becomes less flat, especially in more complicated setups.\n"
+    },
+    "satisfaction_conditions": [
+      "Event handler must be registered before event emission",
+      "Tasks must execute in a controlled sequence despite asynchronous nature",
+      "Event handler callback must be accessible to later operations",
+      "Final assertions and checks must execute after event handling",
+      "Solution must resolve the circular dependency between event setup and emission"
+    ],
+    "created_at": "2016-10-24T23:39:21Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1298",
+    "source": {
+      "issue_number": 1298
+    },
+    "initial_question": {
+      "title": "Odd result from waterfall",
+      "body": "**What version of async are you using?**\n2.0.1\n\n**Which environment did the issue occur in (Node version/browser version)**\nNode 6.7.0\n\n**What did you do? Please include a minimal reproducable case illustrating issue.**\n\n``` javascript\nrequire(\"async\").waterfall([\n    (callback) => callback()\n], (error) => console.log(error));\n```\n\n**What did you expect to happen?**\nIn `async@1.5.2`, in the above case `error` is undefined. \n\n**What was the actual result?**\nIn `async@2.0.1`, in the above case `error` is `null`. The final callback is somehow called with `callback(null)` which probably should have been `callback()`.\n\nThis may be working as indended, but its just something I noticed had changed recently.\n"
+    },
+    "satisfaction_conditions": [
+      "Final callback receives null as error parameter when no error occurs",
+      "Behavior is consistent with other series-based async functions",
+      "Change maintains backward compatibility for error detection"
+    ],
+    "created_at": "2016-10-06T06:20:23Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1215",
+    "source": {
+      "issue_number": 1215
+    },
+    "initial_question": {
+      "title": "async.applyEach callback is not working",
+      "body": "I am using v2.2.0 of async.js and I am using it on client side.\n\nI am trying basic example of async.applyEach\n\n```\nvar enableSearch = function(string){\n  console.info(string);\n};\nvar updateSchema = function(string){\n  console.warn(string);\n};\n\nasync.applyEach([enableSearch, updateSchema], 'New msg', function(){\n  console.log('It is done...');\n});\n```\n\nI suppose I should expect results to be...\n\n```\nNew msg\nNew msg\nIt is done\n```\n\nbut some reason I am not getting `It is done`. That means callback is no firing. Anything I am doing wrong here...\n"
+    },
+    "satisfaction_conditions": [
+      "All functions in the array must execute with the provided argument"
+    ],
+    "created_at": "2016-07-04T06:33:48Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1150",
+    "source": {
+      "issue_number": 1150
+    },
+    "initial_question": {
+      "title": "Throwing an error in callback results in \"Unhandled rejection Error: Callback was already called.\"",
+      "body": "Throwing an error in callback results in \"Unhandled rejection Error: Callback was already called.\"\nThis prevents user from seeing actual error message, created by assertions in tests. \nThis hasn't been happening in 2.0.0-rc3. Is this expected behaviour in rc4?\n\nHere's the example code\n\n``` js\nasync.waterfall([\n  (next) => {\n    apiClient\n      .post('/some-url')\n      .send({prop: 'value'})\n      .expect(200)\n      .end(next);\n  }\n], (err) => {\n  assert.ifError(err);\n  throw new Error('Some Error');\n});\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Asynchronous operation flow must complete properly"
+    ],
+    "created_at": "2016-05-08T11:36:00Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/1104",
+    "source": {
+      "issue_number": 1104
+    },
+    "initial_question": {
+      "title": "How can I dynamically push functions with different arguments to an array? I need to process those functions using Async.js (parallel or race mode)",
+      "body": "Currently I am trying to run in parallel the same function with different arguments using Node.JS\n\nFor this I use Async.js and i am struggling trying to push/stack functions to an array. \nThe problem is that the functions are executed with the same arguments. This is what I have:\n\n``` js\nvar async = require(\"async\");\nvar array = [];\nvar x = [1,2,3,4];\n\n// This portion of code works perfect and the arguments are passed perfectly\n// The results that i am getting are: [100, 200, 300, 400]\narray.push(function(callback){ callback(null,calculate(x[0]))});\narray.push(function(callback){ callback(null,calculate(x[1]))});\narray.push(function(callback){ callback(null,calculate(x[2]))});\narray.push(function(callback){ callback(null,calculate(x[3]))});\n\n// This portion of code does not work and I dont know why ... \n// The results that i am getting are: [400, 400, 400, 400]\n// Obviusly the function is receiving the same argument a=4 everytime is called\nfor (i=0;i<3;i++){\n    array.push(function(callback){ callback(null,calculate(x[i]))});\n}\n\nasync.parallel(array,function(err,result){\n    if (err) {\n        console.log(err);\n        return;\n    }\n    console.log(\"Results are: \" + result);\n});\n\n\nfunction calculate(a) {\n  return a*100\n}\n```\n\nAny idea?\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "Functions must execute in parallel",
+      "Array of functions must be dynamically generated",
+      "Proper error handling must be implemented"
+    ],
+    "created_at": "2016-04-07T23:27:23Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/969",
+    "source": {
+      "issue_number": 969
+    },
+    "initial_question": {
+      "title": "each and eachSeries not passing back values to results array - why?",
+      "body": "This is probably my misunderstanding, but there's a small chance of a bug\n\n``` javascript\n\nasync.each([1,2,3], function(value,cb){\n    setTimeout(function(){\n        cb(null,value);\n    },200);\n\n},function complete(err, results) {\n    console.log(err,results);  //results is undefined here, err is null\n});\n\n\nasync.eachSeries([1,2,3], function(value,cb){\n    setTimeout(function(){\n        cb(null,value);\n    },200);\n\n},function complete(err, results) {\n    console.log(err,results); //results is undefined here, err is null as expected\n});\n```\n\nfor the async.series and async.parallel apis, we have the results argument being populated as an array, but with async.each and async.eachSeries, this does not seem to be the case.\n\nis there something I am missing?\n\nthanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Asynchronous operations must complete successfully for all array elements",
+      "Original execution order must be preserved if sequential processing is specified"
+    ],
+    "created_at": "2015-12-01T05:11:11Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/939",
+    "source": {
+      "issue_number": 939
+    },
+    "initial_question": {
+      "title": "Does the async.each() method return the array in the same order?",
+      "body": "This may seem like a silly question but I want to ensure I understand it correctly. I understand that the iterator will obviously take a different amount of time per function in the array. But, is the returned array mapped in the initial order, or in the order in which the async callbacks were returned?\n\nThank you!!\n"
+    },
+    "satisfaction_conditions": [
+      "Clarify that async.each() does not return an array",
+      "Provide guidance on maintaining array order in async operations",
+      "Distinguish between different async array methods",
+      "Address error handling behavior"
+    ],
+    "created_at": "2015-10-22T18:17:40Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/919",
+    "source": {
+      "issue_number": 919
+    },
+    "initial_question": {
+      "title": "How to re-push failed task?",
+      "body": "Hi ..\n\nany idea how to re-push failed task, inside my async.queue, i've try something like this, but not work ..\n\n``` js\nvar q = async.queue(function(task, nextQueue) {\n    // do something\n\n    if (err) {\n        q.push(task)\n    }\n})\n```\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "Failed tasks are automatically resubmitted to the queue",
+      "Queue continues processing other tasks while handling retries",
+      "Original task data is preserved during retries",
+      "Error conditions trigger the retry mechanism"
+    ],
+    "created_at": "2015-09-28T16:34:20Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/901",
+    "source": {
+      "issue_number": 901
+    },
+    "initial_question": {
+      "title": "How to send arguments in async.auto in its first method",
+      "body": "``` js\nvar signup=function(user){\nAsync.auto({\n            verifyPassword:verifyPassword,\n            saveUser:['verifyPassword',saveUser]\n            })\n}\nvar verifyPassword=function(user,next ){\n\n}\n```\n\nNow I want to send user object into verifyPassword function\n"
+    },
+    "satisfaction_conditions": [
+      "The user object must be accessible within the verifyPassword function when executed by async.auto",
+      "The async flow structure must be maintained",
+      "The verifyPassword function must receive both the user parameter and the callback parameter"
+    ],
+    "created_at": "2015-09-04T17:06:11Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/788",
+    "source": {
+      "issue_number": 788
+    },
+    "initial_question": {
+      "title": "series/waterfall callback is added to stack of last fn's done() call",
+      "body": "Can't seem to find this problem in the docs/issues, it seems the last fn's call to done() sits beneath the callback function in the stack, meaning its able to try/catch any errors encountered in the callback. Simple example:\n\n```\nasync.series([function(done) {\n    try {\n        done();\n    } catch(e) {\n        console.log('caught error from callback')\n    }\n}], function(err, result) {\n    throw new Error('callback threw');\n});\n```\n\nIn my case, I'm using the \"wd\" library and my last fn in the series array is:\n\n```\nbrowser.init({browserName: 'chrome'}).then(done);\n```\n\nIn my callback, I'm calling mocha.run() which throws an error if the coffeescript modules cannot compile. With the async + wd/q stack, the error is being swallowed.\nIs there another way I can use the async lib to prevent this, and ensure that all thrown errors in the callback function always bubble up to the process? thanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Call stack separation between async operations and callbacks",
+      "Maintain expected execution order of operations"
+    ],
+    "created_at": "2015-06-13T19:23:05Z"
+  },
+  {
+    "id": "https://github.com/caolan/async/issues/787",
+    "source": {
+      "issue_number": 787
+    },
+    "initial_question": {
+      "title": "how to do a simple for loop",
+      "body": "I've been trying to figure out how to do a simple for loop, say, from 1 to 10, and have a callback when the loop is done. For example:\n\n```\nfor(i=1; i<=10;i++) {\n    User.insert({ username: \"user\" + i }, callback)\n}\n\nrunWhenDoneInserting();\n```\n\nI figured that it could be done using the `async.each` method, but that would mean building an array with all the elements I wanna loop, and that seems both wasteful (what if I want to execute a loop 1M times?), and also the array building code is quite declarative...\n\n```\nvar i = [];\nfor(var j = 1; j<=10;j++) {\n   i.push(j);\n}\n\nasync.each(i,foo,callback);\n```\n\n Is there any way to accomplish the above without having to manually create the iteration array?\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Loop executes the desired number of iterations (1 to 10 in example)",
+      "Asynchronous operations within the loop complete before callback execution",
+      "Memory efficiency is maintained for large iteration counts",
+      "Callback executes exactly once after all iterations complete"
+    ],
+    "created_at": "2015-06-13T17:32:25Z"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/ReaJason/MemShellParty/issues/14",
+    "source": {
+      "issue_number": 14
+    },
+    "initial_question": {
+      "title": "docker\u542f\u52a8\u65e0\u6cd5\u8bbf\u95ee",
+      "body": "\u4f7f\u7528docker run --pull=always --rm -it -d -p 8080:8080 --name memshell reajason/memshell-party\u547d\u4ee4\u542f\u52a8\u540e\u65e0\u6cd5\u4ece\u5916\u9762\u76848080\u7aef\u53e3\u8bbf\u95ee\uff0c\u4f46\u662fdocker\u5bb9\u5668\u5185\u76848080\u7aef\u53e3\u53ef\u4ee5\u6b63\u5e38\u8bbf\u95ee\u3002"
+    },
+    "satisfaction_conditions": [
+      "Service inside container must remain operational after networking changes"
+    ],
+    "created_at": "2025-01-02T07:14:20Z"
+  }
+]

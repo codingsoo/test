@@ -1,0 +1,22 @@
+[
+  {
+    "number": 1349,
+    "title": "Configuration for rule \"no-param-reassign\" is invalid ",
+    "created_at": "2017-03-27T06:56:52Z",
+    "closed_at": "2017-03-27T07:03:47Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/airbnb/javascript/issues/1349",
+    "body": "I think the latest version of eslint-config-airbnb-base v11.1.2 is giving me an error whenever I use the airbnb config with eslint. \r\n\r\nError log:\r\n\r\n```\r\nError: <project>/node_modules/eslint-config-airbnb-base/rules/best-practices.js:\r\n\tConfiguration for rule \"no-param-reassign\" is invalid:\r\n\tValue \"data[\"0\"].ignorePropertyModificationsFor\" has additional properties.\r\n\r\nReferenced from: <project>/node_modules/eslint-config-airbnb-base/index.js\r\nReferenced from: airbnb\r\n```\r\n\r\nAm I doing something wrong?",
+    "comments_url": "https://api.github.com/repos/airbnb/javascript/issues/1349/comments",
+    "author": "kartiklad",
+    "comments": [
+      {
+        "user": "ljharb",
+        "created_at": "2017-03-27T06:59:18Z",
+        "body": "That means you didn't update eslint along with it - ie, you didn't update the peer deps.\r\n\r\nRerun the install command in the package readme to update the peer deps to the right versions."
+      }
+    ]
+  }
+]

@@ -1,0 +1,71 @@
+[
+  {
+    "id": "https://github.com/jingyaogong/minimind/issues/82",
+    "source": {
+      "issue_number": 82
+    },
+    "initial_question": {
+      "title": "\u8bf7\u6559Pretrian\u4e2d\u65ad\u540e\u7ee7\u7eed\u8bad\u7ec3\u7684\u7591\u95ee",
+      "body": "\u5728\u6267\u884cPretrain.py\u65f6\u5982\u679c\u6ca1\u6709\u8bad\u7ec3\u5b8c\u5c31\u4e2d\u65ad\u4e86\r\n\u60f3\u8981\u5728\u4e2d\u65ad\u524d\u7684checkpoint\u7684\u57fa\u7840\u4e0a\u7ee7\u7eed\u8bad\u7ec3\uff0c\u672c\u9879\u76ee\u7684\u4ee3\u7801\u8bf7\u95ee\u5e94\u8be5\u4fee\u6539\u54ea\u4e2a\u90e8\u5206\u5440\u3002\r\n\u8c22\u8c22\u5404\u4f4d\u5927\u4f6c"
+    },
+    "satisfaction_conditions": [
+      "Training state must be successfully restored from the last checkpoint",
+      "Model architecture must remain consistent after restoration",
+      "Training must continue from the last saved state without loss of progress",
+      "Checkpoint loading must handle any model state incompatibilities"
+    ],
+    "created_at": "2024-11-04T03:47:03Z"
+  },
+  {
+    "id": "https://github.com/jingyaogong/minimind/issues/81",
+    "source": {
+      "issue_number": 81
+    },
+    "initial_question": {
+      "title": "Padding Mask\u90e8\u5206\u7684\u7591\u60d1",
+      "body": "\u60a8\u597d\uff0c\u611f\u8c22\u60a8\u7684\u9879\u76ee\u3002\r\n\u6211\u5728\u60a8\u7684\u9879\u76ee\u4e2d\u53d1\u73b0\u6a21\u578b\u4e2d\u7684Attention\u6a21\u5757\u4e2d\u7684mask\u53ea\u662f\u5305\u542b attention mask\uff0c\u800c\u6ca1\u6709\u901a\u8fc7\u4f20\u5165padding\u90e8\u5206\u7684padding mask\u7ed3\u5408\u4f5c\u4e3amask\u3002\u6211\u53d1\u73b0\u60a8\u5728\u6a21\u578b\u8f93\u51fa\u5b8clogits\u540e\u8ba1\u7b97loss\u65f6\uff08\u4f8b\u5982pretrain\u4ee3\u7801\u4e2d\u8ba1\u7b97entropy loss\uff09\uff0c\u901a\u8fc7padding mask\u5bf9loss\u8ba1\u7b97\u7ed3\u679cmask\u6389\u4e86padding\u90e8\u5206\u3002\u6211\u60f3\u8bf7\u6559\u4e0b\u8fd9\u4e24\u79cdpadding mask\u7684\u5b9e\u73b0\u65b9\u6cd5\u4e0a\u5728\u6548\u679c\u4e0a\u6709\u4ec0\u4e48\u533a\u522b\u3002\r\n\u8c22\u8c22\uff0c\u5e0c\u671b\u60a8\u80fd\u56de\u590d\u6211\u7684\u7591\u60d1\uff01"
+    },
+    "satisfaction_conditions": [
+      "Model must prevent future tokens from influencing predictions of current tokens",
+      "Training efficiency must be maintained despite padding tokens",
+      "Loss calculation must exclude padding tokens",
+      "Attention mechanism must maintain causal relationships"
+    ],
+    "created_at": "2024-11-02T09:28:27Z"
+  },
+  {
+    "id": "https://github.com/jingyaogong/minimind/issues/69",
+    "source": {
+      "issue_number": 69
+    },
+    "initial_question": {
+      "title": "\u6a21\u578b\u7684\u8f93\u5165\u8f93\u51fa\u957f\u5ea6",
+      "body": "1.\u8fd9\u4e2a\u6a21\u578b\u8bad\u7ec3\u597d\u540e\uff0c\u4e0a\u4e0b\u6587\u8f93\u5165\u7684\u957f\u5ea6\u6700\u957f\u80fd\u5230\u591a\u5c11\uff0c\u662f\u7531max_seq_len: int = 512 \u6765\u63a7\u5236\u7684\u5417\uff1f\r\n2.\u8fd9\u4e2a\u6a21\u578b\u8bad\u7ec3\u597d\u540e\uff0c\u8f93\u51fa\u7684\u6700\u5927\u957f\u5ea6\u662f\u7531\u54ea\u91cc\u63a7\u5236\u7684\u5462\uff1f\u8c22\u8c22"
+    },
+    "satisfaction_conditions": [
+      "Model must handle input sequences up to the configured maximum length",
+      "Model must maintain quality for sequences within trained length range",
+      "Model must accept input beyond trained length without errors",
+      "Length limitations should be configurable"
+    ],
+    "created_at": "2024-10-17T07:09:06Z"
+  },
+  {
+    "id": "https://github.com/jingyaogong/minimind/issues/23",
+    "source": {
+      "issue_number": 23
+    },
+    "initial_question": {
+      "title": "\u5173\u4e8ePretrainDataset\u8bfb\u53d6\u8bad\u7ec3\u6570\u636e\u7684\u95ee\u9898",
+      "body": "\r\n```python\r\nclass PretrainDataset(Dataset):\r\n    def __init__(self, data_path_lst, max_length=512, memmap=False):\r\n        super().__init__()\r\n        #\r\n        if memmap:\r\n            with open(data_path_lst[0], 'r') as f:\r\n                nbytes = f.seek(0, 2)\r\n                flen = f.tell() // np.dtype('uint16').itemsize\r\n            self.data = np.memmap(data_path_lst[0], dtype=np.dtype('uint16'), shape=(flen // max_length, max_length))\r\n        else:\r\n            data_lst = []\r\n            for data_path in data_path_lst:\r\n                with open(data_path, 'rb') as f:\r\n                    data = np.fromfile(f, dtype=np.uint16)\r\n                    data_lst.append(data)\r\n            data = np.concatenate(data_lst)\r\n            data = data[:max_length * int(len(data) / max_length)]\r\n            # np.random.shuffle(data)\r\n            self.data = data.reshape(-1, max_length)\r\n```\r\n \r\n\r\n\u4ece\u4ee3\u7801\u903b\u8f91\u4e0a\u770b\uff0cPretrainDataset\u8bfb\u53d6bin\u6570\u636e\u7684\u65f6\u5019\uff0c\u6309\u7167512\u7684\u957f\u5ea6\u4f5c\u4e3a\u4e00\u6761\u6570\u636e\u4e86\u597d\u50cf\u3002\r\n\u4f46\u662f\u5728\u6570\u636e\u5b58\u50a8\u7684\u65f6\u5019\uff0c\u5404\u6761\u6570\u636e\u5e76\u6ca1\u6709\u683c\u5f0f\u5316\u6210512\u7684\u7a0b\u5ea6\u518d\u5b58\u5165bin\u6587\u4ef6\u4e2d\uff0c\u5982\u679c\u6309\u7167512\u957f\u5ea6\u8bfb\u53d6\u51fa\u6765\uff0c\u8bad\u7ec3\u6570\u636e\u53ef\u80fd\u6ca1\u6709\u4e25\u683c\u6309\u7167\u8bad\u7ec3\u6570\u636e\u96c6\u7684\u6761\u76ee\u8fdb\u884c\u5212\u5206\u5427\u3002\r\n"
+    },
+    "satisfaction_conditions": [
+      "Dataset must handle variable-length text sequences within fixed-length windows",
+      "Text sequence boundaries must remain identifiable",
+      "Memory efficiency must be maintained",
+      "Dataset must support local context learning",
+      "Data loading must support both memory-mapped and direct loading modes"
+    ],
+    "created_at": "2024-09-14T07:17:14Z"
+  }
+]

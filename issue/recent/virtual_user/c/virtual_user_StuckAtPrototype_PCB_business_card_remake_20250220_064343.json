@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/StuckAtPrototype/PCB_business_card_remake/issues/1",
+    "source": {
+      "issue_number": 1
+    },
+    "initial_question": {
+      "title": "can't compile (BLE related)",
+      "body": "I installed `ESP-IDF 5.4.0` and tried to build your code. But I got some error:\r\n\r\n```\r\nfirmware/main/gap.h:4:10: fatal error: host/ble_hs.h: No such file or directory\r\n```\r\n\r\nWithin the main.c I got three include errors:\r\n\r\n```\r\n#include \"gap.h\"\r\n#include \"gatt_svr.h\"\r\n#include \"esp_bt.h\"\r\n```\r\n\r\nThis files can't be fully resolved (because of transient dependencies)."
+    },
+    "satisfaction_conditions": [
+      "BLE/NIMBLE dependencies are properly enabled in the project configuration",
+      "Project configuration is properly initialized before build"
+    ],
+    "created_at": "2024-12-20T13:37:33Z"
+  }
+]

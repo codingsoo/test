@@ -1,0 +1,84 @@
+[
+  {
+    "id": "https://github.com/deezer/spleeter/issues/896",
+    "source": {
+      "issue_number": 896
+    },
+    "initial_question": {
+      "title": "[Discussion] Is there any way to release memory after separating is done??",
+      "body": "I need to process multiple audio files in a loop.\r\nI've been unable to find a solution to ensure that memory is properly released after the separation task is completed.\r\nI'd greatly appreciate any insights, suggestions, or experiences."
+    },
+    "satisfaction_conditions": [
+      "Memory is released after each audio file processing",
+      "Audio separation functionality remains intact"
+    ],
+    "created_at": "2024-03-17T12:00:36Z"
+  },
+  {
+    "id": "https://github.com/deezer/spleeter/issues/510",
+    "source": {
+      "issue_number": 510
+    },
+    "initial_question": {
+      "title": "the question of the audio separate time",
+      "body": "Excuse me, is the separated audio file just the first ten minutes of audio?\r\nWhat to do if the original audio is longer than ten minutes\uff1f\r\n"
+    },
+    "satisfaction_conditions": [
+      "Audio processing duration must be configurable beyond the default 10 minutes",
+      "User must be informed about system resource limitations",
+      "Duration parameter must be adjustable through command options",
+      "Full audio file length must be processable if system resources allow"
+    ],
+    "created_at": "2020-11-04T09:24:32Z"
+  },
+  {
+    "id": "https://github.com/deezer/spleeter/issues/434",
+    "source": {
+      "issue_number": 434
+    },
+    "initial_question": {
+      "title": "[Discussion] Why files outputted by splitter is three times bigger than initial file? ",
+      "body": "<!-- Please respect the title [Discussion] tag. -->\r\nThanks for the awesome project guys. I am wondering why outputted files are much bigger than the initial file?\r\nFor example, my initial file was 9mb and the vocal I got after processing 36mb."
+    },
+    "satisfaction_conditions": [
+      "Output file size increase must be explained by technical audio parameters",
+      "Size increase ratio must be quantifiably justified",
+      "Audio quality parameters of output must be clearly specified",
+      "File size management options must be available"
+    ],
+    "created_at": "2020-06-26T12:44:48Z"
+  },
+  {
+    "id": "https://github.com/deezer/spleeter/issues/388",
+    "source": {
+      "issue_number": 388
+    },
+    "initial_question": {
+      "title": "[Discussion] Output in FLAC or other formats",
+      "body": "Hi,\r\nI was wondering if it is possible to to export the output files in other formats than WMA. I would be interested in having the files as FLAC, is it already possible to do so ?\r\n\r\nI thank you in advance for your time and comprehension towards my request."
+    },
+    "satisfaction_conditions": [
+      "Audio output format can be changed to FLAC",
+      "Format selection mechanism is available to user",
+      "Multiple audio format options are supported",
+      "Format selection is documented"
+    ],
+    "created_at": "2020-05-22T12:33:33Z"
+  },
+  {
+    "id": "https://github.com/deezer/spleeter/issues/138",
+    "source": {
+      "issue_number": 138
+    },
+    "initial_question": {
+      "title": "[Discussion] How to correctly set bitrate?",
+      "body": "I have set command in order to have vocal and accomaniment in flac format, at a bitrate of 320kbps in 'output' destination folder.\r\nWhat I wrote:\r\n\r\n`spleeter separate -i 'songName.flac' -p spleeter:2stems -c flac -b 320k -o output`\r\n\r\nWhat i get is two flac files (ok), but with higher bitrate than the one request by parameter `-b 320k`\r\n\r\nIs there something wrong in wrinting the command? How should the bitrate parameter be written? (there's no explanation on that by reading the manual)"
+    },
+    "satisfaction_conditions": [
+      "User understands that bitrate cannot be manually set for FLAC format",
+      "Explanation clarifies why the -b parameter is ignored",
+      "User understands what determines the actual output bitrate"
+    ],
+    "created_at": "2019-11-26T13:02:18Z"
+  }
+]

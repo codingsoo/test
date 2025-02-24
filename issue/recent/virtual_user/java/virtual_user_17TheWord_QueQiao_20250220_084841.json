@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/17TheWord/QueQiao/issues/18",
+    "source": {
+      "issue_number": 18
+    },
+    "initial_question": {
+      "title": "\u8bf7\u95eespigot1.18.2\u5728\u54ea",
+      "body": "modrinth\u6ca1\u67091.18.2\r\nCF\u53ea\u6709fabric & forge"
+    },
+    "satisfaction_conditions": [
+      "Plugin functionality is maintained with compatible Spigot API version"
+    ],
+    "created_at": "2024-10-03T03:17:16Z"
+  }
+]

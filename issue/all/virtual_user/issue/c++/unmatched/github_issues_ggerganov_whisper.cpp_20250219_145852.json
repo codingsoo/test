@@ -1,0 +1,93 @@
+[
+  {
+    "number": 1844,
+    "title": "Improvement: Wanting to change 16khz requirement to 8khz (or Xkhz ideally)",
+    "created_at": "2024-02-08T05:40:57Z",
+    "closed_at": "2024-02-10T04:51:26Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ggerganov/whisper.cpp/issues/1844",
+    "body": "\r\nCurrently main program requires\r\nRIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 16000 Hz\r\n\r\nbut all my audios are created as \r\nRIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz\r\n\r\nSure I can convert them using `sox` or `ffmpeg` but would be best if it I can just recompile `main` program to use 8khz. Can anyone provide any guidance and what modifications are required? I'm thinking this should be easy am I wrong? \r\n\r\nLooking at examples/common.cpp  I see \r\n#define COMMON_SAMPLE_RATE 16000\r\n\r\ntried changing to \r\n#define COMMON_SAMPLE_RATE 8000\r\nbut then I get random words in output. \r\n\r\nTried searching for  COMMON_SAMPLE_RATE din't find anything. Kinda of weird. Is the 16khz hardcoded and that define is just a check? or how does it work? Any guidance would be appreciated. ",
+    "comments_url": "https://api.github.com/repos/ggerganov/whisper.cpp/issues/1844/comments",
+    "author": "lfmunoz",
+    "comments": [
+      {
+        "user": "bobqianic",
+        "created_at": "2024-02-09T18:40:16Z",
+        "body": "It's not feasible because the model was trained using data at a 16KHz sampling rate. When you input audio at 8KHz, it doesn't match the training data's distribution, leading to considerable distortion in the output. AI learns by identifying statistically significant information within the provided dataset. "
+      }
+    ]
+  },
+  {
+    "number": 1284,
+    "title": "Significantly Less Accurate Results when Using Multiple Threads",
+    "created_at": "2023-09-13T13:25:19Z",
+    "closed_at": "2023-09-13T15:14:43Z",
+    "labels": [
+      "question",
+      "solution"
+    ],
+    "url": "https://github.com/ggerganov/whisper.cpp/issues/1284",
+    "body": "I'm aware that there is a warning for transcription accuracy when using multiple threads, but in my testing, even using something like 4 threads on a 30-40 second clip results in wildly different results from using a single thread. Is this expected? Is there any way to improve this with what `whisper.cpp` offers out of the box? \r\n\r\nI assume the issue is that the audio is split into even chunks which could be right in the middle of a sentence. One idea would be to try to auto detect \"silence\" in audio clips and split it into chunks based on that and then transcribe those chunks using multiple threads.",
+    "comments_url": "https://api.github.com/repos/ggerganov/whisper.cpp/issues/1284/comments",
+    "author": "DeveloperPaul123",
+    "comments": [
+      {
+        "user": "bobqianic",
+        "created_at": "2023-09-13T13:52:49Z",
+        "body": "Which flag did you use to set the number of threads? `-p` or `-t`?"
+      },
+      {
+        "user": "DeveloperPaul123",
+        "created_at": "2023-09-13T14:22:49Z",
+        "body": "I'm currently setting this in code, not from a command line. Something like:\r\n```cpp\r\nwhisper_full_params whisper_params =\r\n                whisper_full_default_params(WHISPER_SAMPLING_BEAM_SEARCH);\r\nwhisper_params.n_threads = 4;\r\n```\r\n\r\nEdit: Just realized I may have been doing this wrong. When calling `whisper_full_parallel`, I was passing the `n_threads` parameter as the final argument instead of the the processor count as is done in the `main` example. "
+      },
+      {
+        "user": "bobqianic",
+        "created_at": "2023-09-13T14:35:55Z",
+        "body": "> I'm currently setting this in code, not from a command line. Something like:\r\n> \r\n> ```c++\r\n> whisper_full_params whisper_params =\r\n>                 whisper_full_default_params(WHISPER_SAMPLING_BEAM_SEARCH);\r\n> whisper_params.n_threads = 4;\r\n> ```\r\n\r\nCould you let me know the value of `whisper_params.n_processors`? If this value is set to `1`, even when you invoke `whisper_full_parallel`, it should default to `whisper_full`. In this case, the audio shouldn't be split."
+      },
+      {
+        "user": "DeveloperPaul123",
+        "created_at": "2023-09-13T14:39:42Z",
+        "body": "@bobqianic Do you know if the CLBlast backed is more effective than OpenBlas? It seems like there is no tensor offloading for whisper like in llama.cpp."
+      },
+      {
+        "user": "bobqianic",
+        "created_at": "2023-09-13T14:50:25Z",
+        "body": "> @bobqianic Do you know if the CLBlast backed is more effective than OpenBlas? It seems like there is no tensor offloading for whisper like in llama.cpp.\r\n\r\nI\u2018m not sure, but you can give it a try. Based on my experience with cuBLAS, there is a performance improvement, but it's not significant : )"
+      }
+    ]
+  },
+  {
+    "number": 489,
+    "title": "--diarize labels everything (speaker ?)",
+    "created_at": "2023-02-09T23:39:52Z",
+    "closed_at": "2023-02-15T18:15:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/ggerganov/whisper.cpp/issues/489",
+    "body": "\r\nThe following command yields the results snippet below and I was wondering if anyone could provide insight as to why?\r\n(using Windows x64 executable)\r\n\r\n`\r\n$ ./main -m models/ggml-tiny.bin -f audio/The-Big-Tech-Show_Dropbox-CEO.wav --diarize\r\n`\r\n\r\nAlso why does it repeat the one sentence for a minute and a half?\r\n\r\n```\r\n[00:09:00.000 --> 00:09:10.000]  (speaker ?) Do you say you're more or less likely or there's no difference in advancing the career giving a promotion to somebody who you don't meet and see regularly?\r\n[00:09:10.000 --> 00:09:23.000]  (speaker ?) I'd say, so to the extent the promotions are based on FaceTime, then clearly folks that have any imbalances there are harmful to equity.\r\n[00:09:23.000 --> 00:09:29.000]  (speaker ?) But that said, you know, FaceTime probably shouldn't be using some other process.\r\n[00:09:29.000 --> 00:09:33.000]  (speaker ?) Then just how much have you been physically together with someone.\r\n[00:09:33.000 --> 00:09:43.000]  (speaker ?) I think one of the great things about the distributed world is some of the ways that it does level the playing field is, you know, I'm the CEO of the company.\r\n[00:09:43.000 --> 00:09:47.000]  (speaker ?) But my tile is not any bigger than anyone else's.\r\n[00:09:47.000 --> 00:09:55.000]  (speaker ?) I think we were all learned a lot before the pandemic about how little subtle biases or where you set it a table.\r\n[00:09:55.000 --> 00:10:02.000]  (speaker ?) You know, what you interrupt people and all these little kind of micro patterns actually have a big effect on how you're perceived.\r\n[00:10:02.000 --> 00:10:05.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:05.000 --> 00:10:08.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:08.000 --> 00:10:11.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:11.000 --> 00:10:14.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:14.000 --> 00:10:17.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:17.000 --> 00:10:20.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:20.000 --> 00:10:23.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:23.000 --> 00:10:26.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:26.000 --> 00:10:29.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:29.000 --> 00:10:32.000]  (speaker ?) I think that's a great way to do that.\r\n[00:10:32.000 --> 00:10:35.000]  (speaker ?) I think that's a great way to do that.\r\n\r\n```\r\n\r\nBelow is the ffmpeg command I use when converting an MP3 file to a WAV Stereo 16khz file\r\n\r\n```\r\ncommand = [\r\n    \"ffmpeg\",\r\n    \"-i\", input_file,\r\n    \"-ac\", \"2\", # stereo\r\n    \"-ar\", \"16000\", # 16kHz\r\n    \"-acodec\", \"pcm_s16le\",\r\n    output_file\r\n]\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/ggerganov/whisper.cpp/issues/489/comments",
+    "author": "SLong97",
+    "comments": [
+      {
+        "user": "strangelearning",
+        "created_at": "2023-02-14T15:58:04Z",
+        "body": "As a complete novice, I wonder if one can simply \"convert\" a mono (1 channel) into stereo audio file. \r\n\r\nI just ran into the same issue with `speaker ?` for each speaker. Going to try and download a \"natively\" stereo audio file and then try that. "
+      },
+      {
+        "user": "strangelearning",
+        "created_at": "2023-02-14T18:27:40Z",
+        "body": "I'm aware of that ffmpeg command, but it would seem weird if that actually\nworked, and in fact, does not work for me.\n\nAfter running it, I get (? speaker) for each line of transcription\nunfortunately.\n\n> Message ID: ***@***.***>\n>\n"
+      },
+      {
+        "user": "ggerganov",
+        "created_at": "2023-02-15T18:15:13Z",
+        "body": "The existing `--diarize` option is designed only for stereo recordings where one speaker speaks in channel 1 and the other in channel 2. This is very basic strategy and will not work in the general case.\r\n\r\nConverting mono to stereo will not work.\r\nBetter diarization might be available in the future."
+      }
+    ]
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "number": 3407,
+    "title": "DuplicateTypeMapConfigurationException due to MapperConfigurationExpression.AddMap(IEnumerable<Type>)",
+    "created_at": "2020-05-06T17:12:04Z",
+    "closed_at": "2020-05-06T18:56:50Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3407",
+    "body": "I have multiple assemblies and each has multiple types derived from `AutoMapper.Profile` so that mappings are nicely organized.\r\n\r\nWhen creating the `MapperConfiguration` I used the `AddMaps(IEnumerable<Type>)` overload and passed all those derived types that are available in the current `AppDomain`.\r\n\r\nThen calling `AssertConfigurationIsValid()` throws `DuplicateTypeMapConfigurationException`.\r\n\r\n### Mapping configuration\r\n\r\n```csharp\r\npublic class DependencyModule : Module\r\n{\r\n    protected override void Load(ContainerBuilder builder)\r\n    {\r\n        // Here we collect all types that are\r\n        // - derived from AutoMapper.Profile and\r\n        // - loaded into the current AppDomain.\r\n        IEnumerable<Type> profileTypes = GetAutoMapperProfileTypes();\r\n\r\n        var mapperConfiguration =\r\n            new MapperConfiguration(\r\n                config =>\r\n                {\r\n                    config.AllowNullCollections = true;\r\n                    config.AddMaps(profileTypes);\r\n                }\r\n            );\r\n\r\n        // This throws DuplicateTypeMapConfigurationException.\r\n        mapperConfiguration.AssertConfigurationIsValid();\r\n\r\n        IMapper mapper = mapperConfiguration.CreateMapper();\r\n\r\n        builder.RegisterInstance(mapper);\r\n    }\r\n}\r\n```\r\n\r\n### Version: 8.1.1\r\n\r\n### Expected behavior\r\n\r\nThe expected behavior is `DuplicateTypeMapConfigurationException` not to be thrown.\r\n\r\n### Actual behavior\r\n\r\n`DuplicateTypeMapConfigurationException` was thrown and based on the exception message it seemed that the same assembly is loaded exactly `n` times where `n` is the number of types derived from `AutoMapper.Profile` in that specific assembly.\r\n\r\nIf skipping `mapperConfiguration.AssertConfigurationIsValid();` then no `Exception` is thrown.\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\n    private IEnumerable<Type> GetAutoMapperProfileTypes()\r\n    {\r\n        return new Type[]\r\n        {\r\n            typeof(CustomProfile1),\r\n            typeof(CustomProfile2)\r\n        };\r\n    }\r\n    \r\n    public class Entity1 { }\r\n    \r\n    public class Entity2 { }\r\n    \r\n    public class Model1 { }\r\n    \r\n    public class Model2 { }\r\n    \r\n    public class CustomProfile1 : AutoMapper.Profile\r\n    {\r\n        public CustomProfile1()\r\n        {\r\n            CreateMap<Entity1, Model1>();\r\n        }\r\n    }\r\n    \r\n    public class CustomProfile2 : AutoMapper.Profile\r\n    {\r\n        public CustomProfile2()\r\n        {\r\n            CreateMap<Entity2, Model2>();\r\n        }\r\n    }\r\n\r\n```\r\n\r\n### Suggested change\r\n\r\nChange `MapperConfigurationExpression.cs` as below:\r\n\r\nIn `AddMaps(IEnumerable<Type>)` method call `.Distinct()` after calling `.Select()`.\r\n\r\nSimilarly in `AddMapsCore(IEnumerable<Assembly>)` method call `.Distinct()` in between `.Where()` and `.SelectMany()`.\r\n\r\n### Remarks\r\n\r\nAs for `AddMaps(IEnumerable<Type>)` I might misused/misunderstood it but it might not be 100% obvious that to you should pass *only one type per assembly*. Otherwise, you risk `DuplicateTypeMapConfigurationException` to be thrown.\r\n\r\nAdding the above suggested `.Distinct()` calls help avoid `DuplicateTypeMapConfigurationException` that I think is worth thinking about.\r\n\r\nIf you like this idea then I would happily make this minor change.",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3407/comments",
+    "author": "gcsizmadia",
+    "comments": [
+      {
+        "user": "jbogard",
+        "created_at": "2020-05-06T17:16:26Z",
+        "body": "Why are you adding the same assembly multiple times? It seems that you can call `Distinct` on your side before calling into AutoMapper.\r\n\r\nI don't like our code making those sorts of assumptions."
+      },
+      {
+        "user": "gcsizmadia",
+        "created_at": "2020-05-06T17:24:23Z",
+        "body": "I don't add the same assembly multiple times. \r\n\r\nI add different types derived from `AutoMapper.Profile` that are in the same assembly hence your `AddMaps(IEnumerable<Type>)` overload selects the same assembly multiple times in the 74th line:\r\n`.Select(t => t.GetTypeInfo().Assembly)`"
+      },
+      {
+        "user": "jbogard",
+        "created_at": "2020-05-06T17:28:20Z",
+        "body": "Oh, don't do that. Those types you pass in are types to match assemblies.\r\n\r\n@lbargaoanu I wonder if this is more confusing than helpful, should we only have methods that accept Assembly objects? It'll just force you to do `typeof(MyProfile).Assembly`."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-05-06T17:37:05Z",
+        "body": "A lot of things can be confusing :) I vote to keep them. I'm sure I've seen this in some other library and I would guess it's pretty useful."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-05-06T17:42:07Z",
+        "body": "The name of the parameter seems well chosen to me. But I guess we could rename it if there's a better idea."
+      },
+      {
+        "user": "jbogard",
+        "created_at": "2020-05-06T17:45:30Z",
+        "body": "\"MarkerTypesForAssembliesButOnlyOneMarkerTypePerAssemblyPlease\""
+      },
+      {
+        "user": "gcsizmadia",
+        "created_at": "2020-05-06T17:46:28Z",
+        "body": "I suspected I misunderstood the purpose of that method. :)\r\n\r\nAs for me I now use the `AddMaps(IEnumerable<Assembly>)` overload and it works well.\r\n\r\nRegarding the subject I'd suggest\r\n- either extending the XML comment for that method to make it clear(er) - should pass only one type per assembly!\r\n- or adding that `.Distinct()` call as a guard\r\n\r\nThe parameter name could remain as it is now."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-05-06T18:56:50Z",
+        "body": "About the docs, a PR is welcome."
+      }
+    ]
+  },
+  {
+    "number": 3190,
+    "title": "Breaking change between v8.1.0 and v8.1.1 when mapping to a dictionary",
+    "created_at": "2019-08-12T17:42:02Z",
+    "closed_at": "2019-08-12T17:53:23Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3190",
+    "body": "Hello,\r\n\r\nI meant to post this a while ago when 8.1.1 was released but I got caught up in things at work so I never got a chance. I'm not sure if this was an intentional breaking change or not, but there was a breaking change in 8.1.1 when mapping from a collection of Key/Values to a Dictionary (the Key/Value type is not `KeyValuePair` because it is an EF entity).\r\n\r\n### Expected behavior\r\nIn 8.1.0 of AutoMapper, this mapping worked without any issues. It would map the Key/Values into the Dictionary.\r\n\r\n### Actual behavior\r\nIn 8.1.1, the following error is thrown:\r\n\r\n```\r\nAutoMapperMappingException: Error mapping types.\r\n\r\nMapping types:\r\nOrder -> OrderModel\r\nUserQuery+Order -> UserQuery+OrderModel\r\n\r\nType Map configuration:\r\nOrder -> OrderModel\r\nUserQuery+Order -> UserQuery+OrderModel\r\n\r\nDestination Member:\r\nAttributes\r\n```\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\nvoid Main()\r\n{\r\n    var services = new ServiceCollection();\r\n    services.AddAutoMapper(this.GetType().Assembly);\r\n    \r\n    using var root = services.BuildServiceProvider();\r\n    var mapper = root.GetRequiredService<IMapper>();\r\n    \r\n    var model = mapper.Map<OrderModel>(new Order\r\n    {\r\n        OrderNumber = \"PO1001\",\r\n        Attributes =\r\n        {\r\n            new Order.Attribute { Key = \"Key1\", Value = \"Value1\" },\r\n            new Order.Attribute { Key = \"Key2\", Value = \"Value2\" },\r\n        }\r\n    });\r\n}\r\n\r\npublic class Order\r\n{\r\n    public String OrderNumber { get; set; }\r\n    public ICollection<Attribute> Attributes { get; set; } = new HashSet<Attribute>();\r\n\r\n    public class Attribute\r\n    {\r\n        public String Key { get; set; }\r\n        public String Value { get; set; }\r\n    }\r\n}\r\n\r\npublic class OrderModel\r\n{\r\n    public String OrderNumber { get; set; }\r\n    public IDictionary<String, String> Attributes { get; set; } = new Dictionary<String, String>();\r\n}\r\n\r\npublic class Profile : AutoMapper.Profile\r\n{\r\n    public Profile()\r\n    {\r\n        this.CreateMap<Order, OrderModel>();\r\n    }\r\n}\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3190/comments",
+    "author": "ChristopherHaws",
+    "comments": [
+      {
+        "user": "ChristopherHaws",
+        "created_at": "2019-08-12T18:06:57Z",
+        "body": "@lbargaoanu This issue still occurs in v9."
+      },
+      {
+        "user": "jbogard",
+        "created_at": "2019-08-14T12:46:00Z",
+        "body": "The `Order.Attribute` type is unknown to AutoMapper. Previously, we would create dynamic maps on the fly. We turned that off, then removed dynamic maps, since you could have misspelled or changed the `Order.Attribute` type and your mapping would silently skip those properties.\r\n\r\nYou need to create a map from your custom type to the KeyValuePair type:\r\n\r\n```c#\r\npublic class Profile : AutoMapper.Profile\r\n{\r\n    public Profile()\r\n    {\r\n        this.CreateMap<Order, OrderModel>();\r\n        this.CreateMap<Order.Attribute, KeyValuePair<string, string>>();\r\n    }\r\n}\r\n```"
+      }
+    ]
+  }
+]

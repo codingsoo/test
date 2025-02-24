@@ -1,0 +1,101 @@
+[
+  {
+    "id": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/678",
+    "source": {
+      "issue_number": 678
+    },
+    "initial_question": {
+      "title": "image for notifycation ",
+      "body": "please.\nHow can the ImageLoader be used to load images on an notification?\nBecause the displayImage method takes an ImageView as parameter and in a widget we have to use RemoteViews.\nThanks.\n"
+    },
+    "satisfaction_conditions": [
+      "Images must successfully load and display in notifications",
+      "Solution must handle RemoteViews compatibility",
+      "Integration with existing ImageLoader functionality"
+    ],
+    "created_at": "2014-07-09T07:59:57Z"
+  },
+  {
+    "id": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/575",
+    "source": {
+      "issue_number": 575
+    },
+    "initial_question": {
+      "title": "Thumbnail Image for large Image",
+      "body": "I have a gridview that will load huge images. When loading to grid I can load small Image s by setting up \n.cacheOnDisc(true)\nand \n.discCacheExtraOptions(408, 306, CompressFormat.JPEG, 75, null)\n\nThis will create an image of 408x306 in disk cache. But when I select an image in the view and open the image in a viewpager the cache image will be used, But what if I want to load the image that fit the display size?\n(// default = device screen dimensions)\n\nIs there any way to achieve this?\n"
+    },
+    "satisfaction_conditions": [
+      "Grid view must display optimized thumbnail images at 408x306 resolution",
+      "ViewPager must display full-resolution images that fit the display size",
+      "Both thumbnail and full-resolution versions must be accessible simultaneously",
+      "Image loading system must handle different cache requirements for different views",
+      "System must maintain efficient memory usage while handling both image sizes"
+    ],
+    "created_at": "2014-03-30T15:47:57Z"
+  },
+  {
+    "id": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/569",
+    "source": {
+      "issue_number": 569
+    },
+    "initial_question": {
+      "title": "one uncertainty on single inheritance in Universal-Image-Loader",
+      "body": "Recently, I was reading the source codes of Universal-Image-Loader, And I found an interesting question on inheritance in Java. We know that the multiple inheritance is not allowed in Java. Java designers replaced the concept of multiple inheritance by that of interface. In the release 1.9.1 of Universal-Image-Loader, the interface called BlockingDeque in the package of com.nostra13.universalimageloader.core.assist.deque extends two parent class, BlockingQueue and Deque, but Eclipse does't show any wrong information about it. So I am confused about it. Does someone else ever notice this??\n"
+    },
+    "satisfaction_conditions": [
+      "Clarify the distinction between class inheritance and interface inheritance in Java",
+      "Explain why BlockingDeque extending multiple interfaces is valid Java syntax"
+    ],
+    "created_at": "2014-03-19T06:46:49Z"
+  },
+  {
+    "id": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/455",
+    "source": {
+      "issue_number": 455
+    },
+    "initial_question": {
+      "title": "delete the specified cache",
+      "body": "When I want to delete the specified cache, I wrote this code:\n\n``` java\n    public void clearCache(String uri, ImageView imageView) {\n        ImageSize targetSize = ImageSizeUtils.defineTargetSizeForView(\n                new ImageViewAware(imageView), getMaxImageSize());\n        String memoryCacheKey = MemoryCacheUtil.generateKey(uri, targetSize);\n\n        imageLoader.getMemoryCache().remove(memoryCacheKey);\n\n        File file = imageLoader.getDiscCache().get(uri);\n        if (file != null) {\n            file.delete();\n        }\n    }\n\n    ImageSize getMaxImageSize() {\n        DisplayMetrics displayMetrics = context.getResources()\n                .getDisplayMetrics();\n\n        int width = maxImageWidthForMemoryCache;\n        if (width <= 0) {\n            width = displayMetrics.widthPixels;\n        }\n        int height = maxImageHeightForMemoryCache;\n        if (height <= 0) {\n            height = displayMetrics.heightPixels;\n        }\n        return new ImageSize(width, height);\n    }\n```\n\nCould you provide a similar interface in \"ImageLoader.java\"??\n"
+    },
+    "satisfaction_conditions": [
+      "Cache entries associated with the specified URI must be removed from memory cache",
+      "Cache entries associated with the specified URI must be removed from disk cache",
+      "Cache key generation must account for image dimensions",
+      "Cache clearing operation must handle both existing and non-existing cache entries"
+    ],
+    "created_at": "2013-11-20T03:34:17Z"
+  },
+  {
+    "id": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/339",
+    "source": {
+      "issue_number": 339
+    },
+    "initial_question": {
+      "title": "Why use WeakReference?",
+      "body": "in the ImageLoadingInfo\n\nWhether it will lead to frequent GC?  use softReference?\n"
+    },
+    "satisfaction_conditions": [
+      "Reference type allows ImageView objects to be garbage collected when no longer needed",
+      "Reference implementation matches the desired garbage collection behavior",
+      "Memory management strategy is appropriate for image loading use case"
+    ],
+    "created_at": "2013-07-22T06:54:20Z"
+  },
+  {
+    "id": "https://github.com/nostra13/Android-Universal-Image-Loader/issues/123",
+    "source": {
+      "issue_number": 123
+    },
+    "initial_question": {
+      "title": "Does Android-Universal-Image-Loader support Asset folder?",
+      "body": "Hi nostra13,\n\nI was going to use this lib in my project, but after some searches, I couldn't figure out how to use this lib to load images from assets folder, even when I used \"file:///android_asset/... , it didn't work.\n\n``` java\n        mImageLoader.displayImage(\"file:///android_asset/\" + path, \n                iv, Const.displayImageOptions, \n                new SimpleImageLoadingListener()\n        {\n            @Override\n            public void onLoadingComplete(Bitmap loadedImage) {\n                Animation anim = AnimationUtils\n                        .loadAnimation(mContext, R.anim.fade_in);\n                iv.setAnimation(anim);\n                anim.start();\n            }\n        }); \n```\n\nIf it's possible, could you provide me some code? or even if I have to customized some code myself, please let me know how to do it.\n\nThanks in advance and sorry for my bad English :)\n"
+    },
+    "satisfaction_conditions": [
+      "Images from Android assets folder load and display successfully",
+      "Correct URI scheme is used for asset references",
+      "Support for asset subfolder navigation",
+      "Compatible with ImageLoader configuration system"
+    ],
+    "created_at": "2012-12-17T18:14:47Z"
+  }
+]

@@ -1,0 +1,186 @@
+[
+  {
+    "id": "https://github.com/reduxjs/redux/issues/1714",
+    "source": {
+      "issue_number": 1714
+    },
+    "initial_question": {
+      "title": "Dispatch a redux action from an external javascript module",
+      "body": "Hi guys,\nI'm working on a react/redux application, which makes use of an external module (written in plain javascript):\n\n``` javascript\nmodule.exports = {\n    ...\n    // Some functions here..\n    someFunction () {\n        dispatch(setSomething());\n    }\n    ...\n};\n```\n\nI need to dispatch an action on the existing store, previously built and linked to the React application. \nWhat's the best way?\n\nThank you\n"
+    },
+    "satisfaction_conditions": [
+      "External module must have access to the dispatch function",
+      "Dispatch calls from the external module must affect the Redux store state",
+      "Module remains decoupled from Redux store implementation",
+      "Solution maintains testability of the external module"
+    ],
+    "created_at": "2016-05-11T09:17:36Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/1390",
+    "source": {
+      "issue_number": 1390
+    },
+    "initial_question": {
+      "title": "Component Loading",
+      "body": "I'm curious about best practices for my use-case (which I believe is probably very common). It's combination of `react`, `redux`, `react-router` but I believe the discussion is best suited for `redux`\n\nDocumentation and guides are very vague when it comes to component-to-component communication (of a non parent-child nature). Imagine using `react-router` where the overall page is derived of nested layout components such as\n\n``` js\nReactDOM.render((\n    <Router>\n        <Route component={DefaultLayout}>\n            <Route path=\"foo\" component={FooLayout}>\n                <Route path=\"products\" component={Products}>\n                <Route path=\"users\" component={Users}>\n                <Route path=\"widgets\" component={Widgets}>\n            </Route>\n        </Route>\n    </Router>\n), document.getElementById('app'))\n```\n\n`DefaultLayout` looks like this:\n\n``` js\nexport default React.createClass({\n    render: function() {\n        return (\n            <div className=\"default-layout\">\n                <div class=\"receive-any-component\"></div>\n                <main>\n                    {this.props.children}\n                </main>\n            </div>\n        )\n    }\n})\n```\n\nFor the sake of this example, `FooLayout` (loaded into `this.props.children`) can be any sub layout you want to imagine. \n\nAll three routes: `/products`, `/users`, or `/widgets` have a button in their component. When clicked, it will load a whole new component into the `DefaultLayout`'s `<div class=\"receive-any-component\"></div>` section. For example\n\n`Products` component:\n\n``` js\nimport store from 'path/to/store'\n\nexport default React.createClass({\n    render: function() {\n        return (\n            <div className=\"product\">\n                Lorem ipsum...\n                <button onClick={this.onClick}>Click Me</button>\n            </div>\n        )\n    },\n    onClick: function() {\n        // There are several ways to have a component loaded DefaultLayout's\n        // div.receive-any-component\n    }\n})\n```\n\nThis whole example is over simplified. I'm using `react-redux` in the real thing. Official react docs only say one small bit on this type of use-case:\n\n> For communication between two components that don't have a parent-child relationship, you can set up your own global event system. Subscribe to events in componentDidMount(), unsubscribe in componentWillUnmount(), and call setState() when you receive an event. Flux pattern is one of the possible ways to arrange this.\n\nSo, I understand that I can use Redux to dispatch info whereby `DefaultLayout` is subscribed, but I need to load a whole component into `DefaultLayout`. It would seem to me there are two basic options, neither of which I feel are correct.\n## Option One\n\nHave our `Product` component dispatch the component we want to load:\n\n``` js\nimport store from 'path/to/store'\nconst componentToLoad = (\n    <Whatever />\n)\n\nexport default React.createClass({\n    render: function() {\n        return (\n            <div className=\"product\">\n                Lorem ipsum...\n                <button onClick={this.onClick}>Click Me</button>\n            </div>\n        )\n    },\n    onClick: function() {\n        store.dispatch({\n            type: 'LOAD',\n            component: componentToLoad\n        })\n    }\n})\n```\n\nUltimately, I'd like the `DefaultLayout` to be unaware of what components it's loading, so this solution works out in that regards. But sending a component into `redux` just seems so wrong, but it works.\n## Option Two\n\nInstead of dispatching a component, dispatch some state that indicates which component should be loaded. In this case, it would seem that `DefaultLayout` would have to `import` every possible component it might need to load (which in my real usecase is many), then subscribe to our state and use a switch statement to determine which one of our loaded components should be placed into `.receive-any-component`. This feels better from the `redux` end but feels crappy that `DefaultLayout` is aware of every possible component that it might need to load.\n\nI'm not new to JS, but somewhat new to React/Redux. What am I missing?\n\nAnd I apologize this question is so long. It's difficult for me to describe this any other way\n"
+    },
+    "satisfaction_conditions": [
+      "Components must be able to trigger content changes in non-child components",
+      "The state management solution must maintain data serializability",
+      "The layout component must remain decoupled from specific content components",
+      "Component loading must work within the established routing structure",
+      "The solution must scale to handle multiple different components"
+    ],
+    "created_at": "2016-02-11T18:33:07Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/1000",
+    "source": {
+      "issue_number": 1000
+    },
+    "initial_question": {
+      "title": "Mocking nested smart components with mocha",
+      "body": "Hi,\n\nI'm trying to test a \"smart\" connected component that has another connect'ed child inside.\nPreparing a store for the test and providing it directly\n\n``` js\nTestUtils.renderIntoDocument(\n    <SmartParent store={store} />\n);\n```\n\nand SmartParent has `<SmartChild />` in it that throws an exception like `Either wrap the root component in a <Provider>, or explicitly pass \"store\"...`\n\nI know there's `rewire`, but I couldn't manage babel\\webpack\\karma\\rewire setup easily, so I went with making the `SmartChild` dumb for now. But I really would like to figure testing thing out.\nAny hints on this? Maybe some working examples?\n\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Redux store must be accessible to all connected components in the test environment",
+      "Test setup must allow rendering of nested connected components without throwing Provider-related exceptions",
+      "Testing setup must maintain component hierarchy and relationships",
+      "Solution must work within standard testing frameworks (TestUtils/Mocha)"
+    ],
+    "created_at": "2015-11-03T21:27:00Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/872",
+    "source": {
+      "issue_number": 872
+    },
+    "initial_question": {
+      "title": "Why does this work?",
+      "body": "So, after literally hours of moving things around, trudging through docs, etc., I finally got this to work:\n\n``` js\nconst middleware = compose(\n  applyMiddleware(promise, thunk),\n  devTools(),\n  persistState(window.location.href.match(/[?&]debug_session=([^&]+)\\b/)),\n);\n\n// You may call this a finalCreateStore\nconst store = middleware(createStore)(reducer); // reducer is already combined up the chain\n...\n```\n\nSo...\n- What gets `compose`d vs. `applyMiddleware`d?\n- Why can't I `compose(promise, thunk, devTools(), persist(...))`?\n- Why can't I `applyMiddleware(promise, thunk, devTools())`\n- Why can't I do `compose(..., createStore, reducer)`?\n\nSorry if these are \"newbie\" questions, but my take was that things are either `actions`, `actionCreators`, `reducers`, or `middleware`, so I thought all of the above was middleware?\n"
+    },
+    "satisfaction_conditions": [
+      "Store enhancers and middleware must be applied in the correct hierarchical order",
+      "Middleware must be wrapped by a store enhancer function",
+      "The final composition must return a valid store creator function",
+      "Store enhancer composition must preserve the ability to modify store behavior",
+      "The composition order must allow for proper middleware execution sequence"
+    ],
+    "created_at": "2015-10-08T19:34:12Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/816",
+    "source": {
+      "issue_number": 816
+    },
+    "initial_question": {
+      "title": "Sanity checks in production builds",
+      "body": "I was nosing around and I noticed that the sanity checks in `combineReducers` are invoking each reducer - not once, but twice upon boot! I figured this seems like an unnecessarily bottleneck during boot. It make sense in a development environment but is it really necessary in production? \n\nI was wondering if a \"santity checkless\" build is a common thing for libraries?\n"
+    },
+    "satisfaction_conditions": [
+      "Error detection remains consistent between development and production environments",
+      "Critical runtime errors are detected early in the application lifecycle",
+      "Performance impact remains negligible",
+      "Developer maintains ability to customize validation behavior",
+      "Stack traces remain meaningful and debuggable"
+    ],
+    "created_at": "2015-09-28T15:37:29Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/763",
+    "source": {
+      "issue_number": 763
+    },
+    "initial_question": {
+      "title": "Displaying time?",
+      "body": "I have a lot of components that update every seconds based on `Date.now()`. However, performing these updates through the redux stores makes dev-tools and logging extremely slow, spammed and unusable.\n\nDoes anyone have any suggestions on how one can handle this in the best way?\n\nOne way I was thinking about was that the components themselves have a time subscription that calls `setState` with the current time, i.e. time updates are local to the component. The time has (mostly) no logical meaning only visual.\n"
+    },
+    "satisfaction_conditions": [
+      "Time updates do not overload Redux dev tools or logging",
+      "Components display continuously updating time values",
+      "Time-related display updates are handled separately from business logic state"
+    ],
+    "created_at": "2015-09-20T15:30:54Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/621",
+    "source": {
+      "issue_number": 621
+    },
+    "initial_question": {
+      "title": "Problem with componentWillMount on connected component",
+      "body": "I have a problem with server rendering when use `componentWillMount` method for request data. Some of my requests are pre-fetched on server-side and some of them not.\nExample:\n\n``` javascript\n// HomePage container\nclass HomePage extends Component {\n  static willRender = store => {\n    // I don't want fetch anything - let's client do this job\n  }\n\n  componentWillMount() {\n    this.props.fetchSongs();\n    this.props.fetchAlbums();\n    this.props.fetchBands();\n  }\n\n  ...\n}\n\nexport default connect(select, mapDispatchToProps)(HomePage);\n```\n\nWhen server render markup client can not use it, I see this error in console:\n\n```\nWarning: React attempted to reuse markup in a container but the checksum was invalid. This generally means that you are using server rendering and the markup generated on the server was not what the client was expecting. React injected new markup to compensate which works but you have lost many of the benefits of server rendering. Instead, figure out why the markup being generated is different on the client or server:\n (client) eoa8oo3k.1.$/\"><div class=\"loader-block\"\n (server) eoa8oo3k.1.$/\"><div data-reactid=\".meeoa\n```\n\nAs I understand it's because this method invoked on the client side before rendering and on server side \"after\".\n"
+    },
+    "satisfaction_conditions": [
+      "Component lifecycle methods must be used appropriately for the rendering environment"
+    ],
+    "created_at": "2015-08-25T13:21:41Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/596",
+    "source": {
+      "issue_number": 596
+    },
+    "initial_question": {
+      "title": "store.dispatch() from Actions",
+      "body": "I'm working on an example that makes use of async state updates. In that app I'm trying to find the best place for dispatch (e.g. as in `redux-thunk`), and it just happens to make sense to use it from Actions. \n\nHere's a sample action just to illustrate. \n\n```\nimport { RECEIVE_LOCATION } from '../constants/Types';\nimport { defaultPosition } from '../constants/Geo';\nimport store from '../stores';\n\nfunction requestGeolocation() {\n  return function(dispatch) {\n    navigator.geolocation.getCurrentPosition(function(position) {\n      dispatch({\n        type: RECEIVE_LOCATION,\n        coords: {\n          latitude: position.coords.latitude,\n          longitude: position.coords.longitude,\n          inProgress: false,\n        },\n      });\n    });\n  };\n}\n\nexport function getGeolocation() {\n  if (!navigator.geolocation) {\n    return store.dispatch({\n      type: RECEIVE_LOCATION,\n      ...defaultPosition,\n    });\n  }\n  return store.dispatch(requestGeolocation());\n}\n```\n\nObviously `dispatch` didn't come from a view when firing `getGeolocation()`, which is why I'm looking to hear about your take on this approach. This kind of makes sense to me only for the agnostic components where I don't expect bound actions received through props (e.g. `<GeoButton />` that cares less about anything other than triggering that action)\n\nSo my question is, would this pattern break the basic Redux principles?\n"
+    },
+    "satisfaction_conditions": [
+      "Action creators must be able to handle asynchronous operations",
+      "Redux store access pattern must maintain application universality",
+      "Components must be able to trigger state updates without direct store access",
+      "Action creators must handle both success and fallback scenarios",
+      "Components must be able to remain 'dumb' if desired"
+    ],
+    "created_at": "2015-08-21T08:01:26Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/584",
+    "source": {
+      "issue_number": 584
+    },
+    "initial_question": {
+      "title": "Best practise of handling normalised Entities?",
+      "body": "In my first App with Redux, I am trying to keep my collections normalised as recommended. This way you only have to change the Entities in one place. (this feels right to me)\n\nAt first i successfully normalised my Array of data to an Array-like-Object of Entities with the id's as key's\n\nThen i wanted to list the entities in a View, so i had to parse it back to an Array. Also if i want to filter my Entities, i need the real Array. <b>Is this really the right approach? </b>\n\nExample with re-select:\n\n``` javascript\n    // As \"id\" for my images i use \"uri\"\n\n    imageEntities = {\n     uri1: {image...},\n     uri2: {image...},\n    ....\n    }\n\n    // Selectors:\n    const imagesSelector = state => state.images;\n\n    // parse the Array-like-Object to an Array\n    const imagesArySelector = createSelector(\n      [imagesSelector],\n          images => {\n            let ary = [];\n            for (var key in images) {\n              if (images.hasOwnProperty(key)) {\n                ary.push(images[key]);\n              }\n             }\n            return ary;\n          }\n     );\n\n    // filter the Array to get only the new images\n    export const newImagesSelector = createSelector(\n      [imagesArySelector],\n        images => images.filter(image => image.isNew)\n     );\n```\n\n<b>Is this really the right approach? </b> (it is working fine, from what i see until now)\n"
+    },
+    "satisfaction_conditions": [
+      "Data must maintain normalized structure in store while being accessible in array format when needed",
+      "Transformation from normalized state to array must preserve all entity data",
+      "Solution must support filtering operations on the data"
+    ],
+    "created_at": "2015-08-19T21:29:56Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/421",
+    "source": {
+      "issue_number": 421
+    },
+    "initial_question": {
+      "title": "Showing notifications from reducers",
+      "body": "Hey, \nI'm still trying to wrap my head around redux.\n\nNow, I've created a store that would trigger notifications:\n\n``` javascript\nimport {\n   CRUD_SAVE_SUCCESS,\n} from '../actions/action-types';\n\nconst initialState = {\n};\n\nexport default function notification(state = initialState, action = {}) {\n   console.log(\"Trigger\", action.type);\n   switch (action.type) {\n      case CRUD_SAVE_SUCCESS:\n         window.addNotification({\n            message: \"Saved.\",\n            level: \"success\",\n            title: \"Status\"\n         });\n         return state;\n      default:\n         return state;\n   }\n}\n\n```\n\nProblem is, a new notification is created every time the state changes. The console log showed to me, that every time the state changes, all previous actions are re-triggered. This results in a new notification for each state-change for each time `CRUD_SAVE_SUCCESS` is called, so 2 calls result in 2 notifications the next time `SOME_ACTION` is triggered. \n\nIs that the normal behaviour? Or might I have a bug somewhere in my code? Any idea how I could solve that problem?\n\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "State updates remain consistent",
+      "Asynchronous operations complete successfully"
+    ],
+    "created_at": "2015-08-07T15:06:21Z"
+  },
+  {
+    "id": "https://github.com/reduxjs/redux/issues/391",
+    "source": {
+      "issue_number": 391
+    },
+    "initial_question": {
+      "title": "Question: where this the place for keeping \"isLoading\" state?",
+      "body": "Hello. Thanks for a perfect work and very useful tool!\nWe are trying to use it in our project and meet a next difficult situation:\n\nwe have a movies collection in our project. movies could be recommendation, new releases, free, etc. How should we construct our store for keep all of this types and movies and how we detect that free movies are loading but new releases already loaded? All of this collections are paginated.\n\nfor example movies reducer:\n\n``` javascript\nconst initialState = {\n  allMovies: {}, // id => movie\n  free: [], // id\n  releases: [], // id\n  ...,\n  search: new Map() // {search query} => [id1, id2, ...]\n};\n\nexport default function movies(state = initialState, action) {\n  const movies = selectn('payload.entities.movies', action);\n  const ids = selectn('payload.result.movies', action);\n\n  switch (action.type) {\n  case RECEIVED_NEW_RELEASES:\n    // add movies and return new state\n\n  case RECEIVED_FREE_MOVIES:\n    // add movies and return new state\n  default:\n   // return state\n  }\n}\n```\n\nSo, how can I detect that my request for free movies is in process or finished? Where this state should be placed?\n"
+    },
+    "satisfaction_conditions": [
+      "Loading state must be tracked separately for each movie collection type",
+      "Loading state must persist across pagination requests",
+      "Loading state must be accessible from the same store as the movie data",
+      "State structure must maintain separation between movie data and loading metadata"
+    ],
+    "created_at": "2015-08-04T08:32:44Z"
+  }
+]

@@ -1,0 +1,139 @@
+[
+  {
+    "number": 48748,
+    "title": "Blazor WebAssembly not caching in browser",
+    "created_at": "2023-06-13T06:09:15Z",
+    "closed_at": "2023-06-13T10:30:43Z",
+    "labels": [
+      "question",
+      "area-blazor",
+      ":heavy_check_mark: Resolution: Answered",
+      "Status: Resolved"
+    ],
+    "url": "https://github.com/dotnet/aspnetcore/issues/48748",
+    "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Describe the bug\n\nBlazor WebAssembly is caching libraries to browser's Cache Storage only on localhost access.\r\n\r\nWhen i was starting to develop WASM project, i've inspected browser cache to make sure that dotnet and other libraries are cached and next startups are faster (sha checks, returned statuses 204, cache is used). This works well. But after publishing the project to IIS hosting and accessing the page over the internet, libraries are never stored in browser cache. So effectively, libraries are always downloaded. Running browser on the same machine where the IIS is located works and libraries are cached (same as running browser directly from VS in development). I've tried this on default projects in .net6 and .net7 and the behaviour is the same.\r\n\r\nI must be missing something basic here...\n\n### Expected Behavior\n\nLibraries are cached to browser regardless if the page is accessed localy or remotely over the internet.\n\n### Steps To Reproduce\n\nIn VS:\r\n\r\n- create new \"Blazor WebAssembly App\"\r\n- check off \"Configure for HTTPS\"\r\n- publish (i'm using just the directory publish with manual copy of files to created web page on iis)\n\n### Exceptions (if any)\n\n_No response_\n\n### .NET Version\n\n7.0.302\n\n### Anything else?\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/dotnet/aspnetcore/issues/48748/comments",
+    "author": "ns6000",
+    "comments": [
+      {
+        "user": "javiercn",
+        "created_at": "2023-06-13T10:18:52Z",
+        "body": "@ns6000 thanks for contacting us.\r\n\r\nCaching depends on the caching APIs that are only available in secure context. We don't do caching over HTTP because the APIs are not available."
+      }
+    ]
+  },
+  {
+    "number": 24054,
+    "title": "[Blazor] execute check at high level to redirect to another page",
+    "created_at": "2020-07-17T12:03:22Z",
+    "closed_at": "2020-07-17T14:08:39Z",
+    "labels": [
+      "question",
+      "area-blazor",
+      ":heavy_check_mark: Resolution: Answered",
+      "Status: Resolved"
+    ],
+    "url": "https://github.com/dotnet/aspnetcore/issues/24054",
+    "body": "hello guys, i have some trouble with my blazor webassembly webapp when the user decide to refresh the page (with f5 for example).\r\n\r\nI can't maintain a stable state concerning my data so if its happen i prefer disconnect him and and redirect him to the login page.\r\n\r\nim able to suscribe to the onload js event and call method of one to my component to disconnect the user, it work. but in this method, if i try to redirect to the login page with the NavigationManager its not work (it stay on the current page, no redirection)\r\n\r\nI try another way, in my layout on the OnInitialized method i check if my user is not connected and if im not on the login page, if its the case i redirect to the login page. It works, but the problem is the current page will run her lifecycle with inconsistend data so it will sometimes crash. So there is a way to do that at another level to be sure the current page will not be loaded ? \r\n\r\nI wait for yours suggestions, don't hesitate if you have better idea to achieve what i want !\r\n\r\nthanks !",
+    "comments_url": "https://api.github.com/repos/dotnet/aspnetcore/issues/24054/comments",
+    "author": "julienGrd",
+    "comments": [
+      {
+        "user": "julienGrd",
+        "created_at": "2020-07-17T13:56:22Z",
+        "body": "> @julienGrd thanks for contacting us.\r\n> \r\n> I would suggest you do this directly within the App.razor component. Wouldn't that be simpler for you than having to deal with the layout and other concerns?\r\n\r\nYes it can be ! how i can do that ? for me the app.razor contains only the main point of the app without code.\r\n\r\nthis is my actual App.razor\r\n````\r\n<Router AppAssembly=\"typeof(Program).Assembly\">\r\n    <Found Context=\"routeData\">\r\n        <RouteView RouteData=\"routeData\" DefaultLayout=\"typeof(Components.Layouts.MainLayout)\" />\r\n    </Found>\r\n    <NotFound>\r\n        <LayoutView Layout=\"@typeof(Components.Layouts.MainLayout)\">\r\n            <Is.Geckos.Blazor.Client.Components.Pages.Main.PageFallBack />\r\n        </LayoutView>\r\n        \r\n    </NotFound>\r\n</Router>\r\n````"
+      },
+      {
+        "user": "javiercn",
+        "created_at": "2020-07-17T13:59:16Z",
+        "body": "@julienGrd define a `@code` block, inject NavigationManager, check the Url property on it within `OnInitialize` and trigger the navigation?"
+      }
+    ]
+  },
+  {
+    "number": 21226,
+    "title": "Checkbox keep checked, after List Updated and StateHasChanged() method is called",
+    "created_at": "2020-04-27T06:26:30Z",
+    "closed_at": "2020-04-27T15:34:47Z",
+    "labels": [
+      "question",
+      "area-blazor",
+      ":heavy_check_mark: Resolution: Answered",
+      "Status: Resolved"
+    ],
+    "url": "https://github.com/dotnet/aspnetcore/issues/21226",
+    "body": "Hi, I have this code in Blazor :\r\n\r\n```\r\n@foreach (var item in list)\r\n{\r\n <input type=\"checkbox\" @onchange=\"@(e => HandleCheckChanged(e, item.Name))\" checked=\"@item.IsChecked\">\r\n}\r\n\r\nprivate async Task HandleCheckChanged(ChangeEventArgs e, string itemName)\r\n{\r\n   // do something ...\r\n   StateHasChanged();\r\n}\r\n```\r\nif I check a checkbox it calls the HandleCheckChanged and the checkbox is checked\r\nBut if I change the list items the previews checked checkbox is still checked and is not updated based on the new list items.\r\n\r\nfor example suppose that I have a list of ordered numbers {1-20} I follow these steps :\r\n1 : list = GetAll().Where(c => c.Id < 10);\r\n2 : I check the first checkbox (number 1)\r\n3 : list = GetAll().Where(c => c.Id >= 10); (list updated and state has changed)\r\n4 : the problem raises here , checkbox 11 is checked ??? but its value is false\r\nIt seems that DOM does not follow the Component's State ",
+    "comments_url": "https://api.github.com/repos/dotnet/aspnetcore/issues/21226/comments",
+    "author": "webebox",
+    "comments": [
+      {
+        "user": "javiercn",
+        "created_at": "2020-04-27T14:40:33Z",
+        "body": "@webebox thanks for contacting us.\r\n\r\nSeveral things here, I don't think you need to be calling `StateHasChanged` in your handler. The framework will do that for you automatically. You likely need to use `@key` to have the behavior you want, since otherwise Blazor tries to find the minimal change needed to update the UI and that might not have the effect you expect."
+      }
+    ]
+  },
+  {
+    "number": 15161,
+    "title": "RenderFragment ignores component's initialized values",
+    "created_at": "2019-10-18T18:11:31Z",
+    "closed_at": "2019-10-21T11:22:27Z",
+    "labels": [
+      "question",
+      "area-blazor"
+    ],
+    "url": "https://github.com/dotnet/aspnetcore/issues/15161",
+    "body": "`RenderFragment` ignores my initialized values.  In the following code, everytime there's a mouse click, a new object is created with the mouse coordinates where the click occurred.  During the rendering section in razor, the markup is generated as expected, but the `Coordinate` parameter is zero. The `CustomText` doesn't have this issue.\r\n\r\nThis is clearly a bug since it is unexpected and inconsistent. On a side note, why is `RenderFragment` emitting \"<!--!-->\"?\r\n\r\n```\r\n<div><!--!-->\r\n        <!--!--><div>Before the component</div>\r\n        <!--!--><!--!--><text x=\"0\" y=\"0\">Custom Text</text><!--!-->\r\n        <!--!--><div>Afterthe component</div>\r\n    </div>\r\n```\r\n\r\n```\r\nTextDesignObject.razor\r\n-----------------------\r\n@Markup\r\n\r\n@code\r\n{\r\n        public MarkupString Markup { get; private protected set; }\r\n\r\n        public string Style { get; set;  }\r\n        private PointF _coordinate;\r\n        [Parameter]\r\n        public PointF Coordinate { get => _coordinate; set { Console.WriteLine(\"Coordinate setter called\");  _coordinate = value; } }\r\n\r\n    public string CustomText { get; set; } = \"Custom Text\";\r\n    public string FontStyle { get; }\r\n\r\n    protected override void OnInitialized() {\r\n        var svgString = new string(\"<text x=\" + Coordinate.X + \" y=\" + Coordinate.Y + \">\" + CustomText + \"</text>\");\r\n        Markup = new MarkupString(svgString.ToString());\r\n    }\r\n}\r\n\r\nDesigner.razor\r\n---------------\r\n@foreach (var designObject in ToolService.DesignObjects)\r\n{\r\n    Console.WriteLine(\"Binding MouseCoordinate to DesignObject...\");\r\n    RenderFragment renderFragment = builder =>\r\n    {\r\n        builder.OpenComponent(0, designObject.GetType()); \r\n        builder.CloseComponent();\r\n    };\r\n    <div>\r\n        <div>Before the component</div>\r\n        @renderFragment\r\n        <div>After the component</div>\r\n    </div>\r\n}\r\n\r\n\r\n@code {\r\n    [Parameter]\r\n    // Create a new design object based on selected tool\r\n    private void OnDesignPanelClicked(MouseEventArgs e)\r\n    {\r\n        Console.WriteLine(\"CallingCreateDesignObject...\");\r\n        var designObject = ToolService.SelectedTool.CreateDesignObject();\r\n        if (designObject == null) return;\r\n        \r\n        Console.WriteLine(\"Setting design object to mouse coordinates.\");\r\n        designObject.Coordinate = new PointF((float) e.ClientX,  (float) e.ClientY);\r\n        Console.Write(designObject.Coordinate);\r\n        \r\n        Console.WriteLine(\"Adding new DesignObject\");\r\n        ToolService.DesignObjects.Add(designObject);\r\n    }\r\n}\r\n\r\n```",
+    "comments_url": "https://api.github.com/repos/dotnet/aspnetcore/issues/15161/comments",
+    "author": "Joebeazelman",
+    "comments": [
+      {
+        "user": "javiercn",
+        "created_at": "2019-10-21T11:21:41Z",
+        "body": "@Joebeazelman Thanks for contacting us.\r\n\r\nYou are not passing in the designObject instance in the render fragment, you are only passing the type.\r\nThe coordinate is the default value because you are not passing it as a parameter inside the RenderFragment (which would be the appropriate way to do it).\r\nThe text is set in the property setter to a default value and its not defined as a parameter, so its value will always be constant.\r\n\r\nYou can't pass in a component instance directly in Blazor as that breaks the Blazor rendering model where Blazor itself is responsible for the lifecycle of the components.\r\n\r\nTo achieve your scenario I suggest you separate your component from your component model and iterate over the list of component models and pass in the parameters to the underlying components from the associated component model.\r\n\r\nI would also suggest (based on what I infer you are trying to do, that you give each component a unique identity using `@key=componentModel.key` which will help the renderer produce a better result according to what you are trying to implement.\r\n\r\nI would also discourage you from using `MarkupString` directly as that will open an attack vector for XSS.\r\n\r\n```\r\nDesigner.razor\r\n---------------\r\n@foreach (var designObject in ToolService.DesignObjects)\r\n{\r\n    RenderFragment renderFragment = builder =>\r\n    {\r\n        builder.OpenComponent(0, designObject.ComponentType);\r\n        builder.SetKey(designObject.Key);\r\n        builder.AddAttribute(1, designObject.Coordinates);\r\n        builder.CloseComponent();\r\n    };\r\n    <div>\r\n        <div>Before the component</div>\r\n        @renderFragment\r\n        <div>After the component</div>\r\n    </div>\r\n}\r\n```\r\n\r\n"
+      }
+    ]
+  },
+  {
+    "number": 14699,
+    "title": "[Blazor] AuthorizeView Policy=<value> bug when <value> comes from variable",
+    "created_at": "2019-10-03T11:31:07Z",
+    "closed_at": "2019-10-03T16:14:21Z",
+    "labels": [
+      "question",
+      "area-blazor"
+    ],
+    "url": "https://github.com/dotnet/aspnetcore/issues/14699",
+    "body": "### Description\r\nIn **Blazor**, When trying to use tag `AuthorizeView Policy=<some-value>` with property value being a string variable, it does not behave the same as if property value was a raw string.\r\n\r\n### To Reproduce\r\nSteps to reproduce the behavior:\r\n1. Using this version of ASP.NET Core '3.0.1'\r\n2. Run this code \r\n```\r\n<AuthorizeView Policy=ADMINS_ONLY >\r\n    <Authorized>\r\n        Authorized...\r\n    </Authorized>\r\n    <NotAuthorized>\r\n        NotAuthorized\r\n    </NotAuthorized>\r\n</AuthorizeView>\r\n\r\n@code {\r\n    private string ADMINS_ONLY = \"AdminsOnly\";\r\n}\r\n```\r\n\r\n3. Should work like this \r\n```\r\n<AuthorizeView Policy=\"AdminsOnly\">\r\n    <Authorized>\r\n        Authorized...\r\n    </Authorized>\r\n    <NotAuthorized>\r\n        NotAuthorized\r\n    </NotAuthorized>\r\n</AuthorizeView>\r\n```\r\n\r\n4. See error\r\n`blazor.server.js:15 [2019-10-03T11:20:53.249Z] Error: There was an unhandled exception on the current circuit, so this circuit will be terminated. For more details turn on detailed exceptions in 'CircuitOptions.DetailedErrors'.`\r\n\r\n### Expected behavior\r\nThe AuthorizeView should call the AuthorizationHandler as provided by the policy setup (in this case: the policy named \"AdminsOnly\").\r\n\r\nUpdate: clearifying area of effect",
+    "comments_url": "https://api.github.com/repos/dotnet/aspnetcore/issues/14699/comments",
+    "author": "henkla",
+    "comments": [
+      {
+        "user": "rynowak",
+        "created_at": "2019-10-03T16:11:24Z",
+        "body": "String properties require the `@` to use variable/expressions. My guess is that this is passing the value `ADMINS_ONLY` into your `AuthorizeView` and not `AdminsOnly` as you expect.\r\n\r\nTry:\r\n```html\r\n<AuthorizeView Policy=\"@ADMINS_ONLY\">\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 10548,
+    "title": "Integrate javascript library in Razor ServerSide ends in endless requests to server",
+    "created_at": "2019-05-26T20:05:08Z",
+    "closed_at": "2019-05-31T17:26:25Z",
+    "labels": [
+      "question",
+      "area-blazor"
+    ],
+    "url": "https://github.com/dotnet/aspnetcore/issues/10548",
+    "body": "I would like to integrate fullcalendar.io into an application written using Blazor ServerSide components.\r\nThe code looks like this:\r\n\r\n```js\r\nwindow.ShowCalendar = (message) => {\r\n        var calendarEl = document.getElementById('calendar');\r\n\r\n        var calendar = new FullCalendar.Calendar(calendarEl, {\r\n          aspectRatio: 1.5,\r\n          header: {\r\n            left: 'prev,next',\r\n            center: 'title',\r\n            right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'\r\n          },\r\n          plugins: [ 'dayGrid', 'resourceTimeline' ],\r\n          defaultView: 'resourceTimelineDay',\r\n          resources: '/api/resources',\r\n          events: '/api/events'\r\n        });\r\n        calendar.render();\r\n      };\r\n```\r\n\r\n```razor\r\n@functions {\r\n    protected override async Task OnAfterRenderAsync()\r\n    {\r\n        await this.JsRuntime.InvokeAsync<string>(\"ShowCalendar\", \"\");\r\n\r\n        StateHasChanged();\r\n    }\r\n}\r\n```\r\n\r\nThe problem is that the api calls are continuously raised.\r\nWhat's the problem?\r\n\r\nI also tried to change it using JSInterop, but without success. Something like this:\r\n\r\n```js\r\nvar calendar = new FullCalendar.Calendar(calendarEl, {\r\n          aspectRatio: 1.5,\r\n          header: {\r\n            left: 'prev,next',\r\n            center: 'title',\r\n            right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'\r\n          },\r\n          plugins: [ 'dayGrid', 'resourceTimeline' ],\r\n          defaultView: 'resourceTimelineDay',\r\n          resources: DotNet.invokeMethodAsync(\"WebApplication.Views\", \"GetResourcesAsync\"),\r\n          events: DotNet.invokeMethodAsync(\"WebApplication.Views\", \"GetEventsAsync\")\r\n        });\r\n```\r\n\r\n```razor\r\n[JSInvokable]\r\n  public static async Task<CalendarEvent[]> GetEventsAsync()\r\n  {\r\n      return ...\r\n  }\r\n\r\n  [JSInvokable]\r\n  public static async Task<CalendarResource[]> GetResourcesAsync()\r\n  {\r\n      return ...\r\n  }\r\n```",
+    "comments_url": "https://api.github.com/repos/dotnet/aspnetcore/issues/10548/comments",
+    "author": "fleed",
+    "comments": [
+      {
+        "user": "kennywangjin",
+        "created_at": "2019-05-27T08:15:09Z",
+        "body": "I think you should stop calling `StateHasChanged` in OnAfterRenderAsync! Otherwise You would get infinite rendering: rendering=>OnAfterRenderAsync=>StateHasChanged=>again rendering."
+      }
+    ]
+  }
+]

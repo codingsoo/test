@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/deepseek-ai/Janus/issues/67",
+    "source": {
+      "issue_number": 67
+    },
+    "initial_question": {
+      "title": "Where is installition folder",
+      "body": "I cannot find model folders, it isnt in env"
+    },
+    "satisfaction_conditions": [
+      "Model files location is successfully identified",
+      "Location is appropriate for user's operating system"
+    ],
+    "created_at": "2025-01-28T17:03:31Z"
+  }
+]

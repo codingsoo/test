@@ -1,0 +1,387 @@
+[
+  {
+    "number": 2147,
+    "title": "Specify model name like \"claude-sonnet-latest\"",
+    "created_at": "2024-10-24T23:28:37Z",
+    "closed_at": "2024-10-31T21:58:52Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/2147",
+    "body": "### Issue\n\nI have these options in my config file to use o1-preview as my architect and claude-sonnet as my editor, \r\n\r\no1-preview: true\r\narchitect: true\r\neditor-model: claude-3-5-sonnet-20241022\r\n\r\nthis works, but it'd be great if I could say something like \"claude-sonnet-latest\" instead of that specific date version.  for example, it appears I can use the more generic model name \"gpt-4o\".  I'm guessing this is really just an artifact of how these api's work, but still it'd be nice if aider would abstract over that for me and let me just say somehow in my config \"use the latest, whatever that may be\".  \n\n### Version and model info\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/2147/comments",
+    "author": "jubishop",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-10-31T21:53:59Z",
+        "body": "Thanks for trying aider and filing this issue.\r\n\r\nYou can use `anthropic/claude-3-5-sonnet-latest`."
+      }
+    ]
+  },
+  {
+    "number": 1976,
+    "title": "Use a git repo in a different folder",
+    "created_at": "2024-10-08T16:07:27Z",
+    "closed_at": "2024-11-11T19:15:06Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/1976",
+    "body": "### Issue\n\nFirst off, thank you for this incredible tool.  It has changed my view of LLM's and made me appreciate them so much more!\r\n\r\nI'd like to use aider from a folder other than my git repo.  `git` itself has an option for this: `-C`.  Does aider have any support for this.\r\n\r\nMy use case is that I'm using direnv from a directory that is not the root of my git repo.  I want to use aider from this dir, too.  I can't just put direnv at the root of my repo because I have multiple different configurations I use for various tasks with this repo.\r\n\r\nWith other tools, there is an environmental variable I can use.  For example, PIPENV_PIPFILE for pipenv and PYTHONPATH.  \n\n### Version and model info\n\nLatest version of aider",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/1976/comments",
+    "author": "powelleric",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-11-08T21:11:35Z",
+        "body": "Sorry, yes you can do this. Just launch aider with the path to any file in the repo:\n\n\naider /path/to/any/file.txt"
+      }
+    ]
+  },
+  {
+    "number": 1834,
+    "title": "Uncaught NotFoundError in utils.py line 8071",
+    "created_at": "2024-09-30T04:57:30Z",
+    "closed_at": "2024-09-30T05:51:55Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/1834",
+    "body": "Aider version: 0.58.0\r\nPython version: 3.12.3\r\nPlatform: Linux-6.8.0-45-generic-x86_64-with-glibc2.39\r\nPython implementation: CPython\r\nVirtual environment: Yes\r\nOS: Linux 6.8.0-45-generic (64bit)\r\nGit version: git version 2.43.0\r\n\r\nAn uncaught exception occurred:\r\n\r\n```\r\nTraceback (most recent call last):\r\n  File \"openai.py\", line 907, in completion\r\n    raise e\r\n  File \"openai.py\", line 825, in completion\r\n    self.make_sync_openai_chat_completion_request(\r\n  File \"openai.py\", line 683, in make_sync_openai_chat_completion_request\r\n    raise e\r\n  File \"openai.py\", line 672, in make_sync_openai_chat_completion_request\r\n    raw_response = openai_client.chat.completions.with_raw_response.create(\r\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_legacy_response.py\", line 353, in wrapped\r\n    return cast(LegacyAPIResponse[R], func(*args, **kwargs))\r\n                                      ^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_utils.py\", line 274, in wrapper\r\n    return func(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^\r\n  File \"completions.py\", line 704, in create\r\n    return self._post(\r\n           ^^^^^^^^^^^\r\n  File \"_base_client.py\", line 1268, in post\r\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\r\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_base_client.py\", line 945, in request\r\n    return self._request(\r\n           ^^^^^^^^^^^^^^\r\n  File \"_base_client.py\", line 1049, in _request\r\n    raise self._make_status_error_from_response(err.response) from None\r\nopenai.NotFoundError: Error code: 404 - {'error': {'message': 'The model `o1-mini` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"main.py\", line 1419, in completion\r\n    raise e\r\n  File \"main.py\", line 1372, in completion\r\n    response = openai_o1_chat_completions.completion(\r\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"o1_handler.py\", line 58, in completion\r\n    response = super().completion(\r\n               ^^^^^^^^^^^^^^^^^^^\r\n  File \"openai.py\", line 914, in completion\r\n    raise OpenAIError(\r\nlitellm.llms.OpenAI.openai.OpenAIError: Error code: 404 - {'error': {'message': 'The model `o1-mini` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"aider\", line 8, in <module>\r\n    sys.exit(main())\r\n             ^^^^^^\r\n  File \"main.py\", line 727, in main\r\n    coder.run()\r\n  File \"base_coder.py\", line 730, in run\r\n    self.run_one(user_message, preproc)\r\n  File \"base_coder.py\", line 773, in run_one\r\n    list(self.send_message(message))\r\n  File \"base_coder.py\", line 1208, in send_message\r\n    saved_message = self.auto_commit(edited)\r\n                    ^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"base_coder.py\", line 1891, in auto_commit\r\n    res = self.repo.commit(fnames=edited, context=context, aider_edits=True)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"repo.py\", line 110, in commit\r\n    commit_message = self.get_commit_message(diffs, context)\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"repo.py\", line 195, in get_commit_message\r\n    commit_message = simple_send_with_retries(\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"sendchat.py\", line 44, in wrapper\r\n    return decorated_func(*args, **kwargs)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"_sync.py\", line 105, in retry\r\n    ret = target(*args, **kwargs)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"sendchat.py\", line 102, in simple_send_with_retries\r\n    _hash, response = send_completion(**kwargs)\r\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"sendchat.py\", line 83, in send_completion\r\n    res = litellm.completion(**kwargs)\r\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"utils.py\", line 1086, in wrapper\r\n    raise e\r\n  File \"utils.py\", line 974, in wrapper\r\n    result = original_function(*args, **kwargs)\r\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"main.py\", line 2847, in completion\r\n    raise exception_type(\r\n          ^^^^^^^^^^^^^^^\r\n  File \"utils.py\", line 8194, in exception_type\r\n    raise e\r\n  File \"utils.py\", line 8071, in exception_type\r\n    raise NotFoundError(\r\nlitellm.exceptions.NotFoundError: litellm.NotFoundError: NotFoundError: OpenrouterException - Error code: 404 - {'error': {'message': 'The model `o1-mini` does not exist or you do not have access to it.', 'type': 'invalid_request_error', 'param': None, 'code': 'model_not_found'}}\r\n\r\n```",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/1834/comments",
+    "author": "6rz6",
+    "comments": [
+      {
+        "user": "fry69",
+        "created_at": "2024-09-30T05:14:16Z",
+        "body": "Thank you for filing this issue.\r\n\r\n> `The model `o1-mini` does not exist or you do not have access to it.`\r\n\r\nThe `o1` models on the OpenAI API still require an account with Tier 4, you can use OpenRouter instead to access those models without this requirement."
+      },
+      {
+        "user": "6rz6",
+        "created_at": "2024-09-30T05:24:27Z",
+        "body": "thanks yes thats what i did, its set on default openrouter/openai/o1-mini now and works well"
+      }
+    ]
+  },
+  {
+    "number": 1295,
+    "title": "Q: When adding the output of a command to the chat, if you choose a message is that added in addition to the output or in place of?",
+    "created_at": "2024-09-02T10:39:13Z",
+    "closed_at": "2024-09-04T14:06:39Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/1295",
+    "body": "### Issue\n\nI just wanted to clarify an ambiguity on the Y/N/Message prompt you get after you run a command:\r\n\r\n```\r\nAdd the output to the chat?                                                                                                                                                                                                \r\n(Y)es/(n)o/message with instructions:\r\n\r\n```\r\nIf you choose message is that (Y) with message or (n) with message?\r\n\r\nAider aider 0.54.10\r\nModel: --sonnet\n\n### Version and model info\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/1295/comments",
+    "author": "5ocworkshop",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-09-03T15:44:38Z",
+        "body": "Thanks for trying aider and filing this issue.\r\n\r\nYou can type Y or N or simply type a message. If you type a message, it will send the output along with your message."
+      }
+    ]
+  },
+  {
+    "number": 1154,
+    "title": "[Question] How to add context in the chat window without triggering a model response?",
+    "created_at": "2024-08-23T08:32:47Z",
+    "closed_at": "2024-09-03T15:53:04Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/1154",
+    "body": "### Issue\n\nHi all!\r\n\r\nI know it is possible to create a file, add it and have that be my \"extra\" context. But sometimes I just want to add a bit of context without going through the hassle of the file stuff. \r\n\r\nI currently do /ask for this, but this seems 1) wasteful 2) the model response may confuse the context I am trying to add.\r\n\r\nIs there a way to add context to the chat history without triggering any model response?\n\n### Version and model info\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/1154/comments",
+    "author": "DamianB-BitFlipper",
+    "comments": [
+      {
+        "user": "razhangwei",
+        "created_at": "2024-08-25T12:06:27Z",
+        "body": "How about /clipboard?"
+      },
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-08-26T21:50:05Z",
+        "body": "Thanks for trying aider and filing this issue.\r\n\r\nType in your context. Then just don't press enter until you are ready to type in an actual instruction?"
+      },
+      {
+        "user": "DamianB-BitFlipper",
+        "created_at": "2024-08-27T07:43:12Z",
+        "body": "That works and it's what I am currently doing. I'm making an aider plugin for Emacs.\r\n\r\nI wanted to add \"context\" to aider from Emacs's IDE functionality (ie: with a keybinding, make the focus a specific variable, and then your coding command can be \"Make this more modular\") and it know what you're referring to. Right now I'm making a prompt prefix that gets prepended to all /code, /ask requests."
+      }
+    ]
+  },
+  {
+    "number": 1129,
+    "title": "\ud83e\udeb2 BUG During reflector ",
+    "created_at": "2024-08-19T18:09:54Z",
+    "closed_at": "2024-08-26T21:25:33Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/1129",
+    "body": "### Issue\r\n\r\nI'm error that Only 3 reflector are allowed ? why and how to solve it ? is anyone facing this issue ?\r\n\r\n### Version and model info\r\n\r\nAIDER V.50.1\r\nMODEL : DEEPSEEK",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/1129/comments",
+    "author": "djfaizp",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-08-19T18:12:01Z",
+        "body": "Thanks for trying aider and filing this issue.\r\n\r\nYou can just ask it to try again. But if it get stuck for 3 retries, you may want to run `/clear` before asking again for the change. The model may have gotten itself confused."
+      },
+      {
+        "user": "djfaizp",
+        "created_at": "2024-08-24T15:40:26Z",
+        "body": "it's works now after /clear and my file had 1000+ line codes that's why model was confusing . now i have split them in 4 i will update if i still found that error thanks @paul-gauthier for this awesome project."
+      }
+    ]
+  },
+  {
+    "number": 1068,
+    "title": "[Bug] \"/add\" command fails with \"--subtree-only\" option when searching for files",
+    "created_at": "2024-08-13T01:47:44Z",
+    "closed_at": "2024-08-20T02:22:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/1068",
+    "body": "### Issue\n\nWhen using Aider with the `--subtree-only` command line option, the `/add` command fails to add files when only the file name is provided, even though it correctly identifies matching files.\r\n\r\n## Steps to reproduce:\r\n1. Start Aider with the `--subtree-only` option\r\n2. Try to add a file using only its name with the `/add` command\r\n\r\n## Expected behavior:\r\nAider should search for the file within the allowed subtree and ask if I want to add it if found.\r\n\r\n## Actual behavior:\r\nAider identifies matching files but skips them, citing that they match an \"aiderignore spec\".\r\n\r\n## Example interaction:\r\n```\r\n> /add example_file.dart\r\n\r\nSkipping /path/to/project/subtree/example_file.dart that matches aiderignore spec.\r\n```\r\n\r\n## Additional information:\r\n- This behavior only occurs when the `--subtree-only` option is used.\r\n- The error message mentions an \"aiderignore spec\", which seems unrelated to the `--subtree-only` option.\n\n### Version and model info\n\nAider v.0.49.1",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/1068/comments",
+    "author": "go-run-jump",
+    "comments": [
+      {
+        "user": "go-run-jump",
+        "created_at": "2024-08-13T02:50:01Z",
+        "body": "I think I might have misunderstood the functionality of using \"/add\" for a file name that it can't find exactly like that. It seems that it will then ask me to create a file. \r\n\r\nI think it would be nice if there was the kind of partial matching functionality after pressing enter. So we can just use the file name and work with that."
+      },
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-08-19T17:58:45Z",
+        "body": "Thanks for trying aider and filing this issue. The `/add` command will you you matches BEFORE you press enter. Use TAB to autocomplete from them."
+      }
+    ]
+  },
+  {
+    "number": 1024,
+    "title": "Do files need to be /drop then /add after a big change in git?",
+    "created_at": "2024-08-07T10:54:36Z",
+    "closed_at": "2024-08-08T00:13:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/1024",
+    "body": "### Issue\n\nWhen I checkout a commit in git and there is a significant change to a file, does it need to be /drop then /add back in, or is it automatically updated to the latest code?\n\n### Version and model info\n\nAider: latest\r\nLLM: Sonnet 3.5",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/1024/comments",
+    "author": "lockmeister",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-08-07T15:56:12Z",
+        "body": "Thanks for trying aider and filing this issue.\r\n\r\nNo, aider always uses the latest versions of files."
+      }
+    ]
+  },
+  {
+    "number": 998,
+    "title": "deepseek/coder suggests only how to edit the files but doesnt edit it directly. how to make it edit the files and make changes directly on the files?",
+    "created_at": "2024-08-04T01:10:35Z",
+    "closed_at": "2024-08-07T16:03:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/998",
+    "body": "### Issue\n\nas titled\n\n### Version and model info\n\nlatest\r\ndeepseek/deepseek-coder",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/998/comments",
+    "author": "sprappcom",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-08-05T14:20:45Z",
+        "body": "When reporting problems, it is very helpful if you can provide:\r\n\r\n- Aider version\r\n- LLM model you are using\r\n- Any stack traces or error messages\r\n- A description of what you were doing when the error happened. \r\n\r\nIncluding the \u201cannouncement\u201d lines that aider prints at startup is an easy way to share some of this helpful info.\r\n\r\n```\r\nAider v0.37.1-dev\r\nModels: gpt-4o with diff edit format, weak model gpt-3.5-turbo\r\nGit repo: .git with 243 files\r\nRepo-map: using 1024 tokens\r\n```"
+      },
+      {
+        "user": "99cv",
+        "created_at": "2024-08-06T07:10:03Z",
+        "body": "I can confirm.\r\n\r\nRunning `aider --model deepseek/deepseek-coder`\r\n\r\nwith\r\n```\r\nAider v0.47.1\r\nModel: deepseek/deepseek-coder with diff edit format\r\nGit repo: .git with 463 files\r\nRepo-map: using 1024 tokens\r\n```\r\n\r\nand having two files added to context:\r\n`99c_target/imports/ui/App.vue 99c_target/imports/ui/Login.vue`\r\n\r\nand giving the following prompt:\r\n\r\n> change the code to make `99c_target/imports/ui/Login.vue` the entry point of the app                                                                                                       \r\n\r\nmakes aider only giving suggestions instead of changing the code:\r\n```\r\nTo make 99c_target/imports/ui/Login.vue the entry point of your Vue.js application, we need to configure the router to use this component as the default route. Since you've added           \r\n99c_target/imports/ui/App.vue to the chat, we can proceed with the necessary changes.                                                                                                        \r\n\r\nLet's assume you have a router configuration file (router.js or index.js) that we need to update. If you don't have one, please let me know, and I'll guide you through creating it.         \r\n\r\nExample router.js or index.js (if you have one)                                                                       \r\n\r\n                                                                                                                                                                                             \r\n // router/index.js or router.js                                                                                                                                                             \r\n import { createRouter, createWebHistory } from 'vue-router';                                                                                                                                \r\n import Login from '99c_target/imports/ui/Login.vue';                                                                                                                                        \r\n                                                                                                                                                                                             \r\n const routes = [                                                                                                                                                                            \r\n   {                                                                                                                                                                                         \r\n     path: '/',                                                                                                                                                                              \r\n     name: 'Login',                                                                                                                                                                          \r\n     component: Login                                                                                                                                                                        \r\n   }                                                                                                                                                                                         \r\n   // Add other routes here if needed                                                                                                                                                        \r\n ];                                                                                                                                                                                          \r\n                                                                                                                                                                                             \r\n const router = createRouter({                                                                                                                                                               \r\n   history: createWebHistory(),                                                                                                                                                              \r\n   routes                                                                                                                                                                                    \r\n });                                                                                                                                                                                         \r\n                                                                                                                                                                                             \r\n export default router;                                                                                                                                                                      \r\n                                                                                                                                                                                             \r\n\r\nUpdate main.js or main.ts                                                                                  \r\n\r\nEnsure your main entry file (main.js or main.ts) imports and uses the router configuration:                                                                                                  \r\n\r\n                                                                                                                                                                                             \r\n // main.js or main.ts                                                                                                                                                                       \r\n import { createApp } from 'vue';                                                                                                                                                            \r\n import App from './App.vue';                                                                                                                                                                \r\n import router from './router'; // Adjust the path according to your project structure                                                                                                       \r\n                                                                                                                                                                                             \r\n createApp(App)                                                                                                                                                                              \r\n   .use(router)                                                                                                                                                                              \r\n   .mount('#app');                                                                                                                                                                           \r\n                                                                                                                                                                                             \r\n createApp(App)                                                                                                                                                                              \r\n   .use(router)                                                                                                                                                                              \r\n   .mount('#app');                                                                                                                                                                           \r\n                                                                                                                                                                                             \r\n\r\nEnsure App.vue uses the router\r\n```\r\n\r\nEven telling aider explicitly to change into `/chat-mode code` or use `change code directly` in the prompt did not change the behaviour."
+      },
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-08-06T11:11:42Z",
+        "body": "You can try using `--edit-format whole`"
+      },
+      {
+        "user": "leanit-piotr",
+        "created_at": "2024-08-06T11:18:21Z",
+        "body": "It seems I have found a work-around. At least it worked now once with another terminal. Please check guys if this isn't the problem with the built in VS Code terminal. In the standard command line all works as expected it seems...\r\n\r\nUpdate:\r\n- checked again and it seems it depends on the size/complexity of the prompt. It's weird, but it looks like more complex prompts are just forwarded to chat only and \"no action\" mode and simple prompts are executed correctly."
+      },
+      {
+        "user": "99cv",
+        "created_at": "2024-08-06T11:55:08Z",
+        "body": "@leanit-piotr \r\nI never use aider in the vs code terminal. So the issue occured in normal terminal in zsh shell as well.\r\nMy last task was to change just one line (finally just for testing purposes) in one file and aider with model deepseek/deepseek-coder was still just dropping suggestions instead of \"doing the work\".\r\n\r\n@paul-gauthier \r\nwith option `--edit-format whole` aider is doing changes again with model deepseek/deepseek-coder!\r\nThanks!\r\n"
+      }
+    ]
+  },
+  {
+    "number": 640,
+    "title": "Question: Generate new project using Aider?",
+    "created_at": "2024-06-03T22:01:21Z",
+    "closed_at": "2024-06-07T09:21:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/640",
+    "body": "### Issue\n\nHello,  \r\nhow can I start new project from scratch using Aider? For example, how can I tell Aider to _\"Generate boilerplate for Chrome extension which will have popup window with one button.\"_ ? \r\n\r\nSuch task requires creation of multiple files. And I want Aider to think of the proper file names, it's content etc. \r\n\r\nThank you. \n\n### Version and model info\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/640/comments",
+    "author": "Michal-Mikolas",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-06-03T22:33:38Z",
+        "body": "Thanks for trying aider and filing this issue.\r\n\r\nHave try tried running aider in an empty directory and literally typing \"Generate boilerplate for Chrome extension which will have popup window with one button\"  into the chat? I just did, and aider made some logical looking files...\r\n\r\n```\r\n> Generate boilerplate for Chrome extension which will have popup window with one button.\r\n\r\nHere is the boilerplate code for a Chrome extension with a popup window containing one button:\r\n\r\n...\r\n\r\nThis setup includes:\r\n\r\n 1 manifest.json to define the extension.\r\n 2 popup.html for the popup window with a button.\r\n 3 popup.js to handle the button click event.\r\n 4 Placeholder paths for icon images.\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 601,
+    "title": "gpt-4o model context window error",
+    "created_at": "2024-05-13T23:23:06Z",
+    "closed_at": "2024-05-16T16:03:47Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/601",
+    "body": "Thank you for this great program!\r\n\r\nUsing the gpt-4o model to edit a single markdown file, I keep running into the cryptic error below, or variations of the same.  It seems like I should be nowhere near an error situation, but requests fail with this message, saying 7k tokens exceeds the context window size, which it reports as 128k.  Similar writing requests made to any of the gpt-3.5 or gpt-4 models seem to work just fine, although I'd prefer to use the faster, cheaper, and hopefully smarter gtp-4o.\r\n\r\nThe expectation is that the returned text diff would be applied to the files.  The actual result is the error message quoted below.\r\n\r\nAider v0.35.1-dev                                                                                                                                                         \r\nModels: openai/gpt-4o with diff edit format, weak model gpt-3.5-turbo                                                                                                     \r\nGit repo: .git with 8 files                                                                                                                                               \r\nRepo-map: using 1024 tokens                                                                                                                                               \r\n\r\n```\r\nThe chat session is larger than the context window!                                                                     \r\n                                                                                                                                                                          \r\nApproximate context window usage, in tokens:                                                                                                                              \r\n                                                                                                                                                                          \r\n$ 0.0045      902 system messages                                                                                                                                         \r\n$ 0.0059    1,172 chat history    use /clear to clear                                                                                                                     \r\n$ 0.0261    5,227 app.md          use /drop to drop from chat                                                                                                             \r\n$ 0.0009      171 diagrams.md     use /drop to drop from chat                                                                                                             \r\n==================                                                                                                                                                        \r\n$ 0.0374    7,472 tokens total                                                                                                                                            \r\n          120,528 tokens remaining in context window                                                                                                                      \r\n          128,000 tokens max context window size                                                                                                                          \r\n                                                                                                                                                                          \r\nTo reduce token usage:                                                                                                                                                    \r\n - Use /drop to remove unneeded files from the chat session.                                                                                                              \r\n - Use /clear to clear chat history.                \r\n```",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/601/comments",
+    "author": "u2324",
+    "comments": [
+      {
+        "user": "u2324",
+        "created_at": "2024-05-13T23:42:06Z",
+        "body": "Yes, in the middle of a long reply:\r\n\r\n$ wc reply\r\n  506  2287 18259 reply\r\n  \r\nThat's the length of the reply in lines, words, and bytes, in that order.  \r\n\r\nHowever, the exact same request to gpt-4 or gpt-3.5 completes without issue, although I didn't count the length of the replies.   If the request needs to be broken up, I can usually just say \"continue\" and it will do so.\r\n"
+      },
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-05-13T23:47:00Z",
+        "body": "Ah, you may have hit the output limit. I believe gpt-4o can only output 4k tokens. Based on that `wc` output, that looks like more than 4k."
+      },
+      {
+        "user": "u2324",
+        "created_at": "2024-05-13T23:50:40Z",
+        "body": "I see, thank you for letting me know.  I will try to isolate sections of text in separate files so the output is smaller, and use the older models for re-organizing text (which is where this repeatedly fails).  Perhaps the error message could be improved."
+      }
+    ]
+  },
+  {
+    "number": 547,
+    "title": "Files not created / saved",
+    "created_at": "2024-04-11T18:49:22Z",
+    "closed_at": "2024-04-11T21:04:27Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/547",
+    "body": "When asking questions or reporting issues, it is very helpful if you can include:\r\n\r\n- Aider version `aider 0.28.0`\r\n- Model being used (`gpt-4-xxx`, etc) `gpt-3.5-turbo` & `gpt-4-1106-preview`\r\n- Other switches or config settings that are active\r\n\r\n```\r\nAider v0.28.0\r\nModel: gpt-3.5-turbo using whole edit format\r\nGit repo: ../.git with 255 files\r\nRepo-map: using 1024 tokens\r\nUse /help to see in-chat commands, run with --help to see cmd line args\r\n```\r\n\r\nPrompt: `create python hello world file save to h.py`\r\n\r\nAider showed me the content and let me choose if I want to save the file, I pressed enter to choose default answer (y), then I run `/exit` and check if `h.py` was there - it wasn't. \r\n\r\nI don't know why this happened, could you help me please?",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/547/comments",
+    "author": "tddschn",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-04-11T19:01:05Z",
+        "body": "It looks like you ran aider from a subdir within your git repo. Notice how aider prints `Git repo: ../.git`. All filenames in aider are relative to the repo root. You should have seen a warning to this effect right below the lines you pasted into the issue: `Note: in-chat filenames are always relative to the git working dir, not the current working dir.`\r\n\r\nSo my guess is that you'll find `h.py` in the root directory of your git repo. Try `cd ..; ls -l h.py`."
+      }
+    ]
+  },
+  {
+    "number": 471,
+    "title": ".gitignore: .aider* -> .aider.* to preserve .aiderignore by default.",
+    "created_at": "2024-02-09T01:07:18Z",
+    "closed_at": "2024-02-11T22:50:01Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/471",
+    "body": "When asking questions or reporting issues, it is very helpful if you can include:\r\n\r\n```\r\nStarting aider with model gpt-4\r\n\r\nLoading aider:\r\n  remember to use /help for a list of commands\r\n\r\nAider v0.23.0\r\nVSCode terminal detected, pretty output has been disabled.\r\nAdd .aider* to .gitignore (recommended)? n\r\nModel: gpt-4 using diff edit format\r\nGit repo: .git with 16,518 files\r\nWarning: For large repos, consider using an .aiderignore file to ignore irrelevant files/dirs.\r\nRepo-map: using 1024 tokens\r\nAdded Dockerfile to the chat.\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/471/comments",
+    "author": "zackees",
+    "comments": [
+      {
+        "user": "zackees",
+        "created_at": "2024-02-09T02:58:02Z",
+        "body": "I'd like to keep .aiderignore because it prevents a large repo from causing aider to freeze. This needs to be checked in so that others can use aider as well. However your rule prevents this because .aider* will ignore .aiderignore. To solve this I added .aider.* so that just the other files are ignored."
+      },
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-02-09T03:15:42Z",
+        "body": "You just need to manually manage/edit the .gitignore file for your project. You don't need to change aider. "
+      },
+      {
+        "user": "zackees",
+        "created_at": "2024-02-09T07:07:09Z",
+        "body": "I did edit the .gitignore manually. The bug is that aider keeps bugging me to add the pattern exactly as it's hardcoded in the project. So simplest solution seems to be to change the hardcoded pattern."
+      },
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-02-10T18:46:30Z",
+        "body": "Once you've added `.aiderignore` to `.gitignore` it doesn't matter if `.aider.*` is in `.gitignore` after that. The `.aiderignore` file is already part of git.\r\n\r\n```\r\ntmp$ mkdir ignore\r\ntmp$ cd ignore\r\ntmp/ignore$ echo one > .aiderignore\r\ntmp/ignore$ git init\r\nInitialized empty Git repository in /Users/gauthier/tmp/ignore/.git/\r\ntmp/ignore$ git add .aiderignore\r\ntmp/ignore$ gc -m initial\r\n[main (root-commit) 951a16e] initial\r\n 1 file changed, 1 insertion(+)\r\n create mode 100644 .aiderignore\r\ntmp/ignore$ echo .aiderignore > .gitignore\r\ntmp/ignore$ echo two >> .aiderignore\r\ntmp/ignore$ git status\r\nOn branch main\r\nChanges not staged for commit:\r\n  (use \"git add <file>...\" to update what will be committed)\r\n  (use \"git restore <file>...\" to discard changes in working directory)\r\n\tmodified:   .aiderignore\r\n\r\nno changes added to commit (use \"git add\" and/or \"git commit -a\")\r\ntmp/ignore$ gc -a -m .aiderignore\r\n[main 486233c] .aiderignore\r\n1 file changed, 1 insertion(+)\r\n```"
+      },
+      {
+        "user": "zackees",
+        "created_at": "2024-02-11T02:04:02Z",
+        "body": "Okay, but why-by-default try to exclude the .aiderignore file? All the rest make sense. You don't want to add in the chat logs.\r\n\r\nLet me give you an example:\r\n\r\nIn my current project, we migrated an EC2 instance to docker and we over-included files to make it work. Aider just halts.\r\n\r\nI struggled a little to add the aiderignore because the tool just wanted to revert it. However by default, my front end is passing no auto commit, so I might have a different default experience than you.\r\n\r\nBut anyway, just wanted to help a small friction point I experienced. Its up to you to accept the PR or not, since it's your project. Great job. My bill to openai went up a ton too but it's def worth it!!"
+      },
+      {
+        "user": "harleypig",
+        "created_at": "2024-02-11T16:43:23Z",
+        "body": "Use this in your `.gitignore` file:\r\n\r\n```\r\n.aider*\r\n!.aider.conf.yml\r\n!.aiderignore\r\n```\r\nThis will allow those two files while still ignoring all other `.aider*` files."
+      },
+      {
+        "user": "zackees",
+        "created_at": "2024-02-11T19:44:07Z",
+        "body": "Okay this is a good work around, I can just control .gitignore myself I guess. Thanks for showing me the '!'"
+      }
+    ]
+  },
+  {
+    "number": 438,
+    "title": "Option to let Aider stage the changes without committing them ?",
+    "created_at": "2024-01-08T12:50:17Z",
+    "closed_at": "2024-01-17T19:05:14Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/438",
+    "body": "I know that there is an option to show the diff in the terminal but IDE's are naturally better suited to show the changes visually. So I wonder if Aider has an **option to stage all changes without committing them unless asked to do so**? That would allow me to check the changes in VSCode to see exactly where and what was changed.\r\n\r\nI've already checked the option list with /help but am not sure if e.g. `--no-auto-commits` would have the desired effect.\r\n",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/438/comments",
+    "author": "Hexodus",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2024-01-08T18:49:33Z",
+        "body": "Thanks for trying aider and filing this issue.\r\n\r\nTry `--no-auto-commits`, which will leave the commits dirty in the repo. Your IDE should be able to show you the diff."
+      }
+    ]
+  },
+  {
+    "number": 153,
+    "title": "Is there a way to exclude the .env file from cTag?",
+    "created_at": "2023-07-26T13:38:45Z",
+    "closed_at": "2023-07-26T20:51:43Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Aider-AI/aider/issues/153",
+    "body": "Hey, maybe this is already done, but I couldn't find anything related to that. What I actually want: I don't want the .env file being mapped and send to OpenAI.",
+    "comments_url": "https://api.github.com/repos/Aider-AI/aider/issues/153/comments",
+    "author": "GitIgnoreMaybe",
+    "comments": [
+      {
+        "user": "paul-gauthier",
+        "created_at": "2023-07-26T20:44:46Z",
+        "body": "Thanks for trying aider and reporting this issue.\r\n\r\nIf the `.env` is checked into git, then it will be part of the ctags repo map. Did you intend to commit it to git?"
+      }
+    ]
+  }
+]

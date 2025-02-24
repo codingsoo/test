@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/sammwyy/MikuMikuBeam/issues/2",
+    "source": {
+      "issue_number": 2
+    },
+    "initial_question": {
+      "title": "The frontend doesn't show",
+      "body": "Hi !\nI'm trying to run the frontend with the `npm run dev` but when it get launched I get a white screen. I also get this in my developper console :\n\n`Uncaught (in promise) DOMException: An invalid or illegal string was specified`\n`setupWebSocket client:536`\n`fallback client:509`\n`setupWebSocket client:555`\n`setupWebSocket client:552`\n`<anonymous> client:531`\n`client:536`\n`setupWebSocket client:536`\n`fallback client:509`\n`setupWebSocket client:555`\n`(Asynchrone : EventListener.handleEvent)`\n`setupWebSocket client:552`\n`<anonyme> client:531`\n\nI guess he doesn't really like it \ud83d\ude05 \nIf you know how to sole this problem it would be great, thanks by advance <3"
+    },
+    "satisfaction_conditions": [
+      "Application functions in at least one supported browser"
+    ],
+    "created_at": "2025-01-20T17:59:24Z"
+  }
+]

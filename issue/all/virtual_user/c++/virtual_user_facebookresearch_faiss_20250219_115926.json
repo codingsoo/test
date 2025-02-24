@@ -1,0 +1,556 @@
+[
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2953",
+    "source": {
+      "issue_number": 2953
+    },
+    "initial_question": {
+      "title": "IndexFlatL2 multithread is slower than single thread",
+      "body": "python faiss-cpu 1.7.4 installed with pip3.x\r\nMultithread performance is pool on my 32-processor machine\r\n\r\nmodel name\t: Intel(R) Xeon(R) Platinum 8255C CPU @ 2.50GHz\r\n************ nthread= 1\r\n*********** nq= 100\r\n========== d= 16\r\ndataset in dimension 16, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=1.393 ms (\u00b1 0.1564)\r\nsearch k= 10 t=2.679 ms (\u00b1 0.0422)\r\nsearch k=100 t=6.473 ms (\u00b1 0.4788)\r\n========== d= 32\r\ndataset in dimension 32, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=11.656 ms (\u00b1 23.1539)\r\nsearch k= 10 t=3.664 ms (\u00b1 0.4651)\r\nsearch k=100 t=6.653 ms (\u00b1 0.6943)\r\n========== d= 64\r\ndataset in dimension 64, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=4.447 ms (\u00b1 0.4957)\r\nsearch k= 10 t=4.460 ms (\u00b1 0.0903)\r\nsearch k=100 t=8.210 ms (\u00b1 0.8620)\r\n========== d= 128\r\ndataset in dimension 128, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=7.682 ms (\u00b1 1.1851)\r\nsearch k= 10 t=8.133 ms (\u00b1 1.1031)\r\nsearch k=100 t=10.987 ms (\u00b1 1.5985)\r\nrestab=\r\n 1.39302\t2.67902\t6.4728\r\n11.6563\t3.66396\t6.65313\r\n4.44698\t4.45956\t8.20962\r\n7.68209\t8.13305\t10.9866\r\n*********** nq= 10000\r\n========== d= 16\r\ndataset in dimension 16, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.080 s (\u00b1 0.0044)\r\nsearch k= 10 t=0.257 s (\u00b1 0.0085)\r\nsearch k=100 t=0.564 s (\u00b1 0.0193)\r\n========== d= 32\r\ndataset in dimension 32, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.259 s (\u00b1 0.0097)\r\nsearch k= 10 t=0.321 s (\u00b1 0.0092)\r\nsearch k=100 t=0.635 s (\u00b1 0.0237)\r\n========== d= 64\r\ndataset in dimension 64, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.368 s (\u00b1 0.0306)\r\nsearch k= 10 t=0.410 s (\u00b1 0.0379)\r\nsearch k=100 t=0.681 s (\u00b1 0.0412)\r\n========== d= 128\r\ndataset in dimension 128, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.599 s (\u00b1 0.0144)\r\nsearch k= 10 t=0.645 s (\u00b1 0.0107)\r\nsearch k=100 t=0.921 s (\u00b1 0.0569)\r\nrestab=\r\n 0.0801447\t0.257458\t0.56392\r\n0.259316\t0.321337\t0.635152\r\n0.368472\t0.410237\t0.680965\r\n0.599093\t0.644711\t0.921228\r\n************ nthread= 32\r\n*********** nq= 100\r\n========== d= 16\r\ndataset in dimension 16, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=12.850 ms (\u00b1 7.3587)\r\nsearch k= 10 t=326.201 ms (\u00b1 9.8362)\r\nsearch k=100 t=331.151 ms (\u00b1 16.7528)\r\n========== d= 32\r\ndataset in dimension 32, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=181.012 ms (\u00b1 20.5017)\r\nsearch k= 10 t=325.893 ms (\u00b1 12.7326)\r\nsearch k=100 t=325.874 ms (\u00b1 24.1845)\r\n========== d= 64\r\ndataset in dimension 64, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=181.696 ms (\u00b1 14.6625)\r\nsearch k= 10 t=329.945 ms (\u00b1 17.0235)\r\nsearch k=100 t=329.392 ms (\u00b1 14.8352)\r\n========== d= 128\r\ndataset in dimension 128, with metric L2, size: Q 100 B 10000 T 0\r\nsearch k=  1 t=176.828 ms (\u00b1 9.2367)\r\nsearch k= 10 t=326.336 ms (\u00b1 16.2117)\r\nsearch k=100 t=325.248 ms (\u00b1 13.9408)\r\nrestab=\r\n 12.8498\t326.201\t331.151\r\n181.012\t325.893\t325.874\r\n181.696\t329.945\t329.392\r\n176.828\t326.336\t325.248\r\n*********** nq= 10000\r\n========== d= 16\r\ndataset in dimension 16, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.027 s (\u00b1 0.0119)\r\nsearch k= 10 t=0.980 s (\u00b1 0.0149)\r\nsearch k=100 t=1.029 s (\u00b1 0.0168)\r\n========== d= 32\r\ndataset in dimension 32, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.524 s (\u00b1 0.0138)\r\nsearch k= 10 t=0.986 s (\u00b1 0.0122)\r\nsearch k=100 t=1.066 s (\u00b1 0.0379)\r\n========== d= 64\r\ndataset in dimension 64, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.572 s (\u00b1 0.0328)\r\nsearch k= 10 t=0.999 s (\u00b1 0.0171)\r\nsearch k=100 t=1.090 s (\u00b1 0.0780)\r\n========== d= 128\r\ndataset in dimension 128, with metric L2, size: Q 10000 B 10000 T 0\r\nsearch k=  1 t=0.721 s (\u00b1 0.0103)\r\nsearch k= 10 t=1.059 s (\u00b1 0.0262)\r\nsearch k=100 t=1.147 s (\u00b1 0.0235)\r\nrestab=\r\n 0.0267251\t0.979833\t1.02869\r\n0.523988\t0.985733\t1.0658\r\n0.571997\t0.999151\t1.09039\r\n0.721175\t1.05897\t1.14676\r\n\r\n# Reproduction instructions\r\n\r\nbench_index_flat.py \r\nI modified faiss.cvar.distance_compute_min_k_reservoir from 5 to 100"
+    },
+    "satisfaction_conditions": [
+      "Thread count should be optimized for the hardware architecture"
+    ],
+    "created_at": "2023-07-14T09:33:48Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2792",
+    "source": {
+      "issue_number": 2792
+    },
+    "initial_question": {
+      "title": "Reconstructing all vectors with Arbitrary ID mapping",
+      "body": "# Summary\r\n\r\nHow do I reconstruct all vectors from an Index with ID mapping enabled? The IDs are non-contiguous arbitrary integers in my case, and calling `reconstruct_n(0, index.ntotal)` throws a Fatal Python Error which I assume is because faiss is reconstructing the vectors based on my non-contiguous ID mapping.\r\n\r\nIf I understand this correctly, I should be able to get pass the ID maps and call `reconstruct_n` directly on the Index, which I assume still uses incremental IDs starting at 0.\r\n\r\nI'm aware that I can always loop through the IDs and call `reconstruct` on each item, but I believe there must be a better way?\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: <!-- e.g. macOS 10.13.3 -->\r\n\r\nFaiss version: <!-- git commit, e.g. 56383610bcb982d6591e2e2bea3516cb7723e04a -->\r\n\r\nInstalled from: <!-- anaconda? compiled by yourself ? --> \r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n\r\n# Reproduction instructions\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\n"
+    },
+    "satisfaction_conditions": [
+      "Reconstructs all desired vectors in a batch operation"
+    ],
+    "created_at": "2023-03-27T02:30:36Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2438",
+    "source": {
+      "issue_number": 2438
+    },
+    "initial_question": {
+      "title": "Strange GPU memory usage",
+      "body": "# Summary\r\n\r\nI observe a \"strange\" GPU memory usage so I would like to ask if this is expected behaviors.\r\n\r\nI use the following code to perform K-Means on my data represented by an array `X` of shape `(N, 192)`:\r\n\r\n```python\r\n    kmeans = faiss.Kmeans(X.shape[-1], K, niter=20, gpu=True, max_points_per_centroid=int(1e7))\r\n    kmeans.train(X)\r\n```\r\n\r\nwhere `K` is 1e4 or 2e4.\r\n\r\nWhen launching the training on a server with 8 GPUs:\r\n\r\n- If N = 784e4 and K = 1e4, then each GPU consumes 2385MB.\r\n- If I increase the number of clusters to K = 2e4, then GPU consumption only slightly increases: 2393MB per GPU. Is this normal?\r\n- If I increase the number of data points by ten times, i.e., N = 784e5 and K = 1e4, then only 2385MB per GPU. Why is the number of data points irrelevant?\r\n\r\nI'm asking these questions to make sure that all my data were actually used for the training.\r\n\r\nThank you very much in advance for your responses!\r\n\r\nBest regards.\r\n\r\n# Platform\r\n\r\nInstalled from: anaconda <!-- anaconda? compiled by yourself ? --> \r\n\r\nRunning on:\r\n- [ ] CPU\r\n- [x] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "GPU memory usage remains relatively constant regardless of input data size",
+      "Memory consumption shows minimal increase when increasing cluster count (K)",
+      "Memory usage is distributed across available GPUs"
+    ],
+    "created_at": "2022-08-31T14:05:48Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2370",
+    "source": {
+      "issue_number": 2370
+    },
+    "initial_question": {
+      "title": "IndexShards ignores ids in shards",
+      "body": "# Summary\r\n\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS:\r\n\r\nFaiss version: 1.7.2\r\n\r\nInstalled from:\r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n\r\n# Reproduction instructions\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\n\r\nI did not expect IndexShards to ignore the ID's added to sub-indices, and I don't see how to efficiently work around this. So, I wanted to ask if this is the expected behavior, and - if so - how can I add shards with existing ID's to an IndexShards or IndexBinaryShards?\r\n\r\nI see that IndexShards has an add_with_ids, but this would require me to reconstruct an existing index's data. This would be difficult to use because I'm loading each index from disk with the IO_FLAG_MMAP to deal with memory constraints.\r\n\r\nHere is a POC of the behavior, the second assert fails, while I expected it to pass:\r\n```\r\nimport faiss\r\nimport numpy\r\n\r\n\r\ndef make_shard(dimension, data, id_0):\r\n    id_f = id_0 + data.shape[0]\r\n    print(f\"Make shard dim. {dimension} data shape {data.shape} ids {id_0}-{id_f - 1}\")\r\n    shard = faiss.IndexFlatL2(dimension)\r\n    shard_map = faiss.IndexIDMap(shard)\r\n    ids = numpy.arange(id_0, id_f)\r\n    shard_map.add_with_ids(data, numpy.arange(id_0, id_f))\r\n    return shard_map\r\n\r\n\r\ndef make_sharded_index(dimension, shards):\r\n    index_shards = faiss.IndexShards(dimension)\r\n    for i, shard in enumerate(shards):\r\n        index_shards.add_shard(shard)\r\n    return index_shards\r\n\r\n\r\ndimension = 32\r\nshard_cnt = 5\r\nshard_sz = 10\r\nkcnt = shard_sz + 1\r\nquery_row = 0\r\n\r\ndata = numpy.random.randn(shard_cnt * shard_sz, dimension).astype(numpy.float32)\r\n\r\nall_shards = [make_shard(dimension, data[i:i + shard_sz], i * shard_sz) for i in range(shard_cnt)]\r\n\r\ndata_query = data[query_row:query_row + 1]\r\n\r\nprint(f\"\\nQuery row {query_row} for each shard\")\r\nfor i, shard in enumerate(all_shards):\r\n    dists, ids = shard.search(data_query, kcnt)\r\n    print(f\"shard {i}: dist {dists[0]}\")\r\n    print(f\"shard {i}: ids {ids[0]}\\n\")\r\n\r\nprint(f\"Query row {query_row} in sharded index, in created order\")\r\nindex_shards = make_sharded_index(dimension, all_shards)\r\ndists, ids = index_shards.search(data_query, kcnt)\r\nprint(f\"shards dist {dists[0]}\")\r\nprint(f\"shards ids {ids[0]}\\n\")\r\nassert(ids[0][0] == query_row)\r\n\r\nprint(f\"Query row {query_row} in sharded index, out of order\")\r\nindex_shards = make_sharded_index(dimension, reversed(all_shards))\r\ndists, ids = index_shards.search(data_query, kcnt)\r\nprint(f\"shards rev dist {dists[0]}\")\r\nprint(f\"shards rev ids {ids[0]}\\n\")\r\nassert(ids[0][0] == query_row)\r\n```"
+    },
+    "satisfaction_conditions": [
+      "IndexShards must preserve and correctly handle the original IDs from sub-indices",
+      "The system must correctly handle non-sequential IDs across different shards"
+    ],
+    "created_at": "2022-06-30T12:33:28Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2346",
+    "source": {
+      "issue_number": 2346
+    },
+    "initial_question": {
+      "title": "How to use single thread when do batch search",
+      "body": "# Summary\r\n\r\nwe want to do ivfpq search by single thread, so we use pthread function to  bind ivfpq search on a cpu core, how to do it.\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: ubuntu 18.04\r\n\r\nFaiss version: last\r\n\r\nInstalled from: compiled \r\n\r\n\r\n\r\nRunning on:\r\n- [ \u00d7 ] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ \u00d7] C++\r\n- [ ] Python\r\n\r\n# Reproduction instructions\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Search operations execute on a single thread",
+      "Solution works with IVFPQ search functionality in Faiss",
+      "Solution is implementable in C++"
+    ],
+    "created_at": "2022-06-07T02:20:36Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2285",
+    "source": {
+      "issue_number": 2285
+    },
+    "initial_question": {
+      "title": "ProductQuantizer  compute_codes get wrong codes when nbits not 8",
+      "body": "    \r\n\r\n\r\n    d = 10\r\n    n = 400000\r\n    cs = 5\r\n    np.random.seed(123)\r\n    x = np.random.random(size=(n, d)).astype('float32')\r\n    testInputs=np.random.random(size=(1, d)).astype('float32')\r\n    print(testInputs)\r\n    pq = faiss.ProductQuantizer(d, cs,6)\r\n    pq.verbose=True\r\n    pq.train(x)\r\n    codes=pq.compute_codes(testInputs)\r\n    #here expect 5 code range from 0-64, but get 4 and also code number not range 0-64\r\n    print(codes.shape)\r\n  \r\n   "
+    },
+    "satisfaction_conditions": [
+      "Correct code values must be accessible despite packed storage format",
+      "All 5 quantizer codes must be retrievable",
+      "Bit-level access mechanism must preserve code integrity"
+    ],
+    "created_at": "2022-04-04T00:18:25Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2259",
+    "source": {
+      "issue_number": 2259
+    },
+    "initial_question": {
+      "title": "Chain an existing OPQMatrix with a new IVFPQ index",
+      "body": "# Summary\r\n\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\nI have trained an IVFOPQ index and I want to migrate the OPQMatrix to the top of a new(untrained) IVFPQ index. Here is my code:\r\n```\r\nimport faiss\r\n\r\nold = faiss.index_factory(128, \"OPQ16,IVF4,PQ16\")   # suppose it is already trained, the opqmatrix is not empty\r\nnew = faiss.index_factory(128, \"IVF4,PQ16\")   # a new index that I want to prepend an OPQMatrix to\r\n\r\nvector_transform = faiss.downcast_VectorTransform(old.chain.at(0))\r\nold_opq_matrix = vector_transform.A\r\nold_opq_array = faiss.vector_to_array(old_opq_matrix)\r\n\r\nnew_opq_matrix = faiss.OPQMatrix(vector_transform.d_in, 1, vector_transform.d_out)\r\nfaiss.copy_array_to_vector(old_opq_array, new_opq_matrix.A)\r\nnew_index = faiss.IndexPreTransform(new_opq_matrix, new)\r\n```\r\nI don't think it's a good idea that we should copy the vector to a new array then copy them back. Is there a easier way to do this? I just need to chain the **old** VectorTransform and a **new** IVFPQ. \r\n\r\nI tried the following but none of them worked (throwing segmentation error when adding embeddings to the new index):\r\n```\r\nnew_index = faiss.IndexPreTransform(old.chain.at(0), new)\r\nnew_index = faiss.IndexPreTransform(faiss.downcast_VectorTransform(old.chain.at(0)), new)\r\n```\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: <!-- e.g. macOS 10.13.3 -->\r\n\r\nFaiss version: 1.7.1 <!-- git commit, e.g. 56383610bcb982d6591e2e2bea3516cb7723e04a -->\r\n\r\nInstalled from: pip <!-- anaconda? compiled by yourself ? --> \r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n\r\n# Reproduction instructions\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\n"
+    },
+    "satisfaction_conditions": [
+      "The OPQMatrix transformation parameters are preserved when transferred to the new index",
+      "The resulting index must be operational for adding new embeddings",
+      "The training state of the OPQ transformation must be preserved",
+      "The dimensionality and configuration of the OPQ transformation must match between old and new indexes"
+    ],
+    "created_at": "2022-03-15T08:01:49Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2057",
+    "source": {
+      "issue_number": 2057
+    },
+    "initial_question": {
+      "title": "QUESTION: Can I create an IndexIVFPQ object with custom centroids?",
+      "body": "Hello. I'm trying to run an experiment that involves using some custom centroids (that I generate) with the IVFPQ indexing structure. Since faiss provides highly optimised infrastructure and support for IVFPQ indexing, I would like to use it to perform my experiments.\r\n\r\nIs it possible to to create an `IndexIVFPQ` object whose coarse and fine quantizer centroids are initialised to vectors I provide?\r\n\r\nHere's what I tried doing to achieve this:\r\n\r\n```python\r\nquantizer = faiss.IndexFlatL2(d)  \r\nindex = faiss.IndexIVFPQ(quantizer, d, nlist, m, 8)\r\ncustom_coarse_centroids = <a numpy array>\r\ncustom_pq_centroids = <a numpy array>\r\nquantizer.add(custom_coarse_centroids)\r\nindex.train(custom_coarse_centroids)\r\nfaiss.copy_array_to_vector(custom_pq_centroids.ravel(), index.pq.centroids)\r\n```\r\n\r\nAfter doing this, I verified by reading the corresponding centroids using `index.quantizer.reconstruct_n(0, index.nlist)` and `faiss.vector_to_array(index.pq.centroids).reshape(index.pq.M, index.pq.ksub, index.pq.dsub)` that the centroids are correctly set to what I want them to be. However, when I try to perform a query, I get nonsensical results such as negative distance estimates.\r\n\r\n```python\r\nindex.add(xb)\r\nD, I = index.search(xb[:5], k) # sanity check\r\nprint(I)\r\nprint(D)\r\n```\r\nI understand that certain distances and inner products are precomputed and stored inside an `IndexIVFPQ` object when the index is trained. Am I correct in thinking that what remains to be done to make my custom `IndexIVFPQ` object work correctly is to perform those precomputations? How can I make the `IndexIVFPQ` object carry out the relevant precomputations with the centroids I've just inserted?\r\n\r\nAlternatively, is there a better way to achieve this? My end goal is to create a queryable `IndexIVFPQ` object with my own custom centroids instead of relying on `.train()` to learn them.\r\n\r\nThanks in advance for any help you can offer!"
+    },
+    "satisfaction_conditions": [
+      "Custom centroids must be successfully loaded into both coarse and fine quantizers",
+      "Index must produce valid distance measurements during queries",
+      "Index must properly handle residual encoding",
+      "All necessary precomputed tables must be properly initialized",
+      "Index must return sensible search results for known data points"
+    ],
+    "created_at": "2021-09-21T15:23:20Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1973",
+    "source": {
+      "issue_number": 1973
+    },
+    "initial_question": {
+      "title": "Why does IndexIVFPQFastScan support only 4-bits-per-index cases?",
+      "body": "# Summary\r\n\r\nIn the beginning of IndexIVFPQFastScan.cpp, it checks for `FAISS_THROW_IF_NOT(nbits_per_idx == 4);`. It seems that FastScan shows better performance than normal IndexIVF search since it sorts QC with coarse list number beforehand. If this is the case, why is FastScan only applied to cases where it requires 4-bits per index? Is it also worth considering to apply this technique, sorting the queries beforehand based on coarse quantization results, to other cases, e.g., 8-bits-per-index cases, as well?\r\n\r\n# Platform\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [x] C++\r\n- [ ] Python\r\n"
+    },
+    "satisfaction_conditions": [
+      "The explanation must address hardware resource constraints",
+      "The relationship between bit size and lookup table size must be explained"
+    ],
+    "created_at": "2021-07-02T07:09:54Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1937",
+    "source": {
+      "issue_number": 1937
+    },
+    "initial_question": {
+      "title": "K-Means IP has increasing objective, but better performance - logging issue? ",
+      "body": "# Summary\r\n\r\nWhen running k-means with `spherical=True`, final classification results are improved compared to using an L2 distance metric when the features are unit normed. This is expected. \r\n\r\nHowever, when inspecting training loss with with `.obj` attribute, the loss increases with each iteration. I'm not sure what's causing this discrepancy. As I'm using k-means++ by initializing the centroids manually with `nredo=1` and selecting the best of multiple runs, the `.obj` attribute needs to be accurate to select the lowest loss model. \r\n\r\n\r\n# Platform\r\n\r\nRunning on:\r\n- [X] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [X] Python\r\n\r\n# Reproduction instructions\r\n\r\nRun any unit normed dataset and inspect the `.obj` attribute with `spherical=True`. It will be increasing per iteration, although the final model will perform well. \r\n"
+    },
+    "satisfaction_conditions": [
+      "The objective function behavior must be correctly interpreted for spherical k-means",
+      "Multiple initialization runs must be possible to find optimal centroids",
+      "The clustering results must improve with spherical distance compared to L2 for unit-normed data"
+    ],
+    "created_at": "2021-06-08T22:27:55Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1853",
+    "source": {
+      "issue_number": 1853
+    },
+    "initial_question": {
+      "title": "Windows delete by IDs",
+      "body": "# Platform\r\nOS:\r\n- [x] Windows 10 (Error)\r\n- [x] OSX 10.15.7 (Working)\r\n\r\nFaiss version: 1.7.0\r\n\r\nInstalled from: Anaconda\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n\r\n# Reproduction instructions\r\n\r\nI have problems with `delete_ids` on Windows.\r\n```python\r\nxb = np.random.randn(10, 256)\r\nxb = xb.astype(np.float32)\r\nindex = faiss.IndexFlatL2(xb.shape[1])\r\nindex.remove_ids(np.array([0]))\r\n-------------\r\nTraceback (most recent call last):\r\n  File \"<stdin>\", line 1, in <module>\r\n  File \"C:\\ProgramData\\Anaconda3\\lib\\site-packages\\faiss\\__init__.py\", line 381, in replacement_remove_ids\r\n    sel = IDSelectorBatch(x.size, swig_ptr(x))\r\n  File \"C:\\ProgramData\\Anaconda3\\lib\\site-packages\\faiss\\swigfaiss.py\", line 4843, in __init__\r\n    _swigfaiss.IDSelectorBatch_swiginit(self, _swigfaiss.new_IDSelectorBatch(n, indices))\r\nTypeError: in method 'new_IDSelectorBatch', argument 2 of type 'faiss::IDSelector::idx_t const *'\r\n```\r\n\r\nAlso, I've tried to use `IndexIDMap`\r\n```python\r\nindex = faiss.IndexFlatL2(xb.shape[1])\r\nindex2 = faiss.IndexIDMap(index)\r\nindex2.add_with_ids(xb, ids)\r\n--------------\r\nTraceback (most recent call last):\r\n  File \"<stdin>\", line 1, in <module>\r\n  File \"C:\\ProgramData\\Anaconda3\\lib\\site-packages\\faiss\\__init__.py\", line 212, in replacement_add_with_ids\r\n    self.add_with_ids_c(n, swig_ptr(x), swig_ptr(ids))\r\n  File \"C:\\ProgramData\\Anaconda3\\lib\\site-packages\\faiss\\swigfaiss.py\", line 4661, in add_with_ids\r\n    return _swigfaiss.IndexIDMap_add_with_ids(self, n, x, xids)\r\nTypeError: in method 'IndexIDMap_add_with_ids', argument 4 of type 'faiss::IndexIDMapTemplate< faiss::Index >::idx_t const *'\r\n```\r\n\r\nBut have the same code samples working on OSX. How can I properly delete items from `IndexFlatL2`?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Data type compatibility between input arrays and FAISS expectations"
+    ],
+    "created_at": "2021-04-29T12:02:33Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1795",
+    "source": {
+      "issue_number": 1795
+    },
+    "initial_question": {
+      "title": "Change the centroid vectors for GpuIndexIVFPQ?",
+      "body": "\r\nThe wiki provides a method to change the PQ centroids with python and then write back to Faiss Index object. However, it seems not work with Gpu Index. Is there a way to write back to a GPU index object, specifically, GpuIndexIVFPQ?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Centroid vectors are successfully modified in the GpuIndexIVFPQ",
+      "Modified index remains functional on GPU after centroid update"
+    ],
+    "created_at": "2021-03-30T20:28:56Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1569",
+    "source": {
+      "issue_number": 1569
+    },
+    "initial_question": {
+      "title": "Is the cosine distance normalized to 0-1 and if so how?",
+      "body": "I built an inner_product index with L2 normalized vectors, with the goal to search by cosine distance. The question that I have is whether this distance is in the typical -1 tot 1 range, or whether it has been normalized to 0-1, and if so - how?\r\n\r\nThanks in advance"
+    },
+    "satisfaction_conditions": [
+      "The range of possible distance values must be clearly identified"
+    ],
+    "created_at": "2020-12-10T11:45:12Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1505",
+    "source": {
+      "issue_number": 1505
+    },
+    "initial_question": {
+      "title": "Clearing Cache",
+      "body": "Gooday all,\r\n\r\nIs there a way to clear cache after a query? (Using on-disk faiss)\r\nI noticed the ram usage started to buildup as repeated random queries are performed.\r\n\r\nI would like it to clear cache whenever the program used up more than 90% of total ram.\r\n\r\nThank you.\r\n\r\n- Stefan"
+    },
+    "satisfaction_conditions": [
+      "System memory usage is reduced after cache clearing operation",
+      "Cache clearing can be triggered programmatically"
+    ],
+    "created_at": "2020-11-05T01:55:05Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1469",
+    "source": {
+      "issue_number": 1469
+    },
+    "initial_question": {
+      "title": "How to add a function in C++ and use it in python code in benches",
+      "body": "I want to add a function in C++ file and then use this function in python code in benches. I successfully compile the C++ code by 'cmake' and 'make'. But I failed to call this function in Python. Could you please tell me how to fix it? \r\nThank you"
+    },
+    "satisfaction_conditions": [
+      "Build system successfully compiles C++ code with Python bindings",
+      "Python environment can locate and import the compiled module"
+    ],
+    "created_at": "2020-10-15T14:20:22Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1199",
+    "source": {
+      "issue_number": 1199
+    },
+    "initial_question": {
+      "title": "Question Regarding How Faiss Search Neighbors",
+      "body": "Hi, I have some questions about how Faiss search for neighbors:\r\n\r\n1. For HNSW, why faiss allowed searching k > ef ?\r\n2. For IndexLSH, what is the searching algorithm? Return top k data in the bucket that the query data belong to? What if k > size(bucket that query data belongs to)?\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "System must handle search requests where k > ef in HNSW",
+      "System must indicate invalid or missing results",
+      "LSH search algorithm must be correctly characterized"
+    ],
+    "created_at": "2020-05-04T16:28:58Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1069",
+    "source": {
+      "issue_number": 1069
+    },
+    "initial_question": {
+      "title": "Any plan on python wrapper for faiss::InvertedLists::prefetch_lists",
+      "body": "# Summary\r\ni guess **python** can not call **faiss::InvertedLists::prefetch_lists** for now.\r\nare there any plans on adding it?\r\n\r\n# example\r\ncode:\r\n```\r\ninvlists = faiss.OnDiskInvertedLists(100, 256, \"merged_index.ivfdata\")\r\npf = np.array(range(10)).astype('int')\r\ninvlists.prefetch_lists(pf, 10)\r\n```\r\n\r\nresult:\r\n```\r\nreturn _swigfaiss.OnDiskInvertedLists_prefetch_lists(self, list_nos, nlist)\r\nTypeError: in method 'OnDiskInvertedLists_prefetch_lists', argument 2 of type 'faiss::InvertedLists::idx_t const *'\r\n```\r\n\r\n# Platform\r\n\r\nOS: macOS .\r\n\r\nRunning on:\r\n- CPU\r\n\r\nInterface: \r\n- Python\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Python code must successfully invoke the faiss::InvertedLists::prefetch_lists functionality",
+      "Method must accept numpy array input for list numbers",
+      "Type conversion between Python/numpy types and FAISS native types must be handled"
+    ],
+    "created_at": "2019-12-25T13:33:17Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/900",
+    "source": {
+      "issue_number": 900
+    },
+    "initial_question": {
+      "title": "Kmeans error",
+      "body": "# Summary\r\nTwo 2D tensors with the same shape lead to different kmean result. The one read from csv get an error, but the random generated one runs OK\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: Unbuntu 14.04<!-- e.g. macOS 10.13.3 -->\r\n\r\nFaiss version: Faiss-cpu 1.5.3<!-- git commit, e.g. 56383610bcb982d6591e2e2bea3516cb7723e04a -->\r\n\r\nFaiss compilation options: using conda<!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n\r\n# Reproduction instructions\r\n\r\n## Code\r\n```\r\nimport numpy as np\r\nimport faiss as fs\r\n\r\nA = np.loadtxt('sift_10k.csv', dtype=float, delimiter=',')\r\n\r\nB = np.random.rand(10000, 128).astype('float32')\r\n\r\nprint A\r\nprint B\r\n\r\nprint A.shape\r\nprint B.shape\r\n\r\nncentroids = 100\r\nniter = 20\r\nverbose = True\r\nd = A.shape[1]\r\n\r\nkmeans = fs.Kmeans(d, ncentroids, niter=niter, verbose=verbose)\r\nkmeans.train(A)\r\n\r\nnp.savetxt('vocab_1k.txt',kmeans.centroids)\r\n```\r\n## Error Info\r\n```\r\n[[ 23.  53.   4. ...  18.  66.  33.]\r\n [126.  38.   0. ...  34.  30.  21.]\r\n [  0.   0.   0. ...   0.   0.  13.]\r\n ...\r\n [  5.   1.   0. ...   7.  33.  27.]\r\n [  2.  38. 135. ...   0.   0.   0.]\r\n [ 23.  11.  35. ...   0.  18.   7.]]\r\n[[0.89541894 0.00223683 0.6539429  ... 0.28040436 0.39110968 0.48791024]\r\n [0.57830787 0.5340468  0.08764375 ... 0.00290395 0.31930214 0.42608193]\r\n [0.6888714  0.49050105 0.767181   ... 0.942297   0.25581676 0.13671431]\r\n ...\r\n [0.582841   0.6721598  0.42406493 ... 0.07052245 0.55508786 0.9895143 ]\r\n [0.29442012 0.4657543  0.2024351  ... 0.4854239  0.7695257  0.37914008]\r\n [0.15035798 0.9554772  0.7352968  ... 0.37981966 0.7891361  0.15399767]]\r\n(10000, 128)\r\n(10000, 128)\r\nTraceback (most recent call last):\r\n  File \"sift_10k.py\", line 20, in <module>\r\n    kmeans.train(A)\r\n  File \"/home/dennis/anaconda2/lib/python2.7/site-packages/faiss/__init__.py\", line 626, in train\r\n    clus.train(x, self.index)\r\n  File \"/home/dennis/anaconda2/lib/python2.7/site-packages/faiss/__init__.py\", line 50, in replacement_train\r\n    self.train_c(n, swig_ptr(x), index)\r\n  File \"/home/dennis/anaconda2/lib/python2.7/site-packages/faiss/swigfaiss.py\", line 1504, in train\r\n    return _swigfaiss.Clustering_train(self, n, x, index)\r\nTypeError: in method 'Clustering_train', argument 3 of type 'float const *'\r\n```\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\n"
+    },
+    "satisfaction_conditions": [
+      "Input data shape and format must be preserved after type conversion"
+    ],
+    "created_at": "2019-07-26T12:06:03Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/859",
+    "source": {
+      "issue_number": 859
+    },
+    "initial_question": {
+      "title": "how to guaranteed uniqueness of id in index with add_with_ids",
+      "body": "# Summary\r\n\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: Centos 7.5\r\n\r\nFaiss version: <!-- git commit, e.g. 56383610bcb982d6591e2e2bea3516cb7723e04a -->\r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n\r\n# Reproduction instructions\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\nHi,\r\nI  try try to add vector with a special id into index by add_with_ids api, also I do not want to add duplicate vector(identified by id) into index. \r\nBut i find this index allow duplicate id exist, so i have to maintain an id set to decision whether exist or not. \r\nSo, my questions :\r\n1. Is there some api of index can be used to decision whether some id exist or not. \r\n2. Is there some api guaranteed uniqueness of id\r\n\r\n<pre><code>\r\nimport faiss\r\nimport numpy as np\r\n\r\nv = np.random.rand(1,128).astype('float32')\r\nindex = faiss.IndexFlatL2(128)\r\nindex = faiss.IndexIDMap(index)\r\n\r\nindex.add_with_ids(v, np.array([1001]))\r\nprint(index.ntotal) # 1\r\nindex.add_with_ids(v, np.array([1001]))\r\nprint(index.ntotal) # 2</code></pre>\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\n"
+    },
+    "satisfaction_conditions": [
+      "The solution must preserve Faiss's flexibility to allow duplicate IDs when needed",
+      "The solution must maintain correct vector-to-ID mapping integrity",
+      "The solution must work with the existing add_with_ids API"
+    ],
+    "created_at": "2019-06-12T13:59:44Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/841",
+    "source": {
+      "issue_number": 841
+    },
+    "initial_question": {
+      "title": "redefine the type of idx_t ",
+      "body": "# Summary\r\n\r\nIn my business scenario\uff0c i will use the add_with_ids function to add vector to index\uff0c the xids is userid. but the type of xids is long and i need unsigned long.\r\nIs it possible to redefine idx_t to unsigned long and recompile the faiss?\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "System must handle unsigned long user IDs correctly",
+      "ID mapping must preserve data integrity",
+      "Solution must work within existing Faiss architecture"
+    ],
+    "created_at": "2019-05-28T08:57:45Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/804",
+    "source": {
+      "issue_number": 804
+    },
+    "initial_question": {
+      "title": "How to understand the nlist parameter\uff1f",
+      "body": "# Summary\r\nthe sample code of cpp tutorial\uff0c like this, how to understand the nlist ?\r\n\r\n```\r\nint nlist = 100;\r\nint k = 4;\r\nint m = 8;                             // bytes per vector\r\nfaiss::IndexFlatL2 quantizer(d);       // the other index\r\nfaiss::IndexIVFPQ index(&quantizer, d, nlist, m, 8);\r\n// here we specify METRIC_L2, by default it performs inner-product search\r\nindex.train(nb, xb);\r\nindex.add(nb, xb);\r\n```\r\n\r\nRunning on:\r\n- [ ] CPU\r\n\r\nInterface: \r\n- [ ] C++\r\n"
+    },
+    "satisfaction_conditions": [
+      "The nlist parameter must define a valid number of clusters for vector partitioning",
+      "The clustering must be compatible with the chosen quantizer",
+      "The clustering configuration must support the intended search behavior with nprobe"
+    ],
+    "created_at": "2019-04-24T11:44:31Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/627",
+    "source": {
+      "issue_number": 627
+    },
+    "initial_question": {
+      "title": "The  SIFT1B(BIGANN) dataset",
+      "body": "# Summary\r\n\r\nWe  trained your script file (python bench_gpu_1bn.py) on the BIGANN, and the search performed well.  However, I have a question about data sets. In addition to the necessary Base set and Query set, what are the main functions of the training set(learning set)? Is it possible to train directly with Base set? \r\n\r\nRunning on:\r\n- [ ] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] Python"
+    },
+    "satisfaction_conditions": [
+      "Training data must have same statistical distribution as the database",
+      "Training set can be derived from base dataset"
+    ],
+    "created_at": "2018-10-29T03:35:20Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/620",
+    "source": {
+      "issue_number": 620
+    },
+    "initial_question": {
+      "title": "TypeError: in method 'IndexPreTransform_reconstruct', argument 2 of type 'faiss::Index::idx_t'",
+      "body": "I am using faiss-cpu version with python interface, when I am trying to reconstruct a vector from an idx, i meet an error below: \r\n```\r\nTypeError: in method 'IndexPreTransform_reconstruct', argument 2 of type 'faiss::Index::idx_t'\r\n```\r\n\r\nThe code I use is \r\n```\r\nfeat = np.load('feat.npy')\r\nd = 2048\r\nindex = faiss.index_factory(d, 'PCAR128,IMI2x10,SQ8')\r\nfaiss.ParameterSpace().set_index_parameter(index, 'nprobe', 100)\r\nindex.train(feat)\r\nindex.add(feat)\r\n\r\nquery_feat = np.random.rand(1, d)\r\nk = 10\r\nD, I  = index.search(query_feat, k)\r\nreconstruct_feat = index.reconstruct(I[0, 0]) # I[0, 0] is not -1\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Valid index value for reconstruction"
+    ],
+    "created_at": "2018-10-18T07:47:14Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/495",
+    "source": {
+      "issue_number": 495
+    },
+    "initial_question": {
+      "title": "Nested Indexes",
+      "body": "# Summary\r\nI am trying to run the demo_ondisk_ivf.py, I want to try the PCA dimension reduction, I replaced this line\r\nindex = faiss.index_factory(xt.shape[1], \"IVF4096,Flat\")\r\n\r\nto \r\n\r\nindex = faiss.index_factory(xt.shape[1], \"PCAR8,IVF4096,Flat\")\r\n\r\nBut then, when in stage 5, how can I merge the images. Now the index is VectorTransform, not a IVFIndex, there's no index.invlists, how can I get index.invlists filed\r\n\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\n# Platform\r\n\r\nOS: <!-- e.g. macOS 10.13.3 -->\r\n\r\nFaiss version: <!-- git commit, e.g. 56383610bcb982d6591e2e2bea3516cb7723e04a -->\r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on :\r\n- [ ] CPU\r\n- [ ] GPU\r\n\r\n# Reproduction instructions\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\n"
+    },
+    "satisfaction_conditions": [
+      "Access to inverted lists data structure must be obtained from the nested index",
+      "Index type conversion must handle the transformation wrapper"
+    ],
+    "created_at": "2018-06-19T18:32:46Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/458",
+    "source": {
+      "issue_number": 458
+    },
+    "initial_question": {
+      "title": "Libgomp: Thread creation failed: Resource temporarily unavailable",
+      "body": "Released a faiss service with thrift, my thrift service opened 100 threads, requests more than one, it will give an error:\r\nLibgomp: Thread creation failed: Resource temporarily unavailable\r\n\r\nulimit -u 65535"
+    },
+    "satisfaction_conditions": [
+      "Thread resource conflicts must be resolved",
+      "Thread management must be configurable"
+    ],
+    "created_at": "2018-05-23T09:48:52Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/376",
+    "source": {
+      "issue_number": 376
+    },
+    "initial_question": {
+      "title": "Access `nprobe` attribute for an `IndexPreTransform` ",
+      "body": "# Summary\r\n\r\nFind `nprobe` attribute for an `IndexPreTransform`, such as `OPQ64_256,IVF4096,PQ64`.\r\n\r\n# Platform\r\n\r\nOS: Linux\r\n\r\nFaiss version: 4d440b6698fcc7b08607534bc622902b52bf9c49\r\n\r\nFaiss compilation options: from pytorch/faiss-cpu\r\n\r\nRunning on :\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\n# Reproduction instructions\r\n\r\nI was able to set/get `nprobe` attribute for an `IndexIVFFlat`, or `IndexIVFScalarQuantizer`, but for an index constructed through factory, or `faiss.load_index()`, such as `OPQ64_256,IVF4096,PQ64`, how can I achieve the same attribute?"
+    },
+    "satisfaction_conditions": [
+      "Successfully modifies the nprobe parameter of an IndexPreTransform object",
+      "Works with indexes created through factory strings or loaded from files",
+      "Provides access to the underlying IVF index parameters"
+    ],
+    "created_at": "2018-03-25T20:17:00Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/315",
+    "source": {
+      "issue_number": 315
+    },
+    "initial_question": {
+      "title": "How to convert distance values into 0-100 similarity?",
+      "body": "CODE\uff1a\r\n>D, I = index.search(xq, k)     # actual search\r\n\r\nHow can \u2018D\u2019 be converted to 0-100 (similarity)?"
+    },
+    "satisfaction_conditions": [
+      "Distance values must be converted to a 0-100 range where higher values indicate greater similarity"
+    ],
+    "created_at": "2018-01-17T05:14:26Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/281",
+    "source": {
+      "issue_number": 281
+    },
+    "initial_question": {
+      "title": "GPU Memory when transfer cpu_index to gpu_index",
+      "body": "Hi, \r\nI add about 5.2 million vectors in 144 dims into cpu_index, (IVF2500, PQ48), the cput_index size is actually about 270M , when using cpu_to_gpu to transfer the index to GPU,  how can the GPU Memory Usage show a total memory about 4800MiB?"
+    },
+    "satisfaction_conditions": [
+      "GPU memory usage must be properly accounted for temporary storage requirements",
+      "GPU memory allocation must be sufficient for optimal performance",
+      "Memory usage must be explainable and predictable"
+    ],
+    "created_at": "2017-12-14T08:08:13Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/188",
+    "source": {
+      "issue_number": 188
+    },
+    "initial_question": {
+      "title": "The count of search result",
+      "body": "` index.search (nq, queries.data(), k, dis.data(), nns.data());`\r\nI have more than one million features are in the index. I set k = 200 and the index only returned 117 results. \r\nShouldn't it return 200 results?"
+    },
+    "satisfaction_conditions": [
+      "Results are retrievable from the total feature set"
+    ],
+    "created_at": "2017-08-28T06:35:23Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/187",
+    "source": {
+      "issue_number": 187
+    },
+    "initial_question": {
+      "title": "Getting decoded vector in IVFPQ index?",
+      "body": "I was wondering if there was a way to get a decoded vector from an IVFPQ index. For example in python:\r\n\r\n```python\r\ntest_vectors = np.random.randn(3, d).astype(np.float32)\r\nindex.add(test_vectors)\r\nsearch_vectors = np.array([test_vectors[2]])\r\nD, I = index.search(search_vectors, 5)\r\n\r\n# how to do this?\r\nindex.get_decoded_vector(I[0])\r\n# returns the decoded version of vector\r\n```"
+    },
+    "satisfaction_conditions": [
+      "The system must be able to reconstruct/decode original vectors from their encoded representations in the IVFPQ index",
+      "The system must maintain a mapping between vector IDs and their storage locations"
+    ],
+    "created_at": "2017-08-26T05:46:07Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/174",
+    "source": {
+      "issue_number": 174
+    },
+    "initial_question": {
+      "title": "How can I set ClusteringParameters for GpuIndexIVFFlat  in python ?",
+      "body": ""
+    },
+    "satisfaction_conditions": [
+      "ClusteringParameters must be accessible and modifiable for GPU index objects",
+      "The parameter access syntax must be consistent with the CPU version's interface",
+      "The functionality must work with the GpuIndexIVFFlat class"
+    ],
+    "created_at": "2017-08-07T11:18:58Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2469",
+    "source": {
+      "issue_number": 2469
+    },
+    "initial_question": {
+      "title": "Cosine similarity is too small",
+      "body": "# Summary\r\nHi! I want to get cosine similarity for vectors. I expect, that found vectors dist will be close to 1 (smth like 0.99), but I get 0.1.\r\nHere is the code and output. Ids are right, but dist is small.\r\n\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: Windows 11\r\n\r\nFaiss version: 1.7.2\r\n\r\nInstalled from: pip\r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\r\n- [v] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [V] Python\r\n\r\n# Reproduction instructions\r\n\r\nimport numpy as np\r\nimport faiss\r\nfrom faiss import normalize_L2\r\ndim = 512  # dimension\r\nnb = 65536  # size of dataset\r\nnp.random.seed(228)\r\nvectors = np.random.random((nb, dim)).astype('float32')\r\nquery = vectors[:5]\r\nids = np.array(range(0, nb)).astype(np.int64)\r\nM = 64\r\nD = M * 4\r\nclusters = 4096  # ~16*math.sqrt(nb)\r\nvector_size = D * 4 + M * 2 * 4\r\ntotal_size_gb = round(vector_size*nb/(1024**3), 2)\r\nfactory = f\"IDMap,OPQ{M}_{D},IVF{clusters}_HNSW32,PQ{M}\"\r\nprint(f\"factory: {factory}, {vector_size} bytes per vector, {total_size_gb} gb total\")\r\nfaiss.omp_set_num_threads(10)\r\nindex = faiss.index_factory(dim, factory, faiss.METRIC_INNER_PRODUCT)\r\nnormalize_L2(vectors)\r\nindex.train(vectors)\r\nprint(f'Index trained')\r\nindex.add_with_ids(vectors, ids)\r\nprint(f'{index.ntotal} vectors have been added to index')\r\nk = 1\r\nnprobe = 1\r\nnormalize_L2(query)\r\nindex.nprobe = nprobe\r\ndist, idx = index.search(query, k)\r\nprint(idx)\r\nprint(dist)\r\n\r\n\r\nOUTPUT:\r\nfactory: IDMap,OPQ64_256,IVF4096_HNSW32,PQ64, 1536 bytes per vector, 0.09 gb total\r\nIndex trained\r\n65536 vectors have been added to index\r\n[[0]\r\n [1]\r\n [2]\r\n [3]\r\n [4]]\r\n[[0.11132257]\r\n [0.13959643]\r\n [0.13129388]\r\n [0.12439864]\r\n [0.1243098 ]]\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Index must maintain correct vector-to-ID mapping",
+      "Search results must remain computationally feasible within memory constraints",
+      "Vector normalization must be preserved"
+    ],
+    "created_at": "2022-09-14T10:30:39Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2377",
+    "source": {
+      "issue_number": 2377
+    },
+    "initial_question": {
+      "title": "Getting Cosine similarity different for \"Flat\" & \"HNSW32Flat\" Indexes",
+      "body": "# Summary\r\n\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: linux <!-- e.g. macOS 10.13.3 -->\r\n\r\nFaiss version: <!-- git commit, e.g. 56383610bcb982d6591e2e2bea3516cb7723e04a -->\r\n\r\nInstalled from: <!-- anaconda? compiled by yourself ? --> \r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [x] C++\r\n- [x] Python\r\n\r\n# Reproduction instructions\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\nHello,\r\n\r\nI am trying to find the cosine similarity with HNSW.\r\nBut the cosine similarity found to be incorrect below is the code and comparison of \"Flat\", \"HNSW\" & \"scipy\"\r\n```\r\nimport faiss\r\nemb1 = np.fromfile(\"emb1.raw\", dtype=np.float32)\r\nemb2 = np.fromfile(\"emb2.raw\", dtype=np.float32)\r\n```\r\nScipy code & result\r\n\r\n```\r\nfrom scipy import spatial\r\nresult = 1 - spatial.distance.cosine(emb1, emb2)\r\nprint('Cosine Similarity by scipy:{}'.format(result))\r\n```\r\nResult:\r\n`Cosine Similarity by scipy::0.991761326789856`\r\n\r\nIndexFlatL2/Flat code & result\r\n```\r\nxb = np.expand_dims(emb1,axis=0)\r\nxq = np.expand_dims(emb2,axis=0)\r\n\r\nindex = faiss.index_factory(128, \"Flat\", faiss.METRIC_INNER_PRODUCT)\r\nindex.ntotal\r\nfaiss.normalize_L2(xb)\r\nindex.add(xb)\r\nfaiss.normalize_L2(xq)\r\ndistance, index = index.search(xq, 1)\r\nprint('[FAISS] Cosine Similarity by Flat:{}'.format(distance))\r\n```\r\nResult:\r\n`[FAISS] Cosine Similarity by Flat:[[0.9917611]]`\r\n\r\nIndexHNSWFlat/HNSW32Flat code & result\r\n\r\n```\r\nxb = np.expand_dims(emb1,axis=0)\r\nxq = np.expand_dims(emb2,axis=0)\r\n\r\nindex = faiss.index_factory(128, \"HNSW32Flat\", faiss.METRIC_INNER_PRODUCT)\r\nindex.ntotal\r\nfaiss.normalize_L2(xb)\r\nindex.add(xb)\r\nfaiss.normalize_L2(xq)\r\ndistance, index = index.search(xq, 1)\r\nprint('[FAISS] Cosine Similarity by HNSW32Flat:{}'.format(distance))\r\n```\r\nResult:\r\n`[FAISS] Cosine Similarity by HNSW32Flat:[[0.01647742]]`\r\n\r\n**The results of Scipy & Flat are matching.\r\nWhereas the result is incorrect for HNSW.\r\nVerified the results using C++ & Python API's**"
+    },
+    "satisfaction_conditions": [
+      "Vector normalization must be properly maintained",
+      "Results must match established reference implementations"
+    ],
+    "created_at": "2022-07-07T05:45:32Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/2365",
+    "source": {
+      "issue_number": 2365
+    },
+    "initial_question": {
+      "title": "Search Knn With One Piece Of Data  Optimization",
+      "body": "# Summary\r\n\r\nI want to speed up when building knn with one piece of data .\r\nIn theory, the optimal implementation requires only half the amount of computation of the existing implementation.\r\nSo I want to ask if there is any other way to speed up the construction of knn.\r\n\r\n<!-- Facebook has a bounty program for the safe disclosure of security bugs. In\r\nthose cases, please go through the process outlined on that page and do not\r\nfile a public issue. -->\r\n\r\n# Platform\r\n\r\n<!-- if the question/problem is not platform-specific, please ignore this -->\r\n\r\nOS: <!-- e.g. macOS 10.13.3 -->\r\n\r\nFaiss version: <!-- git commit, e.g. 56383610bcb982d6591e2e2bea3516cb7723e04a -->\r\n\r\nInstalled from: <!-- anaconda? compiled by yourself ? --> \r\n\r\nFaiss compilation options: <!-- e.g. using MKL with compile flags ... -->\r\n\r\nRunning on:\u8fd9\u662f\u6211\u76ee\u524d\u7684\u5b9e\u73b0\uff0c\u60f3\u8bf7\u95ee\u4e00\u4e0b\u6709\u6ca1\u6709\u66f4\u597d\u7684\u65b9\u6cd5\r\n- [ ] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [ ] Python\r\n\r\n# Reproduction instructions\r\n\r\nThis is my current implementation, would like to ask if there is a better way\r\n\r\nres = faiss.StandardGpuResources()\r\nindex = faiss.GpuIndexFlatIp(res,dim)\r\nindex.add(feat)\r\nsims,nbrs = index.search(feat,k=k)\r\n\r\n\r\nI try to get close to optimal speed by splitting to reduce the number of alignments,just like\r\n\r\nres = faiss.StandardGpuResources()\r\nfeat = np.split(feat,2)\r\na = feat[0]\r\nb = feat[1]\r\nindex1 = faiss.GpuIndexFlatIp(res,dim)\r\nindex2 = faiss.GpuIndexFlatIp(res,dim)\r\nindex1.add(a)\r\nindex2.add(b)\r\nsims1,nbrs1 = index.search(a,k=k)\r\nsims2,nbrs2 = index.search(b,k=k)\r\nsims3,nbrs3 = index.search(b,k=k)\r\n\r\nThe number of alignments is reduced by a*b but there is a problem in organizing the results\r\n\r\nIn theory, a*b only needs to be compared once, which can reduce the comparison of a*b. However, because the returned topk has only one b to a\r\n\r\nSo I want to ask if there is another way to write it?\r\n\r\nThanks\r\n\r\n<!-- Please provide specific and comprehensive instructions to reproduce the\r\ndescribed behavior. -->\r\n\r\n<!-- Please *do not* post screenshots of logs. They are not searchable. Copy/paste \r\nthe text or make a gist if the text is too bulky. --> \r\n"
+    },
+    "satisfaction_conditions": [
+      "Solution must handle the complete dataset without loss of information",
+      "Implementation must effectively utilize available GPU resources"
+    ],
+    "created_at": "2022-06-23T11:00:54Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1119",
+    "source": {
+      "issue_number": 1119
+    },
+    "initial_question": {
+      "title": "Regarding the IndexFlatIP",
+      "body": "# Summary\r\n\r\nHi ,May I please know how can I get Cosine similarities not Cosine Distances while searching for similar documents. I've used IndexFlatIP as indexes,as it gives inner product.\r\n\r\n`distances, indices = index.search(query_vectors, k)\r\n`\r\n\r\nRunning on:\r\n- [x] CPU\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] C++\r\n- [x] Python\r\n"
+    },
+    "satisfaction_conditions": [
+      "Search results must return cosine similarity values in the range of -1 to +1",
+      "Vectors must be properly normalized before similarity computation",
+      "Index must successfully handle the user's vector dimensionality",
+      "Solution must work with Python interface",
+      "Solution must execute on CPU",
+      "Index must support searching through large vector collections (millions of vectors)"
+    ],
+    "created_at": "2020-02-28T14:03:05Z"
+  },
+  {
+    "id": "https://github.com/facebookresearch/faiss/issues/1001",
+    "source": {
+      "issue_number": 1001
+    },
+    "initial_question": {
+      "title": "IndexIVFFlat on 2M embeddings from FaceNet is giving poor results",
+      "body": "# Summary\r\nI am using embeddings computed from the popular FaceNet model. I have calculate about 2.5M embeddings in d=512 and am looking at performance of the `IndexIVFFlat` compared to the simple `Flat` index. Even with large `k` I see flat results in the recall\r\n\r\nRunning on:\r\n- [ ] GPU\r\n\r\nInterface: \r\n- [ ] Python\r\n\r\n# Reproduction instructions\r\n```\r\nxb = np.ascontiguousarray(X[::2][:2*1000*1000])\r\nxq = np.ascontiguousarray(X[1::2][:10*1000])\r\nd = xq.shape[1]\r\n\r\n# compute gt\r\nflat_index = faiss.index_factory(d, \"Flat\")\r\nres = faiss.StandardGpuResources()\r\nindex = faiss.index_cpu_to_gpu(res, 0, flat_index, None)\r\nflat_index.train(xb)\r\nflat_index.add(xb)\r\nD, gt = flat_index.search(xq, k)\r\n\r\n# try an approximate method\r\nindex = faiss.index_factory(d, \"IVF<n_centroids>,Flat\")\r\nres = faiss.StandardGpuResources()\r\nindex = faiss.index_cpu_to_gpu(res, 0, index, None)\r\nindex.train(xb)\r\nindex.add(xb)\r\n\r\ndef evaluate(index, xq, gt, k):\r\n    nq = xq.shape[0]\r\n    t0 = time.time()\r\n    D, I = index.search(xq, k)  # noqa: E741\r\n    t1 = time.time()\r\n    recalls = {}\r\n    i = 1\r\n    while i <= k:\r\n        recalls[i] = (I[:, :i] == gt[:, :1]).sum() / float(nq)\r\n        i *= 10\r\n\r\n    return (t1 - t0) * 1000.0 / nq, recalls\r\n\r\nevaluate(flat_index, xq, gt, 1000)\r\n>>\r\n(2.1849388122558593, \r\n {1: 0.99850000000000005, \r\n  10: 1.0, \r\n  100: 1.0, \r\n  1000: 1.0})\r\n\r\nevaluate(index, xq, gt, 1000)\r\n\r\n>>\r\n(0.038869810104370114,\r\n {1: 0.35210000000000002,\r\n  10: 0.35289999999999999,\r\n  100: 0.35289999999999999,\r\n  1000: 0.35299999999999998})\r\n```\r\nNotice how the recall is not increasing as k increases.\r\n\r\nI have tried many ,<n_centroids>, between  4096 to 20000 and I do not see any improvement. \r\n\r\n### Questions:\r\n1. Is it possible that the data distribution is not conducive to this method? \r\n\r\n2. Am I possibly splitting my query and training set incorrectly?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Query performance must maintain reasonable speed advantage over exhaustive search",
+      "Solution must be compatible with high-dimensional face embeddings data structure"
+    ],
+    "created_at": "2019-10-23T16:53:21Z"
+  }
+]

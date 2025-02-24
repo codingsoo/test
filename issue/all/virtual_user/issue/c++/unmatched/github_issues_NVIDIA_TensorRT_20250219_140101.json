@@ -1,0 +1,25 @@
+[
+  {
+    "number": 853,
+    "title": "make trtexec error  fatal error: NvOnnxParserTypedefs.h: No such file or directory",
+    "created_at": "2020-10-27T09:11:28Z",
+    "closed_at": "2020-10-30T03:53:57Z",
+    "labels": [
+      "question",
+      "Module:Samples",
+      "Module:OSS Build",
+      "triaged"
+    ],
+    "url": "https://github.com/NVIDIA/TensorRT/issues/853",
+    "body": "## Description\r\n\r\nI have installed TensorRT-7.1 using deb package. with cuda-10.2 and cuDNN 8.0.  I am able to import tensorrt as trt in python3 as well as `dpkg -l | grep TensorRT` show the installed packages. \r\n\r\n1- Now I am trying to make `trtexec` which are availabe in `/usr/src/tensorrt/samples/trtexec` folder. \r\n\r\nWhen i run the `make` or `sudo make` in the trtexec directory i got the follwing errors. \r\n\r\n2- I am confused that i have installed the tensorrt now do i still need to install TensorRT OSS   to run samples and use trtexec etc?  or the tensorrt installed in the `/usr/src/tensorrt/samples/trtexec` is enough? \r\n\r\nI have attached the error which i found during make in the trtexec. \r\n\r\n\r\n\r\n\r\n## Environment\r\n\r\n**TensorRT Version**:  7.1.3-4+cuda10.2\r\n**GPU Type**:  GTX 1080 Ti\r\n**Nvidia Driver Version**:   \r\n**CUDA Version**:  10-2\r\n**CUDNN Version**: 8.0.1\r\n**Operating System + Version**: Ubuntu 16.04 \r\n**Python Version (if applicable)**:  3.5\r\n**TensorFlow Version (if applicable)**:  \r\n**PyTorch Version (if applicable)**: \r\n**Baremetal or Container (if container which image + tag)**: \r\n\r\n\r\n\r\n## Steps To Reproduce\r\n\r\n\r\n`cd /usr/src/tensorrt/samples/trtexec/`\r\n`sudo make`\r\n\r\nerror \r\n\r\n`\r\n../Makefile.config:10: CUDA_INSTALL_DIR variable is not specified, using /usr/local/cuda by default, use CUDA_INSTALL_DIR=<cuda_directory> to change.\r\n../Makefile.config:15: CUDNN_INSTALL_DIR variable is not specified, using /usr/local/cuda by default, use CUDNN_INSTALL_DIR=<cudnn_directory> to change.\r\n../Makefile.config:28: TRT_LIB_DIR is not specified, searching ../../lib, ../../lib, ../lib by default, use TRT_LIB_DIR=<trt_lib_directory> to change.\r\nif [ ! -d ../../bin/chobj/../common ]; then mkdir -p ../../bin/dchobj/../common; fi; :\r\nCompiling: trtexec.cpp\r\nIn file included from ../common/sampleEngines.h:24:0,\r\n                 from trtexec.cpp:41:\r\n/usr/local/include/NvOnnxParser.h:27:34: fatal error: NvOnnxParserTypedefs.h: No such file or directory\r\ncompilation terminated.\r\n../Makefile.config:312: recipe for target '../../bin/dchobj/trtexec.o' failed\r\nmake: *** [../../bin/dchobj/trtexec.o] Error 1\r\n` \r\n  Please include:\r\n  * Exact steps/commands to build your repro\r\n  * Exact steps/commands to run your repro\r\n  * Full traceback of errors encountered \r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/NVIDIA/TensorRT/issues/853/comments",
+    "author": "MuhammadAsadJaved",
+    "comments": [
+      {
+        "user": "mk-nvidia",
+        "created_at": "2020-10-29T23:06:53Z",
+        "body": "@MuhammadAsadJaved I just tried this with the latest 7.2 release of TensorRT and it worked as expected. Can you upgrade to this version? If not, I'll have to dig some more. The file `NvOnnxParserTypedefs.h` does not exist in 7.2 and is not referenced."
+      }
+    ]
+  }
+]

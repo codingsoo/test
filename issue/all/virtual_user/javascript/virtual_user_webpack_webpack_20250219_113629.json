@@ -1,0 +1,404 @@
+[
+  {
+    "id": "https://github.com/webpack/webpack/issues/12925",
+    "source": {
+      "issue_number": 12925
+    },
+    "initial_question": {
+      "title": "Compiled app doesn't start",
+      "body": "<!-- Please don't delete this template because we'll close your issue -->\r\n<!-- Before creating an issue please make sure you are using the latest version of webpack. -->\r\n\r\n# Bug report\r\n\r\nI've been trying to understand this all day. If I specify `runtimeChunk`, and (maybe?) it gets minified my app doesn't start. If I comment out `runtimeChunk` my app starts. The sources all look okay and are loading, but the entry point doesn't exec.\r\n\r\n**What is the current behavior?**\r\nBlank screen after build.\r\n\r\n**If the current behavior is a bug, please provide the steps to reproduce.**\r\n\r\nI've been trying to isolate this but haven't yet. I'm sorry. I just wanted to get this out there hoping someone else has ideas.\r\n\r\n**What is the expected behavior?**\r\nthe entry point should execute.\r\n\r\n**Other relevant information:**\r\nwebpack version:  5.26.3\r\nNode.js version: 15.12.0\r\nOperating System: linux\r\nAdditional tools:\r\n"
+    },
+    "satisfaction_conditions": [
+      "Application successfully starts and renders content after build",
+      "Webpack rebuild/watch mode functions correctly",
+      "Runtime chunk configuration works without breaking application startup",
+      "Entry point code executes successfully",
+      "Compatible with development mode builds"
+    ],
+    "created_at": "2021-03-18T01:44:48Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2907",
+    "source": {
+      "issue_number": 2907
+    },
+    "initial_question": {
+      "title": "can't support Object(es6)?",
+      "body": "I am use webpack2.1.0-beta.15,when run my code i get error:Object.entries() is not a function.\nbelow is babel config in webpack\n\n```\n{\n        test: /\\.js$/,\n        exclude: /(node_modules|backup)/,\n        loader: 'babel', // 'babel-loader' is also a legal name to reference\n        query: {\n          presets: ['es2015']\n        }\n      },\n```\n"
+    },
+    "satisfaction_conditions": [
+      "ES6 Object.entries() method must be available and functional in the runtime environment",
+      "Polyfill implementation must not conflict with existing dependencies",
+      "Webpack build must complete successfully",
+      "Application must maintain full functionality of all existing features"
+    ],
+    "created_at": "2016-08-23T04:58:53Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2851",
+    "source": {
+      "issue_number": 2851
+    },
+    "initial_question": {
+      "title": "what's the difference of \"style!css!./style.css\" and \"!style!css!./style.css\"?",
+      "body": "as question,\ncan't understand the character \"!\",any one can explain it ?\n"
+    },
+    "satisfaction_conditions": [
+      "Loader sequence is correctly interpreted",
+      "Loader configuration context is provided"
+    ],
+    "created_at": "2016-08-09T02:06:46Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2819",
+    "source": {
+      "issue_number": 2819
+    },
+    "initial_question": {
+      "title": "overwrite watch config from CLI",
+      "body": "I have a webpack.config.js with watch:true and I would like to overwrite that setting when I call \"webpack\" from the CLI in a certain environment. Is this possible? Like `webpack --watch=false` would be nice\n"
+    },
+    "satisfaction_conditions": [
+      "Watch mode configuration must be overridable from command line",
+      "Original webpack.config.js file remains unchanged",
+      "Compatible with existing build scripts"
+    ],
+    "created_at": "2016-07-29T20:42:41Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2587",
+    "source": {
+      "issue_number": 2587
+    },
+    "initial_question": {
+      "title": "specified loader not loaded",
+      "body": "I specify `babel-loader` to handle files `/\\.jsx?$/`, but when load `xx.js`,  `babel-loader` do nothing.\n\nI means `xx.js` file (written in ES6) is saved to dest with original source. Then I inject `console.log` to `babel-loader`'s entry function, and find the `babel-loader` even not loaded.\n\nMy config:\n\n``` js\n  {\n        test: /\\.jsx?$/,\n        loader: 'babel',\n        include: [APP_PATH],\n        exclude: /(node_modules|bower_components)/,\n        query: {\n            presets: ['es2015', 'stage-0', 'react']\n        }\n    }\n```\n\nCompiled `xx.js`:\n\n``` js\nwebpackJsonp([1],[\n/* 0 */\n/***/ function(module, exports) {\n\n    import React from 'react';\n        ...\n        ...\n/***/ }\n]);\n```\n\nwebpack version:\n\n``` bash\n    \"babel-core\": \"^6.8.0\",\n    \"babel-loader\": \"^6.2.4\",\n    \"babel-preset-es2015\": \"^6.6.0\",\n    \"babel-preset-react\": \"^6.5.0\",\n    \"babel-preset-stage-0\": \"^6.5.0\",\n    \"webpack\": \"^1.13.0\"\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Webpack configuration correctly resolves the absolute filesystem path",
+      "Babel loader successfully processes JavaScript files in the specified path",
+      "Include paths configuration captures all source file locations",
+      "Loader execution can be verified through build process"
+    ],
+    "created_at": "2016-06-02T06:54:44Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2557",
+    "source": {
+      "issue_number": 2557
+    },
+    "initial_question": {
+      "title": "webpack2 : remove comments with LoaderOptionsPlugin",
+      "body": "Hi there,\n\nBefore with the UglifyPlugin, I could pass { comments: false } as options, how to do the same with LoaderOptionsPlugin ?\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "The correct plugin/configuration is used for the specific asset type"
+    ],
+    "created_at": "2016-05-27T06:46:32Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2513",
+    "source": {
+      "issue_number": 2513
+    },
+    "initial_question": {
+      "title": "webpack: how to ordering dependencies between entries",
+      "body": "in my webpack config file I have two multy entries:\n\n```\nmodule.exports = {\n      entry:{\n             lib:[\"./scripts/file1.js\",\"./scripts/fil2.ts\"],\n             app:[\"./scripts/login.js\",\"./public/HSplitLayout.js\"]\n      },\n      output: {\n        path: 'builds',\n        filename: '[name].js',\n        publicPath: 'builds/',\n        libraryTarget: \"var\"\n    }\n}\n```\n\nI want to ensure that the lib.js file is completely loaded before app.js is loaded.\n\nThank you for your help\n"
+    },
+    "satisfaction_conditions": [
+      "Library code executes before application code",
+      "Generated output files remain separately accessible"
+    ],
+    "created_at": "2016-05-18T18:16:38Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2295",
+    "source": {
+      "issue_number": 2295
+    },
+    "initial_question": {
+      "title": "[Question]: when will `module` be undefined in UMD webpackBootstrap.",
+      "body": "In webpack UMD wrap, the 2nd **else** is detecting the `exports` ONLY here,  when would the `module` be empty and we have chance to attach it to the `exports`?  I saw when we call with any module, we always passing it as `modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);`\n\nDoes it related with nodejs `module.exports=exports={};`?\n\n``` js\n(function webpackUniversalModuleDefinition(root, factory) {\n    if(typeof exports === 'object' && typeof module === 'object')\n        module.exports = factory();\n    else if(typeof define === 'function' && define.amd)\n        define([], factory);\n    else {\n        var a = factory();\n        for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];\n    }\n})(this, function() {\n});\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Code must handle environments where only 'exports' exists without 'module'",
+      "UMD wrapper must correctly detect the module system environment",
+      "Module exports must be properly assigned regardless of environment",
+      "Fallback mechanism must work when neither CommonJS nor AMD is detected"
+    ],
+    "created_at": "2016-04-07T22:45:26Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2247",
+    "source": {
+      "issue_number": 2247
+    },
+    "initial_question": {
+      "title": "using commonChunk",
+      "body": "It says unexpect token,but I don't know how to solve it,thanks for reply.\n\n```\nvar webpack = require('webpack');\n\nmodule.exports = {\n  devtool: 'inline-source-map',\n  entry: {\n    app:[\n    'webpack-hot-middleware/client',\n    './client/client.js'\n  ],\n    \"vendor\":['react','react-dom']\n},\n\nresolve: {\n        alias: {\n            'react':require('react'),\n            'react-dom':require('react-dom')\n\n        }\n    },\n  output: {\n    path: require(\"path\").resolve(\"./dist\"),\n    filename: 'bundle.js',\n    publicPath: '/'\n  },\n  plugins: [\n    new webpack.optimize.OccurrenceOrderPlugin(),\n    new webpack.HotModuleReplacementPlugin(),\n    new webpack.NoErrorsPlugin(),\n    new webpack.optimize.CommonsChunkPlugin(\"vendor\", \"vendor.js\",Infinity)\n  ],\n  module: {\n    loaders: [\n      {\n        test: /\\.js$/,\n        loader: 'react-hot',\n        loader:'babel-loader',\n        exclude: /node_modules/,\n        query: {\n          presets: ['react', 'es2015', 'react-hmre']\n        }\n      }\n    ]\n  }\n}\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Webpack configuration must compile without syntax errors",
+      "CommonChunksPlugin must successfully separate vendor code",
+      "Module resolution for React dependencies must work correctly",
+      "Babel loader must be properly configured for React/ES6 transpilation",
+      "Hot module replacement functionality must remain intact"
+    ],
+    "created_at": "2016-03-29T07:11:39Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2100",
+    "source": {
+      "issue_number": 2100
+    },
+    "initial_question": {
+      "title": "Is it possible to specify a different context per entry point?",
+      "body": "So I am working on a project that has 'N' number of entry points and we would like each entry point to be able to have a different version of React, for example. This would allow our development team to upgrade different pages to React v15.0.0 while leaving other pages running on older versions while still taking advantage of the ability to use the CommonsChunkPlugin. \n\nEssentially we are looking for a way to have our cake and eat it too :)\n\nIs this possible using webpack today? If it's not, would it be considered as a future feature?\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple entry points can simultaneously use different versions of the same dependency",
+      "Module resolution maintains isolation between entry points"
+    ],
+    "created_at": "2016-02-24T22:02:32Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2029",
+    "source": {
+      "issue_number": 2029
+    },
+    "initial_question": {
+      "title": "Split modules bundled via context into separate chunks",
+      "body": "Considering I have the following context requirement in my application:\n\n```\n// entry.js\nconst reqFixtures = require.context('./components', true, /^\\.\\/.*\\-fixture\\.js$/);\n```\n\nIs there anyway, with existing plugins/features, I could tell webpack to split the output into a chunk per file found within the above context?\n\nIf my tree looks like:\n\n```\n- components/\n  - button/\n    - button-fixture.js\n  - input/\n    - input-fixture.js\n\n```\n\nin the case above I'd end up with chunks:\n\n```\n- button-fixture.js\n- input-fixture.js\n- entry.js\n```\n\nMy use case is having a large test/playground application which can reference tens of fixtures with hundreds of components. I don't want to load all that if we only want to look at a single fixture for a single component, I'd much rather lazy load on demand.\n\n---\n\nIf there are no existing mechanisms or plugins to achieve this it'd be great to have some pointers on how to approach a plugin to do this? I was thinking we could look at the emitted modules and if the module path matches against the same expression as the context used then we could pull that module out into a new chunk. That bit seems like it might be relatively trivial but then how to handle pulling dependencies of those matching modules into the chunks? Or would this be handled by `DedupePlugin`?\n\nAnyway, thanks in advance and sorry if this has been discussed before!\n"
+    },
+    "satisfaction_conditions": [
+      "Each fixture file must be loaded as a separate chunk",
+      "Fixtures must be loadable on-demand/lazily",
+      "Solution must work with dynamic file discovery via require.context"
+    ],
+    "created_at": "2016-02-11T09:58:44Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/2010",
+    "source": {
+      "issue_number": 2010
+    },
+    "initial_question": {
+      "title": "I have a question __dirname setting of node config",
+      "body": "Hi there.\n\nI'm using express with webpack.\nI found __dirname needs set for node and i set like below\n\n```\nnode: {\n  __dirname: false\n}\n```\n\nDocs comment `__dirname: true` is real __dirname, but Above works. Not `true` (true output '')\nIs Docs correct, or not ?\n\nthanks about greate tool!\n"
+    },
+    "satisfaction_conditions": [
+      "The __dirname value must correctly reflect the expected directory path based on the target environment",
+      "The configuration setting must produce a functional __dirname value that doesn't result in empty strings"
+    ],
+    "created_at": "2016-02-06T08:41:52Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1945",
+    "source": {
+      "issue_number": 1945
+    },
+    "initial_question": {
+      "title": "Any Way to Reverse the Order of Require.Context?",
+      "body": "In my particular use case, I have a folder structure like this:\n- angular\n  - directives\n    - date-range\n      - index.js\n    - module.js\n- module.js\n\nAnd id like to simply do\n\n``` javascript\nrequire.context('./angular');\n```\n\nRight now it seems to include files in the bundle in child first order. So my directives are getting put in the file before the module definitions. Essentially Id like files higher up in the hierarchy to appear before files deeper in the hierarchy.\n\nIs there anyway to do this with require.context?\n"
+    },
+    "satisfaction_conditions": [
+      "Module dependencies are loaded in correct hierarchical order",
+      "Files at shallower directory depths are processed before deeper ones",
+      "Module registration completes before directive registration",
+      "Solution works within webpack's module loading system"
+    ],
+    "created_at": "2016-01-28T16:30:44Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1941",
+    "source": {
+      "issue_number": 1941
+    },
+    "initial_question": {
+      "title": "How does HMR event bubble in async modules?",
+      "body": "I noticed that `module.hot.accpet` does not work for the files loaded with `require.ensure` and does not work in those files. So I think the bubbling is different there, but how does it work?\n\nAnd I'm using Webpack `1.x`, would there be difference between `1.x` and `2.x`.\n"
+    },
+    "satisfaction_conditions": [
+      "Hot Module Replacement (HMR) events must be handled in the same scope where the module is required",
+      "HMR functionality must work with asynchronously loaded modules",
+      "Module updates must be properly detected and handled after async loading"
+    ],
+    "created_at": "2016-01-27T08:58:44Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1929",
+    "source": {
+      "issue_number": 1929
+    },
+    "initial_question": {
+      "title": "Should webpack build exit error code when a loader fail?",
+      "body": "I wrote a very simple async loader, following the documentation step by step, and calling the callback with error when some, **but** webpack just log the error in console and continue, exiting 0 as everything went fine.\n\nIs this an issue or am I missing something?\n"
+    },
+    "satisfaction_conditions": [
+      "Build process responds appropriately to loader errors",
+      "Exit code behavior matches webpack version expectations",
+      "Error messages are visible in console output"
+    ],
+    "created_at": "2016-01-25T10:12:04Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1886",
+    "source": {
+      "issue_number": 1886
+    },
+    "initial_question": {
+      "title": "[Plugin] No events on begin/end of compiling entry points",
+      "body": "Hi, \n\nI'm creating a custom plugin and I need to know the begin/end event of every entry point as I should change the plugin's configuration depending on a specific entry point.\n\nReading through the docs, I can't find that event.\n\nThanks,\nJakob\n"
+    },
+    "satisfaction_conditions": [
+      "Plugin configuration must be customizable per entry point",
+      "Plugin must maintain correct configuration context for each entry point"
+    ],
+    "created_at": "2016-01-14T09:18:04Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1688",
+    "source": {
+      "issue_number": 1688
+    },
+    "initial_question": {
+      "title": "Use CommonsChunkPlugin twice on one page",
+      "body": "As part of our caching strategy, I have set up a configuration where we have two instances of CommonsChunkPlugin: one for vendor scripts; one for common app code. Now we want to include both on every page. But the generated `vendor.js` and `commons.js` each include the webpack runtime, which doesn't work.\n\nIs there a way to remove the runtime from one of those bundles, or is there a different correct way to do this?\n"
+    },
+    "satisfaction_conditions": [
+      "Only one bundle contains the webpack runtime code",
+      "Both common and vendor chunks load successfully on the same page",
+      "Correct bundle loading order is maintained",
+      "Shared code is properly extracted into separate bundles"
+    ],
+    "created_at": "2015-11-30T19:56:25Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1662",
+    "source": {
+      "issue_number": 1662
+    },
+    "initial_question": {
+      "title": "how to exclude files from loader",
+      "body": "I have the next config for webpack loaders:\n\n``` javascript\n module: {\n    loaders: [{\n      test: /\\.js$/,\n      include: rootDir + '/src',\n      loader: 'babel?presets[]=es2015'\n    }, {\n      test: /\\.css$/,\n      loader: 'style!css!autoprefixer?browsers=last 2 versions'\n    }, {\n      test: /\\.(png|gif|jpg|svg|ttf|eot|woff|woff2)$/,\n      loader: 'file?name=[path][name].[ext]'\n    }]\n  }\n```\n\nI want to exclude some files from autoprefixer loader. How can I do this? If I do like this:\n\n``` javascript\n{\n  test: /\\.css$/,\n  exclude: 'someFile',\n  loader: 'style!css!autoprefixer?browsers=last 2 versions'\n}\n```\n\nsomeFile will be excluded not only from autoprefixer loader, it will be excluded from styles, css and autoprefixer loader, but I need exclude file only from autoprefixer loader. How can I do this?\n"
+    },
+    "satisfaction_conditions": [
+      "CSS files specified for exclusion must still be processed by style and css loaders",
+      "Specified files must bypass autoprefixer processing while other CSS files continue to use autoprefixer",
+      "The webpack configuration must remain valid and functional for all CSS files",
+      "The solution must allow for specific file targeting"
+    ],
+    "created_at": "2015-11-23T14:43:43Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1648",
+    "source": {
+      "issue_number": 1648
+    },
+    "initial_question": {
+      "title": "Make TemplatedPathPlugin's replacePathVariables available as a utility.",
+      "body": "I am working on writing a plugin that produces a manifest file when a webpack build completes.\n\nAs options to the plugin, I want to be able to let the user specify filenames/paths using webpack's available values such as `[chunk]`, etc.\n\nRight now, that logic is tied up with the TemplatedPathPlugin.\n\nI would like to break it out so that I can do something like this for my own webpack plugin:\n## Plugin\n\n```\nvar replacePathVariables = require( 'webpack/lib/TemplatedPathHelper' ).replacePathVariables;\n\nfunction manifestPluginFactory( opts ) {\n    return function() {\n        this.plugin( 'done', function( stats ) {\n            var manifestContents = _.chain( stats.compilation.namedChunks )\n                .map( function( chunk ) {\n                    // The key is the canonical way to reference the\n                    // file.\n                    var key = chunk.name;\n                    // Get the root directory\n                    var serverPath = path.join( opts.root, opts.path, opts.fileName );\n                    // Leverage existing webpack replacePathVariables method\n                    stats.chunk = chunk;\n                    serverPath = replacePathVariables( serverPath, stats );\n                    return [ key, serverPath ];\n                } )\n                .object()\n                .value();\n            fs.writeFileSync( opts.manifestDest, JSON.stringify( manifestContents ) );\n        } );\n    }\n}\n```\n## Webpack Config\n\n```\n{ plugins: [\n    manifestPluginFactory( {\n        root: '/webpack/build/',\n        path: '[hash]/mobile/',\n        fileName: '[name].js',\n        manifestDest: 'path.join( process.cwd(), 'webpack/build/manifest.json' )'\n    } )\n] }\n```\n## Output\n\nContents of file written to manifestDest:\n\n```\n{ \"mobile/store-test\": \"/webpack/build/366c982a5175bd728f12/mobile/store-test.js\",\n  \"mobile/store\": \"/webpack/build/366c982a5175bd728f12/mobile/store.js\" }\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Plugin must be able to process path templates containing webpack variables (e.g. [hash], [name], [chunk])",
+      "Path variable replacement must be accessible from within custom plugins",
+      "Processed paths must maintain consistency with webpack's internal path resolution",
+      "Path processing must have access to compilation context data (hash, chunk info, etc)",
+      "Processed paths must be usable for file output operations"
+    ],
+    "created_at": "2015-11-19T17:31:34Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1636",
+    "source": {
+      "issue_number": 1636
+    },
+    "initial_question": {
+      "title": "is it possible to specify sourceMappingURL?",
+      "body": "Hi guys.\n\nHelp, please, with the specifying of sourceMappingURL.\nWe have our own dev-server, so we need to specify sourceMappingURL as a static asset URL like **/dist/bundle.js.map**, but the default output of the webpack is \n**# sourceMappingURL=bundle.js.map**.\n\nThanks in advance.\n"
+    },
+    "satisfaction_conditions": [
+      "Source map URL path must be customizable to include a specific directory prefix",
+      "Generated source map comment must maintain valid sourceMappingURL format",
+      "Source map file reference must correctly correspond to the generated bundle file"
+    ],
+    "created_at": "2015-11-16T15:51:38Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1370",
+    "source": {
+      "issue_number": 1370
+    },
+    "initial_question": {
+      "title": "Question: Suggestion: Webpack hard to build desired structure",
+      "body": "If we have \n\n```\n.\n\u251c\u2500\u2500 src\n|   \u251c\u2500\u2500 css\n|   |    \u2514\u2500\u2500  style.css\n|   \u251c\u2500\u2500 images\n|   |    \u2514\u2500\u2500 image.png\n|   \u2514\u2500\u2500 js\n|        \u2514\u2500\u2500 main.js\n.\n```\n\n``` css\n/* src/css/style.css*/\nbody{\n   background:url(../images/image.png)\n}\n```\n\n``` javascript\n/* src/js/main.js*/\nrequire('../css/style.css')\n```\n\nI want compile to `dist` folder as the same structure like \n\n```\n.\n\u251c\u2500\u2500 dist\n|   \u251c\u2500\u2500 css\n|   |    \u2514\u2500\u2500  main-bundle.css\n|   \u251c\u2500\u2500 assets\n|   |    \u2514\u2500\u2500 image.png\n|   \u2514\u2500\u2500 js\n|        \u2514\u2500\u2500 main-bundle.js\n\u251c\u2500\u2500 src\n.   \u2514\u2500\u2500 ...\n```\n\nso we wrote webpack.config.js using ExtractTextPlugin to extract css file seperately like\n\n``` javascript\nentry: {\n    main:\"main.js\"\n},\noutput: {\n    path: path.join(__dirname, \"dist\"),\n    filename: \"./js/[name].bundle.js\"\n},\nmodule: {\n    loaders: [\n        { test: /\\.css$/, loader: ExtractTextPlugin.extract(\"style-loader\", \"css-loader\") },\n        { test: /\\.png$/, loader: \"file-loader?name=./assets/[name].[ext]\" }\n    ],\n    plugins: [\n        new ExtractTextPlugin(\"./css/[name]-bundle.css\")\n    ]\n}\n```\n\nSo we got\n\n``` css\n/* dist/css/main-bundle.css*/\nbody{\n   background:url(./assets/image.png)\n}\n```\n\nBut actually ,we want it to be `url(../assets/image.png)` when I config png loader `file-loader?name=../images/[name].[ext]` it put the image file to outside dist folder instead. I have found out that it's impossible to set url correctly\n"
+    },
+    "satisfaction_conditions": [
+      "Output directory structure must maintain specified hierarchy"
+    ],
+    "created_at": "2015-08-19T16:53:57Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1362",
+    "source": {
+      "issue_number": 1362
+    },
+    "initial_question": {
+      "title": "loading non-required files",
+      "body": "is it possible to use a loader on files that you don't require anywhere?\n\nfor example:\nI'm building my front-end code with Webpack but I also want to lint all *.js files in a server specific folder.\n\nthanks in advance.\nGeoffrey\n"
+    },
+    "satisfaction_conditions": [
+      "Build process must maintain separation between frontend and backend code processing"
+    ],
+    "created_at": "2015-08-17T10:03:40Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1225",
+    "source": {
+      "issue_number": 1225
+    },
+    "initial_question": {
+      "title": "Invalid arguments: 'delay' error",
+      "body": "The current version (1.8.11) is throwing an error in NodeWatchFileSystem,js file (line 29) in the NodeWatchFileSystem.prototype.watch method\n\nif(typeof delay !== \"number\")\n    throw new Error(\"Invalid arguments: 'delay'\");\n\nAccording our research the delay parameter, which is expected as a number, is in fact an object as you can see below: \n{ aggregateTimeout: 200 }\n\nWe used the same version in a previous project and this issues wasn't throwed there so it's posible that some change in the way delay is built introduced this error. \n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "The 'delay' parameter validation error must be resolved",
+      "The application must run without NodeWatchFileSystem errors"
+    ],
+    "created_at": "2015-07-07T14:20:10Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/1202",
+    "source": {
+      "issue_number": 1202
+    },
+    "initial_question": {
+      "title": "When will modules in ensure() be loaded to page? ",
+      "body": "After reading the docs and examples of Code Split,\nI don't really understand it.\n\n``` js\nvar a = require(\"a\");\nvar b = require(\"b\");\nrequire.ensure([\"c\"], function(require) {\n    require(\"b\").xyz();\n    var d = require(\"d\");\n});\n```\n\nMy question is when will \"c\" be loaded?\nWhen should I use require.ensure()?\n"
+    },
+    "satisfaction_conditions": [
+      "Module 'c' loads asynchronously after the main page load",
+      "Specified modules are available when callback executes",
+      "Module is loaded in a separate chunk file",
+      "Module only loads when require.ensure() is called"
+    ],
+    "created_at": "2015-06-27T03:37:43Z"
+  },
+  {
+    "id": "https://github.com/webpack/webpack/issues/799",
+    "source": {
+      "issue_number": 799
+    },
+    "initial_question": {
+      "title": "Question: circular angular dependencies?",
+      "body": "Hi, i have two files\n\n``` javascript\n//app.js\n(function(){\n  //initialize myApp\n  var myApp = angular.module('myApp', []);\n  //requiring constans.js to resolve USER_ROLES\n  require('constans.js');\n  //configure\n  myApp.config(function ($routeProvider, USER_ROLES) {\n    //something with USER_ROLES, e.g. call $routeProvider\n    $routeProvider\n        .when('/admin', {\n            templateUrl: 'admin.tpl.html',\n            controller: 'adminController',\n            access: {\n                authorizedRoles: [USER_ROLES.admin]\n            }\n        });\n    //...\n  });\n  module.exports = myApp;\n})();\n```\n\n``` javascript\n//constants.js\n(function(){\n  //Uncaught ReferenceError: myApp is not defined\n  myApp.constant('USER_ROLES', {\n    'all': '*',\n    'admin': 'ROLE_ADMIN',\n    'user': 'ROLE_USER'\n  });\n})();\n```\n\nconstant.js dependent on app.js and vice versa\nhow can I resolve circular dependencies, to prevent **Uncaught ReferenceError: myApp is not defined**, that constant USER_ROLES use myApp.\nCan anyone give me advice? Thx\n"
+    },
+    "satisfaction_conditions": [
+      "The Angular application module must be accessible when constants are defined",
+      "Constants must be available during route configuration",
+      "The circular dependency between files must be resolved",
+      "The USER_ROLES constant values must be properly registered with the Angular module"
+    ],
+    "created_at": "2015-02-18T11:46:14Z"
+  }
+]

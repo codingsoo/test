@@ -1,0 +1,97 @@
+[
+  {
+    "number": 3666,
+    "title": "Type Error with html 5 canvas ",
+    "created_at": "2015-06-04T19:13:44Z",
+    "closed_at": "2015-06-04T19:27:31Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/backbone/issues/3666",
+    "body": "Hello, I get a type error with backbone 1.2 from the cdnjs when rendering a model from within a view...\n$(document).ready(function(){\nvar Box = Backbone.Model.extend({defaults: {x: 0,y: 0, w: 1,h: 1,}\n});\nvar BoxSet = Backbone.Collection.extend({model:Box });\nvar BoxView= Backbone.View.extend({\n    render : function() {var model=this.model, ctx=this.options.ctx;}\n});\nvar SetView= Backbone.View.extend({ \n    initialize: function() {this.collection.on(\"all\",this.render,this);},\n    render: function() {var canvas=this.$el.get(0) , ctx=canvas.getContext(\"2d\");}\n});  \nvar c=new BoxSet();\nc.add({x:10,y:10,w:100,h:100});  \nvar v=new SetView({el:$(\"canvas\"),collection :c});\nv.render();\n})\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/backbone/issues/3666/comments",
+    "author": "billyholt",
+    "comments": [
+      {
+        "user": "jridgewell",
+        "created_at": "2015-06-04T19:27:31Z",
+        "body": "We no longer attach `options` to the view. You're error is in your `#render` trying to access the `ctx` property.\n"
+      }
+    ]
+  },
+  {
+    "number": 2653,
+    "title": "Backbone.history.start does not find route ",
+    "created_at": "2013-07-03T21:48:15Z",
+    "closed_at": "2013-07-04T12:15:50Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/backbone/issues/2653",
+    "body": "Suppose I have a web page called `test.html` and I want my `Backbone.Router` to be capable of handling routes like `test.html?new` and also `new`. I've written sth like:\n\n```\nroutes: {\n  'new': function(){alert('new');},\n  'test.html?new': function(){alert('test.html?new');}\n}\n```\n\nBut if I visit `test.html?new` nothing happens. In particular \n\n```\nconsole.log(Backbone.history.start({pushState:true})); // returns false\n```\n\nHowever both:\n\n```\nBackbone.history.navigate('test.html?new', {trigger:true})\nBackbone.history.navigate('new', {trigger:true})\n```\n\ntriggers the route.\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/backbone/issues/2653/comments",
+    "author": "neojski",
+    "comments": [
+      {
+        "user": "braddunbar",
+        "created_at": "2013-07-04T12:15:50Z",
+        "body": "Hi @neojski!  Backbone routers ignore the query string entirely in favor of using the path name (`/test.html/new`, or similar).  Check out #891 if you want all the gory details.  :)\n"
+      }
+    ]
+  },
+  {
+    "number": 2070,
+    "title": "When upgrade to 0.99, the console report an error: \"_.pick is not a function\"  ",
+    "created_at": "2013-01-04T16:18:36Z",
+    "closed_at": "2013-01-04T18:00:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/backbone/issues/2070",
+    "body": "Hello.\nWhen upgrade to 0.99, the console report an error: \"_.pick is not a function\"  . Why?\nPrevious version: 0.9.1\n\nRegards\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/backbone/issues/2070/comments",
+    "author": "vicenrele",
+    "comments": [
+      {
+        "user": "braddunbar",
+        "created_at": "2013-01-04T16:21:14Z",
+        "body": "Hi @vicenrele!  Have you updated your copy of underscore as well?  Backbone 0.9.9 requires underscore 1.4.3 or higher.\n"
+      }
+    ]
+  },
+  {
+    "number": 90,
+    "title": "Access a collection from a model",
+    "created_at": "2010-11-23T19:36:47Z",
+    "closed_at": "2010-11-24T04:24:33Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jashkenas/backbone/issues/90",
+    "body": "I need to access a collection from a model, and I get an error\n\nRelevant code:\n\n```\n$( function() {\n    var namespace = window;\n\n    namespace.Move = Backbone.Model.extend({\n        markable: function(){\n            var below = namespace.Moves.find(function(move) { // <= HERE !!!\n                return move.get(\"i\") === that.get('i')-1;\n            });\n            if(below !== undefined && !below.isNew()) return true;\n            return false;\n        }\n    });\n\n    namespace.Moves = Backbone.Collection.extend({\n        model: Move,\n        localStorage: new Store(\"moves\")\n    });\n});\n```\n\nStack trace (chromium):\n\n```\nUncaught TypeError: Object function (){return a.apply(this,arguments)} has no method 'find'\nj.c.each.c.forEach:9292/javascripts/vendor/underscore-min.js:9\nnamespace.RowView.Backbone.View.extend.render:9292/javascripts/views.js:30\nc.bind:9292/javascripts/vendor/underscore-min.js:16\nnamespace.AppView.Backbone.View.extend.add:9292/javascripts/views.js:72\nc.bind:9292/javascripts/vendor/underscore-min.js:16\nnamespace.AppView.Backbone.View.extend.render:9292/javascripts/views.js:66\nc.bind:9292/javascripts/vendor/underscore-min.js:16\nnamespace.AppView.Backbone.View.extend.initialize:9292/javascripts/views.js:60\ne.View:9292/javascripts/vendor/backbone-min.js:22\nr.d:9292/javascripts/vendor/backbone-min.js:26\n(anonymous function):9292/javascripts/views.js:77\nc.extend.ready:9292/javascripts/vendor/jquery-1.4.2.min.js:26\nL\n```\n",
+    "comments_url": "https://api.github.com/repos/jashkenas/backbone/issues/90/comments",
+    "author": "clyfe",
+    "comments": [
+      {
+        "user": "clyfe",
+        "created_at": "2010-11-23T19:51:07Z",
+        "body": "Note that Model#markable gets called from an `_.template()` via `this.model.markable()`\n\n```\nnamespace.MoveView = Backbone.View.extend({\n    tagName:  \"td\",\n    template: _.template($('#move-template').html()),\n    initialize: function() {\n        _.bindAll(this, \"render\");\n    },\n    render: function() {\n        $(this.el).html(this.template(this.model.toJSON()));\n        return this;\n    }\n});\n\n\n<script type=\"text/html\" id=\"move-template\">\n\n    <%= console.log(this.model.cid) %>\n    <%= console.log(this.model.markable()) %>\n\n  <div\n    id=\"square-<%= i %>-<%= j %>\"\n    class=\"square square-row-<%= i %> square-column-<%= j %>\"\n    ><%= mark %></div>\n\n</script>\n```\n"
+      },
+      {
+        "user": "jashkenas",
+        "created_at": "2010-11-23T20:24:16Z",
+        "body": "Looks like `Moves` doesn't actually have a `find` method defined. Right? Are you looking for `detect`?\n"
+      },
+      {
+        "user": "clyfe",
+        "created_at": "2010-11-24T09:41:51Z",
+        "body": "Changing `find` with `detect` doesn't work either\n\n```\nUncaught TypeError: Object function (){return a.apply(this,arguments)} has no method 'detect'\n```\n\nThe thing is either the `namespace.Moves` from inside `Move#markable` is not the same with the later-on-defined `namespace.Moves`, in witch case this seems like a \"chicken and egg\" issue, either `namespace.Moves` is hidden behind some proxy function somewhere...\n"
+      },
+      {
+        "user": "jashkenas",
+        "created_at": "2010-11-24T13:14:19Z",
+        "body": "Oh, of course. `namespace.Moves` is the collection class (the constructor function) -- not an instance of the collection. If you'd like to make an instance of it, you'll need:\n\n```\nnew namespace.Moves\n```\n"
+      }
+    ]
+  }
+]

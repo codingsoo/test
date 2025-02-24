@@ -1,0 +1,45 @@
+[
+  {
+    "number": 564,
+    "title": "'Revert Block' feature doesn't work",
+    "created_at": "2024-10-17T23:12:51Z",
+    "closed_at": "2024-10-18T12:45:16Z",
+    "labels": [
+      "Bug"
+    ],
+    "url": "https://github.com/cline/cline/issues/564",
+    "body": "### Which API Provider are you using?\n\nOpenRouter\n\n### Which Model are you using?\n\nClaude 3.5 Sonnet\n\n### What happened?\n\nThe revert block feature works up until you click the save button. Then it responds by saying something like \"Thank you for showing me the complete code, I'll now provide the complete code...\" and then it starts over as if the block wasn't inserted and saved. In summary, if it's actually saving the inserted blocks of missing code, it's telling the API something different.\n\n### Steps to reproduce\n\n1. Click the revert block button\r\n2. Click save\r\n3. Notice that the API still tries working on the file when it shouldn't.\r\n\n\n### Relevant API REQUEST output\n\n_No response_\n\n### Additional context\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/cline/cline/issues/564/comments",
+    "author": "techcow2",
+    "comments": [
+      {
+        "user": "saoudrizwan",
+        "created_at": "2024-10-18T12:45:16Z",
+        "body": "Thank you for bringing this up! It's a hit or miss reproducing this but it certainly did happen. I've adjusted the `write_to_file` tool response so that now it's more clear that the file's contents are updated and the model should course correct accordingly, rather than trying to re-apply the edit. Please update to v2.0.15 and lmk if that fixes the issue for you!\r\n\r\n```\r\npushToolResult(\r\n\t`The user made the following updates to your content:\\n\\n${userEdits}\\n\\n` +\r\n\t\t`The updated content, which includes both your original modifications and the user's edits, has been successfully saved to ${relPath.toPosix()}. Here is the full, updated content of the file:\\n\\n` +\r\n\t\t`<final_file_content path=\"${relPath.toPosix()}\">\\n${finalContent}\\n</final_file_content>\\n\\n` +\r\n\t\t`Please note:\\n` +\r\n\t\t`1. You do not need to re-write the file with these changes, as they have already been applied.\\n` +\r\n\t\t`2. Proceed with the task using this updated file content as the new baseline.\\n` +\r\n\t\t`3. If the user's edits have addressed part of the task or changed the requirements, adjust your approach accordingly.` +\r\n\t\t`${newProblemsMessage}`\r\n)\r\n```\r\n\r\nFeel free to re-open if you're still running into problems."
+      }
+    ]
+  },
+  {
+    "number": 272,
+    "title": "Approved file access but stuck in Claude tried to use read_file without value for required parameter 'path'. Retrying...",
+    "created_at": "2024-09-11T19:38:28Z",
+    "closed_at": "2024-09-15T15:20:06Z",
+    "labels": [],
+    "url": "https://github.com/cline/cline/issues/272",
+    "body": "I asked Claude to look into files and facing this issue\r\nClaude tried to use read_file without value for required parameter 'path'. Retrying...\r\n\r\nusing gemini through as follows. litellm --model gemini/gemini-1.5-flash ",
+    "comments_url": "https://api.github.com/repos/cline/cline/issues/272/comments",
+    "author": "subinpauljoy",
+    "comments": [
+      {
+        "user": "mbuhler",
+        "created_at": "2024-09-12T16:29:02Z",
+        "body": "I am getting a smilar error when trying to do the same thing with the same setup as the OP.  I get this error when asking to write code for a simple test application.   \r\n\r\nClaude tried to use write_to_file without value for required parameter 'path'. Retrying..."
+      },
+      {
+        "user": "saoudrizwan",
+        "created_at": "2024-09-15T15:20:06Z",
+        "body": "Pls try using the Google Gemini api provider option, it provides native support that should fix these issues"
+      }
+    ]
+  }
+]

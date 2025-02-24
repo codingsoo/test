@@ -1,0 +1,279 @@
+[
+  {
+    "number": 10128,
+    "title": "Ffmpeg extension quesion",
+    "created_at": "2022-03-30T05:25:24Z",
+    "closed_at": "2022-03-30T14:19:17Z",
+    "labels": [
+      "question",
+      "needs triage"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/10128",
+    "body": "I'm able to build the ffmpeg extension and use it in the demo app and my own app. But I want to just have the armeabi-v7a and arm64-v8a libraries generated only to reduce the apk size. When I build the demo project, it seems  x86 and x64_64 libraries needs to be in  the ANDROID-LIBS folder. I build the ffmpeg extension in  the Linux machine and  copy the ffmpeg directory to Windows 10  where Android Studio is resided. What needs to be done to achieve this? Thanks.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/10128/comments",
+    "author": "tpuserhp",
+    "comments": [
+      {
+        "user": "vovan888",
+        "created_at": "2022-03-30T10:58:23Z",
+        "body": "app/build.gradle:\r\n\r\n```\r\nandroid {\r\n        ndk {\r\n            abiFilters \"armeabi-v7a\", \"arm64-v8a\"\r\n        }\r\n}\r\n\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 9008,
+    "title": "Issue with wrap_content in ExoPlayerView. ExoPlayerView height remain 0 at run-time if it set to wrap_content",
+    "created_at": "2021-06-02T11:46:32Z",
+    "closed_at": "2021-06-02T17:14:09Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/9008",
+    "body": "[Condition]\r\n - video url only available\r\n\r\nThe title of this issue was on Stack Overflow but there was no answer.\r\n\r\nI was trying to set exoplayers to recyclerview with multiple media source.\r\n\r\nAutomatic video playback takes up space appropriately. Also, if the height value is given as an absolute value, thumbnail can be seen through the \"use_artwork\" option even if no replay is made('But it's not fit to the given layout).\r\n\r\nSo I brought a thumbnail separately through Glide, but it was too slow.\r\n\r\nIs there a way to automatically set the height value without playing the EXO player automatically or setting an absolute value?\r\n\r\n```\r\n<com.google.android.exoplayer2.ui.PlayerView\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                app:use_artwork=\"true\"\r\n                app:resize_mode=\"fit\"\r\n                app:show_buffering=\"when_playing\"\r\n                />\r\n```",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/9008/comments",
+    "author": "JiyongYang",
+    "comments": [
+      {
+        "user": "andrewlewis",
+        "created_at": "2021-06-02T14:12:57Z",
+        "body": "If you are trying to set the height of the player view such that it matches the shape of the video but without actually loading the video I don't think there is a way to do that. You can `pause()` the player before preparing it if you want to load the media (and acquire resources for buffering and decoders) but not actually start playback. I'm not sure I follow the question though, so perhaps you could rephrase?"
+      }
+    ]
+  },
+  {
+    "number": 8243,
+    "title": "Exoplayer in viewpager2 with offscreen limit buffers in background",
+    "created_at": "2020-11-18T02:26:27Z",
+    "closed_at": "2020-12-18T17:13:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/8243",
+    "body": "We are using exoplayer inside a viewpager 2 fragment. we have defined off set screen limit to 2. While initialising the player we are setting `playwhenready = false `we have defined max buffer ms as 3. We expected video on position 1 and 2 to have buffered max of 3 sec, However the players in position 1 and 2 while user is at 0th position is buffering more than defined time and sometimes entire video is cached if video is around 1mb in size. \r\n\r\n```\r\nconst val DEFAULT_MIN_BUFFER_MS = 500\r\nconst val DEFAULT_MAX_BUFFER_MS = 3000\r\nconst val DEFAULT_MIN_BUFFER_FOR_PLAY_BACK = 500\r\nconst val DEFAULT_MIN_BUFFER_AFTER_REBUFFER = 500\r\n```\r\n  ```\r\n  var player = SimpleExoPlayer.Builder(Mitron.getContext(), DefaultRenderersFactory(Mitron.getContext()))\r\n                    .setLoadControl(\r\n                            DefaultLoadControl.Builder()\r\n                                    .setPrioritizeTimeOverSizeThresholds(false)\r\n                                    .setBufferDurationsMs(\r\n                                            Constants.DEFAULT_MIN_BUFFER_MS,\r\n                                            Constants.DEFAULT_MAX_BUFFER_MS,\r\n                                            Constants.DEFAULT_MIN_BUFFER_FOR_PLAY_BACK,\r\n                                            Constants.DEFAULT_MIN_BUFFER_AFTER_REBUFFER\r\n                                    )\r\n                                    .createDefaultLoadControl()\r\n                    )\r\n                    .setTrackSelector(DefaultTrackSelector())\r\n                    .build()\r\n            player.playWhenReady = false\r\n            binding?.playerview?.useController = true\r\n            binding?.playerview?.setKeepContentOnPlayerReset(true)\r\n            var cacheKey = if (videoModel?.video_url?.contains(\"?\") == true) {\r\n                videoModel?.video_url?.substring(0, videoModel?.video_url?.lastIndexOf(\"?\") ?: 1)\r\n            } else {\r\n                videoModel?.video_url\r\n            }\r\n            val mediaSource =\r\n                    ProgressiveMediaSource.Factory(CacheUtils.cacheDataSourceFactory)\r\n                            .setCustomCacheKey(cacheKey).createMediaSource(Uri.parse(videoModel?.video_url))\r\n            player.prepare(mediaSource)\r\n            binding?.playerview?.player = player\r\n```\r\n ```\r\n for_you_pager.setOffscreenPageLimit(2);\r\n for_you_pager.registerOnPageChangeCallback(forYouPagerListener);\r\n for_you_pager.setAdapter(forYoupagerAdapter);\r\n for_you_pager.setPageTransformer(new ParallaxTransformer());\r\n```",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/8243/comments",
+    "author": "Arunkarthicknallasami",
+    "comments": [
+      {
+        "user": "tonihei",
+        "created_at": "2020-12-17T16:48:37Z",
+        "body": "Sorry for the delay in answering your question, I didn't realize I was assigned to the issue.\r\n\r\n`ProgressiveMediaSource` loads the data in chunks of a certain byte size before checking whether loading should continue. The default size of these chunks is 1 MB, so that's why we always load 1 MB even though it may be more than your configured max buffer duration in seconds. \r\n\r\nIf you want to check more often, you can call `setContinueLoadingCheckIntervalBytes` on `ProgressiveMediaSource.Factory` and specify any number you want. Note that this comes with a small pause in loading, so you shouldn't choose this chunk size too small to avoid stalling the loading process too much."
+      }
+    ]
+  },
+  {
+    "number": 8117,
+    "title": "Crash while playing HLS live content (probably a playlist update retry process)",
+    "created_at": "2020-10-27T01:47:11Z",
+    "closed_at": "2020-10-28T01:17:33Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/8117",
+    "body": "In exoplayer 2.10.6\r\n\r\nI am having trouble with a crashing phenomenon while playing live content on HLS.\r\n\r\nIt was crashing in the part of the playlist where I was getting an I/O (HTTP) error and retrying to get the playlist update.\r\n\r\nI suspect the crash is caused by the fact that the process of updating currentTask is not thread-safe.\r\n\r\nI think that if <Loader#startLoading> is called between <Loader.LoadTask#finish> and <Loader.LoadTask#start> in <Loader.LoadTask#handleMessage>, it will be like this.\r\n\r\nIs this working as designed?\r\n\r\n\r\nLogging of crashes:\r\n```\r\nFatal Exception: java.lang.IllegalStateException\r\n       at com.google.android.exoplayer2.util.Assertions.checkState(Assertions.java:81)\r\n       at com.google.android.exoplayer2.upstream.Loader$LoadTask.start(Loader.java:351)\r\n       at com.google.android.exoplayer2.upstream.Loader$LoadTask.handleMessage(Loader.java:481)\r\n       at android.os.Handler.dispatchMessage(Handler.java:106)\r\n       at android.os.Looper.loop(Looper.java:193)\r\n       at android.app.ActivityThread.main(ActivityThread.java:6758)\r\n       at java.lang.reflect.Method.invoke(Method.java)\r\n       at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:493)\r\n       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:858)",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/8117/comments",
+    "author": "Our-colibri",
+    "comments": [
+      {
+        "user": "ojw28",
+        "created_at": "2020-10-27T19:33:22Z",
+        "body": "For that stack trace to happen, I think `Loader.startLoading` must have been called on the application's main thread. This should never happen, since loads are only expected to be started by the player's own internal thread(s).\r\n\r\nThis suggests to me that your application code might be calling something directly that it shouldn't be calling. Perhaps your application code is calling `prepareSource` on a `MediaSource` instance, for example. Could you take a look? If that's not the case, I think you'll need to figure out how `Laoder.startLoading` ends up being called on the application's main thread. If you can point to where this happens in the ExoPlayer library, then that would be something we could investigate and fix.\r\n"
+      }
+    ]
+  },
+  {
+    "number": 7514,
+    "title": "PlayerNotificationManager not showing notification for video",
+    "created_at": "2020-06-17T10:48:32Z",
+    "closed_at": "2020-06-17T12:53:56Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/7514",
+    "body": "I have application which plays video and I want to show notification with player controls - play, pause, next, previous etc.\r\nI tried using PlayerNotificationManager mentioned in the Medium Post\r\nPlayerNotificationManager\r\nBut the notification isn't visible. I assigned the player to notification manager after the player is initialised.\r\n\r\nChecking on android API 29 and I am using SimpleExoPlayer for player and setting it to notification manager\r\n\r\n          `  DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(getContext())\r\n                .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);\r\n        SimpleExoPlayer   player = new SimpleExoPlayer.Builder(getContext(), defaultRenderersFactory)\r\n                .setTrackSelector(trackSelector)\r\n                .build();\r\n        player.addListener(this);\r\n        playerView.setPlayer(player);\r\n        playerView.setPlaybackPreparer(this);\r\n        PlayerNotificationManager playerNotificationManager = new PlayerNotificationManager(\r\n                appCMSPresenter.getCurrentContext(),\r\n                \"player not\",\r\n                459, new DescriptionAdapter());\r\n\r\n        playerNotificationManager.setPlayer(player);`",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/7514/comments",
+    "author": "wishy-viewlift",
+    "comments": [
+      {
+        "user": "marcbaechinger",
+        "created_at": "2020-06-17T11:57:27Z",
+        "body": "With the code above you are saying that you have created a notification channel with the title `player not`. If such a notification channel does not exist, the system will not show the notification and I believe you would find something in the logs telling this (not sure though).\r\n\r\nCan you double check  whether the notification channel 'player not' has been properly created? \r\n\r\nIf you find you need to create a channel first, you may consider looking into the static factory method which will create the channel with the declared id's and names for you.\r\n\r\n```\r\ncreateWithNotificationChannel(\r\n      Context context,\r\n      String channelId,\r\n      @StringRes int channelName,\r\n      @StringRes int channelDescription,\r\n      int notificationId,\r\n      MediaDescriptionAdapter mediaDescriptionAdapter)\r\n```\r\n\r\nIf this does not work, please accept my apologies and do a bug report and upload it here so I can look into your issue some more. You can alternatively send the bug report by email to dev.exoplayer@gmail.com using a subject in the format \"Issue #7514\"."
+      }
+    ]
+  },
+  {
+    "number": 6580,
+    "title": "Error: ExoPlaybackException OutOfMemoryError when play .mkv local file.",
+    "created_at": "2019-10-25T09:26:34Z",
+    "closed_at": "2019-11-02T02:25:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/6580",
+    "body": "- ExoPlayer version: 2.10.6\r\n- OS: android 9.0\r\n\r\nHi Dev team, I play file mkv from local (size 3840*2160 - 30s - 679MB), when play to 10s -> OutOfMemoryError\r\n\r\n```\r\nLog: 019-10-25 16:11:57.109 9875-10049/net.vsmart.vphotos E/ExoPlayerImplInternal: Source error.\r\n    com.google.android.exoplayer2.upstream.Loader$UnexpectedLoaderException: Unexpected OutOfMemoryError: Failed to allocate a 65552 byte allocation with 58232 free bytes and 56KB until OOM, max allowed footprint 268435456, growth limit 268435456\r\n        at com.google.android.exoplayer2.upstream.Loader$LoadTask.run(Loader.java:424)\r\n        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)\r\n        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)\r\n        at java.lang.Thread.run(Thread.java:764)\r\n     Caused by: java.lang.OutOfMemoryError: Failed to allocate a 65552 byte allocation with 58232 free bytes and 56KB until OOM, max allowed footprint 268435456, growth limit 268435456\r\n        at com.google.android.exoplayer2.upstream.DefaultAllocator.allocate(DefaultAllocator.java:102)\r\n        at com.google.android.exoplayer2.source.SampleQueue.preAppend(SampleQueue.java:641)\r\n        at com.google.android.exoplayer2.source.SampleQueue.sampleData(SampleQueue.java:561)\r\n        at com.google.android.exoplayer2.extractor.mkv.MatroskaExtractor.readToOutput(MatroskaExtractor.java:1461)\r\n        at com.google.android.exoplayer2.extractor.mkv.MatroskaExtractor.writeSampleData(MatroskaExtractor.java:1363)\r\n        at com.google.android.exoplayer2.extractor.mkv.MatroskaExtractor.binaryElement(MatroskaExtractor.java:1161)\r\n        at com.google.android.exoplayer2.extractor.mkv.MatroskaExtractor$InnerEbmlProcessor.binaryElement(MatroskaExtractor.java:1628)\r\n        at com.google.android.exoplayer2.extractor.mkv.DefaultEbmlReader.read(DefaultEbmlReader.java:138)\r\n        at com.google.android.exoplayer2.extractor.mkv.MatroskaExtractor.read(MatroskaExtractor.java:440)\r\n        at com.google.android.exoplayer2.source.ProgressiveMediaPeriod$ExtractingLoadable.load(ProgressiveMediaPeriod.java:965)\r\n        at com.google.android.exoplayer2.upstream.Loader$LoadTask.run(Loader.java:394)\r\n        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)\u00a0\r\n        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)\u00a0\r\n```\r\n\r\nPlease help me re-check and resolve this issue. Thanks so much!",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/6580/comments",
+    "author": "BuiVanNam",
+    "comments": [
+      {
+        "user": "tonihei",
+        "created_at": "2019-10-31T15:05:27Z",
+        "body": "> 30s - 679MB\r\n\r\nThat's 181 Mbps :)\r\n\r\nExoPlayer buffers up to a certain minimum buffer length by default irrespective of the memory usage. If you want ExoPlayer to stop buffering at the target memory usage, you can try to set `DefaultLoadControl.Builder.setPrioritizeTimeOverSizeThresholds(false)`."
+      }
+    ]
+  },
+  {
+    "number": 4490,
+    "title": "IllegalStateException: Assertions.checkState When using same instance of SimpleCache",
+    "created_at": "2018-07-10T07:59:00Z",
+    "closed_at": "2018-07-10T09:06:39Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/4490",
+    "body": "Hi,\r\nI am getting the exception\r\n```\r\njava.lang.IllegalStateException\r\nat com.google.android.exoplayer2.util.Assertions.checkState(Assertions.java:81)\r\nat com.google.android.exoplayer2.upstream.cache.SimpleCache.getContentMetadata(SimpleCache.java:348)\r\nat com.google.android.exoplayer2.upstream.cache.SimpleCache.getContentLength(SimpleCache.java:335)\r\nat com.google.android.exoplayer2.upstream.cache.CacheUtil.getCached(CacheUtil.java:88)\r\n```\r\n when I'm trying to use the singleton instance of SimpleCache.\r\n```\r\ncompanion object DownloadCache {\r\n        private var downloadCache: Cache? = null\r\n        private var downloadDirectory: File? = null\r\n\r\n        @Synchronized\r\n        internal fun getDownloadCache(context: Context): Cache {\r\n            if (downloadCache == null) {\r\n                val downloadContentDirectory = File(getDownloadDirectory(context), \"cache\")\r\n                downloadCache = SimpleCache(downloadContentDirectory, NoOpCacheEvictor())\r\n            }\r\n            return downloadCache!!\r\n        }\r\n\r\n        private fun getDownloadDirectory(context: Context): File {\r\n            if (downloadDirectory == null) {\r\n                downloadDirectory = File(LogTrackUtil().getDir(context))\r\n                if (downloadDirectory == null) {\r\n                    downloadDirectory = context.filesDir\r\n                }\r\n            }\r\n            return downloadDirectory!!\r\n        }\r\n    }\r\n```\r\n\r\nI am checking the cached data for a particular URL.\r\nThe below code works perfectly for the first time but following calls to this code throws the exception.\r\n```\r\ndownloadCache = VideoPlayerUtil.getDownloadCache(mContext!!) as SimpleCache\r\nval uri = Uri.parse(mExercise?.fileUrl)\r\nval counters = CacheUtil.CachingCounters()\r\nCacheUtil.getCached(DataSpec(uri), downloadCache, counters)\r\n```\r\n\r\nWhat am I doing wrong?? Please help.",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/4490/comments",
+    "author": "joecizac",
+    "comments": [
+      {
+        "user": "erdemguven",
+        "created_at": "2018-07-10T09:06:39Z",
+        "body": "Probably, you're releasing your singleton instance of SimpleCache (using SimpleCache.release() method) at some point and then try to reuse it. That's why it's throwing that exception.\r\n\r\nAs you use a singleton, I think you can just remove the call to release(). Otherwise you need to recreate another SimpleCache instance after release() call."
+      }
+    ]
+  },
+  {
+    "number": 3405,
+    "title": "Multiple ClippingMediaSource not working for m3u8 files ",
+    "created_at": "2017-10-30T05:28:00Z",
+    "closed_at": "2017-10-31T13:04:58Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/3405",
+    "body": "# Issue \r\n**When I use two or more ClippingMediaSource not working for m3u8. But working same code for MP4**\r\n\r\n### Reproduction steps\r\n\r\n**Bug : When I use Multiple ClippingMediaSource for m3u8 files not working**\r\n\r\nBut working in following cases\r\n\r\n1. Only one ClippingMediaSource with m3u8 - working\r\n2. Multiple ClippingMediaSource with mp4 - working \r\n\r\n\r\n        MediaSource movieMediaSource =getMediaSourceFromUrl(context, mLiveURL);\r\n            final long oneMinute = 60000000L;\r\n            ClippingMediaSource videoSource1 = new ClippingMediaSource(movieMediaSource, 0, oneMinute/2);\r\n\r\n            ClippingMediaSource videoSource2 = new ClippingMediaSource(movieMediaSource, oneMinute/2, oneMinute);\r\n  \r\n            ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource(videoSource1,videoSource2);\r\n\r\n\r\n       public static MediaSource getMediaSourceFromUrl(Context context, String url) {\r\n        mBandwidthMeter = new DefaultBandwidthMeter();\r\n       //Produces DataSource instances through which media data is loaded.\r\n        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(context, \r\n        Util.getUserAgent(context, \"MOD\"), mBandwidthMeter);\r\n       //Produces Extractor instances for parsing the media data.\r\n        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();\r\n        MediaSource videoSource = null;\r\n        if (url != null && !url.isEmpty()) {\r\n            Log.d(TAG, \"getMediaSourceFromUrl: 11\");\r\n            if (url.contains(\".m3u8\")) {\r\n          //FOR LIVESTREAM LINK:\r\n                Uri mp4VideoUri = Uri.parse(url);\r\n                videoSource = new HlsMediaSource(mp4VideoUri, dataSourceFactory, null, null);\r\n        \r\n            } else if (url.contains(\".mp4\")) {\r\n         //FOR SD CARD SOURCE:\r\n                Uri mp4VideoUri = Uri.parse(url);\r\n                videoSource = new ExtractorMediaSource(mp4VideoUri, dataSourceFactory, extractorsFactory, null, null);\r\n              }\r\n           }\r\n            return videoSource;\r\n        }\r\n\r\n\r\n### Version of ExoPlayer being used\r\n2.5.4\r\n\r\n### Device(s) and version(s) of Android being used\r\nAndroid 5.1 & Android 7.0\r\n\r\n### A full bug report captured from the device\r\n\r\nLenova A6000+  & Nexus 6\r\n\r\n\r\n### Error Log\r\n\r\n> Internal runtime error.\r\n                                                                    java.lang.IllegalStateException at com.google.android.exoplayer2.util.Assertions.checkState(Assertions.java:79) at com.ajax.mod.controller.player.MyHlsMediaSource.prepareSource(MyHlsMediaSource.java:97)  at com.google.android.exoplayer2.source.ClippingMediaSource.prepareSource(ClippingMediaSource.java:89) at com.google.android.exoplayer2.source.ConcatenatingMediaSource.prepareSource(ConcatenatingMediaSource.java:78) at com.google.android.exoplayer2.ExoPlayerImplInternal.prepareInternal(ExoPlayerImplInternal.java:425)  at com.google.android.exoplayer2.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:328) at android.os.Handler.dispatchMessage(Handler.java:98)\r\nat android.os.Looper.loop(Looper.java:154)\r\nat android.os.HandlerThread.run(HandlerThread.java:61)",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/3405/comments",
+    "author": "rranjithkumar100",
+    "comments": [
+      {
+        "user": "tonihei",
+        "created_at": "2017-10-30T09:12:04Z",
+        "body": "The problem is that you can't re-use MediaSources. That means you need to create a new movieMediaSource for each ClippingMediaSource. "
+      }
+    ]
+  },
+  {
+    "number": 2969,
+    "title": "UnrecognizedInputFormatException when play dash live stream in v2 ",
+    "created_at": "2017-06-19T13:11:15Z",
+    "closed_at": "2017-06-19T14:59:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/2969",
+    "body": "There is a live stream(dash with widevine),  it worked fine in exoplayer v1, but after upgrade to v2, it shows below error   \r\n```                                              com.google.android.exoplayer2.source.UnrecognizedInputFormatException: None of the available extractors (MatroskaExtractor, FragmentedMp4Extractor, Mp4Extractor, Mp3Extractor, AdtsExtractor, Ac3Extractor, TsExtractor, FlvExtractor, OggExtractor, PsExtractor, WavExtractor) could read the stream.\r\n                                                                       at com.google.android.exoplayer2.source.ExtractorMediaPeriod$ExtractorHolder.selectExtractor(ExtractorMediaPeriod.java:722)\r\n                                                                       at com.google.android.exoplayer2.source.ExtractorMediaPeriod$ExtractingLoadable.load(ExtractorMediaPeriod.java:645)\r\n                                                                       at com.google.android.exoplayer2.upstream.Loader$LoadTask.run(Loader.java:295)\r\n                                                                       at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)\r\n                                                                       at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)\r\n                                                                       at java.lang.Thread.run(Thread.java:761)\r\n06-19 22:23:13.812 2750-3372/com.test.player E/ExoPlayerImplInternal: Source error.\r\n                                                                             com.google.android.exoplayer2.source.UnrecognizedInputFormatException: None of the available extractors (MatroskaExtractor, FragmentedMp4Extractor, Mp4Extractor, Mp3Extractor, AdtsExtractor, Ac3Extractor, TsExtractor, FlvExtractor, OggExtractor, PsExtractor, WavExtractor) could read the stream.\r\n                                                                                 at com.google.android.exoplayer2.source.ExtractorMediaPeriod$ExtractorHolder.selectExtractor(ExtractorMediaPeriod.java:722)\r\n                                                                                 at com.google.android.exoplayer2.source.ExtractorMediaPeriod$ExtractingLoadable.load(ExtractorMediaPeriod.java:645)\r\n                                                                                 at com.google.android.exoplayer2.upstream.Loader$LoadTask.run(Loader.java:295)\r\n                                                                                 at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1133)\r\n                                                                                 at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:607)\r\n                                                                                 at java.lang.Thread.run(Thread.java:761)\r\n06-19 22:23:13.812 2750-2750/com.test.player E/playback\u00a0error\u00a0>>>: com.google.android.exoplayer2.ExoPlaybackException\r\n```\r\nShould I email you the MPD file?\r\nThanks.\r\n",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/2969/comments",
+    "author": "jiafei1986",
+    "comments": [
+      {
+        "user": "ojw28",
+        "created_at": "2017-06-19T13:46:21Z",
+        "body": "You're trying to play a DASH stream using `ExtractorMediaSource`, where-as you should be using `DashMediaSource`."
+      }
+    ]
+  },
+  {
+    "number": 2332,
+    "title": "STATE_ENDED not detected r2.1.1",
+    "created_at": "2017-01-16T05:25:40Z",
+    "closed_at": "2017-01-16T14:14:18Z",
+    "labels": [
+      "question",
+      "wont fix: infeasible"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/2332",
+    "body": "STATE_ENDED not detected. Video repeating , looping never stoped. if i remove \" exoplayerview.setPlayer(exoplayer);\" only audio playing not repeating \r\n\r\n\r\n ` BandwidthMeter defaultBandWidthMeter = new DefaultBandwidthMeter();\r\n        TrackSelection.Factory videoTrackSelectionFactory =\r\n                new AdaptiveVideoTrackSelection.Factory(defaultBandWidthMeter);\r\n        TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);\r\n        LoadControl loadControl = new DefaultLoadControl();\r\n        exoplayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);\r\n        exoplayerview.setPlayer(exoplayer);\r\n       // exoplayer.setPlayWhenReady(true);\r\n        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(\r\n                this,\r\n                Util.getUserAgent(this, getString(R.string.app_name)),\r\n                (DefaultBandwidthMeter) defaultBandWidthMeter\r\n        );\r\n        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();\r\n        MediaSource videoSource = new ExtractorMediaSource(\r\n                Uri.parse(VIDEO_URL),\r\n                dataSourceFactory,\r\n                extractorsFactory,\r\n                null, null\r\n        );\r\n        LoopingMediaSource loopingSource = new LoopingMediaSource(videoSource);\r\n        exoplayer.prepare(loopingSource);\r\n\r\n\r\n        exoplayer.addListener(new ExoPlayer.EventListener() {\r\n\r\n            @Override\r\n            public void onLoadingChanged(boolean isLoading) {\r\n                Log.v(\"isLoading\",\"Listener-onLoadingChanged...\");\r\n\r\n            }\r\n\r\n            @Override\r\n            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {\r\n                Log.v(\"playWhenReady\",\"Listener-onPlayerStateChanged...\");\r\n\r\n                switch(playbackState) {\r\n                    case ExoPlayer.STATE_BUFFERING:\r\n                        videoprogressBar.setVisibility(View.VISIBLE);\r\n                        exo_play.setVisibility(View.GONE);\r\n                        exo_pause.setVisibility(View.GONE);\r\n                        break;\r\n                    case ExoPlayer.STATE_ENDED:\r\n                        exoplayer.setPlayWhenReady(false);\r\n                        exoplayer.seekTo(0,0);\r\n                        Toast.makeText(VideoView_Activity.this, \"stoped\", Toast.LENGTH_LONG).show();\r\n                        Log.v(\"naagu\",\"Listener-onLoadingChanged...\");\r\n                        break;\r\n                    case ExoPlayer.STATE_IDLE:\r\n                        break;\r\n\r\n                    case ExoPlayer.STATE_READY:\r\n                        if (exoplayer.getPlayWhenReady()) {\r\n                            videoprogressBar.setVisibility(View.GONE);\r\n                        } else {\r\n\r\n                        }\r\n                        break;\r\n                    default:\r\n                        break;\r\n                }\r\n\r\n            }\r\n\r\n            @Override\r\n            public void onTimelineChanged(Timeline timeline, Object manifest) {\r\n                Log.v(\"timeline\",\"Listener-onTimelineChanged...\");\r\n\r\n            }\r\n\r\n            @Override\r\n            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {\r\n\r\n            }\r\n\r\n            @Override\r\n            public void onPlayerError(ExoPlaybackException error) {\r\n\r\n            }\r\n\r\n            @Override\r\n            public void onPositionDiscontinuity() {\r\n                Log.v(\"onPositionDiscontinuity\",\"Listener-onPositionDiscontinuity...\");\r\n\r\n            }\r\n        });\r\n        exoplayer.setPlayWhenReady(true);\r\n`",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/2332/comments",
+    "author": "Naguchennai",
+    "comments": [
+      {
+        "user": "AquilesCanta",
+        "created_at": "2017-01-16T10:13:42Z",
+        "body": "This is working as intended. As you mention, you are using a LoopingMediaSource, so the player doesn't end because the media goes on \"_forever_\".\r\n\r\nCould you please clarify:\r\n>  if i remove \" exoplayerview.setPlayer(exoplayer);\" only audio playing not repeating\r\n\r\nIf you remove that line the player actually reaches ENDED state? Or it doesn't but the audio doesn't loop, as it would with the line."
+      }
+    ]
+  },
+  {
+    "number": 1915,
+    "title": "Logcat show error when come back the activity. ",
+    "created_at": "2016-10-08T07:09:33Z",
+    "closed_at": "2016-10-10T03:06:24Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/1915",
+    "body": "Reproduction step:\n1. Play a video with ExoPlayer at a activity, exoPlayer to show the video with surfaceView.\n2. Leave the activity at playing a video.\n3. After that,come back the activity, play the video continue, logcat show error.\n\nNote:\nThe surface view is destroy when i leave the activity, i create a new surface view when come back. The instance of exoPlayer is not destroy throughout the process.\n\nLog:\n\n```\n10-08 15:08:05.028 15837-6568/com.fxtv.threebears E/BufferQueueProducer: [SurfaceTexture-0-15837-11] queueBuffer: BufferQueue has been abandoned\n10-08 15:08:05.028 15837-6568/com.fxtv.threebears E/Surface: queueBuffer: error queuing buffer to SurfaceTexture, -19\n10-08 15:08:05.028 15837-6568/com.fxtv.threebears E/ACodec: queueBuffer failed in onOutputBufferDrained: -19\n10-08 15:08:05.028 15837-6568/com.fxtv.threebears E/ACodec: signalError(omxError 0x80001001, internalError -19)\n10-08 15:08:05.028 15837-6567/com.fxtv.threebears E/MediaCodec: Codec reported err 0xffffffed, actionCode 0, while in state 6\n10-08 15:08:05.036 15837-6529/com.fxtv.threebears E/ExoPlayerImplInternal: Internal runtime error.\n                                                                           java.lang.IllegalStateException\n                                                                               at android.media.MediaCodec.native_dequeueInputBuffer(Native Method)\n                                                                               at android.media.MediaCodec.dequeueInputBuffer(MediaCodec.java:2505)\n                                                                               at com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.feedInputBuffer(MediaCodecRenderer.java:536)\n                                                                               at com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.render(MediaCodecRenderer.java:478)\n                                                                               at com.google.android.exoplayer2.ExoPlayerImplInternal.doSomeWork(ExoPlayerImplInternal.java:431)\n                                                                               at com.google.android.exoplayer2.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:265)\n                                                                               at android.os.Handler.dispatchMessage(Handler.java:98)\n                                                                               at android.os.Looper.loop(Looper.java:154)\n                                                                               at android.os.HandlerThread.run(HandlerThread.java:61)\n                                                                               at com.google.android.exoplayer2.util.PriorityHandlerThread.run(PriorityHandlerThread.java:40)\n10-08 15:08:05.066 15837-6568/com.fxtv.threebears E/Surface: getSlotFromBufferLocked: unknown buffer: 0xc40db3a0\n10-08 15:08:05.066 15837-6568/com.fxtv.threebears W/ACodec: [OMX.qcom.video.decoder.avc] can not return buffer 38 to native window\n10-08 15:08:05.067 15837-6568/com.fxtv.threebears E/Surface: getSlotFromBufferLocked: unknown buffer: 0xc40daec0\n10-08 15:08:05.067 15837-6568/com.fxtv.threebears W/ACodec: [OMX.qcom.video.decoder.avc] can not return buffer 37 to native window\n10-08 15:08:05.067 15837-6568/com.fxtv.threebears E/Surface: getSlotFromBufferLocked: unknown buffer: 0xc40daf20\n10-08 15:08:05.067 15837-6568/com.fxtv.threebears W/ACodec: [OMX.qcom.video.decoder.avc] can not return buffer 36 to native window\n10-08 15:08:05.068 15837-6568/com.fxtv.threebears E/Surface: getSlotFromBufferLocked: unknown buffer: 0xc40da440\n10-08 15:08:05.068 15837-6568/com.fxtv.threebears W/ACodec: [OMX.qcom.video.decoder.avc] can not return buffer 35 to native window\n10-08 15:08:05.069 15837-6568/com.fxtv.threebears E/Surface: getSlotFromBufferLocked: unknown buffer: 0xc40db520\n10-08 15:08:05.069 15837-6568/com.fxtv.threebears W/ACodec: [OMX.qcom.video.decoder.avc] can not return buffer 32 to native window\n10-08 15:08:05.069 15837-6568/com.fxtv.threebears E/Surface: getSlotFromBufferLocked: unknown buffer: 0xc40db640\n10-08 15:08:05.069 15837-6568/com.fxtv.threebears W/ACodec: [OMX.qcom.video.decoder.avc] can not return buffer 31 to native window\n10-08 15:08:05.082 15837-15837/com.fxtv.threebears D/fxtv_MeasureHelper: doMeasure,default width size = 2560\n10-08 15:08:05.082 15837-15837/com.fxtv.threebears D/fxtv_MeasureHelper: doMeasure,default height size = 1440\n10-08 15:08:05.083 15837-15837/com.fxtv.threebears D/fxtv_MeasureHelper: doMeasure,result w=2560,h=1440\n10-08 15:08:05.084 15837-15837/com.fxtv.threebears D/fxtv_MeasureHelper: doMeasure,default width size = 2560\n10-08 15:08:05.085 15837-15837/com.fxtv.threebears D/fxtv_MeasureHelper: doMeasure,default height size = 1440\n10-08 15:08:05.085 15837-15837/com.fxtv.threebears D/fxtv_MeasureHelper: doMeasure,result w=2560,h=1440\n10-08 15:08:05.087 15837-6529/com.fxtv.threebears E/ExoPlayerImplInternal: Stop failed.\n                                                                           java.lang.IllegalStateException\n                                                                               at android.media.MediaCodec.native_stop(Native Method)\n                                                                               at android.media.MediaCodec.stop(MediaCodec.java:2005)\n                                                                               at com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.releaseCodec(MediaCodecRenderer.java:441)\n                                                                               at com.google.android.exoplayer2.mediacodec.MediaCodecRenderer.onDisabled(MediaCodecRenderer.java:396)\n                                                                               at com.google.android.exoplayer2.video.MediaCodecVideoRenderer.onDisabled(MediaCodecVideoRenderer.java:275)\n                                                                               at com.google.android.exoplayer2.BaseRenderer.disable(BaseRenderer.java:136)\n                                                                               at com.google.android.exoplayer2.ExoPlayerImplInternal.resetInternal(ExoPlayerImplInternal.java:624)\n                                                                               at com.google.android.exoplayer2.ExoPlayerImplInternal.stopInternal(ExoPlayerImplInternal.java:600)\n                                                                               at com.google.android.exoplayer2.ExoPlayerImplInternal.handleMessage(ExoPlayerImplInternal.java:317)\n                                                                               at android.os.Handler.dispatchMessage(Handler.java:98)\n                                                                               at android.os.Looper.loop(Looper.java:154)\n                                                                               at android.os.HandlerThread.run(HandlerThread.java:61)\n                                                                               at com.google.android.exoplayer2.util.PriorityHandlerThread.run(PriorityHandlerThread.java:40)\n\n```\n",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/1915/comments",
+    "author": "hardcattle",
+    "comments": [
+      {
+        "user": "ojw28",
+        "created_at": "2016-10-09T15:50:01Z",
+        "body": "The logging is indicative of you not clearing the old `Surface` from the player when it's destroyed. It looks like an application error, in that you're most likely failing to do this.\n"
+      }
+    ]
+  },
+  {
+    "number": 1892,
+    "title": "Calculating size of SurfaceView",
+    "created_at": "2016-10-04T16:15:29Z",
+    "closed_at": "2016-10-04T18:55:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/1892",
+    "body": "Hello all, I am trying to add ExoPlayer 2.0.1 instead of MediaPlayer. With MediaPlayer in the onPrepared() method I use getVideoWidth() and getVideoHeight() to get width and height of video to calculate size of SurfaceView with correct aspect ratio. With ExoPlayer 2.0.1 library I am creating intance of SimpleExoPlayer:\n\n```\n            Handler mainHandler = new Handler();\n            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();\n            TrackSelection.Factory videoTrackSelectionFactory =\n                    new AdaptiveVideoTrackSelection.Factory(bandwidthMeter);\n            TrackSelector trackSelector =\n                    new DefaultTrackSelector(mainHandler, videoTrackSelectionFactory);\n            LoadControl loadControl = new DefaultLoadControl();\n            exoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector, loadControl);\n            //simpleExoPlayerView.setPlayer(exoPlayer);\n            exoPlayer.setVideoSurfaceHolder(videoHolder);\n            exoPlayer.addListener(this);\n```\n\nI suppose I need to use this event to get width and height, but this event is not fired, why and what should I use? onPlayerStateChanged event is working.\n\n```\n    @Override\n    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,\n                                   float pixelWidthAspectRatio) {\n        appendLog(\"onVideoSizeChanged: \" +  String.valueOf(width) + \", \" + String.valueOf(height) + \", \" + String.valueOf(pixelWidthAspectRatio));\n    }\n```\n\nTried it on Android 6 on Sony Z3 Compact, LG Spirit.\n",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/1892/comments",
+    "author": "AntonAndev",
+    "comments": [
+      {
+        "user": "ojw28",
+        "created_at": "2016-10-04T18:50:20Z",
+        "body": "Where in your code are you registering the listener? There should be a call to `SimpleExoPlayer.setVideoListener` somewhere?\n"
+      }
+    ]
+  },
+  {
+    "number": 967,
+    "title": "Switching between encrypted streams",
+    "created_at": "2015-11-18T12:49:19Z",
+    "closed_at": "2015-11-26T12:15:28Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/google/ExoPlayer/issues/967",
+    "body": "Hello,\nI have encountered a problem while switching between encrypted HLS streams after upgrading to ExoPlayer 1.5.2 from 1.4.1, I am switching between streams as advised in question #931\nSwitching between non-encrypted streams is fine, also between encrypted and non-encrypted. But when switching between encrypted streams i get this exception\n\n``` java\n11-18 13:32:27.926 13748-13847/? E/LoadTask: Unexpected exception loading stream\n11-18 13:32:27.926 13748-13847/? E/LoadTask: java.lang.IllegalArgumentException\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at com.google.android.exoplayer.util.Assertions.checkArgument(Assertions.java:39)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at com.google.android.exoplayer.util.ParsableByteArray.setPosition(ParsableByteArray.java:133)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at com.google.android.exoplayer.util.ParsableByteArray.skipBytes(ParsableByteArray.java:145)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at com.google.android.exoplayer.extractor.ts.TsExtractor.read(TsExtractor.java:141)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at com.google.android.exoplayer.hls.HlsExtractorWrapper.read(HlsExtractorWrapper.java:240)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at com.google.android.exoplayer.hls.TsChunk.load(TsChunk.java:108)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at com.google.android.exoplayer.upstream.Loader$LoadTask.run(Loader.java:209)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:390)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at java.util.concurrent.FutureTask.run(FutureTask.java:234)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1080)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:573)\n11-18 13:32:27.926 13748-13847/? E/LoadTask:     at java.lang.Thread.run(Thread.java:841)\n```\n\nI have tried to track down the issue and found out that TS Extractor is trying to skip adaptation field longer than the size of tsPacket Buffer:\n\n``` java\n11-18 13:32:27.625 13748-13773/? E/null\u00a0check: position: 5, bytes: 7, limit: 188\n11-18 13:32:27.625 13748-13773/? E/null\u00a0check: position: 6, bytes: 1, limit: 9\n11-18 13:32:27.625 13748-13773/? E/null\u00a0check: position: 9, bytes: 0, limit: 9\n11-18 13:32:27.625 13748-13748/? E/Status: preparing\n11-18 13:32:27.896 13748-13847/? E/null\u00a0check: position: 5, bytes: 10, limit: 188\n11-18 13:32:27.926 13748-13847/? E/null\u00a0check: position: 5, bytes: 185, limit: 188\n```\n\nwhere preparing is status of player after switching and bytes is the number if bytes extractor is trying to skip. This never happened while i was using version 1.4.1. Encryption is standard AES so it should be replicable with any encrypted HLS streams.\n",
+    "comments_url": "https://api.github.com/repos/google/ExoPlayer/issues/967/comments",
+    "author": "SnowcatSVK",
+    "comments": [
+      {
+        "user": "ojw28",
+        "created_at": "2015-11-18T17:21:43Z",
+        "body": "You're probably not fully rebuilding the renderers when you switch. You shouldn't re-use any objects that you used to build one set of renderers when building the next set, particularly things like DataSource instances. Is it possible that you are re-using them? If so, try not doing so.\n"
+      },
+      {
+        "user": "SnowcatSVK",
+        "created_at": "2015-11-19T08:05:25Z",
+        "body": "Well, i am using DemoPlayer and HLSRendererBuilder from demo directory in project, these are the methods i am using for switching:\n\n``` java\nprivate HlsRendererBuilder createRenderer() {\n        String userAgent = Util.getUserAgent(this, \"ExoplayerTest\");\n        return new HlsRendererBuilder(this, userAgent, contentUri.toString());\n    }\n\n    private void preparePlayer() {\n        if (player == null) {\n            player = new DemoPlayer(createRenderer());\n            player.addListener(this);\n            player.setCaptionListener(this);\n            player.setMetadataListener(this);\n            playerNeedsPrepare = true;\n\n        }\n        if (playerNeedsPrepare) {\n            player.prepare();\n            playerNeedsPrepare = false;\n        }\n        player.setSurface(surfaceView.getHolder().getSurface());\n        player.setPlayWhenReady(true);\n    }\n\n    private void releasePlayer() {\n        if (player != null) {\n            //playerPosition = player.getCurrentPosition();\n            player.release();\n            player = null;\n\n        }\n    }\n```\n\nand this is the way i am using those methods: \n\n``` javascript\n    releasePlayer();\n    preparePlayer();\n```\n\nonly thing i am reusing is surfaceView, unless there is something in DemoPlayer and HLSRendererBuilder that i have missed, but that shouldn't be the case since it never happened with nonencrypted streams\n"
+      },
+      {
+        "user": "ojw28",
+        "created_at": "2015-11-19T16:53:35Z",
+        "body": "If that's the case then the two playbacks should be completely independent to one another. It's pretty much equivalent to backing out of playback in the demo activity and selecting another sample. In which case I don't understand how one playback could affect the next (at a theoretical level)?\n\nCan you modify the demo app in some way to reproduce the issue? And if so, can you upload it to GitHub so that we can reproduce ourselves?\n"
+      },
+      {
+        "user": "ojw28",
+        "created_at": "2015-11-26T12:15:28Z",
+        "body": "The issue is related to the way that you've made `HlsChunkSource.encryptionKeyUri`static in your branch. The breaks the assumption that the second playback is independent of the first, because state is being left lying around from the first playback in the static variable. If I null it out where the player is released, then the second playback works fine.\n\nSo the conclude - It looks like an issue with your local modifications. As a general style point, it's worth exploring solutions that don't require statics except in the specific case of singletons (which definitely isn't the case for this particular variable). I also noticed some interesting code in User.java where initSingletons re-initializes singletons potentially multiple times, which looks wrong to me.\n"
+      }
+    ]
+  }
+]

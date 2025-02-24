@@ -1,0 +1,20 @@
+[
+  {
+    "number": 75,
+    "title": "NotImplementedError: Cannot copy out of meta tensor; no data! Please use torch.nn.Module.to_empty() instead of torch.nn.Module.to() when moving module from meta to a different device.",
+    "created_at": "2024-08-23T05:19:32Z",
+    "closed_at": "2024-08-26T00:15:25Z",
+    "labels": [],
+    "url": "https://github.com/XLabs-AI/x-flux/issues/75",
+    "body": "  File \"/root/data/x-flux/train_flux_lora_deepspeed.py\", line 301, in <module>\r\n    main()\r\n  File \"/root/data/x-flux/train_flux_lora_deepspeed.py\", line 149, in main\r\n    dit, optimizer, _, lr_scheduler = accelerator.prepare(\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/accelerate/accelerator.py\", line 1292, in prepare\r\n    result = tuple(\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/accelerate/accelerator.py\", line 1293, in <genexpr>\r\n    self._prepare_one(obj, first_pass=True, device_placement=d) for obj, d in zip(args, device_placement)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/accelerate/accelerator.py\", line 1169, in _prepare_one\r\n    return self.prepare_model(obj, device_placement=device_placement)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/accelerate/accelerator.py\", line 1412, in prepare_model\r\n    model = model.to(self.device)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1174, in to\r\n    return self._apply(convert)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 780, in _apply\r\n    module._apply(fn)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 805, in _apply\r\n    param_applied = fn(param)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1167, in convert\r\n    raise NotImplementedError(\r\nNotImplementedError: Cannot copy out of meta tensor; no data! Please use torch.nn.Module.to_empty() instead of torch.nn.Module.to() when moving module from meta to a different device.\r\nTraceback (most recent call last):\r\n  File \"/opt/miniconda/bin/accelerate\", line 8, in <module>\r\n    sys.exit(main())\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/accelerate/commands/accelerate_cli.py\", line 46, in main\r\n    args.func(args)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/accelerate/commands/launch.py\", line 1082, in launch_command\r\n    simple_launcher(args)\r\n  File \"/opt/miniconda/lib/python3.10/site-packages/accelerate/commands/launch.py\", line 688, in simple_launcher\r\n    raise subprocess.CalledProcessError(returncode=process.returncode, cmd=cmd)\r\nsubprocess.CalledProcessError: Command '['/opt/miniconda/bin/python', 'train_flux_lora_deepspeed.py', '--config', 'train_configs/test_lora.yaml']' returned non-zero exit status 1.",
+    "comments_url": "https://api.github.com/repos/XLabs-AI/x-flux/issues/75/comments",
+    "author": "starinskycc",
+    "comments": [
+      {
+        "user": "whiterm",
+        "created_at": "2024-08-25T20:52:46Z",
+        "body": "It looks like you are trying to use the quantized model, which is not supported. You need to use the full version, not the quantized one."
+      }
+    ]
+  }
+]

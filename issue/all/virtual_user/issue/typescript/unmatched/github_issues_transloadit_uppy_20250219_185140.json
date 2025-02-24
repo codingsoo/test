@@ -1,0 +1,42 @@
+[
+  {
+    "number": 2390,
+    "title": "when using the dashboard and OnbeforeUpload, I click on send, it sends, but the behavior is not as expected. Length undefined error",
+    "created_at": "2020-07-23T13:33:02Z",
+    "closed_at": "2020-07-24T11:58:56Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/transloadit/uppy/issues/2390",
+    "body": "I am using a dashBoard in my project with the OnbeforeUpload option, but when I click on send, it brings me a length error and does not bring me the statusBar\r\n\r\nMy code is like this\r\n\r\n```js\r\nconst beforeUpload = (files: any) => {\r\n      const updatedFiles = {};\r\n      Object.keys(files).forEach(fileID => {\r\n        this.anexoMetadata.idTipo = this.tipoDocumento.value.id;\r\n        this.anexoMetadata.sigiloso = this.sigiloso.value;\r\n\r\n        updatedFiles[fileID] = {\r\n          ...files[fileID],\r\n\r\n          meta: files[fileID] = this.anexoMetadata,\r\n        };\r\n      });\r\n\r\n      return updatedFiles;\r\n    };\r\n```\r\n\r\nmy dash \r\n\r\n```js\r\nuppy.use(Dashboard, {\r\n      inline: true,\r\n      replaceTargetContent: true,\r\n      height: 200,\r\n      width: 413,\r\n      note: 'Somente imagens e arquivos (PDF) de at\u00e9 2 MB',\r\n      target: '#dash-drag-drop',\r\n      showProgressDetails: true,\r\n      browserBackButtonClose: true,\r\n      disablePageScrollWhenModalOpen: false,\r\n      showLinkToFileUploadResult: false,\r\n    });\r\n```\r\n\r\nWhen I use it without onBeforeUpload, it works but can't find my files.\r\n",
+    "comments_url": "https://api.github.com/repos/transloadit/uppy/issues/2390/comments",
+    "author": "guimaraesSalgado",
+    "comments": [
+      {
+        "user": "goto-bus-stop",
+        "created_at": "2020-07-24T11:28:05Z",
+        "body": "The Dashboard uses a file's `meta.name` for rendering. This line is probably overwriting `meta` so that the file name is not there anymore:\r\n```js\r\n          meta: files[fileID] = this.anexoMetadata,\r\n```\r\n(Also, that `files[fileID]` assignment seems wrong \ud83d\ude04 )\r\n\r\nThis should work instead:\r\n```js\r\nmeta: {\r\n  ...files[fileID],\r\n  ...this.anexoMetadata\r\n}\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 1541,
+    "title": "Preact resolution error with Parcel [solution: clear parcel cache]",
+    "created_at": "2019-05-10T09:46:31Z",
+    "closed_at": "2019-05-10T12:03:14Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/transloadit/uppy/issues/1541",
+    "body": "Parcel since upgrading to 1.0.1 from 1.0.0 causes the following issue when compiling:\r\n\r\n```\r\n/node_modules/preact/dist/preact.mjs: ENOENT: no such file or directory, open /node_modules/preact/dist/preact.mjs'\r\n```\r\n\r\nSo it appears a fix to help webpack has broken another bundler",
+    "comments_url": "https://api.github.com/repos/transloadit/uppy/issues/1541/comments",
+    "author": "wroughtec",
+    "comments": [
+      {
+        "user": "goto-bus-stop",
+        "created_at": "2019-05-10T10:12:03Z",
+        "body": "oh my! I think this might be a cache issue, can you try removing the `.cache` directory in your project folder and restarting parcel?"
+      }
+    ]
+  }
+]

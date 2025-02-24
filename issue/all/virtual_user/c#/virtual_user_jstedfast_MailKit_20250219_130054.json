@@ -1,0 +1,1077 @@
+[
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1775",
+    "source": {
+      "issue_number": 1775
+    },
+    "initial_question": {
+      "title": "New version scheme",
+      "body": "Hi there, I noticed that the version changed from 4.7.1 to 4.7.1.1 - is this intentional? May I ask what's the reason to introduce a new digit?\r\n\r\nBest regards,\r\nGeorg"
+    },
+    "satisfaction_conditions": [
+      "Version numbering change must maintain backward compatibility",
+      "Version scheme must clearly distinguish between major changes and minor fixes",
+      "Version change must address the specific package issue",
+      "Version numbering must maintain consistency with dependency management"
+    ],
+    "created_at": "2024-07-16T08:19:51Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1667",
+    "source": {
+      "issue_number": 1667
+    },
+    "initial_question": {
+      "title": "Is it supposed to work?",
+      "body": "Trying to connect to an imap server and get the list of messages.\r\n\r\n```\r\n        static void Main(string[] args)\r\n        {\r\n            ImapClient client = new ImapClient(new ProtocolLogger(\"imap.log\"));\r\n            client.Connect(\"imap.one.com\", 993, true);\r\n            client.Authenticate(new NetworkCredential(\"...@....me.uk\", \"...\"));\r\n            foreach (FolderNamespace? n in client.PersonalNamespaces)\r\n            {\r\n                Console.WriteLine($\"Namespace {n.Path}\");\r\n            }\r\n            foreach (IMailFolder f in client.GetFolders(client.PersonalNamespaces[0]))\r\n            {\r\n                Console.WriteLine($\"Folder {f.Name}\");\r\n            }\r\n\r\n            IMailFolder ff = client.GetFolder(client.PersonalNamespaces[0]);\r\n            FolderAccess fa = ff.Open(FolderAccess.ReadWrite);\r\n            IFetchRequest rq = new FetchRequest(MessageSummaryItems.All);\r\n            IList<IMessageSummary> msgs = ff.Fetch(0, ff.Count, rq);\r\n            foreach(IMessageSummary m in msgs)\r\n            {\r\n                Console.WriteLine(m.NormalizedSubject);\r\n            }\r\n        }\r\n```\r\n\r\nBut the `.Fetch` fails with\r\n> `MailKit.Net.Imap.ImapCommandException: 'The IMAP server replied to the 'FETCH' command with a 'BAD' response: Error in IMAP command FETCH: Invalid messageset (0.001 + 0.000 secs).'`\r\n\r\nHere is the log file:\r\n```\r\nConnected to imaps://imap.one.com:993/\r\nS: * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN AUTH=LOGIN] Dovecot ready.\r\nC: A00000000 AUTHENTICATE PLAIN ********\r\nS: A00000000 OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SNIPPET=FUZZY PREVIEW=FUZZY STATUS=SIZE SAVEDATE LITERAL+ NOTIFY QUOTA] Logged in\r\nC: A00000001 NAMESPACE\r\nS: * NAMESPACE ((\"INBOX.\" \".\")) NIL NIL\r\nS: A00000001 OK Namespace completed (0.001 + 0.000 secs).\r\nC: A00000002 LIST \"\" \"INBOX\" RETURN (SUBSCRIBED CHILDREN)\r\nS: * LIST (\\HasChildren) \".\" \"INBOX\"\r\nS: A00000002 OK List completed (0.001 + 0.000 secs).\r\nC: A00000003 LIST \"\" \"INBOX.*\" RETURN (SUBSCRIBED CHILDREN)\r\nS: A00000003 OK List completed (0.001 + 0.000 secs).\r\nC: A00000004 SELECT INBOX (CONDSTORE)\r\nS: * FLAGS (\\Answered \\Flagged \\Deleted \\Seen \\Draft)\r\nS: * OK [PERMANENTFLAGS (\\Answered \\Flagged \\Deleted \\Seen \\Draft \\*)] Flags permitted.\r\nS: * 1 EXISTS\r\nS: * 0 RECENT\r\nS: * OK [UIDVALIDITY 1699716082] UIDs valid\r\nS: * OK [UIDNEXT 5] Predicted next UID\r\nS: * OK [HIGHESTMODSEQ 10] Highest\r\nS: A00000004 OK [READ-WRITE] Select completed (0.001 + 0.000 secs).\r\nC: A00000005 FETCH 1:2 ALL\r\nS: A00000005 BAD Error in IMAP command FETCH: Invalid messageset (0.001 + 0.000 secs).\r\n```\r\n\r\nWhat is wrong?"
+    },
+    "satisfaction_conditions": [
+      "IMAP folder must be successfully opened before fetching",
+      "Authentication and connection must be established"
+    ],
+    "created_at": "2023-11-17T16:19:04Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1651",
+    "source": {
+      "issue_number": 1651
+    },
+    "initial_question": {
+      "title": "How to transfer an \"inline\" image via SmtpClient.Send",
+      "body": "I'm trying to send a message with an **inline** image. To do this, I'm using the `BodyBuilder` with the following code:\r\n\r\n    var stream = new FileStream(linkedResource.LocalFilename, FileMode.Open);\r\n    var mimePart = new MimePart()\r\n    {\r\n        Content = new MimeContent(stream),\r\n        ContentId = linkedResource.ContentId,\r\n        ContentTransferEncoding = ContentEncoding.Base64,\r\n        FileName = linkedResource.Filename,\r\n    };\r\n    mimePart.ContentDisposition.IsAttachment = false;\r\n    mimePart.ContentType.MediaType = HtmlParserHelper.GetImageContentTypeByFile(linkedResource.LocalFilename);\r\n    builder.LinkedResources.Add(mimePart;\r\n\r\nUnfortunately, the image will be transffered as an **attachment**. The received mail shows the following headers for this image:\r\n\r\n\tContent-Type: image/png/octet-stream;\r\n\t\tname=449a0b24-fabc-4cab-8c48-a0995b6c5de1.png\r\n\tContent-Id: <d5316e0e5fc04362a7086deae753804f@xyz>\r\n\tContent-Transfer-Encoding: base64\r\n\tContent-Disposition: attachment;\r\n\t\tfilename=449a0b24-fabc-4cab-8c48-a0995b6c5de1.png\r\n\r\nThe `Content-Disposition` is still an attachment, even I set `IsAttachment` to `false`.\r\n\r\nWhat is the correct way to tell the `MimePart` to be sent as `inline`?\r\n\r\nThanks a lot for your answer."
+    },
+    "satisfaction_conditions": [
+      "Image must be accessible as a linked resource in the email body",
+      "Image data must be properly encoded for email transmission"
+    ],
+    "created_at": "2023-10-02T11:07:02Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1642",
+    "source": {
+      "issue_number": 1642
+    },
+    "initial_question": {
+      "title": "Unable to connect to smtp.office365.com",
+      "body": "**Describe the bug**\r\nGot SslHandshakeException when attempt to connect to office 365 smpt server at the stagel of \"ConnectAsync()\"\r\n\r\n**Platform (please complete the following information):**\r\n - OS: Windows\r\n - .NET Runtime: .NET Framework\r\n - .NET Framework: .NET Framework 4.6.1\r\n - MailKit Version:  4.2.0\r\n\r\n**Exception**\r\nIf you got an exception, please include the exception Message *and* StackTrace.\r\n\r\nMailKit.Security.SslHandshakeException\r\n  HResult=0x80131500\r\n  Message=An error occurred while attempting to establish an SSL or TLS connection.\r\n\r\nThe server's SSL certificate could not be validated for the following reasons:\r\n\u2022 The server certificate has the following errors:\r\n  \u2022 The revocation function was unable to check revocation for the certificate.\r\n\r\n\r\n  Source=MailKit\r\n  StackTrace:\r\n   at MailKit.Net.Smtp.SmtpClient.<ConnectAsync>d__8.MoveNext()\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()\r\n   at ConsoleApp1.Program.<Main>d__23.MoveNext() in D:\\Code\\NoSourceControl\\ConsoleApp1\\ConsoleApp1\\Program.cs:line 454\r\n\r\n  This exception was originally thrown at this call stack:\r\n    System.Net.Security.SslState.InternalEndProcessAuthentication(System.Net.LazyAsyncResult)\r\n    System.Net.Security.SslState.EndProcessAuthentication(System.IAsyncResult)\r\n    System.Net.Security.SslStream.EndAuthenticateAsClient(System.IAsyncResult)\r\n    System.Threading.Tasks.TaskFactory<TResult>.FromAsyncCoreLogic(System.IAsyncResult, System.Func<System.IAsyncResult, TResult>, System.Action<System.IAsyncResult>, System.Threading.Tasks.Task<TResult>, bool)\r\n    System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(System.Threading.Tasks.Task)\r\n    System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task)\r\n    System.Runtime.CompilerServices.TaskAwaiter.ValidateEnd(System.Threading.Tasks.Task)\r\n    MailKit.Net.Smtp.SmtpClient.ConnectAsync(string, int, MailKit.Security.SecureSocketOptions, System.Threading.CancellationToken)\r\n\r\nInner Exception 1:\r\nAuthenticationException: The remote certificate is invalid according to the validation procedure.\r\n\r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\nExecute the code snippets.\r\n\r\n\r\n**Expected behavior**\r\nConnect to the smtp server\r\n\r\n**Code Snippets**\r\n\r\n```csharp\r\n            using (var client = new SmtpClient())\r\n            {\r\n                await client.ConnectAsync(\"smtp.office365.com\", 587, SecureSocketOptions.StartTls);\r\n\r\n                await client.DisconnectAsync(true);\r\n            }\r\n```\r\n\r\n**Protocol Logs**\r\nPlease include a protocol log (scrubbed of any authentication data), especially\r\nif you got an exception such as `Syntax error in XYZ. Unexpected token: ...`.\r\n\r\nTo get a protocol log, follow one of the following code snippets:\r\n\r\n\r\n\r\nConnected to smtp://smtp.office365.com:587/?starttls=always\r\nS: 220 AM8P189CA0004.outlook.office365.com Microsoft ESMTP MAIL Service ready at Thu, 14 Sep 2023 15:42:19 +0000\r\nC: EHLO DESKTOP-LOD3TBH\r\nS: 250-AM8P189CA0004.outlook.office365.com Hello [139.28.110.98]\r\nS: 250-SIZE 157286400\r\nS: 250-PIPELINING\r\nS: 250-DSN\r\nS: 250-ENHANCEDSTATUSCODES\r\nS: 250-STARTTLS\r\nS: 250-8BITMIME\r\nS: 250 SMTPUTF8\r\nC: STARTTLS\r\nS: 220 2.0.0 SMTP server ready\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "SSL/TLS connection must be established successfully with the SMTP server",
+      "Certificate validation process must complete without errors",
+      "Solution addresses certificate revocation check failures"
+    ],
+    "created_at": "2023-09-14T15:43:36Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1604",
+    "source": {
+      "issue_number": 1604
+    },
+    "initial_question": {
+      "title": "SMTP Client Send Result",
+      "body": "How do you determine if sending the email was successful?\r\n\r\nThe Send/SendAsync methods return a string, which at the moment for me it returns something like:\r\n`XXXXXXXXXX mail accepted for delivery`.\r\n\r\nAnd I'm pretty sure I've had results like `OK` in the past.\r\n\r\nIs there way to simply know if the message was sent (i.e `true`/`false`) rather than trying to see if result contains 'OK', 'Accepted' etc..\r\n"
+    },
+    "satisfaction_conditions": [
+      "The solution must provide a clear binary success/failure indication",
+      "The success/failure determination must be reliable across different SMTP server responses",
+      "The determination method must work without string parsing"
+    ],
+    "created_at": "2023-07-10T13:45:22Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1547",
+    "source": {
+      "issue_number": 1547
+    },
+    "initial_question": {
+      "title": "Message index #question",
+      "body": "Hi,\r\n\r\nI apologize if this is a stupid question but I can not find the information I need from the official documentation. I know that if I delete a message it is actually deleted when the client disconnects. I need to know if calling the delete method on a message , this action change the other messages indexes, so incrementing the index and calling get message will return the next message from the box?\r\n\r\nRegards"
+    },
+    "satisfaction_conditions": [
+      "Message deletion must maintain sequential index ordering",
+      "Message indexes must be predictable after deletion",
+      "Deletion changes must be consistent with POP3 protocol behavior"
+    ],
+    "created_at": "2023-04-12T16:28:38Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1537",
+    "source": {
+      "issue_number": 1537
+    },
+    "initial_question": {
+      "title": "Cannot use AddFlags on ImapClient.Inbox to delete message",
+      "body": "Hi.\r\n\r\ni just want do read an delete messages with an ImapClient so\r\n\r\nMailKit.Net.Imap.ImapClient clientIMAP = new MailKit.Net.Imap.ImapClient();\r\nAuthenticateAsync(clientIMAP).GetAwaiter().GetResult();  //OAT2 on office\r\nclientIMAP.Inbox.Open(MailKit.FolderAccess.ReadWrite);\r\nvar uids = clientIMAP.Inbox.Search(SearchQuery.All);  // ok access message no pb\r\n...\r\n...\r\n...\r\n\r\n//want to delete\r\nclientIMAP .Inbox.AddFlags   // but AddFlags   not exist on Inbox\r\n\r\nwhat i miss ?\r\n\r\nThanks a lot\r\n"
+    },
+    "satisfaction_conditions": [
+      "The IMAP client must maintain write access to the inbox",
+      "The code must be compatible with the MailKit version being used"
+    ],
+    "created_at": "2023-03-28T16:39:03Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1516",
+    "source": {
+      "issue_number": 1516
+    },
+    "initial_question": {
+      "title": "Move and set flag Add Flags",
+      "body": "Is there any way to download message attachments and set Seen flag in one loop ? My current code looks like this :\r\n```\r\nfor (int i = 0; inbox.Count > i; i++)\r\n{\r\nvar message = inbox.GetMessage(0);\r\nforeach (var attachment in message.Attachments)\r\n                            {\r\n                                if (!(attachment is MessagePart))\r\n                                {\r\n                                    var part = (MimePart)attachment;\r\n                                    var fileName = part.FileName;\r\n/*\r\n.\r\n.\r\n.\r\nrest of my code to download attachments \r\n*/\r\n}\r\n```\r\nAfter that second loop :\r\n```\r\nforeach (var message in FMiesiac.Fetch(0, -1, MessageSummaryItems.UniqueId))\r\n{\r\n       FMiesiac.AddFlags(message.UniqueId, MessageFlags.Seen, true);\r\n}\r\n```\r\nThis code process 800 - 1200 e-mails so this second loop takes some additional time. Is there any way to download and set this flag in single loop ? \r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Message attachments are successfully downloaded",
+      "Messages are marked as seen",
+      "Operations occur in a single loop iteration per message"
+    ],
+    "created_at": "2023-02-17T10:45:13Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1511",
+    "source": {
+      "issue_number": 1511
+    },
+    "initial_question": {
+      "title": "Question: Is it possible to search for folders that have at least one e-mail in it?",
+      "body": "Hi,\r\n\r\nI now do this to get all the folders that I need to process.... is it also possible to do some kind of search that only gives me the folders that have at least one e-mail in it so that I don't have to itterate through the folder structure every time?\r\n\r\n```c#\r\n                case MailBoxType.Imap:\r\n                {\r\n                    using var memoryStream = StreamHelpers.Manager.GetStream(\"MailBoxes.GetFolders\");\r\n                    using var protocolLogger = new ProtocolLogger(memoryStream);\r\n                    using var client = new ImapClient(protocolLogger);\r\n\r\n                    try\r\n                    {\r\n                        ConnectAndAuthenticate(client);\r\n                        client.GetFolders(client.PersonalNamespaces[0]);\r\n                        var subFolders = client.GetFolders(client.PersonalNamespaces[0]);\r\n\r\n\r\n                        var rootMailBoxFolder = new MailBoxFolder { Name = \"Root\" };\r\n                        var count = 0;\r\n\r\n                        foreach (var subFolder in subFolders)\r\n                        {\r\n                            count += 1;\r\n\r\n                            var subMailBoxFolder = new MailBoxFolder\r\n                            {\r\n                                Id = subFolder.Id,\r\n                                Name = subFolder.Name,\r\n                                TotalCount = subFolder.Count\r\n                            };\r\n\r\n                            rootMailBoxFolder.AddFolder(subFolder.ParentFolder.Id, subMailBoxFolder);\r\n                        }\r\n\r\n                        return rootMailBoxFolder;\r\n                    }\r\n\r\n                    return result;\r\n                }\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Retrieves folder message counts without downloading messages",
+      "Maintains folder hierarchy information",
+      "Works with IMAP folder access",
+      "Handles authentication and connection state"
+    ],
+    "created_at": "2023-02-08T11:22:05Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1449",
+    "source": {
+      "issue_number": 1449
+    },
+    "initial_question": {
+      "title": "Message flag 'seen' does not persist on Exchange server",
+      "body": "Hi, I was tasked with downloading messages from an old Exchange server 2010 (yes you read correctly).\r\nI am able to set the flag to seen and the server seems to acknowledge the request. However next time around this same message (based on uid) has no flags set.\r\n\r\nCode which opens the folder in question and sets the flag:\r\n```\r\nvar folder = await Client.GetFolderAsync(folderPath, CancellationToken);\r\nawait folder.OpenAsync(FolderAccess.ReadWrite, CancellationToken);\r\ntry\r\n{\r\n\tawait folder.RemoveFlagsAsync(uniqueId, MessageFlags.Seen, true);\r\n}\r\nfinally\r\n{\r\n\tawait folder.CloseAsync();\r\n}\r\n```\r\n\r\nProtocol log acknowledging the update:\r\n```\r\nC: A00000009 SELECT INBOX\r\nS: * 4 EXISTS\r\nS: * 0 RECENT\r\nS: * FLAGS (\\Seen \\Answered \\Flagged \\Deleted \\Draft $MDNSent)\r\nS: * OK [PERMANENTFLAGS (\\Seen \\Answered \\Flagged \\Deleted \\Draft $MDNSent)] Permanent flags\r\nS: * OK [UNSEEN 1] Is the first unseen message\r\nS: * OK [UIDVALIDITY 7937] UIDVALIDITY value\r\nS: * OK [UIDNEXT 67167] The next unique identifier value\r\nS: A00000009 OK [READ-WRITE] SELECT completed.\r\nC: A00000010 UID STORE 67162 -FLAGS.SILENT (\\Seen)\r\nS: A00000010 OK STORE completed.\r\nC: A00000011 LOGOUT\r\nS: * BYE Microsoft Exchange Server 2010 IMAP4 server signing off.\r\nS: A00000011 OK LOGOUT completed.\r\n```\r\n\r\nIs there something I am doing wrong?\r\n\r\nThank you."
+    },
+    "satisfaction_conditions": [
+      "Server acknowledges flag modification commands successfully",
+      "Message can be uniquely identified across sessions"
+    ],
+    "created_at": "2022-10-17T21:03:45Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1447",
+    "source": {
+      "issue_number": 1447
+    },
+    "initial_question": {
+      "title": "How to encode mail subject and body using UTF-8 encoding in Mailkit?",
+      "body": "In System.Net.Mail.MailMessage library, SubjectEncoding and BodyEncoding options can be used to set encoding for subject and body of the mail.\r\n_System.Net.Mail.MailMessage psuedo code:_\r\n```\r\nvar mailMessage = new MailMessage(new MailAddress(From), recipient)\r\n{\r\n    SubjectEncoding = Encoding.UTF8,\r\n    BodyEncoding = Encoding.UTF8\r\n};\r\n```\r\nAre there similar options to SubjectEncoding and BodyEncoding available in MimeKit.MimeMessage library to encode subject and body?\r\n_Mimekit psuedo code:_\r\n```\r\nvar message = new MimeMessage();\r\nmessage.Subject = \"Howdie\";\r\nmessage.Body = \"Test\";\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Message body content must be properly UTF-8 encoded",
+      "Message subject must be properly UTF-8 encoded",
+      "Solution must work within MimeKit's architecture",
+      "Recipient names must support UTF-8 encoding"
+    ],
+    "created_at": "2022-10-13T09:18:30Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1441",
+    "source": {
+      "issue_number": 1441
+    },
+    "initial_question": {
+      "title": "Mailkit cannot read autogenerated mails from mailbox",
+      "body": "**Describe the bug**\r\nHi, \r\nI hope I'm not bothering you with my question. I ran into a weird bug. I develop an application that extracts information from the client's mailbox. My problem is that once an autogenerated mail arrives in the mailbox, if the Server crashes, Mailkit will not read the mail, it is empty. But if the email comes from a different email address (I tried from my personal and school email address), it reads the email fine.  \r\n\r\n**Platform (please complete the following information):**\r\n - OS: Windows\r\n - .NET Framework: [.NET 4.0, WPF]\r\n - MailKit Version: 3.3.0\r\n\r\n\r\n\r\n```csharp\r\n using (var client = new ImapClient())\r\n                {\r\n                    using (var cancel = new System.Threading.CancellationTokenSource())\r\n                    {\r\n\r\n                        client.Connect(emailParser.ServerName, emailParser.Port, emailParser.IsSSLuse,\r\n                            cancel.Token);\r\n\r\n                        client.Authenticate(emailParser.Username, emailParser.Password, cancel.Token);\r\n\r\n                        var inbox = client.Inbox;\r\n                        inbox.Open(FolderAccess.ReadOnly, cancel.Token);\r\n\r\n                        for (int i = 0; i < inbox.Count; i++)\r\n                        {\r\n                            var message = inbox.GetMessage(i, cancel.Token); \r\n                            MessageBox.Show(message.TextBody);                                                                                \r\n                            \r\n                                }\r\n\r\n                            }\r\n\r\n                        }\r\n\r\n                        client.Disconnect(true, cancel.Token);\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Email content must be successfully retrieved regardless of message format (HTML or plain text)",
+      "Application must handle auto-generated emails without data loss",
+      "No null pointer exceptions when accessing message content",
+      "IMAP connection and authentication must complete successfully"
+    ],
+    "created_at": "2022-09-27T14:05:15Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1433",
+    "source": {
+      "issue_number": 1433
+    },
+    "initial_question": {
+      "title": "How long is an Index valid in a ImapClient connection?",
+      "body": "I'm trying to use IDLE notifications with the following code:\r\n\r\n```\r\nimapClient.Idle(new CancellationTokenSource(new TimeSpan(0, 29, 0)).Token, _idleCancelSource.Token);\r\n\r\nmailFolder.MessageFlagsChanged -= FolderMessageFlags_ChangedEvent;\r\n\r\n```\r\n\r\nI receive notifications, if the \"seen\" (\"read\") flag has been changed. But I get only the `Index`, but not the `UniqueId`.\r\n\r\nIs this a further bug of my mail server?\r\n\r\nHow long can I use the `Index`, until it's invalid? I ask, since I'm developing an app with multiple simultaneous `ImapClient` connections. So is `Index` valid between the different connection?"
+    },
+    "satisfaction_conditions": [
+      "Message index values must be treated as temporarily valid within a single folder context",
+      "System must maintain accurate message tracking across multiple client connections",
+      "Changes in message flags must be correctly associated with the corresponding messages",
+      "Solution must handle message expunge events appropriately",
+      "System must maintain separate index tracking for each IMAP folder",
+      "Solution must handle IDLE connection state changes correctly"
+    ],
+    "created_at": "2022-09-14T19:54:40Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1432",
+    "source": {
+      "issue_number": 1432
+    },
+    "initial_question": {
+      "title": "Does mark MailKit mark received messages automatically as \"seen\" (read)?",
+      "body": "I'm receiving messages with Imap and this works so far. But after I'm receiving it with `ImapClient.Inbox.Fetch(uniqueIds, MessageSummaryItems.Headers | MessageSummaryItems.Size | MessageSummaryItems.Flags | MessageSummaryItems.BodyStructure);`, they are marked as \"seen\" / \"read\" on the server.\r\n\r\nDoes MailKit sends this flag?\r\n\r\nIs there a way for me, not to send this flag?"
+    },
+    "satisfaction_conditions": [
+      "IMAP protocol commands use BODY.PEEK[] instead of BODY[]",
+      "Message summary retrieval successfully returns required data fields"
+    ],
+    "created_at": "2022-09-14T13:07:42Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1410",
+    "source": {
+      "issue_number": 1410
+    },
+    "initial_question": {
+      "title": "Performance issue",
+      "body": "When working with older Gmail accounts, and with it, using search after query, it seems like it's working in following way:\r\nInitially it's gathering message id's of entire folder, then filtering out message id's in regard to it's date.\r\n\r\nCorrect me if I am wrong, but downloading for example 100 emails for today for a new account takes way less time then picking out 100 emails from today with inbox having 3000 emails + over all time.\r\n\r\nIf I am not clear feel free to ask me for some more details."
+    },
+    "satisfaction_conditions": [
+      "Search results must correctly filter messages based on specified criteria",
+      "Search functionality must support filtering by message UIDs"
+    ],
+    "created_at": "2022-07-26T15:55:11Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1405",
+    "source": {
+      "issue_number": 1405
+    },
+    "initial_question": {
+      "title": "Does the Move operation returns correctly the new uids?",
+      "body": "**Describe the bug**\r\nIn case of Aol and Yahoo carriers, the `MoveTo` operation result is not correct. I'm not sure if the issue comes from them or from the Mailkit.\r\nI move **two** messages from the inbox to a custom folder, let's say the uids in inbox are 186 and 187. The move returns the destination uids, which are (lets' say): 22 and 23. So, the 186 became 22 in the destination folder and the 187 became 23. But actually this is not corect, the order should be inverted.\r\nWhen I debug the move operation, this is what I see: (check protocol logs as well below)\r\n```\r\nuniqueIdMap\r\n\tDestination\t{22:23}\r\n\tKeys\t{186:187}\r\n\tSource\t{186:187}\r\n\tValues\t{22:23}\r\n\t\tCount\t2\r\n\t\tSortOrder\tAscending\r\nResults View\r\n\t[0]\t{[{186}, {22}]}\r\n\t[1]\t{[{187}, {23}]}\r\n```\r\n\r\nI checked the same scenario with Gmail, and I found the following:\r\n```\r\nuniqueIdMap\r\n\tDestination\t{9,8}\r\n\tKeys\t{1747,1750}\r\n\tSource\t{1747,1750}\r\n\tValues\t{9,8}\r\n\t\tCount\t2\r\n\t\tSortOrder\tDescending\r\nResults View\r\n\t[0]\t{[{1747}, {9}]}\r\n\t[1]\t{[{1750}, {8}]}\r\n```\r\nSo basically the difference is that the sort order is Descending, and this way it sets correctly the new uids.\r\n\r\n**Platform:**\r\n - OS: Windows\r\n - .NET Runtime: Core 3.1\r\n - MailKit Version: 2.11.1\r\n\r\n**Protocol Logs**\r\n```\r\nC: X00000057 UID MOVE 187:186 xcc\r\nS: * OK [COPYUID 1657263256 186:187 22:23]\r\nS: * 159 EXPUNGE\r\nS: * 159 EXPUNGE\r\nS: X00000057 OK UID MOVE completed\r\n```\r\n\r\nBased on your experience, can I do simply to invert the values order in this case? Or what else could you suggest?"
+    },
+    "satisfaction_conditions": [
+      "UID mapping must match server-reported COPYUID response",
+      "UID order must be maintained in ascending sequence when communicating with IMAP"
+    ],
+    "created_at": "2022-07-11T14:23:17Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1399",
+    "source": {
+      "issue_number": 1399
+    },
+    "initial_question": {
+      "title": "Can I use the repo to delete all emails in inbox folder?",
+      "body": "Hello:\r\nI can use the repo to retrieve all emails from inbox by IMAP, which seems to be easy.\r\nBut I can't find any simple way to delete all the email in the inbox folder.  For most of the email servers, the inbox is the only folder.\r\nI have quite a number of emails on different email servers.  So I want to write a simple program I can run every week or every month, it just simply deletes all the emails from inbox folder without reading contents or titles of any emails.\r\nCan you show me some simple code to do this without complicated query statement.\r\nThanks,"
+    },
+    "satisfaction_conditions": [
+      "Folder access permissions must be properly configured",
+      "All emails in inbox must be marked for deletion",
+      "Deletion must be executed without reading email content",
+      "Changes must be permanently applied to the mailbox",
+      "Solution must work with IMAP protocol"
+    ],
+    "created_at": "2022-06-27T20:13:50Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1372",
+    "source": {
+      "issue_number": 1372
+    },
+    "initial_question": {
+      "title": "How to use SMTP vis proxy? Any demo?",
+      "body": "I want to send mail via socks5 ,the proxy server require username and  password authentication. \r\nbut something goes wrong  .Is there any demo?\r\n\r\n```csharp\r\nusing (var client = new MailKit.Net.Smtp.SmtpClient())\r\n{\r\n    var string proxyip=\"220.10.10.1\";\t\r\n    var int proxyport=4145;\r\n    var string proxyusername=\"\";  // how to \r\n    var string proxypassword=\"\";\r\n    var socksClient = new Socks5Client(proxyip,proxyport);\r\n    client.ProxyClient = socksClient;\r\n\r\n    client.Connect(\"smtp.mysmtp.com\", 25, false);\r\n    client.Authenticate(\"username@mysmtp.com\", \"password\");\r\n\r\n    client.Send(message);\r\n    client.Disconnect(true);\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "SOCKS5 proxy authentication credentials are properly configured",
+      "SMTP client successfully connects through authenticated proxy",
+      "Email sending functionality remains intact",
+      "Proxy connection parameters are configurable"
+    ],
+    "created_at": "2022-05-06T23:25:43Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1371",
+    "source": {
+      "issue_number": 1371
+    },
+    "initial_question": {
+      "title": "Are links in MimeMessage.Subject supported at all?",
+      "body": "Hi,\r\n\r\nA customer just came across an valid/interesting request. He's used to have links in the subjects of his mails. This works nicely e.g. in Outlook where he then could click on that link.\r\n\r\nHowever, MimeMessage.Subject is a plain string. Is there some support for links other than me just parsing the .Subject string and visualize the link by whatever UI means?\r\n\r\nThanks in advance"
+    },
+    "satisfaction_conditions": [
+      "Acknowledge that MIME message subjects are plain text by design",
+      "Address the possibility of including URL text in subjects",
+      "Explain client-side handling options",
+      "Indicate the non-standardized nature of subject link handling"
+    ],
+    "created_at": "2022-04-30T14:01:30Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1356",
+    "source": {
+      "issue_number": 1356
+    },
+    "initial_question": {
+      "title": "What's the recommended/performant way to use the getStreams method?",
+      "body": "Hi, I found `getStreams` when looking through past issues regarding bulk processing. I'd like to consume around ~30k emails from a folder and am looking for the most performant way to do so!\r\n\r\nCurrently I'm using this pattern:\r\n``` csharp\r\n// using an exact path for the type below as it was the only way to get it to resolve getStreams\r\nMailKit.Net.Imap.IImapFolder all = (IImapFolder)client.GetFolder(SpecialFolder.All);\r\nUniqueIdRange range = new UniqueIdRange(uidMin, uidNext); // predefined range for last 30k\r\nvar refs = all.Search(range, SearchQuery.All);\r\n\r\nIList<Task<MimeMessage>> tasks = new List<Task<MimeMessage>>();\r\nvoid getMessageFromStream(ImapFolder _, int __, UniqueId ___, Stream stream) {\r\n    tasks.Add(MimeMessage.LoadAsync(stream));\r\n}\r\nall.GetStreams(refs, getMessageFromStream);\r\nMimeMessage[] messages = await Task.WhenAll(tasks);\r\n```\r\n\r\nI'm looking to possibly parallelize this; as the callback doesn't require a full IMAP connection since it just parses the message, I figured it shouldn't be an issue to have that be done in large batches of threads. However, I read that the stream is closed when the callback returns, so I'm not sure what the best way to go about this is. Would love some insight here as to how to accomplish this or whether there's a better way to go about this!"
+    },
+    "satisfaction_conditions": [
+      "All messages from the specified range are retrieved",
+      "Message content is correctly parsed into MimeMessage format",
+      "Solution handles IMAP connection constraints appropriately"
+    ],
+    "created_at": "2022-04-06T19:38:37Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1355",
+    "source": {
+      "issue_number": 1355
+    },
+    "initial_question": {
+      "title": "header tag: Return-Path dont appear in email AWS SES",
+      "body": "**Describe the bug**\r\nDuring sending Email, we added header \"Return-Path\" with value \"ReturnPath@mail.com\". As result tag did not appear in result Email. What is wrong? Did we do something wrong or AWS remove it. pls, help us to understand your part.\r\n\r\n**Platform (please complete the following information):**\r\n - OS: Windows\r\n - .NET Runtime: ASP.NET 4.6.1 \r\n - MailKit Version: 3.1.1\r\n\r\n**Expected behavior**\r\nHeader should consist this attr\r\n\r\n**Code Snippets**\r\nIf applicable, add code snippets to help explain your problem.\r\n\r\n```csharp\r\n            MimeMessage mailMessage = new MimeMessage();\r\n            mailMessage.From.Clear();\r\n            mailMessage.From.Add(new MailboxAddress(\"Test from\", \"From@mail.com\"));\r\n\r\n            mailMessage.To.Add(new MailboxAddress(\"Test To\", \"To@mail.com\"));\r\n\r\n            mailMessage.Headers.Add(\"Return-Path\", MailboxAddress.Parse(\"ReturnPath@mail.com\").ToString());\r\n\r\n            mailMessage.Subject = \"test Message\";\r\n\r\n            var sender = new MailboxAddress(\"Sender@mail.com\");\r\n            mailMessage.Body = ....\r\n\r\n            await _client.SendAsync(mailMessage, sender, cancellationToken).ConfigureAwait(false);\r\n```\r\n\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Email headers must be properly preserved during transmission to AWS SES",
+      "Email sending functionality must remain operational"
+    ],
+    "created_at": "2022-03-31T23:06:44Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1328",
+    "source": {
+      "issue_number": 1328
+    },
+    "initial_question": {
+      "title": "Custom DefaultLocalDomain for SmtpClient",
+      "body": "**Is your feature request related to a problem? Please describe.**\r\nI use MailKit in a docker container to send email through SMTP.\r\nI was debugging some issue with an SMTP provider, and I notice that the hostname of the container is present in the raw email \r\n```text\r\nReceived: from container-hostname (unknown [42.42.42.42])\r\n```\r\n\r\n**Describe the solution you'd like**\r\nI would like to know if there is a way to customize the `DefaultLocalDomain` with a personal value without changing the container hostname ?\r\n\r\nIn advance, thank you."
+    },
+    "satisfaction_conditions": [
+      "The local domain name in SMTP communication must be configurable independently of the container hostname",
+      "The configured value must appear correctly in email headers instead of the default container hostname",
+      "The configuration must be possible at the SMTP client level"
+    ],
+    "created_at": "2022-02-08T17:10:34Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1325",
+    "source": {
+      "issue_number": 1325
+    },
+    "initial_question": {
+      "title": "Example how to get UID",
+      "body": "HI, how can i get uid from this code pls ? Im trying to make delete possible but this implementation of imap is kind of strange to me and very confusing.. This below example is nice, shows how to get all info from emails i need, but all other examples are not enough to understand whole functionality. \r\n\r\n```sharp\r\nusing System;\r\n\r\nusing MimeKit;\r\nusing MailKit;\r\nusing MailKit.Search;\r\nusing MailKit.Net.Imap;\r\n\r\nnamespace TestClient {\r\n    class Program\r\n    {\r\n        public static void Main (string[] args)\r\n        {\r\n            using (var client = new ImapClient ()) {\r\n                client.Connect (\"imap.friends.com\", 993, true);\r\n\r\n                client.Authenticate (\"joey\", \"password\");\r\n\r\n                // The Inbox folder is always available on all IMAP servers...\r\n                var inbox = client.Inbox;\r\n                inbox.Open (FolderAccess.ReadOnly);\r\n\r\n                Console.WriteLine (\"Total messages: {0}\", inbox.Count);\r\n                Console.WriteLine (\"Recent messages: {0}\", inbox.Recent);\r\n\r\n                for (int i = 0; i < inbox.Count; i++) {\r\n                    var message = inbox.GetMessage (i);\r\n                    Console.WriteLine (\"Subject: {0}\", message.Subject);\r\n                }\r\n\r\n                client.Disconnect (true);\r\n            }\r\n        }\r\n    }\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Code must retrieve unique message identifiers from IMAP inbox",
+      "Code must maintain successful IMAP connection and authentication",
+      "Code must be able to access individual message data",
+      "Retrieved identifiers must be compatible with IMAP deletion operations"
+    ],
+    "created_at": "2022-01-31T20:29:29Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1192",
+    "source": {
+      "issue_number": 1192
+    },
+    "initial_question": {
+      "title": "Will Maintain email conversation on email server as well as local Is it possible? ",
+      "body": "(1)I want it to be updated in the sent folder of the mail server while  i reply to someone or created new email.\r\n\r\n(2)How do I know if I have spammed an email on email server and want it from the imap in local?"
+    },
+    "satisfaction_conditions": [
+      "Sent messages must be successfully stored in the mail server's sent folder",
+      "System must be able to detect spam status of messages retrieved via IMAP",
+      "Spam detection must work with standard IMAP message attributes"
+    ],
+    "created_at": "2021-04-14T11:53:30Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/1066",
+    "source": {
+      "issue_number": 1066
+    },
+    "initial_question": {
+      "title": "MailKit Pop3Client.Count retrieves all emails, not just the number of emails.",
+      "body": "**Describe the bug**\r\nMailKit Pop3Client.Count retrieves all emails, not just the number of emails.\r\n\r\nMy code is as follows\r\n\r\n```\r\nusing (var client = new Pop3Client(new ProtocolLogger(\"d:\\\\pop3.txt\") ))\r\n            {\r\n                client.Connect(emailSettings.PopServer, emailSettings.PopPort, SecureSocketOptions.SslOnConnect);\r\n                client.Authenticate(emailSettings.Username, emailSettings.Password);\r\n\r\n                EmailCount = client.Count();\r\n            }\r\n```\r\n\r\nThe mailbox I am issung this command against has over 1000 emails in it. When examining the created Pop3.txt file I see that the client has correctly issued the ```STAT``` command and recieves the reply ```+OK 1122 50068335```.\r\n\r\nHowever the Client then goes on to retrieves all email, issuing ```RETR``` until all have been downloaded.\r\n\r\nWhen calling the ```client.Count()``` command, all the client needs to do is issue STAT and return the number from the server. Anything further is not necessary and a waste of bandwidth.\r\n\r\n\r\n**Platform (please complete the following information):**\r\n - OS: Windows 10\r\n - .NET: Net Core 3.1\r\n-  Microsoft Visual Studio Community 2019 Version 16.7.2\r\n - MailKit Version: 2.8.0\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Email count retrieval must not download full message content",
+      "Count operation must return accurate number of emails",
+      "Operation must complete with minimal network traffic",
+      "Must maintain compatibility with POP3 protocol standards"
+    ],
+    "created_at": "2020-08-30T08:51:29Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/984",
+    "source": {
+      "issue_number": 984
+    },
+    "initial_question": {
+      "title": "How to get the uniqueID of a message\uff1f",
+      "body": "**Is your feature request related to a problem? Please describe.**\r\nI have used inbox.getmessage (1) to get message information, but I can't find the one to get uniqueID\u3002\r\n\r\n**Describe the solution you'd like**\r\nvar message = Inbox.GetMessage(1);\r\nstring subject = message.Subject; //Subject\r\n\r\nHow to get uniqueID next\uff1f\r\nI need to get this uniqueID for setflags\u3002\r\nBut the uniqueID cannot be obtained by using GetMessage\u3002\r\n\r\n**Describe alternatives you've considered**\r\nA clear and concise description of any alternative solutions or features you've considered.\r\n\r\n**Additional context**\r\nAdd any other context or screenshots about the feature request here.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Must successfully retrieve unique message identifiers",
+      "Must be able to map between messages and their UIDs",
+      "Must support subsequent flag operations",
+      "Must work within the context of an email folder/inbox"
+    ],
+    "created_at": "2020-02-11T07:05:12Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/978",
+    "source": {
+      "issue_number": 978
+    },
+    "initial_question": {
+      "title": "Argument 1: Cannot convert from \"MimeKit.MimeMessage\" to \"string\".",
+      "body": "hello, I'm trying to copy part of the text from a REGEX letter , but I have a problem. produces such an error\r\n\u00a0Argument 1: Cannot convert from \"MimeKit.MimeMessage\" to \"string\".\r\n\r\n```csharp\r\n var a = inbox.GetMessage(UID); // \r\n                    var rsw = new Regex(\"(?i)<p [^>]*?>\\\\s*<em[^>]*?>(.*)</em\");\r\n  string capture2 = rsw.Match(a).Groups[1].Value;\r\n```\r\nI do not quite understand how to fix this.\r\n\r\nif this has nothing to do with your project, then I apologize.\r\nthanks"
+    },
+    "satisfaction_conditions": [
+      "Input to Regex.Match() must be a string type",
+      "Message content must be properly extracted from MimeMessage object",
+      "Regex pattern must be able to process HTML content",
+      "Solution must handle cases where target content might not exist"
+    ],
+    "created_at": "2020-01-22T15:29:35Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/955",
+    "source": {
+      "issue_number": 955
+    },
+    "initial_question": {
+      "title": "use aws ses(Amazon Simple Email Service) error   501 Invalid MAIL FROM address provided",
+      "body": "Dear Friend\r\nI use mailkit to send aws  ses \r\ncsharp code:\r\n\r\n```csharp\r\n            using (var client = new MailKit.Net.Smtp.SmtpClient(new ProtocolLogger(Program.CreateMailLog())))\r\n            {\r\n\r\n                //25 587\r\n                // String HOST = \"email-smtp.us-west-2.amazonaws.com\";\r\n                // int PORT = 587;\r\n                client.Connect(HOST, PORT, SecureSocketOptions.StartTlsWhenAvailable);\r\n                //SMTP_USERNAME: Replace smtp_username with your Amazon SES SMTP user name.\r\n                // SMTP_PASSWORD: Replace smtp_password with your Amazon SES SMTP user name.\r\n                client.Authenticate(SMTP_USERNAME, SMTP_PASSWORD);\r\n                // client.Authenticate(oauth);\r\n                client.Send(message);\r\n                client.Disconnect(true);\r\n            }\r\n```\r\n\r\nbut is error.\r\nlogs:\r\n```\r\nConnected to smtp://email-smtp.us-west-2.amazonaws.com:587/?starttls=when-available\r\nS: 220 email-smtp.amazonaws.com ESMTP SimpleEmailService-d-B1D75AM90 83qp4IzaerfvF0CNuJJJ\r\nC: EHLO [192.168.1.110]\r\nS: 250-email-smtp.amazonaws.com\r\nS: 250-8BITMIME\r\nS: 250-SIZE 10485760\r\nS: 250-STARTTLS\r\nS: 250-AUTH PLAIN LOGIN\r\nS: 250 Ok\r\nC: STARTTLS\r\nS: 220 Ready to start TLS\r\nC: EHLO [192.168.1.110]\r\nS: 250-email-smtp.amazonaws.com\r\nS: 250-8BITMIME\r\nS: 250-SIZE 10485760\r\nS: 250-STARTTLS\r\nS: 250-AUTH PLAIN LOGIN\r\nS: 250 Ok\r\nC: AUTH PLAIN XXX\r\nS: 235 Authentication successful.\r\nC: MAIL FROM:<myemailname> SIZE=606\r\nS: 501 Invalid MAIL FROM address provided\r\nC: RSET\r\nS: 250 Ok\r\n```\r\n\r\nlogs say my error is 501 Invalid MAIL FROM address provided\r\nbut i don't know what can i do\r\nsomeone has idea of it\r\nBest wish  \r\nRico \r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The SMTP authentication must remain successful",
+      "The SMTP connection must establish successfully with AWS SES endpoint"
+    ],
+    "created_at": "2019-11-21T06:40:04Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/941",
+    "source": {
+      "issue_number": 941
+    },
+    "initial_question": {
+      "title": "Smtp lifetime",
+      "body": "Hi, I was wondering how should I use `MailKit.Net.Smtp.smptclient` object, and what is the best life-time for `smtpclient` object.\r\nI mean should I use it as a singleton object, or is it ok to use it with c# `using(resource)` pattern?\r\nmy main concern here is how `smtpclient`  object handles underlying network connection, and what should I do in order to avoid socket exhaustion.\r\n\r\nI am asking this since all the tutorials on the web use `smtpclient` with c# `using(resource)` pattern. However, if `smtpclient` is anything like .net `httpclient` this is going to mess things up in production\r\n"
+    },
+    "satisfaction_conditions": [
+      "Network connections must be properly managed to avoid socket exhaustion",
+      "Connection cleanup must be handled gracefully",
+      "Client instance reuse must be implemented for bulk operations",
+      "Thread safety considerations must be addressed",
+      "Resource disposal must be guaranteed"
+    ],
+    "created_at": "2019-10-28T07:12:06Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/927",
+    "source": {
+      "issue_number": 927
+    },
+    "initial_question": {
+      "title": "Content Id for mails set to \"multipart/multipart/mixed\" in email message.",
+      "body": "**Describe the bug**\r\nWhen creating a new mail message using the MailKit and Mimekit helpers, when creating a message from a Multipart object, the Content Id is set to \"multipart/multipart/mixed\" instead of the normal \"multipart/mixed\". This happens when creating a MimeMessage object from a Multipart object, and then sending the email.\r\n\r\n**To Reproduce**\r\nSteps to reproduce the behavior:\r\nCreate a new outgoing email message using a MimeMessage, instead of using the BodyBuilder helper class. The MimeMessage should be built from a Multipart object using the \"subType\" of \"multipart/mixed\". Adding attachments is optional. \r\nWhen sending the mail and viewing the email as an EML file, the Content Id value is set to \"multipart/multipart/mixed\", instead of the correct \"multipart/mixed\". This can cause issues with certain email servers antispam/antivirus software seeing this message as a \"malformed\" message. This happened in a scenario where the recipient was using MailMarshal.\r\n\r\n**Expected behavior**\r\nContentId should be set to \"multipart/mixed\" in all scenarios.\r\n\r\n**Screenshots**\r\nIf applicable, add screenshots to help explain your problem.\r\n\r\n**Desktop (please complete the following information):**\r\n - OS: Windows 10\r\n - Browser All\r\n - Version 2.1.5.1\r\n\r\n**Additional context**\r\nWhen creating a new mail message using the BodyBuilder helper class, the message's Content Id is set correctly.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Email message Content-Type header must contain 'multipart/mixed'",
+      "Multipart content type must not have redundant 'multipart/' prefix",
+      "Solution must work when creating messages directly from Multipart objects"
+    ],
+    "created_at": "2019-10-07T10:33:48Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/917",
+    "source": {
+      "issue_number": 917
+    },
+    "initial_question": {
+      "title": "Need option to remove sender header from message.",
+      "body": "**Is your feature request related to a problem? Please describe.**\r\nWhen I add the sender ```MailboxAddress``` it changes the MAIL FROM in the envelope but also adds a sender header. The problem is that in some email clients and in particular, Outlook, the client displays something like \"sender@domain.com on behalf of from@domain.com\" or \"Sender <sender@domain.com> on behalf of From <from@domain.com>\". This may be correct but the recipient is often left in doubt as to who the message is really from. Typically the sender is going to be used to handle NDRs programmatically using a VERP (Variable envelope return path) scheme and the alias part of the address could be a GUID.\r\n\r\n**Describe the solution you'd like**\r\nI would like an option to not add the sender header, and only change the MAIL FROM in the envelope. Perhaps adding the sender to the MimeMessage should add the header but adding it in the ```MailTransport.SendAsync``` overload does not?\r\n\r\n**Describe alternatives you've considered**\r\nThe only way I've found to get what I want so far is to extend the SmtpClient and remove the header from the ```Prepare``` method:\r\n\r\n```\r\npublic class ExtendedSmtpClient : SmtpClient\r\n{\r\n\tprotected override void Prepare(FormatOptions options, MimeMessage message, EncodingConstraint constraint, int maxLineLength)\r\n\t{\r\n\t\tmessage.Headers.Remove(HeaderId.Sender);\r\n\r\n\t\tbase.Prepare(options, message, constraint, maxLineLength);\r\n\t}\r\n}\r\n```\r\n\r\nI haven't fully tested this but I'm wondering if there's a better way you could point out to me?\r\n\r\n**Additional context**\r\nAmazon SES modifies the MAIL FROM without adding the sender header so I guess this is considered acceptable practice.\r\n\r\nPlease let me know what you think.\r\nThanks \r\nAndrew"
+    },
+    "satisfaction_conditions": [
+      "Email envelope MAIL FROM is modified without adding a Sender header",
+      "Message displays only the From address to recipients",
+      "Solution works with standard email protocols and clients"
+    ],
+    "created_at": "2019-09-26T09:32:12Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/907",
+    "source": {
+      "issue_number": 907
+    },
+    "initial_question": {
+      "title": "FetchAsync is not loading list of UniqueIds",
+      "body": "**Describe the bug**\r\n\r\nI'm attempting to load recent messages from a given folder, in this case a user's inbox.  I get a list of unique ids using `folder.SortAsync()` then take that list and call `folder.FetchAsync()`.  `SortAsync` is returning 199 UniqueId values.  When I call fetch, no records are returned.\r\n\r\nHowever, if I request a single UniqueId at a time, it works.  I assume the IMAP server does not support ranges.\r\n\r\nIs there a capability I can look at the determine this behavior?  Also, is there a way to request that Fetch not use ranges?\r\n\r\nUsing MailKit 2.3.0\r\n\r\n**Expected behavior**\r\nI'd expect `FetchAsync` to return the 199 messages.\r\n\r\n**Additional context**\r\n<details><summary>Output from Imap Protocol Logger</summary>\r\n<pre>\r\nS: A00000000 OK [CAPABILITY IMAP4REV1 LITERAL+ UTF8=ALL STARTTLS IDLE NAMESPACE UNSELECT SORT QUOTA ID] User [redacted] authenticated\r\nC: A00000001 NAMESPACE\r\nS: * NAMESPACE ((\"\" \"/\")) NIL NIL\r\nS: A00000001 OK NAMESPACE completed\r\nC: A00000002 LIST \"\" \"INBOX\"\r\nS: * LIST (\\NoInferiors) NIL INBOX\r\nS: A00000002 OK LIST completed\r\nC: A00000003 LIST \"\" \"%\"\r\nS: * LIST (\\NoInferiors) NIL INBOX\r\nS: * LIST (\\Marked) \"/\" mail/SPAM.incoming\r\nS: * LIST (\\UnMarked) \"/\" mail/drafts\r\nS: * LIST (\\UnMarked) \"/\" mail/sent-mail\r\nS: * LIST (\\UnMarked) \"/\" mail/trash\r\nS: * LIST (\\UnMarked) \"/\" \"Junk E-mail\"\r\nS: * LIST (\\UnMarked) \"/\" \"Sent Items\"\r\nS: * LIST (\\UnMarked) \"/\" \"Deleted Items\"\r\nS: * LIST (\\UnMarked) \"/\" Drafts\r\nS: A00000003 OK LIST completed\r\nC: A00000004 LIST \"\" mail\r\nS: A00000004 OK LIST completed\r\nC: A00000005 EXAMINE INBOX\r\nS: * 199 EXISTS\r\nS: * 2 RECENT\r\nS: * OK [UIDVALIDITY 1279810762] UID validity status\r\nS: * OK [UIDNEXT 38448] Predicted next UID\r\nS: * FLAGS (\\Answered \\Flagged \\Deleted \\Draft \\Seen)\r\nS: * OK [PERMANENTFLAGS ()] Permanent flags\r\nS: * OK [UNSEEN 198] first unseen message in mailbox\r\nS: A00000005 OK [READ-ONLY] EXAMINE completed\r\nC: A00000006 UID SORT (REVERSE ARRIVAL) US-ASCII ALL\r\nS: * SORT 38447 38446 38445 38444 38443 38442 38441 38440 38439 38438 38437 38436 38435 38434 38433 38432 38431 38430 38429 38428 38427 38426 38425 38424 38423 38422 38421 38420 38419 38418 38417 38416 38415 38414 38413 38412 38411 38410 38409 38408 38407 38406 38405 38404 38403 38402 38401 38400 38399 38398 38397 38396 38395 38394 38393 38392 38391 38390 38389 38388 38387 38386 38385 38384 38383 38382 38381 38380 38379 38378 38377 38376 38375 38374 38373 38372 38371 38370 38369 38368 38367 38366 38365 38364 38363 38362 38361 38360 38359 38358 38357 38356 38355 38354 38353 38352 38351 38350 38349 38348 38347 38346 38345 38344 38343 38342 38341 38340 38339 38338 38337 38336 38335 38334 38333 38332 38331 38330 38329 38328 38327 38326 38325 38324 38323 38322 38321 38320 38319 38318 38317 38316 38315 38314 38313 38312 38311 38310 38309 38308 38307 38306 38305 38304 38303 38302 38301 38300 38299 38298 38297 38296 38295 38294 38293 38292 38291 38290 38289 38288 38287 38286 38285 38284 38283 38282 38281 38280 38279 38278 38277 38276 38275 38274 38273 38272 38271 38270 38269 38268 38267 38266 38265 38264 38263 38262 38261 38260 38259 38258 38257 38256 38255 38254 38253 38252 38251 38250 38249\r\nS: A00000006 OK UID SORT completed\r\nC: A00000007 UID FETCH 38447:38348 BODY.PEEK[HEADER.FIELDS (TO FROM MESSAGE-ID DATE DELIVERY-DATE SUBJECT REFERENCES IN-REPLY-TO)]\r\nS: A00000007 OK UID FETCH completed\r\n</pre>\r\n</details>\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Compatible with server's IMAP capabilities",
+      "Maintains message ordering as specified by the original sort request"
+    ],
+    "created_at": "2019-09-10T16:08:06Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/899",
+    "source": {
+      "issue_number": 899
+    },
+    "initial_question": {
+      "title": "Attachment file size showing higher than the actual size",
+      "body": "Hi,\r\nI am trying to check the attachments size before downloading the complete message. For this I have used the MessageSummaryItems.BodyStructure while Fetching the items from inbox. As follows.\r\n\r\n```csharp\r\nvar items = folder.Fetch (ids, MessageSummaryItems.BodyStructure | MessageSummaryItems.UniqueId);\r\nforeach (var item in items) {\r\n    foreach (var attachment in item.Attachments) {\r\n        // 'octets' is just a fancy word for \"number of bytes\"\r\n        var size = attachment.Octets;\r\n\tlog.Info(size);\r\n    }\r\n}\r\n```\r\n\r\nBut, looking at the log, it shows the file size as more than the actual file size. Log comes as follows.\r\n\r\nFound 2 attachments with the mail (UniqueID:5533)\r\nIndividual attachment size for message:5533 is :: 3427408\r\nIndividual attachment size for message:5533 is :: 2875804\r\nTotal size of attachment for message:5533 is 6303212\r\n\r\nBut the actual file size in File Properties shows as 2504642 and 2101546 respectively.\r\n\r\nCan you please help me understand why the size shows more than the actual size when we download it from the email? If this is an expected behavior, is there a way to get the actual file size before downloading the attachments?\r\n\r\nMy requirement is to put a limit on the email attachment size, and ignore those emails if the size is above the limit."
+    },
+    "satisfaction_conditions": [
+      "System must handle the difference between encoded attachment size and decoded file size",
+      "Size limit enforcement must work with encoded attachment sizes",
+      "System must function without requiring full attachment download"
+    ],
+    "created_at": "2019-08-30T15:20:07Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/846",
+    "source": {
+      "issue_number": 846
+    },
+    "initial_question": {
+      "title": "Empty Sender in Envelope object",
+      "body": "Hi, we have encountered an issue with the reading sender from an envelope in the case when the sender doesn't have a hostname. Sender and From properties are NULL in this case.\r\nHere is an exapmle:\r\n```\r\nC: B00000092 UID FETCH 16855:16880 ENVELOPE\r\nS: * 1 FETCH (ENVELOPE (\"Sat, 6 Apr 2019 06:11:46 +0000\" \"SUBJECT\" ((\"NAME\" NIL NIL \".MISSING-HOST-NAME.\")) ((NIL NIL \"NAME\" \".MISSING-HOST-NAME.\")) NIL ((NIL NIL \"TEST\" \"TEST.COM\")) NIL NIL NIL \"<D5EE6C329218A78D@>\") UID 16855)\r\n```\r\nSender and From headers in such emails have the following values\r\n\r\n```\r\nSender: <NAME>\r\nFrom: NAME\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Email addresses without hostnames are handled without null values",
+      "Envelope.Sender contains the local part of the email address",
+      "Envelope.From follows email address format requirements",
+      "IMAP FETCH ENVELOPE command response is correctly parsed",
+      "Software version is current enough to handle incomplete addresses"
+    ],
+    "created_at": "2019-04-15T16:02:28Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/833",
+    "source": {
+      "issue_number": 833
+    },
+    "initial_question": {
+      "title": "SMTP Client - Capture response from successful SendAsync",
+      "body": "Following successful submission of a message via the SMTP client, I would like the ability to capture the server response for the specific message.\r\n\r\nFor example,  given a successful call\r\n    `await client.SendAsync (message).ConfigureAwait(false);` , \r\n\r\nI would like to capture the server's response, such as\r\n    `250 2.0.0 x2KMTNgW014937 Message accepted for delivery`\r\n\r\nI've seen this as part of the protocol log, but it's only the delivery response that I would like to write to application logs.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "SMTP server response message is successfully captured after message delivery",
+      "Response capture occurs after successful message delivery",
+      "Captured response can be written to application logs",
+      "Response capture is specific to individual message submissions"
+    ],
+    "created_at": "2019-03-20T22:36:26Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/757",
+    "source": {
+      "issue_number": 757
+    },
+    "initial_question": {
+      "title": "Not able to read Inbox using IMAP client",
+      "body": "I want to read emails & download attachments from my mailbox (a govt. provided service) using MailKit IMAP client.\r\n\r\n- What were you trying to do?\r\n  Read emails using IMAP client.\r\n\r\n- What happened?\r\n     Exception at  **inbox.Open(FolderAccess.ReadOnly);**\r\n**(Exception: MailKit.Net.Imap.ImapCommandException: 'The IMAP server replied to the 'EXAMINE' command with a 'BAD' response: Unrecognised option condstore on Examine')**\r\n\r\n- What did you expect to happen?\r\n  Successfully get the Read access for the inbox.\r\n\r\n- Step-by-step reproduction instructions and/or a simple test case.\r\n\r\n```\r\nusing (var client = new ImapClient(new ProtocolLogger(\"E:\\\\imap.log\")))\r\n            {\r\n                // For demo-purposes, accept all SSL certificates\r\n                client.ServerCertificateValidationCallback = (s, c, h, e) => true;\r\n\r\n                client.Connect(\"mail.gov.in\", 993, true);\r\n\r\n                client.Authenticate(\"XYZ@abc.gov.in\", \"password\");\r\n                // The Inbox folder is always available on all IMAP servers...\r\n\r\n                var inbox = client.Inbox;\r\n               \r\n                **inbox.Open(FolderAccess.ReadOnly);** Crashed here\r\n\r\n                Console.WriteLine(\"Total messages: {0}\", inbox.Count);\r\n                Console.WriteLine(\"Recent messages: {0}\", inbox.Recent);\r\n\r\n                for (int i = 0; i < 3; i++)\r\n                {\r\n                    var message = inbox.GetMessage(i);\r\n                    Console.WriteLine(\"Subject: {0}\", message.Subject);\r\n                }\r\n\r\n                client.Disconnect(true);\r\n            }\r\n```\r\nIf you got an exception, please include the exception Message *and* StackTrace.\r\n\r\n**(Exception: MailKit.Net.Imap.ImapCommandException: 'The IMAP server replied to the 'EXAMINE' command with a 'BAD' response: Unrecognised option condstore on Examine')**\r\n\r\nimap protocol log:\r\n\r\nConnected to imaps://mail.gov.in:993/\r\nS: * OK [CAPABILITY IMAP4rev1 UIDPLUS CHILDREN NAMESPACE SORT QUOTA ACL STARTTLS AUTH=PLAIN] Messaging Multiplexor (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May  5 2014))\r\nC: A00000000 AUTHENTICATE PLAIN\r\nS: + \r\nC: AGNiaW11bWJhaS5sZWdhbEBjYmkuZ292LmluAEFjYkAyMDE3\r\nS: A00000000 OK User XYZ.gov.in logged in\r\nC: A00000001 CAPABILITY\r\nS: * CAPABILITY IMAP4 IMAP4rev1 ACL RIGHTS=tekx QUOTA LITERAL+ NAMESPACE UIDPLUS CHILDREN BINARY UNSELECT SORT CATENATE URLAUTH LANGUAGE ESEARCH ESORT THREAD=ORDEREDSUBJECT THREAD=REFERENCES ENABLE QRESYNC CONTEXT=SEARCH CONTEXT=SORT WITHIN SASL-IR SEARCHRES METADATA ID XSENDER X-SUN-SORT ANNOTATE-EXPERIMENT-1 X-UNAUTHENTICATE X-SUN-IMAP XUM1 IDLE\r\nS: A00000001 OK Completed\r\nC: A00000002 NAMESPACE\r\nS: * NAMESPACE ((\"\" \"/\")) ((\"Shared Folders/User/\" \"/\")) ((\"Shared Folders/Public/\" \"/\"))\r\nS: A00000002 OK Completed\r\nC: A00000003 LIST \"\" \"INBOX\"\r\nS: * LIST (\\NoInferiors) \"/\" INBOX\r\nS: A00000003 OK Completed\r\nC: A00000004 EXAMINE INBOX (CONDSTORE)\r\nS: A00000004 BAD Unrecognised option condstore on Examine\r\n\r\n\r\nPlease help."
+    },
+    "satisfaction_conditions": [
+      "IMAP client successfully connects to the mail server",
+      "Authentication with the mail server succeeds"
+    ],
+    "created_at": "2018-09-18T10:20:50Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/755",
+    "source": {
+      "issue_number": 755
+    },
+    "initial_question": {
+      "title": "ReplyTo is Difficult for me to set",
+      "body": "**Is your feature request related to a problem? Please describe.**\r\nI'm just wanting to be able to set the reply to property in the MimeMessage so that emails that go out will reply to that property. I can't figure out what I would inherit or use to set this as I've been trying a few things and checking documentation for any answers on how to actually set the property.\r\n\r\n**Describe the solution you'd like**\r\nI can set the to addresses, from addresses, message and body, subject... I'd love to be able to set the reply to property as well or at least know how.\r\n\r\n**Describe alternatives you've considered**\r\nTrying to implement and change the code myself. I'm somewhat new at this so I need documentation that tells me how I would set properties like this with only a getter or at least how they were intended to be used and why I can't set them like other properties that I can set.\r\n\r\n**Additional context**\r\nIf there's anything that helps me set this then please refer me and I would really appreciate it.\r\n"
+    },
+    "satisfaction_conditions": [
+      "The MimeMessage object must allow adding reply-to addresses",
+      "The reply-to functionality must work consistently with other email address fields"
+    ],
+    "created_at": "2018-09-17T21:41:12Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/682",
+    "source": {
+      "issue_number": 682
+    },
+    "initial_question": {
+      "title": "Get the top EMAIL unique id",
+      "body": "My inbox email count is 2035, but my last(top/newest) email's  unique id is 2110..Is there a way to get the top/last/newest email's uid without retrieveing the entire folder ? "
+    },
+    "satisfaction_conditions": [
+      "Returns the most recent email's unique ID without retrieving all messages",
+      "Handles cases where the latest message might not exist",
+      "Works with the IMAP folder's message counting system"
+    ],
+    "created_at": "2018-03-21T22:13:37Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/656",
+    "source": {
+      "issue_number": 656
+    },
+    "initial_question": {
+      "title": "IMAP /SMTP client connection is very slow",
+      "body": "Yo Jeff,\r\nI'm using your library and loved this...\r\n\r\nNow, I'm facing an issue regarding speed. [ in backend, I'm creating new ImapClient on each operation on server in \"using\" code block  (`using (var client = new ImapClient() { client.connect() })`)]\r\nImap or Smtp client creation and connection with server (using email, password, incoming/outgoing server with ports) and FOLDER opening (by `client.GetFolder()` ) takes much time and makes the overall process much slower.\r\n\r\nIs there a way to speed this up? or any valuable suggestions are highly appreciated.\r\nThank you so much!"
+    },
+    "satisfaction_conditions": [
+      "Connection establishment time is reduced compared to creating new connections for each operation",
+      "Connections remain functional for extended periods",
+      "Multiple email account connections can be managed simultaneously"
+    ],
+    "created_at": "2018-02-28T06:59:05Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/635",
+    "source": {
+      "issue_number": 635
+    },
+    "initial_question": {
+      "title": "NotSupportedException: No compatible authentication mechanisms found",
+      "body": "Hello,\r\nI was using MailKit 1.4.0 and my code worked fine:\r\n```csharp\r\n            using (var smtpClient = new SmtpClient())\r\n            {\r\n                await smtpClient.ConnectAsync(_configuration.SmtpServer, _configuration.SmtpPort);\r\n                await smtpClient.AuthenticateAsync(_configuration.SmtpUsername, _configuration.SmtpPassword);\r\n\r\n                await smtpClient.SendAsync(message);\r\n                await smtpClient.DisconnectAsync(true);\r\n\r\n            }\r\n```\r\nNow I want to upgrade to MailKit 2.0.1 and I've got an NotSupportedExcetion:\r\n```\r\nNotSupportedException: No compatible authentication mechanisms found.\r\nMailKit.Net.Smtp.SmtpClient+<AuthenticateAsync>d__64.MoveNext()\r\n\r\n\r\nMailKit.Net.Smtp.SmtpClient+<AuthenticateAsync>d__64.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nSSO.Core.Mail.Service.EmailService+<SendAsync>d__2.MoveNext() in EmailService.cs\r\n+\r\n                await smtpClient.AuthenticateAsync(_configuration.SmtpUsername, _configuration.SmtpPassword);\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nSSOLocalWeb.Controllers.AccountController+<ForgotPassword>d__11.MoveNext() in AccountController.cs\r\n+\r\n            await emailService.SendAsync(emailMessage);\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nSystem.Runtime.CompilerServices.TaskAwaiter.GetResult()\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker+<InvokeActionMethodAsync>d__12.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker+<InvokeNextActionFilterAsync>d__10.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.Rethrow(ActionExecutedContext context)\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker.Next(ref State next, ref Scope scope, ref object state, ref bool isCompleted)\r\nMicrosoft.AspNetCore.Mvc.Internal.ControllerActionInvoker+<InvokeInnerFilterAsync>d__14.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker+<InvokeNextResourceFilter>d__22.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker.Rethrow(ResourceExecutedContext context)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker.Next(ref State next, ref Scope scope, ref object state, ref bool isCompleted)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker+<InvokeFilterPipelineAsync>d__17.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Mvc.Internal.ResourceInvoker+<InvokeAsync>d__15.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Builder.RouterMiddleware+<Invoke>d__4.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Authentication.AuthenticationMiddleware+<Invoke>d__6.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Session.SessionMiddleware+<Invoke>d__9.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nMicrosoft.AspNetCore.Session.SessionMiddleware+<Invoke>d__9.MoveNext()\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\nSystem.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\nMicrosoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware+<Invoke>d__7.MoveNext()\r\n```\r\n\r\nI've sent you a protocol log at your email\r\njestedfa@microsoft.com instead of including it in the GitHub issue.\r\n"
+    },
+    "satisfaction_conditions": [
+      "SMTP authentication succeeds after upgrading MailKit",
+      "Compatible authentication mechanism is established between client and server",
+      "Solution accounts for changes in default authentication behavior between versions"
+    ],
+    "created_at": "2018-01-17T09:11:09Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/626",
+    "source": {
+      "issue_number": 626
+    },
+    "initial_question": {
+      "title": "Failure sending multiple simultaneous emails",
+      "body": "After upgrading our solution from MailKit 1.x version to 2.0.1 version, we have started to experience errors whenever we attempt to send e-mails on multiple threads at the same time.\r\n\r\nWe receive one of the two following errors:\r\n\r\n> Error reading a response from the SMTP server. => Cannot access a disposed object.\r\n> Object name: 'SslStream'.\r\n\r\n> Error reading a response from the SMTP server. =>  The BeginRead method cannot be called when another read operation is pending.\r\n\r\nIs there any reference on how to properly use new asynchronous APIs?\r\n\r\nThis is code sample from our app:\r\n\r\n    public class MailerProcess\r\n    {\r\n        public static void Run()\r\n        {\r\n             using (SmtpClient client = new SmtpClient())\r\n             {\r\n                   string host = AppSettingsWrapper.Host;\r\n                   string port = AppSettingsWrapper.Port.ToString();\r\n\r\n                   client.Connect(AppSettingsWrapper.Host, AppSettingsWrapper.Port, SecureSocketOptions.Auto);\r\n                   client.Authenticate(AppSettingsWrapper.UserName, AppSettingsWrapper.Password);\r\n                   client.Timeout = AppSettingsWrapper.Timeout;\r\n\r\n \t           List<Task> taskList = new List<Task>();\r\n \r\n                   foreach (MailerJob job in batch)\r\n                   {\r\n                        taskList.Add(SendAsync(client, fm, job.Email));\r\n                   }\r\n\r\n                   Task.WhenAll(taskList).Wait();\r\n\r\n                   if(client.IsConnected)\r\n                   {\r\n                        client.Disconnect(true);\r\n                   }\r\n              }\r\n        }\r\n\r\n        private static async Task SendAsync(SmtpClient client, IFileManager fm, Email email)\r\n        {\r\n            try\r\n            {\r\n                MimeMessage message = new MimeMessage();\r\n\r\n                MailboxAddress from = new MailboxAddress(email.Content.FromDisplayName, email.Content.FromAddress);\r\n                MailboxAddress to = new MailboxAddress(email.Content.ToDisplayName, email.Content.ToAddress);\r\n                message.From.Add(from);\r\n                message.To.Add(to);\r\n\r\n                message.Subject = email.Content.Subject;\r\n\r\n                BodyBuilder bodyBuilder = new BodyBuilder();\r\n                if (email.Content.IsHtmlContent)\r\n                {\r\n                    bodyBuilder.HtmlBody = email.Content.Body;\r\n                }\r\n                else\r\n                {\r\n                    bodyBuilder.TextBody = email.Content.Body;\r\n                }\r\n\r\n                message.Body = bodyBuilder.ToMessageBody();\r\n\r\n                if (client.IsConnected)\r\n                {\r\n                    await client.SendAsync(message);\r\n                }\r\n                return;\r\n            }\r\n            catch (SmtpCommandException se)\r\n            {\r\n                email.StatusMessage = se.Message;\r\n                email.StatusCode = (int)se.StatusCode;\r\n            }\r\n            catch (Exception e)\r\n            {\r\n                email.StatusMessage = e.RecursiveMessage();\r\n            }\r\n        }\r\n    }\r\n\r\nRun method is invoked from .NET Core 2.0 console application.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Email sending operations must be synchronized to prevent concurrent access to the SMTP client",
+      "All emails in the batch must be processed without disposed object errors",
+      "Solution must work within an asynchronous context",
+      "Multiple email sending requests must complete successfully within a single SMTP session"
+    ],
+    "created_at": "2018-01-12T18:16:25Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/613",
+    "source": {
+      "issue_number": 613
+    },
+    "initial_question": {
+      "title": "The ImapClient is currently busy processing a command in another thread",
+      "body": "- **What were you trying to do?**\r\nPreviously in 1.22.0, I was successfully able to listen for notifications without using IDLE and just NoOp. When an event is triggered, I would search the Inbox for any unseen items (if there were any) and if there were new items, it would parse the new messages.\r\n\r\n- **What happened?**\r\nAfter updating to 2.0.0\r\nWhen attempting to Fetch the items in the Inbox, I am getting the following message \r\n\r\n> _The ImapClient is currently busy processing a command in another thread. Lock the SyncRoot property to properly synchronize your threads._\r\n\r\nThis message occurs at the following commands under the EventHandler.\r\n\r\n```csharp\r\npublic static async void OnMessageFlagsChanged(object sender, MessageFlagsChangedEventArgs e)\r\n{\r\n        var folder = (ImapFolder)sender;\r\n            \r\n        IList<IMessageSummary> summaries;\r\n        var query = SearchQuery.SubjectContains(\"New message\").And(SearchQuery.NotSeen);\r\n        var uids = await folder.SearchAsync(query); // <-- This is where it breaks\r\n```\r\n\r\nOddly enough, I downgraded back to 1.22.0, and my issue went away, and everything works as I had expected.\r\n\r\n> Connected to imaps://outlook.office365.com:993/\r\nS: * OK The Microsoft Exchange IMAP4 service is ready. [RABNADUAUABSADIAMQBDAEEAMAAwADIAMgAuAG4AYQBtAHAAcgBkADIAMQAuAHAAcgBvAGQALgBvAHUAdABsAG8AbwBrAC4AYwBvAG0A]\r\nC: A00000000 CAPABILITY\r\nS: * CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=XOAUTH2 SASL-IR UIDPLUS ID UNSELECT CHILDREN IDLE NAMESPACE LITERAL+\r\nS: A00000000 OK CAPABILITY completed.\r\nC: A00000001 AUTHENTICATE PLAIN AGpmZWxwc0BpbnRlZ3JpdGVsLnVzXHRyYW5zY3JpYmUAQjV1elU5cmU=\r\nS: A00000001 NO AUTHENTICATE failed.\r\nC: A00000002 LOGIN **[INFO REMOVED]**\r\nS: A00000002 OK LOGIN completed.\r\nC: A00000003 CAPABILITY\r\nS: * CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=XOAUTH2 SASL-IR UIDPLUS MOVE ID UNSELECT CLIENTACCESSRULES CLIENTNETWORKPRESENCELOCATION BACKENDAUTHENTICATE CHILDREN IDLE NAMESPACE LITERAL+\r\nS: A00000003 OK CAPABILITY completed.\r\nC: A00000004 NAMESPACE\r\nS: * NAMESPACE ((\"\" \"/\")) NIL NIL\r\nS: A00000004 OK NAMESPACE completed.\r\nC: A00000005 LIST \"\" \"INBOX\"\r\nS: * LIST (\\Marked \\HasNoChildren) \"/\" INBOX\r\nS: A00000005 OK LIST completed.\r\nC: A00000006 SELECT INBOX\r\nS: * 16 EXISTS\r\nS: * 0 RECENT\r\nS: * FLAGS (\\Seen \\Answered \\Flagged \\Deleted \\Draft $MDNSent)\r\nS: * OK [PERMANENTFLAGS (\\Seen \\Answered \\Flagged \\Deleted \\Draft $MDNSent)] Permanent flags\r\nS: * OK [UIDVALIDITY 14] UIDVALIDITY value\r\nS: * OK [UIDNEXT 114] The next unique identifier value\r\nS: A00000006 OK [READ-WRITE] SELECT completed.\r\nC: A00000007 UID SEARCH SUBJECT \"New message\" UNSEEN\r\nS: * SEARCH\r\nS: A00000007 OK SEARCH completed.\r\nC: A00000008 FETCH 1:* (UID FLAGS INTERNALDATE RFC822.SIZE ENVELOPE BODY)\r\nS: * 1 FETCH (UID 65 FLAGS (\\Seen) INTERNALDATE \"19-Dec-2017 15:55:05 +0000\" **[INFO REMOVED]**\r\nS: A00000008 OK FETCH completed.\r\nC: A00000009 NOOP\r\nS: A00000009 OK NOOP completed.\r\nC: A00000010 NOOP\r\nS: * 16 FETCH (FLAGS ())\r\nS: A00000010 OK NOOP completed.\r\n\r\n> \"   at MailKit.Net.Imap.ImapEngine.QueueCommand(ImapCommand ic)\r\n   at MailKit.Net.Imap.ImapFolder.<SearchAsync>d__323.MoveNext()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()\r\n   at Voicemail_Transcription.EventHandlers.<OnCountChanged>d__1.MoveNext() in C:\\\\Users\\\\jfelps\\\\Documents\\\\Visual Studio 2017\\\\Projects\\\\Voicemail Transcription\\\\Voicemail Transcription\\\\EventHandlers.cs:line 29\"\r\n\r\n> Exception thrown: 'System.InvalidOperationException' in mscorlib.dll\r\nThe ImapClient is currently busy processing a command in another thread. Lock the SyncRoot property to properly synchronize your threads.\r\n\r\nPlease let me know if there is anything more that I need to provide. I have no problem providing my code through email preferably.\r\n"
+    },
+    "satisfaction_conditions": [
+      "IMAP client must handle concurrent command execution without throwing threading exceptions",
+      "Event handlers must be able to respond to IMAP server notifications without blocking or crashing",
+      "IDLE/NOOP operations must be gracefully interruptible",
+      "Client must maintain consistent state during connection lifecycle events",
+      "Thread synchronization mechanism must prevent command conflicts"
+    ],
+    "created_at": "2017-12-30T06:19:05Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/597",
+    "source": {
+      "issue_number": 597
+    },
+    "initial_question": {
+      "title": "POP3 Client",
+      "body": "Hey Jeffrey,\r\nWill use pop3 to get mail, can distinguish between inbox mail and deleted mail? If you can, what to do\uff1f"
+    },
+    "satisfaction_conditions": [
+      "POP3 client correctly identifies accessible messages",
+      "Client handles deleted message status appropriately"
+    ],
+    "created_at": "2017-12-13T12:42:19Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/578",
+    "source": {
+      "issue_number": 578
+    },
+    "initial_question": {
+      "title": "How to use \"SyncRoot\"?",
+      "body": "How can I use \"SyncRoot\" for synchronization of my client and IMAP server?\r\nany helping material you can share."
+    },
+    "satisfaction_conditions": [
+      "Thread synchronization is properly implemented for IMAP operations",
+      "Single IMAP command execution at a time",
+      "Shared synchronization object across related components",
+      "No IMAP commands executed within event handlers",
+      "Command queuing mechanism for event-triggered operations"
+    ],
+    "created_at": "2017-10-27T09:53:00Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/561",
+    "source": {
+      "issue_number": 561
+    },
+    "initial_question": {
+      "title": "Unable to connect to imaps when setting up TLS ",
+      "body": "So i'm having an issue I am trying to connect to using TLS\r\n\r\nServer name: outlook.office365.com\r\nPort: 993\r\nEncryption method: TLS\r\n\r\nso I am using this to connect to the server \r\n \r\n` _client.Connect( \"outlook.office365.com\", \"993\", SecureSocketOptions.StartTls);`\r\n\r\nBut it fails and the log only contains one line and throws an exception\r\n\r\n> Connected to **imap:**//outlook.office365.com:993/?starttls=always\r\n\r\nBut if use below it connect successfully but need to use TLS\r\n\r\n` _client.Connect( \"outlook.office365.com\", \"993\", SecureSocketOptions.Auto);`\r\n\r\n> Connected to **imaps**://outlook.office365.com:993/\r\n> S: * OK The Microsoft Exchange IMAP4 service is ready. [SABFADEAUAAxADkAMABDAEEAMAAwADEANQAuAEUAVQBSAFAAMQA5ADAALgBQAFIATwBEAC4ATwBVAFQATABPAE8ASwAuAEMATwBNAA==]\r\n> C: C00000000 CAPABILITY\r\n> S: * CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=XOAUTH2 SASL-IR UIDPLUS ID UNSELECT CHILDREN IDLE NAMESPACE LITERAL+\r\n> S: C00000000 OK CAPABILITY completed.\r\n> C: C00000001 AUTHENTICATE XOAUTH2  ***********************\r\n> S: C00000001 NO AUTHENTICATE failed.\r\n> C: C00000002 AUTHENTICATE PLAIN ***********************\r\n> S: C00000002 OK AUTHENTICATE completed.\r\n> C: C00000003 CAPABILITY\r\n> S: * CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=XOAUTH2 SASL-IR UIDPLUS MOVE ID UNSELECT CLIENTACCESSRULES CLIENTNETWORKPRESENCELOCATION BACKENDAUTHENTICATE CHILDREN IDLE NAMESPACE LITERAL+\r\n> S: C00000003 OK CAPABILITY completed.\r\n> C: C00000004 NAMESPACE\r\n> S: * NAMESPACE ((\"\" \"/\")) NIL NIL\r\n> S: C00000004 OK NAMESPACE completed.\r\n> C: C00000005 LIST \"\" \"INBOX\"\r\n> S: * LIST (\\Marked \\HasNoChildren) \"/\" INBOX\r\n> S: C00000005 OK LIST completed.\r\n> C: C00000006 SELECT INBOX\r\n> S: * 5 EXISTS\r\n> S: * 2 RECENT\r\n> S: * FLAGS (\\Seen \\Answered \\Flagged \\Deleted \\Draft $MDNSent)\r\n> S: * OK [PERMANENTFLAGS (\\Seen \\Answered \\Flagged \\Deleted \\Draft $MDNSent)] Permanent flags\r\n> S: * OK [UNSEEN 4] Is the first unseen message\r\n> S: * OK [UIDVALIDITY 14] UIDVALIDITY value\r\n> S: * OK [UIDNEXT 626] The next unique identifier value\r\n> S: C00000006 OK [READ-WRITE] SELECT completed.\r\n> C: C00000007 FETCH 1:* (UID FLAGS INTERNALDATE RFC822.SIZE ENVELOPE BODY)\r\n\r\nshould the TLS be going to imaps as well?\r\n\r\nAm I missing something any help would be useful I have removed the  ***********************\r\n"
+    },
+    "satisfaction_conditions": [
+      "Successful secure connection established with Office 365 IMAP server on port 993",
+      "Connection uses appropriate encryption protocol for port 993",
+      "Client receives expected IMAP server capabilities and can perform IMAP operations"
+    ],
+    "created_at": "2017-09-06T10:06:31Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/533",
+    "source": {
+      "issue_number": 533
+    },
+    "initial_question": {
+      "title": "Question: How to get the message headers (like X-....)",
+      "body": "Hi,\r\n\r\nI now use below code to get MessageSummary items to get information about the message. I also want to retrieve the headers. Is it possible to do it somehow in the same call or do I need to use the client.Inbox.GetHeaders(result[0].Index); method on each message?\r\n\r\n```\r\nclient.Inbox.Open(FolderAccess.ReadOnly);\r\n\r\nconst MessageSummaryItems items =\r\n\tMessageSummaryItems.UniqueId |\r\n\tMessageSummaryItems.Flags |\r\n\tMessageSummaryItems.Envelope |\r\n\tMessageSummaryItems.Body |\r\n\tMessageSummaryItems.Size;\r\n\r\nvar fields = new HashSet<HeaderId> {HeaderId.Importance};\r\nvar result = client.Inbox.Count == 0\r\n\t? new IMessageSummary[0]\r\n\t: client.Inbox.Fetch(0, -1, items, fields);\r\n\r\n//var test = client.Inbox.GetHeaders(result[0].Index);\r\n\r\nclient.Inbox.Close();\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Message headers are successfully retrieved from email messages",
+      "Header retrieval operation works within a single fetch operation or with acceptable performance",
+      "Attachment presence can be determined without retrieving entire message content",
+      "Custom/specific headers can be selectively retrieved",
+      "Operations maintain read-only access when appropriate"
+    ],
+    "created_at": "2017-07-03T08:24:01Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/524",
+    "source": {
+      "issue_number": 524
+    },
+    "initial_question": {
+      "title": "Not able to send an email through office365 ",
+      "body": "Hi there,\r\n\r\nI am trying to send an email through office 365 through mailkit (.net core 1.1) but it is giving me an authentication failed error.\r\n\r\nError: MailKit.Security.AuthenticationException: Authentication failed.\r\n   at MailKit.Net.Smtp.SmtpClient.Authenticate(Encoding encoding, ICredentials credentials, CancellationToken cancellationToken)\r\n   at MailKit.MailService.Authenticate(String userName, String password, CancellationToken cancellationToken)\r\n   at ConsoleApp1.Program.Main(String[] args) in C:\\Users\\kcauc\\OneDrive\\Documents\\Visual Studio 2017\\Projects\\ConsoleApp1\\ConsoleApp1\\Program.cs\r\n\r\nHere is my code: \r\n`                string Subject = \"Hello World - Sending email using ASP.NET Core 1.1\";\r\n                string BodyContent = \"test.\";\r\n\r\n                //Smtp Server \r\n                string SmtpServer = \"smtp.office365.com\";\r\n                //Smtp Port Number \r\n                int SmtpPortNumber = 587;\r\n\r\n                var mimeMessage = new MimeMessage();\r\n                mimeMessage.From.Add(new MailboxAddress(FromAddress));\r\n                mimeMessage.To.Add(new MailboxAddress(ToAddress));\r\n                mimeMessage.Subject = Subject;\r\n                mimeMessage.Body = new TextPart(\"plain\")\r\n                {\r\n                    Text = BodyContent\r\n\r\n                };\r\n\r\n                using (var client = new SmtpClient())\r\n                {\r\n\r\n                    client.Connect(SmtpServer, SmtpPortNumber, false);\r\n                    // Note: only needed if the SMTP server requires authentication \r\n                    // Error 5.5.1 Authentication  \r\n                    client.Authenticate(FromAddress, GetPassword());\r\n                    client.Send(mimeMessage);\r\n                    Console.WriteLine(\"The mail has been sent successfully !!\");\r\n                    Console.ReadLine();\r\n                    client.Disconnect(true);\r\n\r\n                }`\r\n\r\nWhen switching to .Net Framework 4.5, using System.Net.Mail, it works fine.\r\n\r\nBecause of this, I assume the issue is coming from MailKit.\r\n\r\nAny help?\r\n\r\nThanks\r\n\r\nP.S. Yes, the credentials are ok."
+    },
+    "satisfaction_conditions": [
+      "Email authentication succeeds with Office 365 SMTP server",
+      "SMTP connection establishes successfully using MailKit in .NET Core 1.1",
+      "Authentication mechanism is compatible with Office 365's requirements"
+    ],
+    "created_at": "2017-06-14T13:32:29Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/493",
+    "source": {
+      "issue_number": 493
+    },
+    "initial_question": {
+      "title": "Cancelling Search or GetMessage causes client to disconnect",
+      "body": "I don't know if it's a bug or just me not grasping the usage of the CancellationToken correctly, since I couldn't find an explanation about it. I'm trying to make a simple mail client, so to show messages in a folder using the `ImapService` I do the following:\r\n\r\n\r\n    static CancellationTokenSource _messagesTaskCts;\r\n    IMailFolder _sourceFolder;\r\n\r\n    async Task<ObservableCollection<MailMessage>> GetMessages()\r\n    {\r\n        try { _messagesTaskCts?.Cancel(); }\r\n        catch (ObjectDisposedException) { /* The implicated task already finished */ }\r\n        \r\n        using (_messagesTaskCts = new CancellationTokenSource())\r\n        {\r\n            var cToken = _messagesTaskCts.Token;\r\n            var messages = new ObservableCollection<MailMessage>();\r\n\r\n            await _sourceFolder.OpenAsync(FolderAccess.ReadOnly).ConfigureAwait(false);\r\n            var uids = (await _sourceFolder.SearchAsync(SearchQuery.All, cToken));\r\n\r\n            foreach (var uid in uids)\r\n            {\r\n                var msg = await _sourceFolder.GetMessageAsync(uid, cToken);\r\n                messages.Add(new MailMessage(msg));\r\n            }\r\n\r\n            return messages;\r\n        }\r\n    }\r\n\r\n\r\nHowever, if one folder is currently trying to retrieve its messages and I want to start retrieving messages from another folder (i.e. cancel current task and start new) I end up getting a `ServiceNotConnectedException.cs` telling me that the client has been disconnected.\r\n\r\nI expected that cancelling the token source would simply terminate the operation (be it `_sourceFolder.SearchAsync` or `_sourceFolder.GetMessageAsync`), but maybe that's not how I'm supposed to use the token?\r\n\r\nUsing MailKit v1.14.2 from NuGet"
+    },
+    "satisfaction_conditions": [
+      "Cancellation successfully stops in-progress operations"
+    ],
+    "created_at": "2017-04-18T19:38:14Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/456",
+    "source": {
+      "issue_number": 456
+    },
+    "initial_question": {
+      "title": "Email InternalDate",
+      "body": "Hi,\r\n1) When i fetch the message summaries \r\n\r\n`inbox.Fetch(uids, MessageSummaryItems.UniqueId | MessageSummaryItems.Envelope | MessageSummaryItems.InternalDate)`\r\n\r\nInternalDate is the same Date, but i expect \"received\" date from headers:\r\n\r\n```\r\nReceived: by 10.103.85.210 with SMTP id q79csp283698vsg;\r\n        Sat, 11 Feb 2017 18:24:14 -0800 (PST)\r\nX-Received: by 10.200.40.113 with SMTP id 46mr14303764qtr.167.1486866254026;\r\n        Sat, 11 Feb 2017 18:24:14 -0800 (PST)\r\nReceived: from a11-99.smtp-out.amazonses.com (a11-99.smtp-out.amazonses.com. [54.240.11.99])\r\n        by mx.google.com with ESMTPS id y36si4464679qty.52.2017.02.11.18.24.13\r\n        for <...@gmail.com>\r\n        (version=TLS1 cipher=ECDHE-RSA-AES128-SHA bits=128/128);\r\n        Sat, 11 Feb 2017 18:24:13 -0800 (PST)\r\nDate: Sun, 12 Feb 2017 02:24:13 +0000\r\n```\r\n\r\n2) How to get internal date (\"received\") when get message like `inbox.GetMessage(id)`?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Message received date information must be accessible",
+      "Retrieved date must reflect email header timestamps",
+      "Solution must work within message fetch operations",
+      "Header field access must be selective"
+    ],
+    "created_at": "2017-02-12T09:40:41Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/445",
+    "source": {
+      "issue_number": 445
+    },
+    "initial_question": {
+      "title": "send attachement from array",
+      "body": "I am testing .Net Core MVC, which does not support System.Net.Mail, Mailkit, works well but can't figure out how to send attachments that I have stored in my database as binary. I used the following in MVC 5:\r\n```\r\nvar mail = new MailMessage();\r\n     mail.Attachments.Add(new Attachment(new MemoryStream(attachment), \r\n     attachmentName, attachmentType));\r\n```\r\nI would appreciate your suggestions. Thank you"
+    },
+    "satisfaction_conditions": [
+      "Email message successfully includes binary attachment data from database",
+      "Attachment metadata (name and content type) is properly associated with the binary content",
+      "Solution is compatible with .NET Core MVC environment",
+      "Attachment can be created from in-memory binary data"
+    ],
+    "created_at": "2017-01-01T07:08:56Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/438",
+    "source": {
+      "issue_number": 438
+    },
+    "initial_question": {
+      "title": "MailKit - Attachment From Stream",
+      "body": "I am using epplus with Memory stream to download excel. Now i want use this stream in attachment can i? i cannot find any example about this.\r\nis there any working example like this\r\n> builder.Attachments.Add(stream,\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",  \"Report.xlsx\" );"
+    },
+    "satisfaction_conditions": [
+      "Stream data must be successfully attached to email",
+      "Correct MIME type must be specified for Excel files",
+      "Stream must remain accessible until email is sent",
+      "Attachment must have appropriate filename"
+    ],
+    "created_at": "2016-12-15T21:42:42Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/399",
+    "source": {
+      "issue_number": 399
+    },
+    "initial_question": {
+      "title": "Interesting exception when try to log in an unsecure imap server",
+      "body": "Hi,\nMy problem is: my code is just working fine on gmail and other secure servers. When I'm connecting to this unsecure imap(without ssl) server it works on my main pc(even if I use a virtual machine(different ip, directly connected to the network card(diferent mac too), it has win 8.1 and working perfectly with the unsecure server).\n\nBut when I'm try to run my code on a different computer it throw this exception:\n\"A call to SSPI failed, see inner exception.\"\nInner exception: \"The Local Security Authority cannot be contacted\"\n\nAny idea what can cause this? How should I workaround this?\n(Sorry for my English)\n"
+    },
+    "satisfaction_conditions": [
+      "Client successfully connects to non-SSL IMAP server",
+      "No SSPI or Local Security Authority errors occur",
+      "Connection security settings explicitly match server requirements"
+    ],
+    "created_at": "2016-09-15T17:34:01Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/384",
+    "source": {
+      "issue_number": 384
+    },
+    "initial_question": {
+      "title": "Can't Delete message from GMail",
+      "body": "Hello. I trashed a message and tried to Expunge it. But message still is in trash folder. Code: \n\n```\nvar result = mailFolder.MoveTo(uniqueIds, trashFolder);\nmailFolder.CloseAsync(true);\nif (trashFolder.IsOpen) trashFolder.Close(false);\ntrashFolder.Open(MailKit.FolderAccess.ReadWrite);\ntrashFolder.SetFlags(result.Source, MailKit.MessageFlags.Deleted, true);\ntrashFolder.Expunge(result.Source);\ntrashFolder.Close(true);\n```\n\nHow can i expunge the trash folder?\n"
+    },
+    "satisfaction_conditions": [
+      "Folder state is properly managed during operations"
+    ],
+    "created_at": "2016-08-17T16:36:45Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/379",
+    "source": {
+      "issue_number": 379
+    },
+    "initial_question": {
+      "title": "Search query doesn't work when additional parameters are added inside loop",
+      "body": "```\nI have a strange issue with mailkit:\n\n\n        string[] fromAuthors = new string[] { \"@something.com\", \"@something2.com\", \"@somethingelse.net\" };\n\n        SearchQuery query = SearchQuery.FromContains(fromAuthors[0]);\n        for (int i = 1; i < fromAuthors.Length; i++)\n        {\n            query.Or(SearchQuery.FromContains(fromAuthors[i]));\n        }\n```\n\nThis doesn't work, `inbox.Search(query)` returns results for only the first entry  (in this case \"@something.com\"), everything else is being ignored.\n\nWhile this:\n\n```\n     SearchQuery query = SearchQuery.FromContains(fromAuthors[0]).Or(SearchQuery.FromContains(fromAuthors[1])) \n```\n\nworks fine, and results for both emails are being returned...\n"
+    },
+    "satisfaction_conditions": [
+      "Search query must return results for ALL specified email domains",
+      "Query object must maintain state of all OR conditions",
+      "Search results must be equivalent whether using loop or direct chaining",
+      "Query construction must work with variable number of search terms"
+    ],
+    "created_at": "2016-08-09T22:43:52Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/375",
+    "source": {
+      "issue_number": 375
+    },
+    "initial_question": {
+      "title": "Email start date",
+      "body": "Hi ,\n\nHow do you read an email account (Imap) from a particular time forward? I am using the following code. But this reads all emails on a particular day. I need to update the time read so that I do not have to read any previous emails from a time on a single day.\n\nDateTime ReadSDate = System.DateTime.Today;\nvar query = SearchQuery.DeliveredAfter(ReadSDate);\nforeach (var uid in inbox.Search(query))\n"
+    },
+    "satisfaction_conditions": [
+      "Emails must be filtered by both date AND specific time",
+      "Results must only include emails after the specified date-time point",
+      "Solution must work within IMAP protocol limitations",
+      "Retrieved email set must be complete and accurate"
+    ],
+    "created_at": "2016-07-22T12:31:05Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/338",
+    "source": {
+      "issue_number": 338
+    },
+    "initial_question": {
+      "title": "Move message to folder but also update it subject",
+      "body": "I know i can open a folder\n<code> folder.Open(FolderAccess.ReadWrite); </code> \ncan read a message \n<code> MimeMessage message = folder.GetMessage(messageID); </code> \nand i can move that meassage to another folder\n<code> folder.MoveTo(messageID, _client.GetFolder(\"newFolder\")); </code> \n\nIs there any way I can change the email subject line before I move it to the new folder?\nlike - folder.SetMessage(messageID,message)\n"
+    },
+    "satisfaction_conditions": [
+      "Message subject must be modifiable before being stored in new location",
+      "Message must be successfully moved to the target folder",
+      "Message flags must be configurable during the move operation",
+      "Solution must handle folder access permissions appropriately"
+    ],
+    "created_at": "2016-05-13T12:59:23Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/322",
+    "source": {
+      "issue_number": 322
+    },
+    "initial_question": {
+      "title": "Authentication failed",
+      "body": "Hello,\n\nPeriodically when I connect to IMAP server I receive error:\n\n> MailKit.Security.AuthenticationException: Authentication failed.\n>    at MailKit.Net.Imap.ImapClient.Authenticate(Encoding encoding, ICredentials credentials, CancellationToken cancellationToken)\n>    at MailKit.MailService.Authenticate(String userName, String password, CancellationToken cancellationToken)\n\nIMAP log:\n\n> Connected to imaps://imapserver.com:993/\n> S: \\* OK The Microsoft Exchange IMAP4 service is ready.\n> C: A00000000 CAPABILITY\n> S: \\* CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=NTLM AUTH=GSSAPI UIDPLUS MOVE ID CHILDREN IDLE NAMESPACE LITERAL+\n> S: A00000000 OK CAPABILITY completed.\n> C: A00000001 AUTHENTICATE NTLM\n> S: +\n> C: TlRMTVNTUAABAAAABwIIAAAAAAAgAAAAAAAAACAAAAA=\n> S: + TlRMTVNTUAACAAAACAAIADgAAAAFAokC/swBpqO/71gAAAAAAAAAAI4AjgBAAAAABgOAJQAAAA9PAEEATQBDAAIACABPAEEATQBDAAEAGABNAEMAVABFAFgAQQBSAFMAUgBWADAAMQAEABAAbwBhAG0AYwAuAGMAbwBtAAMAKgBNAEMAVABFAFgAQQBSAFMAUgBWADAAMQAuAG8AYQBtAGMALgBjAG8AbQAFABAAbwBhAG0AYwAuAGMAbwBtAAcACADS32cxyZTRAQAAAAA=\n> C: TlRMTVNTUAADAAAAGAAYAFQAAAAYABgAbAAAAAAAAABAAAAAFAAUAEAAAAAAAAAAVAAAAAAAAACEAAAAAYIIAG8AbQBhAG4ALgBzAHQAYQB0AHMAou72ajqXvS4AAAAAAAAAAAAAAAAAAAAAshgyuH6SJ/S5AP65OD29I8RMy9BPLZSJ\n> S: A00000001 NO AUTHENTICATE failed.\n> C: A00000002 AUTHENTICATE PLAIN\n> S: +\n> C: XXXXXXXX\n> S: A00000002 NO AUTHENTICATE failed.\n> C: A00000003 LOGIN plain_username plain_password\n> S: A00000003 NO Server Unavailable. 15\n> S: \\* BYE Connection closed. 14\n> C: A00000004 LOGOUT\n\nThe problem is that with Chilkat library I can authenticate stable. What can be reason?\nThank you.\n"
+    },
+    "satisfaction_conditions": [
+      "Authentication attempts do not trigger server lockout or rejection",
+      "Authentication mechanism is compatible with server capabilities",
+      "Authentication behavior matches working implementation"
+    ],
+    "created_at": "2016-04-12T15:28:13Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/316",
+    "source": {
+      "issue_number": 316
+    },
+    "initial_question": {
+      "title": "Attachments are corrupt",
+      "body": "Hi, First of all thanks for the project. it's really really helpful. I love it.\n\nI have a question about attachments. I have seen all of your replies so trust me I have spent a full day on this problem but still can't get my head around. The way I have setup is that I download emails but not attachments, instead just save their names and disposition. Then when customer open the email, he can see the list of attachments and just click on them to download, however they are downloading as corrupted. Here is the download code.\n\n``` csharp\n        public MemoryStream GetAttachement(string fileName, string messageId)\n        {\n            HeaderSearchQuery searchCondition = SearchQuery.HeaderContains(\"Message-Id\", messageId);\n            Client.Inbox.Open(FolderAccess.ReadOnly);\n            IList<UniqueId> uids = Client.Inbox.Search(searchCondition);\n\n            foreach (UniqueId uniqueId in uids)\n            {\n                MimeMessage message = Client.Inbox.GetMessage(uniqueId);\n                if (message.Attachments.Count() > 0)\n                {\n                    var attachement = message.Attachments.Where(x => x.ContentDisposition.FileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();\n                    if (attachement != null)\n                    {\n                        var stream = new MemoryStream();\n                        attachement.WriteTo(stream);\n                        attachement.WriteTo(System.Web.HttpContext.Current.Server.MapPath(\"~/\") + fileName);\n                        return stream;\n                    }\n                }\n                //check for inline attachements\n                var inlineattachement = message.BodyParts.Where(x => x.ContentType.MediaType.Equals(\"image\", StringComparison.InvariantCultureIgnoreCase) && x.ContentType.Name.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();\n                if (inlineattachement != null)\n                {\n                    var stream = new MemoryStream();\n                    inlineattachement.WriteTo(stream);\n                    inlineattachement.WriteTo(System.Web.HttpContext.Current.Server.MapPath(\"~/\") + fileName);\n                    return stream;\n                }\n            }\n\n            return null;\n        }\n```\n\nAs a test, I am writing to both stream and saving to file but nothing is working. I have the latest version, so any help will be greatly appreciated.\nThanks in advance.\n"
+    },
+    "satisfaction_conditions": [
+      "Different attachment types (regular attachments vs inline) must be handled appropriately",
+      "Attachment retrieval must be based on both message ID and filename"
+    ],
+    "created_at": "2016-03-30T16:45:44Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/303",
+    "source": {
+      "issue_number": 303
+    },
+    "initial_question": {
+      "title": "Question about downloading attachments.",
+      "body": "Hello, I have the following issue.\n\nI'm using the IMAP protocol and the Fetch() method to get some emails.\nSome of them have attachments in the form of BodyPartBasic. \nI was wandering if there is a way to download the attachments without having to make a call to the server to get the BodyPart like this:\n\nIMessageSummary message = inboxFolder.Fetch(messageIDs, MessageSummaryItems.BodyStructure)[0];\nclient.Inbox.GetBodyPart(email.UniqueId, message.Attachments.FirstOrDefault());\n\nI have created my own EmailMessage class and I wish to save the attachments and to be able to download them when I want without having to make requests to the server for each of them. \nThis is possible if I use the GetMessage() method instead of Fetch(), because that way I get MimeMessage object, which have attachments of class MimeEntity, which I can download like this :\n\nusing (var stream = System.IO.File.Create(path)\n{\n      mimeAttachment.ContentObject.DecodeTo(stream);\n}\n\nI was also wandering what is the reason the GetMessage() method and Fetch() method to return different types of message objects (MimeMessage and IMessageSummary)?\n"
+    },
+    "satisfaction_conditions": [
+      "Ability to access email attachments at a later time without requiring additional server requests",
+      "Clear explanation of the differences between metadata-only and full message retrieval approaches",
+      "Support for both efficient partial message retrieval and complete message download",
+      "Ability to save attachments to local storage",
+      "Preservation of necessary metadata for partial retrieval"
+    ],
+    "created_at": "2016-02-12T07:57:39Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/294",
+    "source": {
+      "issue_number": 294
+    },
+    "initial_question": {
+      "title": "Storing MimeMessage in data base",
+      "body": "Hi Jeff,\n\nI'm trying to store MimeMessage inside the database if for whatever reason our mail server may be down. Have the following fields defined in my sql server: from, to, subject and body.\n\nI'm storing 'from' and 'to' fields in this format in database: {MyCompany,mail@mycompany.com} and body, bodyBuilder.ToMessageBody().ToString() as nvarchar(max). Now that I have it stored, I want to be able to retrieve the fields and re-compose the original MimeMessage. I can re-parse the 'from' and 'to' fields, set the subject, but how do I simply set the body of the message since I already have stored in the database in this format \"Content-Type: multipart/mixed; boundary=.........\" ? Thank you for your help\n"
+    },
+    "satisfaction_conditions": [
+      "Message body must be stored in a format that preserves all MIME content information",
+      "Stored message data must be retrievable and reconstructable into a valid MimeMessage object",
+      "Character encoding of the message content must be preserved",
+      "Storage method must handle multipart MIME messages correctly"
+    ],
+    "created_at": "2016-01-31T09:31:08Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/291",
+    "source": {
+      "issue_number": 291
+    },
+    "initial_question": {
+      "title": "ValidateRemoteCertificate and connection timeout",
+      "body": "Hi Jeff,\n1. Was looking over your project and tried some sample implementations. Couple of things. I was looking at ValidateRemoteCertificate method inside the SmtpClient.cs method, and I see that by default it is returning true. I think that by default it should return false because I may not have a valid certificate that I may be trying to use with the connection. Right now, it's a \"silent fail\" and I have no idea I am using invalid certificate when indeed I am.\n2. It would be nice to have your Connect method take a \"int connectionMillisecondsTimeout = 3000\" default parameter. Right now, if I try to connect to the server, it take 20 seconds to tell me that this server is not available, obviously not acceptable. I want a max of 2~5 seconds, depending on what I want to do, be my wait time. Right now I did this:\n   \n   ```\n               //socket.Connect (ipAddresses[i], port);\n   \n               IAsyncResult result = socket.BeginConnect(ipAddresses[i], port, null, null);\n   \n               if (!result.AsyncWaitHandle.WaitOne(3000, true))\n                   throw new SocketException((int)SocketError.TimedOut);\n   ```\n\nWhat are your thoughts on this?\n"
+    },
+    "satisfaction_conditions": [
+      "Certificate validation behavior must be configurable by developers",
+      "Default certificate validation must balance security with practical usability",
+      "Connection timeout must be configurable",
+      "Default timeout values must accommodate typical network conditions"
+    ],
+    "created_at": "2016-01-24T04:40:29Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/278",
+    "source": {
+      "issue_number": 278
+    },
+    "initial_question": {
+      "title": "Why is IMAP limited to a single connection?",
+      "body": "I am using Mailkit in an application and I would ideally like to have two IMAP connections. One read only (sat in an IDLE loop) and the other ReadWrite for downloading messages and moving them about.\n\nCurrently this isn't possible as the code uses a single ImapEngine (and thus connection) no matter how many instances of the ImapClient you create and forces you to drop the idle before performing operations.\n\nIf I can have multiple clients connected to the same IMAP account at the same time why is this limitation imposed in MailKit?\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple simultaneous IMAP connections to the same account must be possible",
+      "Each IMAP client instance must operate independently",
+      "No thread conflicts between IMAP operations",
+      "Ability to maintain distinct connection states simultaneously"
+    ],
+    "created_at": "2016-01-04T10:51:53Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/269",
+    "source": {
+      "issue_number": 269
+    },
+    "initial_question": {
+      "title": "Authentication failed trying to connect to IMAP:4 Exchange server",
+      "body": "I am trying to connect to an IMAP:4 enabled hosted Exchange Server using \"IMapClient\" class from MailKit but I am getting the Authentication failed exception. The following is the dump of the logger:\n\nConnected to imap://IP-ADDRESS:143/?starttls=when-available\nS: \\* OK The Microsoft Exchange IMAP4 service is ready.\nC: A00000000 CAPABILITY\nS: \\* CAPABILITY IMAP4 IMAP4rev1 LOGINDISABLED STARTTLS UIDPLUS MOVE ID CHILDREN IDLE NAMESPACE LITERAL+\nS: A00000000 OK CAPABILITY completed.\nC: A00000001 STARTTLS\nS: A00000001 OK Begin TLS negotiation now.\nC: A00000002 CAPABILITY\nS: \\* CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=NTLM AUTH=GSSAPI UIDPLUS MOVE ID CHILDREN IDLE NAMESPACE LITERAL+\nS: A00000002 OK CAPABILITY completed.\nC: A00000003 AUTHENTICATE NTLM\nS: +\nC: TlRMTVNTUAABAAAABwIIAAAAAAAgAAAAAAAAACAAAAA=\nS: + TlRMTVNTUAACAAAAEAAQADgAAAAFAokCT++vHlcHakoAAAAAAAAAAKQApABIAAAABgOAJQAAAA9EAFAAVABDAEwATwBVAEQAAgAQAEQAUABUAEMATABPAFUARAABAAoAQwBBAFMAMAAyAAQAHgBkAHAAdABjAGwAbwB1AGQALgBjAG8AbQAuAGEAdQADACoAYwBhAHMAMAAyAC4AZABwAHQAYwBsAG8AdQBkAC4AYwBvAG0ALgBhAHUABQAeAGQAcAB0AGMAbABvAHUAZAAuAGMAbwBtAC4AYQB1AAcACACYJccN0ijRAQAAAAA=\nC: TlRMTVNTUAADAAAAGAAYAFYAAAAYABgAbgAAAAAAAABAAAAAFgAWAEAAAAAAAAAAVgAAAAAAAACGAAAAAYIIAGUAbABlAGMAdAByAGkAYwBpAHQAeQDqlY7S6w1JqQAAAAAAAAAAAAAAAAAAAABmwpjC52AodwEn5tt4Or/Jsrx/RyHV0ew=\nS: A00000003 NO AUTHENTICATE failed.\nC: A00000004 AUTHENTICATE PLAIN\nS: +\nC: AGVsZWN0cmljaXR5AEVQYXNzd29yZDE=\nS: A00000004 NO AUTHENTICATE failed.\nC: A00000005 LOGIN ACCOUNT@EMAILADDRESS ACCPASSWORD\nS: A00000005 NO LOGIN failed.\nAUTHENTICATE failed.\n\nI should mention that same code works when I try to connect to our on-premiss exchange server but the Capabilities are a little bit different as followed:\n\nConnected to imap://IPADDRESS:143/?starttls=when-available\nS: \\* OK The Microsoft Exchange IMAP4 service is ready.\nC: V00000000 CAPABILITY\nS: \\* CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=NTLM AUTH=GSSAPI STARTTLS UIDPLUS ID CHILDREN IDLE NAMESPACE LITERAL+\nS: V00000000 OK CAPABILITY completed.\nC: V00000001 STARTTLS\nS: V00000001 OK Begin TLS negotiation now.\nC: V00000002 CAPABILITY\nS: \\* CAPABILITY IMAP4 IMAP4rev1 AUTH=PLAIN AUTH=NTLM AUTH=GSSAPI UIDPLUS ID CHILDREN IDLE NAMESPACE LITERAL+\nS: V00000002 OK CAPABILITY completed.\nC: V00000003 AUTHENTICATE NTLM\nS: +\nC: TlRMTVNTUAABAAAABwIIAAAAAAAgAAAAAAAAACAAAAA=\nS: + TlRMTVNTUAACAAAADgAOADgAAAAFAokCPaBgQj6SzAoAAAAAAAAAAKYApgBGAAAABgOAJQAAAA9SAE8AQwBLAEUATgBEAAIADgBSAE8AQwBLAEUATgBEAAEAEgBSAE8AQwBLAC0ARQBYADAAMQAEABoAUgBvAGMAawBlAG4AZAAuAGwAbwBjAGEAbAADAC4AUgBPAEMASwAtAEUAWAAwADEALgBSAG8AYwBrAGUAbgBkAC4AbABvAGMAYQBsAAUAGgBSAG8AYwBrAGUAbgBkAC4AbABvAGMAYQBsAAcACABFCJ2wmCjRAQAAAAA=\nC: TlRMTVNTUAADAAAAGAAYAFYAAAAYABgAbgAAAAAAAABAAAAAFgAWAEAAAAAAAAAAVgAAAAAAAACGAAAAAYIIAGYAaQBsAGUAUwBNAEEAUgBUADAAMQDxvOiYzHcqeQAAAAAAAAAAAAAAAAAAAABq6PWCwxas9yZzLne1nD9r+ys7XCOfPXQ=\nS: V00000003 OK AUTHENTICATE completed.\n\nAny thought on that?\n"
+    },
+    "satisfaction_conditions": [
+      "Maintains secure connection via STARTTLS"
+    ],
+    "created_at": "2015-11-27T05:23:51Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/218",
+    "source": {
+      "issue_number": 218
+    },
+    "initial_question": {
+      "title": "Mark an email as read POP3",
+      "body": "Hi. I'm developing a desktop application that monitors an email and gets its messages.\nHowever, everytime I'm gonna read them, I'm obligated to read every email again and again.\nIs there a way to set them as READ and then only read the UNREAD emails?\n\nPlease help me\n"
+    },
+    "satisfaction_conditions": [
+      "System maintains persistent tracking of previously processed emails",
+      "System can uniquely identify each email message",
+      "New email retrieval excludes previously processed messages",
+      "Solution works within POP3 protocol limitations"
+    ],
+    "created_at": "2015-07-24T17:43:47Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/180",
+    "source": {
+      "issue_number": 180
+    },
+    "initial_question": {
+      "title": "Not receiving a MimeMessage sent on SmtpClient",
+      "body": "I'm just trying out MailKit for the first time, so I may be way off here, but I am using the Net.Pop3Client to pull a MimeMessage, and then send it to a new recipient. I am using the code below to send it, but it never appears in the recipient's gmail inbox:\n\n```\nusing (var smtp = new MailKit.Net.Smtp.SmtpClient())\n{\n    smtp.Connect(\"smtp.gmail.com\", 587, false);\n    smtp.AuthenticationMechanisms.Remove(\"XOAUTH2\");\n    smtp.Authenticate(SmtpUser, SmtpPassword);\n\n    message.To.Clear();\n    message.To.Add(new MailboxAddress(\"Brady Kelly\", SmtpRecipient));\n    smtp.Send(message);\n    smtp.Disconnect(true);\n}\n```\n\nThe SmtpRecipient value is correct. I am using this with the built-in SMTP client and that works fine.\n"
+    },
+    "satisfaction_conditions": [
+      "Diagnostic information is available when issues occur"
+    ],
+    "created_at": "2015-05-04T07:03:56Z"
+  },
+  {
+    "id": "https://github.com/jstedfast/MailKit/issues/129",
+    "source": {
+      "issue_number": 129
+    },
+    "initial_question": {
+      "title": "IsAttachment is false for Attachment.",
+      "body": "I used Client.Inbox.Fetch(messagesUids, MessageSummaryItems.Full); for getting information from mailbox, and unfortunately for sent email i received there is no attachment.\nI used Gmail account, Imap, with email without subject and body.\n"
+    },
+    "satisfaction_conditions": [
+      "Message attachment information is correctly retrieved from the mailbox",
+      "Sufficient message metadata is requested in the fetch operation",
+      "IsAttachment property returns true for actual email attachments",
+      "Solution works with emails that lack subject and body content",
+      "Solution is compatible with IMAP protocol and Gmail"
+    ],
+    "created_at": "2014-12-11T12:13:43Z"
+  }
+]

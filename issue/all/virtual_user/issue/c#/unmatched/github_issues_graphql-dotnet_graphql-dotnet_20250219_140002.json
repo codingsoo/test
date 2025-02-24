@@ -1,0 +1,42 @@
+[
+  {
+    "number": 1445,
+    "title": "Classes derived from InputObjectGraphType *sometimes* return error when given a name and a field is given a description.",
+    "created_at": "2019-12-02T15:25:07Z",
+    "closed_at": "2019-12-03T05:49:28Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/graphql-dotnet/graphql-dotnet/issues/1445",
+    "body": "After a ton of testing to figure out exactly why my mutations were sometimes working and sometimes not I've finally isolated the problem down to whether or not the InputObjectGraphType class has been given a name and a field in that class has a description but this only seems to matter _sometimes_ as bizarre as that is.\r\n\r\nFor example, this\r\n```\r\n    public class WololoInputType : InputObjectGraphType\r\n    {\r\n        public WololoInputType()\r\n        {\r\n            Name = \"Enemies are red, allies are blue, WOLOLO, now you're blue too.\";\r\n            /// Attribute Fields\r\n            FieldAsync<NonNullGraphType<EntityReferenceInputType>, EntityReferenceType>(\"customerid\").Description == \"PepperoniPizza\";\r\n        }\r\n    }\r\n```\r\n\r\nGives me this error:\r\n\r\n```\r\n{\r\n    \"errors\": [\r\n        {\r\n            \"message\": \"GraphQL.Validation.ValidationError: Variable \\\"salesorder\\\" cannot be non-input type \\\"SalesOrderCreateInput\\\".\",\r\n            \"locations\": [\r\n                {\r\n                    \"line\": 1,\r\n                    \"column\": 10\r\n                }\r\n            ],\r\n            \"extensions\": {\r\n                \"code\": \"5.7.3\"\r\n            }\r\n        },\r\n        {\r\n            \"message\": \"GraphQL.Validation.ValidationError: Unknown type SalesOrderCreateInput.\",\r\n            \"locations\": [\r\n                {\r\n                    \"line\": 1,\r\n                    \"column\": 23\r\n                }\r\n            ],\r\n            \"extensions\": {\r\n                \"code\": \"5.4.1.2\"\r\n            }\r\n        }\r\n    ]\r\n}\r\n```\r\n\r\nHowever this:\r\n\r\n```\r\n    public class WololoInputType : InputObjectGraphType\r\n    {\r\n        public WololoInputType()\r\n        {\r\n            /// Attribute Fields\r\n            FieldAsync<NonNullGraphType<EntityReferenceInputType>, EntityReferenceType>(\"customerid\");\r\n        }\r\n    }\r\n```\r\n\r\nWill perform the mutation as expected.\r\n\r\nThe _strangest_ part about this error is that if I delete just the field description, rebuild the solution and run it, I still get the above error. However, if I delete both of them, rebuild it and then _add name back to class_ it runs fine, only failing yet again if I add Description back to any field.\r\n",
+    "comments_url": "https://api.github.com/repos/graphql-dotnet/graphql-dotnet/issues/1445/comments",
+    "author": "bigbizze",
+    "comments": [
+      {
+        "user": "sungam3r",
+        "created_at": "2019-12-02T18:09:32Z",
+        "body": "Name is a GraphType's name, not description. Name must have only alphanumeric symbols. Try the latest preview version and you will see runtime error about that when schema is built."
+      }
+    ]
+  },
+  {
+    "number": 655,
+    "title": "Resolving objects inside other objects",
+    "created_at": "2018-05-09T02:33:22Z",
+    "closed_at": "2018-05-09T03:16:22Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/graphql-dotnet/graphql-dotnet/issues/655",
+    "body": "I'm attempting to build a schema with two objects: Assets and Actors.\r\n\r\n```cs\r\n    public class Asset\r\n    {\r\n        public string Id { get; set; }\r\n        public Actor Owner { get; set; }\r\n        public string Location { get; set; }\r\n        public string Variety { get; set; }\r\n        public string Quantity { get; set; }\r\n    }\r\n```\r\n\r\n```cs\r\n    public class Actor\r\n    {\r\n        public string Id { get; set; }\r\n        public string Name { get; set; }\r\n        public string Address { get; set; }\r\n    }\r\n```\r\n\r\nBut I run into an issue running queries to select Assets. For example, this query gives the error \"Field owner of type Actor must have a sub selection\".\r\n\r\n```json\r\nquery {\r\n    asset(id: \"1\")\r\n    {\r\n        id,\r\n        owner,\r\n        location\r\n}\r\n```\r\n\r\nI really have no idea how to deal with this \ud83d\ude28 \r\n\r\nMy asset type:\r\n\r\n```cs\r\n        public AssetType(GeoraData data)\r\n        {\r\n            Name = \"Asset\";\r\n\r\n            Field(a => a.Id).Description(\"The ID of the asset\");\r\n            Field(a => a.Owner).Description(\"The owner of the asset\");\r\n            Field(a => a.Location).Description(\"The location where the asset is stored\");\r\n            Field(a => a.Variety).Description(\"The variety of the asset\");\r\n            Field(a => a.Quantity).Description(\"The quantity of the asset in mt\");\r\n        }\r\n```\r\n\r\nMy query:\r\n```cs\r\n        public Query(Data data)\r\n        {\r\n            Name = \"Query\";\r\n\r\n            Field<AssetType>(\r\n                \"asset\",\r\n                arguments: new QueryArguments(\r\n                    new QueryArgument<NonNullGraphType<StringGraphType>>\r\n                    {\r\n                        Name = \"id\",\r\n                        Description = \"ID of the asset\"\r\n                    }),\r\n                resolve: context => data.GetAssetByIdAsync(context.GetArgument<string>(\"id\")));\r\n\r\n            Field<ActorType>(\r\n                \"actor\",\r\n                arguments: new QueryArguments(\r\n                    new QueryArgument<NonNullGraphType<StringGraphType>>\r\n                    {\r\n                        Name = \"id\",\r\n                        Description = \"ID of the actor\"\r\n                    }),\r\n                resolve: context => data.GetActorByIdAsync(context.GetArgument<string>(\"id\")));\r\n        }\r\n```\r\n\r\nAny help fixing the issue would be very appreciated, as I have no idea where to start!\r\n",
+    "comments_url": "https://api.github.com/repos/graphql-dotnet/graphql-dotnet/issues/655/comments",
+    "author": "kdelwat",
+    "comments": [
+      {
+        "user": "joemcbride",
+        "created_at": "2018-05-09T02:49:12Z",
+        "body": "Because `owner` on `Asset` is a complex type, you have to provide what fields on that `GraphType` you want to query.\r\n\r\n```\r\nquery {\r\n    asset(id: \"1\")\r\n    {\r\n        id\r\n        owner {\r\n            id\r\n            name\r\n        }\r\n        location\r\n}\r\n```\r\n\r\nAlso because it is a complex type you will need to configure what `GraphType` it is.\r\n\r\n```diff\r\n-Field(a => a.Owner).Description(\"The owner of the asset\");\r\n\r\n+Field(a => a.Owner, type: typeof(ActorType)).Description(\"The owner of the asset\");\r\n```\r\n\r\nor\r\n\r\n```diff\r\n-Field(a => a.Owner).Description(\"The owner of the asset\");\r\n\r\n+Field<ActorType>(\"owner\", resolve: ctx => ctx.Source.Owner);\r\n```\r\n\r\nor\r\n\r\n```diff\r\nField(a => a.Owner).Description(\"The owner of the asset\");\r\n\r\n+GraphTypeRegistry.Register(typeof(Actor), typeof(ActorType));\r\n```"
+      }
+    ]
+  }
+]

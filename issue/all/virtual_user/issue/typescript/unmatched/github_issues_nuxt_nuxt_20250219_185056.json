@@ -1,0 +1,23 @@
+[
+  {
+    "number": 12791,
+    "title": "computed value not updating?",
+    "created_at": "2021-11-16T09:47:38Z",
+    "closed_at": "2021-11-16T10:34:27Z",
+    "labels": [
+      "question",
+      "3.x"
+    ],
+    "url": "https://github.com/nuxt/nuxt/issues/12791",
+    "body": "### Environment\r\n\r\nNuxt CLI v3.0.0-27283410.c53b6a5                                      10:45:15\r\nRootDir: /Users/work/Git/XX                                         10:45:16\r\nNuxt project info:                                                    10:45:16\r\n\r\n------------------------------\r\n- Operating System: `Darwin`\r\n- Node Version:     `v16.13.0`\r\n- Nuxt Version:     `3.0.0-27283410.c53b6a5`\r\n- Package Manager:  `npm@8.1.0`\r\n- Bundler:          `Vite`\r\n- User Config:      `css`\r\n- Runtime Modules:  `-`\r\n- Build Modules:    `-`\r\n------------------------------\r\n\r\n\r\n### Reproduction\r\n\r\n````ts\r\n<template>\r\n    <div>{{ processed }}</div>\r\n</template>\r\n<script setup lang=\"ts\">\r\nimport { computed } from 'vue';\r\nconst { data, refresh, pending } = await useAsyncData('/api/data', () => $fetch('/api/data'));\r\n\r\nconst processed = computed(() => {\r\n\tconsole.log(\"COMPUTED GW\", data, !!pending);\r\n\treturn (!pending && data) ? data.length : 0;\r\n});\r\n````\r\n\r\n### Describe the bug\r\n\r\nFirst of all, great work on Nuxt 3! Love where it is going.\r\n\r\nIt might be just me using this wrong, but I can't seem to get computed properties to work (esp. not when using async data). \r\n\r\nAbbreviated example above. This leaves 'processed' at 0 and only runs the computed function once, showing 'pending' as 'true'. When I do similar processing from inside the template (i.e. just say `{{data.length}}`) it seems to work fine.\r\n\r\nAre computed values supposed to work this way, or is it a bug?\r\n\r\n### Additional context\r\n\r\n_No response_\r\n\r\n### Logs\r\n\r\n_No response_",
+    "comments_url": "https://api.github.com/repos/nuxt/nuxt/issues/12791/comments",
+    "author": "pixelspark",
+    "comments": [
+      {
+        "user": "danielroe",
+        "created_at": "2021-11-16T10:34:27Z",
+        "body": "Both `data` and `pending` are refs so are always truthy. Check `pending.value` if you want to know whether it is indeed pending or not.\r\n\r\nThis works:\r\n```vue\r\n<template>\r\n  <div>{{ processed }}</div>\r\n</template>\r\n<script setup lang=\"ts\">\r\nimport { computed } from 'vue'\r\nconst { data, refresh, pending } = await useAsyncData('/api/data', () => $fetch('/api/data'))\r\n\r\nconst processed = computed(() => {\r\n  console.log('COMPUTED GW', data.value, !!pending)\r\n  return (!pending.value && data.value) ? data.value.length : 0\r\n})\r\n</script>\r\n```"
+      }
+    ]
+  }
+]

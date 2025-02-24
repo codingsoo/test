@@ -1,0 +1,35 @@
+[
+  {
+    "id": "https://github.com/XLabs-AI/x-flux/issues/51",
+    "source": {
+      "issue_number": 51
+    },
+    "initial_question": {
+      "title": "How to generate several images at one time by main.py(lora)",
+      "body": "I don't see some parameters represents the number of the image\r\nso how can i modify the `forward` function to generate such as 4 images at one time? "
+    },
+    "satisfaction_conditions": [
+      "Multiple images can be generated in a single execution",
+      "User can specify desired number of output images",
+      "Solution integrates with existing main.py/Lora framework"
+    ],
+    "created_at": "2024-08-16T13:07:49Z"
+  },
+  {
+    "id": "https://github.com/XLabs-AI/x-flux/issues/46",
+    "source": {
+      "issue_number": 46
+    },
+    "initial_question": {
+      "title": "How to train Flux LoRa with a local model dir?",
+      "body": "I download the model to my local dir (following the file structure of the flux repo), so i wanna use the local dir to train flux instead of downloading model by the procedure.\r\nI think it's easier to manage. \r\nHow can I do it? I tried to modify the code but failed\r\nI will be grateful if you can solve the problem"
+    },
+    "satisfaction_conditions": [
+      "Environment variables must be properly configured to point to local model files",
+      "Model loader must correctly identify and load both CLIP and T5 models from local paths",
+      "Required model files must be present in the local directory structure",
+      "Model loading mechanism must maintain original functionality while using local files"
+    ],
+    "created_at": "2024-08-15T02:34:17Z"
+  }
+]

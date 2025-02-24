@@ -1,0 +1,22 @@
+[
+  {
+    "number": 1541,
+    "title": "getValues() will return invaild type, if use array type.",
+    "created_at": "2020-04-30T01:20:32Z",
+    "closed_at": "2020-04-30T01:58:27Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/react-hook-form/react-hook-form/issues/1541",
+    "body": "Is this the expected normal behavior?\r\n\r\n```ts\r\ninterface FormData {\r\n  position_types: string[]\r\n}\r\n\r\nconst defaultValues: FormData = {\r\n  position_types: []\r\n};\r\n\r\nconst Form = props => {\r\n  const { register, getValues } = useForm<FormData>({\r\n    defaultValues\r\n  });\r\n\r\n  // return Record<string, unknown>, not FormData\r\n  getValues();\r\n}\r\n```",
+    "comments_url": "https://api.github.com/repos/react-hook-form/react-hook-form/issues/1541/comments",
+    "author": "naomei",
+    "comments": [
+      {
+        "user": "bluebill1049",
+        "created_at": "2020-04-30T01:42:44Z",
+        "body": "`getValues({ nest: true })` we are fixing this in V6."
+      }
+    ]
+  }
+]

@@ -1,0 +1,410 @@
+[
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2656",
+    "source": {
+      "issue_number": 2656
+    },
+    "initial_question": {
+      "title": "What is the monorepo best practice using airbnb-base and airbnb",
+      "body": "I gonna make monorepo project which has two difference env project.( node version and react version ) \r\n\r\nSo I want to build like this\r\n```\r\n// .eslintrc.root.js\r\nmodule.export = {\r\n  \"extends\": [\r\n    \"airbnb-base\",\r\n  ]\r\n};\r\n```\r\n\r\n// react-project/eslintrc.js\r\n```\r\nmodule.export = {\r\n  \"extends\": [\r\n    \"../.eslintrc.root.js\",\r\n    \"airbnb-react\" // there isn't yet\r\n  ]\r\n};\r\n```\r\n\r\n// node-project/eslintrc.js\r\n```\r\nmodule.export = {\r\n  \"extends\": [\r\n    \"../.eslintrc.root.js\"\r\n  ]\r\n};\r\n```\r\n\r\nI was able to find only `airbnb-base` and `airbnb` plugin.\r\n\r\nCan I make `airbnb-base` root settings and extend the react rules in `airbnb` at sub-workspaces?"
+    },
+    "satisfaction_conditions": [
+      "React-specific ESLint rules must be properly applied only in React project directories",
+      "Base ESLint rules must be consistently applied across all projects",
+      "Rule overrides in project-specific configurations must take precedence over root configurations",
+      "ESLint rules must not execute multiple times on the same files"
+    ],
+    "created_at": "2022-10-14T04:42:05Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2442",
+    "source": {
+      "issue_number": 2442
+    },
+    "initial_question": {
+      "title": "JSX Syntax or Call As Functions?",
+      "body": "# Which one is SIMPLE?\r\n- [x] jsx syntax\r\n- [ ] call as function\r\n\r\n## ??????\r\n\r\n### Components\r\n\r\n``` jsx\r\n// ./MyComponent.jsx\r\nimport React from 'react';\r\n\r\nfunction MyComponent(props){\r\n  return <span style=\"color: red\"> my-component </span>;\r\n}\r\n\r\nexport default MyComponent;\r\n```\r\n\r\n### JSX Syntax\r\n\r\n> i meant JSX-DOM :sweat_smile: \r\n\r\n``` jsx\r\n// ./MyParent.jsx\r\nimport React from 'react';\r\nimport MyComponent from './MyComponent.jsx';\r\n\r\nfunction MyParent(props){\r\n  return (\r\n    <main>\r\n      <h1> my-parent </h1>\r\n      <MyComponent />\r\n    </main>\r\n  )\r\n}\r\n\r\nexport default MyParent;\r\n```\r\n### Call As Function\r\n\r\n``` jsx\r\n// ./MyParent.jsx\r\nimport React from 'react';\r\nimport MyComponent from './MyComponent.jsx';\r\n\r\nfunction MyParent(props){\r\n  return (\r\n    <main>\r\n      <h1> my-parent </h1>\r\n      { MyComponent() }\r\n    </main>\r\n  )\r\n}\r\n\r\nexport default MyParent;\r\n```\r\n\r\n\r\n## OR\r\n\r\nthis is possible use CAF (call-as-function)? :thinking: \r\nand this is good or bad style guid for react? :thinking: \r\n\r\nthank everyone :hugs: \r\n"
+    },
+    "satisfaction_conditions": [
+      "React components must be rendered using JSX syntax (<Component />) rather than function calls",
+      "Component definitions must be callable within the React component lifecycle",
+      "Component rendering must preserve React's component hierarchy",
+      "Component implementation must follow React's component composition patterns"
+    ],
+    "created_at": "2021-06-29T18:08:48Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2441",
+    "source": {
+      "issue_number": 2441
+    },
+    "initial_question": {
+      "title": "Is `constructor` required for class components?",
+      "body": "# Is `constructor` required for class components?\r\n\r\nHi Everyone :wave:,\r\nso, can i use class component alike below? :thinking: \r\n```jsx\r\n// is this good?\r\nclass MyComponent extends React.Component {\r\n  render(){\r\n    return <div>...</div>;\r\n  }\r\n};\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Component renders correctly without constructor",
+      "No constructor-dependent features are used",
+      "Component extends React.Component correctly",
+      "Render method returns valid JSX/elements"
+    ],
+    "created_at": "2021-06-29T16:28:28Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2395",
+    "source": {
+      "issue_number": 2395
+    },
+    "initial_question": {
+      "title": "How to Properly Setup the Extends Array",
+      "body": "This is my current setup of the `extends` array in my `.eslintrc.js` file:\r\n\r\n```\r\n  extends: [\r\n    'plugin:react/recommended',\r\n    'plugin:react-hooks/recommended',\r\n    'airbnb',\r\n    'airbnb/hooks',\r\n    'plugin:@typescript-eslint/recommended',\r\n    'plugin:prettier/recommended',\r\n  ],\r\n```\r\n\r\nI am not sure, though, that I did this the right way.  Here are my questions.\r\n\r\nFirst, do I need to include either `'plugin:react/recommended'` or `'plugin:react-hooks/recommended'`?\r\n\r\nSecondly, if I do need to include those plugins, do I place them **before** `airbnb` and `airbnb/hooks` or **after**?  In other words, should it be like this:\r\n\r\n```\r\n  extends: [\r\n    'plugin:react/recommended',\r\n    'plugin:react-hooks/recommended',\r\n    'airbnb',\r\n    'airbnb/hooks',\r\n    ...\r\n  ],\r\n```\r\n\r\nOr like this:\r\n\r\n```\r\n  extends: [\r\n    'airbnb',\r\n    'airbnb/hooks',\r\n    'plugin:react/recommended',\r\n    'plugin:react-hooks/recommended',\r\n    ...\r\n  ],\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "React and React Hooks linting rules must be properly enforced",
+      "ESLint configuration must remain functional and error-free"
+    ],
+    "created_at": "2021-02-23T09:23:01Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2273",
+    "source": {
+      "issue_number": 2273
+    },
+    "initial_question": {
+      "title": "about array add a item question",
+      "body": "* please see this\r\n```js\r\n  let arr = []\r\n  const template = new Array(100).fill(1)\r\n  /**********************method first***********************/\r\n  template.forEach(i=>{\r\n    arr.push(i)  // look this arr\r\n  })\r\n```\r\n```js\r\n  let arr = []\r\n  const template = new Array(100).fill(1)\r\n  /**********************method second***********************/\r\n  template.forEach((i,index)=>{\r\n    arr[index] = i //look this arr\r\n  })\r\n```\r\nI wonder what is the difference between these two methods!\r\nplease tell me, thank you!!!\r\n"
+    },
+    "satisfaction_conditions": [
+      "The resulting array must contain all elements from the source array in the same order",
+      "The target array must be properly expanded to accommodate new elements",
+      "The operation must be performant for array modifications",
+      "The operation's intent must be clear and readable"
+    ],
+    "created_at": "2020-08-17T06:40:51Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2199",
+    "source": {
+      "issue_number": 2199
+    },
+    "initial_question": {
+      "title": "the demo of 4.7 in 'Table of Contents'",
+      "body": "the demo is the same\r\n```js\r\n// bad\r\ninbox.filter((msg) => {\r\n  const { subject, author } = msg;\r\n  if (subject === 'Mockingbird') {\r\n    return author === 'Harper Lee';\r\n  } else {\r\n    return false;\r\n  }\r\n});\r\n\r\n// good\r\ninbox.filter((msg) => {\r\n  const { subject, author } = msg;\r\n  if (subject === 'Mockingbird') {\r\n    return author === 'Harper Lee';\r\n  }\r\n\r\n  return false;\r\n});\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Code must maintain identical functional behavior",
+      "Code must avoid redundant control flow statements",
+      "Code must handle the Mockingbird/Harper Lee check correctly",
+      "Code must return boolean values appropriately"
+    ],
+    "created_at": "2020-03-22T06:27:56Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2191",
+    "source": {
+      "issue_number": 2191
+    },
+    "initial_question": {
+      "title": "Question about the naming convention",
+      "body": "I have a question about the naming convention, I need to define and export namespace object, should it be PascalCased or not?\r\nthe styleguide specifies:\r\n_23.3 Use PascalCase only when naming constructors or classes. eslint: new-cap_\r\nbut then, there is this statement:\r\n_23.8 Use PascalCase when you export a constructor / class / singleton / function library / bare object._\r\nIt looks for me like a contradiction. I can't wrap my head around it, please help."
+    },
+    "satisfaction_conditions": [
+      "Object naming must reflect its conceptual role in the codebase",
+      "Regular state/data objects must use camelCase naming",
+      "Module-level or application-defining objects must use PascalCase",
+      "Naming convention must be consistent with the object's usage context"
+    ],
+    "created_at": "2020-03-07T14:08:14Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/2082",
+    "source": {
+      "issue_number": 2082
+    },
+    "initial_question": {
+      "title": "How to address consistent-return & array-callback-return with condition",
+      "body": "How should I properly address the following:\r\n\r\n```js\r\nconst things = [\r\n  {\r\n    toy: 'lego',\r\n  },\r\n  {\r\n    ball: 'football',\r\n  },\r\n  {\r\n    series: 'spongebob',\r\n  },\r\n]\r\n\r\nconst newThings = things.map((item) => {\r\n  if (item.toy) {\r\n    return item.toy.toUpperCase();\r\n  }\r\n}).filter((n) => n);\r\n\r\n```\r\n\r\n// eslint error for consistent-return & array-callback-return"
+    },
+    "satisfaction_conditions": [
+      "All code paths in map/filter callbacks must have explicit returns",
+      "Final array must only contain uppercase toy names",
+      "Objects without a 'toy' property must be excluded from final result",
+      "Code must pass ESLint array-callback-return and consistent-return rules"
+    ],
+    "created_at": "2019-08-28T12:07:46Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1958",
+    "source": {
+      "issue_number": 1958
+    },
+    "initial_question": {
+      "title": "prefer-const makes destructuring redundant",
+      "body": "The rule `prefer-const` with the option  `{\"destructuring\": \"any\"}` will report an error on `unit is never reassigned.  Use 'const' instead`\r\n\r\n```js\r\nfunction foo(value) {\r\n  let [, v, unit] = value.toLowerCase().match(/(\\d+)([a-z]*)/) || [];\r\n  if (unit === 'rpx') {\r\n    v *= 1.5;\r\n  }\r\n  return v ? parseInt(v, 10) : 0;\r\n}\r\n```\r\nIf I modify the code for fixing this error, the code will become not elegant.\r\n```js\r\nfunction foo2(value) {\r\n  const result = value.toLowerCase().match(/(\\d+)([a-z]*)/) || [];\r\n  let [, v] = result;\r\n  const [, , unit] = result;\r\n  if (unit === 'rpx') {\r\n    v *= 1.5;\r\n  }\r\n  return v ? parseInt(v, 10) : 0;\r\n}\r\n```\r\nIs there any better suggestion?"
+    },
+    "satisfaction_conditions": [
+      "Code must comply with ESLint prefer-const rule while maintaining destructuring functionality",
+      "Variables that aren't reassigned must be declared as const",
+      "Code must maintain the original functionality of extracting and processing numeric values with optional units",
+      "Solution must handle the 'rpx' unit case correctly by applying the 1.5 multiplier",
+      "Code must handle invalid/missing matches gracefully"
+    ],
+    "created_at": "2018-11-16T03:40:58Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1931",
+    "source": {
+      "issue_number": 1931
+    },
+    "initial_question": {
+      "title": "Since use of 'ForOfStatement' is not allowed ...",
+      "body": "Pretty sure this has been discussed thousands of times but haven't found a perfect replacement for my code snippet below.\r\n\r\nSince the use of `for...of` construct is not allowed, how can I write following code?\r\n\r\n``` javascript\r\n// lines is an array of strings\r\nlet value = ''\r\nfor (const line of lines) {\r\n   try {\r\n      const json = JSON.parse(line)\r\n      if (json) {\r\n        value = json.whatever \r\n        /* \r\n           more logic irrelevant to this question\r\n        */\r\n        // As soon as first jsonable line is found and processed, short-circuit the loop\r\n        break\r\n      }\r\n    } catch (err) {\r\n      // Handle error\r\n      // throw / reject / console.error() / return - could be anything\r\n    }  \r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Must process array elements sequentially until a valid JSON is found",
+      "Must stop processing after finding first valid JSON with desired property",
+      "Must handle JSON parsing errors without terminating overall processing",
+      "Must extract specified property from successfully parsed JSON",
+      "Must work without using for...of syntax"
+    ],
+    "created_at": "2018-10-06T18:49:21Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1926",
+    "source": {
+      "issue_number": 1926
+    },
+    "initial_question": {
+      "title": "Best way to deal with `operator-linebreak` and long line length",
+      "body": "In a few places where code is indented a bit and we have something like this: `myObject.ProbablyTooLong.PropertyName = somethingElse.That.IsLong;`\r\n\r\nWe had previously broken the line up to avoid `max-len` violations:\r\n```\r\nmyObject.ProbablyTooLong.PropertyName\r\n       = somethingElse.That.IsLong;\r\n```\r\n\r\nA recent update now gives us `operator-linebreak` errors, `There should be no line break before or after '='`\r\n\r\nDoes anyone have suggestions on best practice here? Thank you\r\n"
+    },
+    "satisfaction_conditions": [
+      "Code must comply with ESLint style rules without warnings",
+      "Code remains readable and maintainable",
+      "Property assignment functionality must be preserved",
+      "Solution must work within existing code structure"
+    ],
+    "created_at": "2018-10-01T19:30:56Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1860",
+    "source": {
+      "issue_number": 1860
+    },
+    "initial_question": {
+      "title": "why not recommended to use `array.length` directly in if statements \uff1f",
+      "body": "In NO. 15.3.\r\n```\r\n// bad\r\nif (collection.length) {\r\n  // ...\r\n}\r\n\r\n// good\r\nif (collection.length > 0) {\r\n  // ...\r\n}\r\n```\r\nwhy use `collection.length>0` is better than `collection.length`?"
+    },
+    "satisfaction_conditions": [
+      "Code explicitly checks for array size rather than relying on implicit type conversion",
+      "Code's intent is immediately clear to readers without requiring knowledge of type coercion rules",
+      "Comparison operation returns a boolean value directly"
+    ],
+    "created_at": "2018-07-08T13:43:02Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1786",
+    "source": {
+      "issue_number": 1786
+    },
+    "initial_question": {
+      "title": "Prefer default export not working for const variable",
+      "body": "If I have single export in a file like this\r\n```\r\nexport const url = \"google.com\";\r\n```\r\nIt shows me linting error for prefer-default-export, but making it default would throw me this error\r\n`Parsing error: Unexpected token const`"
+    },
+    "satisfaction_conditions": [
+      "The value must be exported and accessible to other modules",
+      "The constant's value must remain unchanged"
+    ],
+    "created_at": "2018-04-17T12:51:15Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1692",
+    "source": {
+      "issue_number": 1692
+    },
+    "initial_question": {
+      "title": "prop-types in react router",
+      "body": "I use `eslint-config-airbnb` rules. and here is my code example.\r\n```jsx\r\nconst PrivateRoute = ({ component: Component, ...rest }) => (\r\n  <Route\r\n    {...rest}\r\n    render={props => (\r\n      authLogin ?\r\n        <Component {...props} /> :\r\n        <Redirect to={{\r\n          pathname: '/login',\r\n          state: { from: props.location },\r\n        }}\r\n        />\r\n    )}\r\n  />\r\n);\r\nPrivateRoute.propTypes = {\r\n  component: PropTypes.element.isRequired,\r\n};\r\n```\r\n[eslint] 'location' is missing in props validation (react/prop-types)\r\n\r\nI wonder what should I do to fix it? I've attempted to fix but useless\r\n  "
+    },
+    "satisfaction_conditions": [
+      "Component must maintain its routing functionality while satisfying prop validation"
+    ],
+    "created_at": "2018-01-10T03:19:28Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1614",
+    "source": {
+      "issue_number": 1614
+    },
+    "initial_question": {
+      "title": "Initialize some property for each object in a list",
+      "body": "I want to do this\r\nthis.someList.forEach(item => item.someProperty = 'Some Value');\r\n\r\nBut i get these\r\nno-return-assign   Arrow function should not return assignment\r\nno-param-reassign  Assignment to property of function parameter 'item'\r\n\r\nHow do i do it diffrently?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Each object in the list must have the specified property set to the desired value",
+      "The solution must comply with ESLint rules no-return-assign and no-param-reassign",
+      "The original list's objects must either be preserved or new objects must be created with the desired property",
+      "The operation must be applied to all items in the list"
+    ],
+    "created_at": "2017-10-24T09:11:26Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1520",
+    "source": {
+      "issue_number": 1520
+    },
+    "initial_question": {
+      "title": "Confusing dot-notation and no-underscore-dangle",
+      "body": "Hi!\r\nI have an object returned to me from third-party API. Object has following structure:\r\n`object = {\r\n    _links: ...\r\n}`\r\n\r\nWhen I'm trying to access `_links` object using dot-notation like this: `object._links` I've got `no-underscore-dangle` error while trying to get object property with brakets `object['_links']` leads to `dot-notation` error. How to deal with such rules confusion?"
+    },
+    "satisfaction_conditions": [
+      "ESLint rules must not produce errors when accessing the property with underscore prefix",
+      "Access to the _links property must remain functional",
+      "Solution must accommodate third-party API structure",
+      "ESLint configuration remains valid for other code"
+    ],
+    "created_at": "2017-08-14T16:18:19Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1519",
+    "source": {
+      "issue_number": 1519
+    },
+    "initial_question": {
+      "title": "Clarification regarding react/prop-types validation and react router dom",
+      "body": "I am getting the alert, that I have to validate in prop types match, but I think it is not necessary.\r\n\r\nimport React from 'react';\r\n\r\n```javascript\r\nconst Header = (props) => {\r\n  const { match } = props; // 'match' is missing props validation (react/prop-types)\r\n  return (\r\n    <div>\r\n      <h1>Hello</h1>\r\n      <h3>ID: {match.params.id}</h3>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default Header;\r\n```\r\n\r\nDo I need to validate it? What's the new convention?\r\n\r\nRegards"
+    },
+    "satisfaction_conditions": [
+      "Props validation must be properly defined for all used props",
+      "Required props must be explicitly marked as required",
+      "Nested object structures in props must have their shape defined"
+    ],
+    "created_at": "2017-08-10T20:37:53Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1493",
+    "source": {
+      "issue_number": 1493
+    },
+    "initial_question": {
+      "title": "JSX Expression Formatting (spaces after opening and before closing braces)",
+      "body": "What is Airbnb's interpretation for the formatting rules for spaces after opening and before closing braces? To illustrate:\r\n\r\n```javascript\r\n// Option 1: No spaces\r\n<div>{foo(1, \"abc\")}</div>\r\n\r\n// Option 2: Yes spaces\r\n<div>{ foo(1, \"abc\") }</div>\r\n```\r\n\r\nThank you."
+    },
+    "satisfaction_conditions": [
+      "JSX expression braces must follow consistent spacing rules",
+      "The formatting rule must clearly differentiate between JSX expression braces and regular JavaScript curly braces",
+      "The chosen formatting must be compatible with standard JSX syntax"
+    ],
+    "created_at": "2017-07-15T18:08:13Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1446",
+    "source": {
+      "issue_number": 1446
+    },
+    "initial_question": {
+      "title": "react/jsx-no-bind: how to borrow some methods and pass them as props to child?",
+      "body": "I'm making a text editor via ACE Editor, and now I re-crafted a search box as a child component.\r\n\r\nIn parent component, I stored the Ace Editor ref in `this.editorRef` and I can access the instance by 'this.editorRef.editor', the editor instance provides some methods like find, findNext, findPrev, replace, replaceAll and others.\r\n\r\nI  want to pass some methods of the editor instance to child `<SearchBox />`, I wrote codes like\r\n\r\n```\r\nrender () {\r\n  const { editor } = this.editorRef\r\n  const { find, findNext, findPrev, replace, replaceAll } = editor\r\n  return (\r\n    <SearchBox\r\n      find={find.bind(editor)}\r\n      findNext={findNext.bind(editor)}\r\n      findPrev={findPrev.bind(editor)}\r\n      replace={replace.bind(editor)}\r\n      replaceAll={replaceAll.bind(editor)}\r\n    />\r\n  )\r\n}\r\n```\r\n\r\ndoes the jsx-no-bind lint consider this situation? Or any suggestion to improve these codes?"
+    },
+    "satisfaction_conditions": [
+      "Methods from editor instance remain functionally bound to their original context",
+      "Editor functionality remains encapsulated while exposing only necessary methods"
+    ],
+    "created_at": "2017-06-11T14:48:27Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1386",
+    "source": {
+      "issue_number": 1386
+    },
+    "initial_question": {
+      "title": "import/no-duplicates vs import/no-named-default",
+      "body": "In a module with both `const` and `default` exports, how do I import both? It seems to fail with either `import/no-duplicates` or `import/no-named-default`.\r\n\r\n```\r\nexport const schema = {...}\r\n...\r\nconst config = ...\r\nexport default config;\r\n```\r\n```\r\nimport config from '.../config';\r\nimport { schema } from '.../config';\r\n\r\nerror config.js imported multiple times import/no-duplicates\r\n```\r\n```\r\nimport { default as config, schema } from '.../config';\r\n\r\nerror Use default import syntax to import 'config' import/no-named-default\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Single import statement successfully imports both default and named exports",
+      "No ESLint 'import/no-duplicates' error is triggered",
+      "No ESLint 'import/no-named-default' error is triggered",
+      "Both imported items are accessible with their intended names in the importing module"
+    ],
+    "created_at": "2017-04-24T18:13:42Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1305",
+    "source": {
+      "issue_number": 1305
+    },
+    "initial_question": {
+      "title": "React-Native + AirBnB's ESLint configuration",
+      "body": "We have started using ESLint in our react-native project and I am interested to find out what the ideal settings are.\r\n\r\nI currently have the following in my .eslintrc.json file.\r\n\r\n```\r\n{\r\n    \"extends\": [\"airbnb\", \"plugin:react-native/all\"],\r\n    \"plugins\": [\r\n        \"react-native\"\r\n    ]\r\n}\r\n```\r\n\r\nSome questions I have: I keep seeing this \"parser\": 'babel-eslint' but when I went to their github they mention this is no longer neccesary. Should I be using it or not?"
+    },
+    "satisfaction_conditions": [
+      "Parser choice must align with the JavaScript features being used",
+      "ESLint must function correctly with React Native specific syntax"
+    ],
+    "created_at": "2017-02-16T13:33:25Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1199",
+    "source": {
+      "issue_number": 1199
+    },
+    "initial_question": {
+      "title": "Expected 'this' to be used by class method 'render'",
+      "body": "Hi, from what I've read this has already been fixed in the eslint-config-airbnb package but I'm getting this error. I've probably set up my .eslintrc file incorrectly or something so if anyone could point out my mistake I'd really appreciate it.\r\n\r\n\r\n.eslintrc\r\n\r\n```\r\n{\r\n    \"extends\": \"airbnb/base\",\r\n    \"parser\": \"babel-eslint\",\r\n    \"parserOptions\": {\r\n        \"sourceType\": \"module\",\r\n        \"allowImportExportEverywhere\": false,\r\n        \"ecmaFeatures\": {\r\n          \"jsx\": true,\r\n        },\r\n    },\r\n    \"plugins\": [\r\n        \"react\",\r\n    ],\r\n    \"env\": {\r\n        \"node\": true,\r\n        \"jasmine\": true,\r\n    },\r\n    \"rules\": {\r\n        \"id-length\": 0,\r\n        \"indent\": [1, 4],\r\n        \"jsx-quotes\": 1,\r\n        \"no-console\": 0,\r\n        \"no-unused-vars\": [1, {\"vars\": \"local\", \"args\": \"none\"}],\r\n        \"react/forbid-prop-types\": 1,\r\n        \"react/jsx-boolean-value\": 1,\r\n        \"react/jsx-closing-bracket-location\": 1,\r\n        \"react/jsx-curly-spacing\": 1,\r\n        \"react/jsx-indent-props\": 1,\r\n        \"react/jsx-key\": 1,\r\n        \"react/jsx-max-props-per-line\": 1,\r\n        \"react/jsx-no-duplicate-props\": 1,\r\n        \"react/jsx-no-undef\": 1,\r\n        \"react/jsx-sort-props\": 1,\r\n        \"react/jsx-uses-react\": 1,\r\n        \"react/jsx-uses-vars\": 1,\r\n        \"react/no-danger\": 1,\r\n        \"react/no-did-mount-set-state\": 1,\r\n        \"react/no-did-update-set-state\": 1,\r\n        \"react/no-direct-mutation-state\": 1,\r\n        \"react/no-multi-comp\": 1,\r\n        \"react/no-set-state\": 1,\r\n        \"react/no-unknown-property\": 1,\r\n        \"react/prefer-es6-class\": 1,\r\n        \"react/prop-types\": 1,\r\n        \"react/react-in-jsx-scope\": 1,\r\n        \"react/require-extension\": 1,\r\n        \"react/self-closing-comp\": 1,\r\n        \"react/sort-comp\": 1,\r\n        \"react/sort-prop-types\": 1,\r\n        \"react/wrap-multilines\": 1,\r\n        \"strict\": 0,\r\n    },\r\n}\r\n```\r\n\r\npackage.json\r\n\r\n```\r\n{\r\n  \"name\": \"KHTestApp\",\r\n  \"version\": \"0.0.1\",\r\n  \"private\": true,\r\n  \"scripts\": {\r\n    \"start\": \"node node_modules/react-native/local-cli/cli.js start\",\r\n    \"test\": \"jest\"\r\n  },\r\n  \"dependencies\": {\r\n    \"@exponent/ex-navigation\": \"^2.1.5\",\r\n    \"@exponent/vector-icons\": \"^2.0.3\",\r\n    \"babel-eslint\": \"6\",\r\n    \"babel-plugin-transform-decorators-legacy\": \"^1.3.4\",\r\n    \"babel-preset-react-native-stage-0\": \"^1.0.1\",\r\n    \"exponent\": \"^12.0.0-rc.5\",\r\n    \"react\": \"15.4.1\",\r\n    \"react-native\": \"0.39.0\",\r\n    \"react-native-code-push\": \"latest\",\r\n    \"react-native-vector-icons\": \"^3.0.0\"\r\n  },\r\n  \"devDependencies\": {\r\n    \"babel-jest\": \"17.0.2\",\r\n    \"babel-preset-react-native\": \"1.9.0\",\r\n    \"eslint\": \"^3.11.1\",\r\n    \"eslint-config-airbnb\": \"^13.0.0\",\r\n    \"eslint-plugin-import\": \"^2.2.0\",\r\n    \"eslint-plugin-jsx-a11y\": \"^2.2.3\",\r\n    \"eslint-plugin-react\": \"^6.8.0\",\r\n    \"jest\": \"17.0.3\",\r\n    \"react-test-renderer\": \"15.4.1\"\r\n  },\r\n  \"jest\": {\r\n    \"preset\": \"react-native\"\r\n  }\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Configuration maintains consistency with project dependencies"
+    ],
+    "created_at": "2016-12-09T09:32:02Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1135",
+    "source": {
+      "issue_number": 1135
+    },
+    "initial_question": {
+      "title": "imports/prefer-default-export idiomatic use",
+      "body": "hi,\n\nhow is the case where a file grows from containing only 1 function to containing 2 handled best?\n\nexample:\n\nlet's say i have a file called `window.js`, which contains only one function, `showWindow()`.\nit's imported as `import { showWindow } from 'window'`.\n\nof course this goes against imports/prefer-default-export. how should this be fixed? i guess i move the code to `window/showWindow.js`.\n\nif i do that, then my import becomes `import showWindow from 'window/showWindow'`.\nnow what happens when a want to create another function, `countWindows()` ?\n\n2 possibilities:\n\nA.\ni move `showWindow` back to `window.js` and add `countWindows` there.\nif i do this, now i have to find all the places that imports `showWindow` and change those imports.\n\nB.\ni create another file called `window/countWindows.js` and put the function there.\nif i do this, it means that nearly all my files will only contain 1 function.\n\nso i wonder, how does airbnb handle this?\n"
+    },
+    "satisfaction_conditions": [
+      "Module structure must support future extensibility",
+      "Export pattern must comply with linting rules by default",
+      "File naming must reflect export content",
+      "Solution must accommodate special cases without breaking general patterns"
+    ],
+    "created_at": "2016-10-17T12:01:42Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1130",
+    "source": {
+      "issue_number": 1130
+    },
+    "initial_question": {
+      "title": "Question about modifying with forEach",
+      "body": "The example for 13.6 contains the snippet\n\n``` javascript\narray.forEach((value) => {\n  value += 1;\n});\n```\n\nHowever, this style guide forbids modifying the value of an element.\n\nWhat's the recommended way to change a property of all elements in an array? I'm working with changing the `.style` of DOM nodes in an array, so using `.map()` doesn't really feel right to me...\n"
+    },
+    "satisfaction_conditions": [
+      "Adheres to style guide rules around mutation, with appropriate exceptions when necessary",
+      "Solution maintains DOM manipulation functionality"
+    ],
+    "created_at": "2016-10-15T02:12:52Z"
+  },
+  {
+    "id": "https://github.com/airbnb/javascript/issues/1087",
+    "source": {
+      "issue_number": 1087
+    },
+    "initial_question": {
+      "title": "PascalCase or camelCase for HOC filenames",
+      "body": "What is a correct filename  for that HOC component? `withFoo.jsx` or `WithFoo.jsx`?\n\n```\nexport default function withFoo(WrappedComponent) {\n    function WithFoo(props) {\n      return <WrappedComponent {...props} foo />;\n    }\n\n    const wrappedComponentName = WrappedComponent.displayName\n      || WrappedComponent.name\n      || 'Component';\n\n    WithFoo.displayName = `withFoo(${wrappedComponentName})`;\n    return WithFoo;\n  }\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Filename matches the exported function name's casing",
+      "Filename follows JavaScript HOC naming conventions",
+      "File extension correctly indicates a React component file",
+      "Filename maintains consistency with the component's displayName property"
+    ],
+    "created_at": "2016-09-23T07:42:27Z"
+  }
+]

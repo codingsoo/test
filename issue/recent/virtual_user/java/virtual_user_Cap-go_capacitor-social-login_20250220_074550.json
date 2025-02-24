@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/Cap-go/capacitor-social-login/issues/34",
+    "source": {
+      "issue_number": 34
+    },
+    "initial_question": {
+      "title": "Apple login on iOS returns only an identityToken",
+      "body": "Tried this plugin yesterday, works on android but on iOS ( 15+ ) device tested it ever only returns an identityToken. Repeated the stop using Apple ID and login cycle like 20 times, whilst using the old cordova-plugin-sign-in-with-apple retuns the user data on the initial login:\r\n\r\n```\r\n        await SocialLogin.initialize({\r\n          apple: {\r\n            clientId,\r\n          },\r\n        });\r\n\r\n        const { result } = (await SocialLogin.login({\r\n          provider: \"apple\",\r\n          options: {\r\n            scopes: [\"email\", \"profile\"],\r\n          },\r\n        })) as { result: AppleProviderResponse };\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "iOS platform compatibility must be maintained"
+    ],
+    "created_at": "2024-10-23T06:29:24Z"
+  }
+]

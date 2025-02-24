@@ -1,0 +1,917 @@
+[
+  {
+    "number": 7413,
+    "title": "service_cpm = sum( service_instance_cpm )  ?",
+    "created_at": "2021-08-05T08:47:42Z",
+    "closed_at": "2021-08-05T09:24:44Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/7413",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ ] Question or discussion\r\n___\r\n### Question\r\n- What do you want to know?\r\nexcuse me.\r\ndoes service_cpm = sum( service_instance_cpm )  ?\r\nin my case, service_cpm !=  sum( service_instance_cpm ) .\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/7413/comments",
+    "author": "klmzfyf",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2021-08-05T09:24:42Z",
+        "body": "Generally, they should match, but if the traffic is too little, it could mismatch.\r\nThe real matching thing is traffic_count(not set in OAL, but logically you can). \r\n\r\nCPM = calls / duration.\r\nSuch as in hour-level metrics, you at least need 60 calls per hour could have 1 CPM."
+      }
+    ]
+  },
+  {
+    "number": 7037,
+    "title": "A question about MetricsPersistentWorker context map",
+    "created_at": "2021-05-29T08:03:16Z",
+    "closed_at": "2021-05-29T08:12:18Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/7037",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n\r\nHi, I have a question about the code of  `MetricsPersistentWorker`.\r\n\r\n```java\r\nprivate void flushDataToStorage(List<Metrics> metricsList,\r\n                                    List<PrepareRequest> prepareRequests) {\r\n        try {\r\n            loadFromStorage(metricsList);\r\n\r\n            for (Metrics metrics : metricsList) {\r\n                Metrics cachedMetrics = context.get(metrics);\r\n                if (cachedMetrics != null) {\r\n                    /*\r\n                     * If the metrics is not supportUpdate, defined through MetricsExtension#supportUpdate,\r\n                     * then no merge and further process happens.\r\n                     */\r\n                    if (!supportUpdate) {\r\n                        continue;\r\n                    }\r\n                    /*\r\n                     * Merge metrics into cachedMetrics, change only happens inside cachedMetrics.\r\n                     */\r\n                    final boolean isAbandoned = !cachedMetrics.combine(metrics);\r\n                    if (isAbandoned) {\r\n                        continue;\r\n                    }\r\n                    cachedMetrics.calculate();\r\n                    prepareRequests.add(metricsDAO.prepareBatchUpdate(model, cachedMetrics));\r\n                    nextWorker(cachedMetrics);\r\n                } else {\r\n                    metrics.calculate();\r\n                    prepareRequests.add(metricsDAO.prepareBatchInsert(model, metrics));\r\n                    nextWorker(metrics);\r\n                }\r\n\r\n                /*\r\n                 * The `metrics` should be not changed in all above process. Exporter is an async process.\r\n                 */\r\n                nextExportWorker.ifPresent(exportEvenWorker -> exportEvenWorker.in(\r\n                    new ExportEvent(metrics, ExportEvent.EventType.INCREMENT)));\r\n            }\r\n        } catch (Throwable t) {\r\n            log.error(t.getMessage(), t);\r\n        } finally {\r\n            metricsList.clear();\r\n        }\r\n    }\r\n```\r\nIn the function `flushDataToStorage`, a metrics object which not stored in `context` is considered as a new metrics, otherwise, it needs to be combined with the old metrics in `context`. After `prepareRequests` of a new metrics generated, we don't put this new metrics into `context`. So in the next run of `PersistenceTimer`, when a metrics with same id comes, we have to query db again. Is there some problems cause that we can't put a new metrics object into context?\r\n\r\nThanks.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/7037/comments",
+    "author": "andyzzl",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2021-05-29T08:12:18Z",
+        "body": ">  a metrics object which not stored in context is considered as a new metrics, otherwise, it needs to be combined with the old metrics in context\r\n\r\nThis is not a correct conclusion. Read `#loadFromStorage`, `context#put` is called if metrics could be loaded from database."
+      },
+      {
+        "user": "andyzzl",
+        "created_at": "2021-05-29T08:27:43Z",
+        "body": "Sorry I didn't make it clear. I mean after `loadFromStorage` called, if a metrics can't be found in `context` still,  it is a new metrics."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2021-05-29T08:47:03Z",
+        "body": "> Sorry I didn't make it clear. I mean after `loadFromStorage` called, if a metrics can't be found in `context` still, it is a new metrics.\r\n\r\nWhy it isn't?  It means you need to insert it into the database, rather than updating."
+      },
+      {
+        "user": "andyzzl",
+        "created_at": "2021-05-29T09:02:01Z",
+        "body": "After prepareRequests generated, we can put it into context, both db and context are updated. So we don\u2019t need to query db in next run."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2021-05-29T09:12:04Z",
+        "body": "That depends on the context. I deleted a comment about this.\r\n\r\nThinking about this, if your service includes parameterized URI, such as `/prod/{id}/create`, but you don't always have grouping rules, or SpringMVC(even you have, there is Gateway before your Spring controller codes), then every request could create different endpoints. All these endpoints have one access but cost memory for nearly 1 minute.(context only has an expired period).\r\nConsidering this, do you still want to add this logic?"
+      }
+    ]
+  },
+  {
+    "number": 6459,
+    "title": "Remove  spring-cloud plugin empty intercept",
+    "created_at": "2021-02-27T01:40:51Z",
+    "closed_at": "2021-02-27T02:20:06Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/6459",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ ] Question or discussion\r\n- [ ] Bug\r\n- [x] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Requirement or improvement\r\n`org.apache.skywalking.apm.plugin.spring.cloud.gateway.v21x.TcpClientConstructorInterceptor` did nothing, should remove it .\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/6459/comments",
+    "author": "haoyann",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2021-02-27T01:55:26Z",
+        "body": "Are you sure? Empty instrumentation always mean requiring dynamic `EnhancedInstance` interface."
+      },
+      {
+        "user": "haoyann",
+        "created_at": "2021-02-27T02:20:06Z",
+        "body": "Thank you for your answer, I looked at the code again and it is used in `org.apache.skywalking.apm.plugin.spring.cloud.gateway.v21x.HttpClientFinalizerConstructorInterceptor#onConstruct`."
+      }
+    ]
+  },
+  {
+    "number": 6326,
+    "title": "Can I delete oap-role.yaml oap-rolebinding.yaml in skywalking-kubernetes",
+    "created_at": "2021-02-05T03:31:28Z",
+    "closed_at": "2021-02-05T03:33:44Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/6326",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [\u2714\ufe0f] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\nWhat's role/rolebinding/serviceaccount for in skywalking-kubernetes, can I delete them?\r\n\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS, and JRE?\r\n\r\n- Which company or project?\r\n\r\n- What happened?\r\nIf possible, provide a way to reproduce the error. e.g. demo application, component version.\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/6326/comments",
+    "author": "xiangwangcheng",
+    "comments": [
+      {
+        "user": "kezhenxu94",
+        "created_at": "2021-02-05T03:39:12Z",
+        "body": "@xiangwangcheng for `role` and `RoleBinding`, if you don't enable Envoy ALS (or you don't know what Envoy ALS is), you can safely delete it, at this time, it takes no effect at all so leaving them there does no harm.\r\n\r\nBut SkyWalking OAP needs a service account, hence you cannot delete `oap-serviceaccount.yaml`"
+      }
+    ]
+  },
+  {
+    "number": 6061,
+    "title": "[javaagent] agent.sample_n_per_3_secs config stands for TraceSegment?",
+    "created_at": "2020-12-23T02:57:05Z",
+    "closed_at": "2020-12-23T02:59:03Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/6061",
+    "body": "Dear skywalking team.\r\nAs I read skywalking agent code, **agent.sample_n_per_3_secs** this config stands for upper limit of TraceSegment, is it right?\r\nAs one TraceSegment can hold many spans, just suppose 1 TraceSegment has 3 spans, \r\nif **agent.sample_n_per_3_secs** set to 150, then the upper limit of spans has been 450.\r\nIs it right? ",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/6061/comments",
+    "author": "lijial",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-12-23T02:59:03Z",
+        "body": "Yes, but span doesn't matter for SkyWalking, especially at the storage level."
+      },
+      {
+        "user": "lijial",
+        "created_at": "2020-12-23T03:08:47Z",
+        "body": "@wu-sheng \r\n>Yes, but span doesn't matter for SkyWalking, especially at the storage level.\r\n\r\n\r\n**agent.sample_n_per_3_secs** config cannot measure network flow accuracy\r\nEven **agent.sample_n_per_3_secs** is numeric small , but the whole network flow could be numeric big. \r\nThe more spans, the high network flow.\r\nSo I would think agent.config need a new config **agent.spans_n_per_3_secs**\r\n\r\nNetwork flow means from javaagent trace data to collector, As high network flow would influence app.jar"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-12-23T04:02:59Z",
+        "body": "Read the document, there is a config called `SPAN_LIMIT_PER_SEGMENT` to do this. But less spans could break your traces, do the client side tracing is not working because of this."
+      }
+    ]
+  },
+  {
+    "number": 5927,
+    "title": "How to skip kafka tracing?",
+    "created_at": "2020-12-01T01:05:08Z",
+    "closed_at": "2020-12-01T01:43:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5927",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [X ] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\nI'm coding a plugin which use kafka to produce metric\uff0cbut it will be traced by apm-kafka-plugin.I want to know whether is there a way to avoid it?\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n\r\n- Which company or project?\r\n\r\n- What happened?\r\nIf possible, provide a way to reproduce the error. e.g. demo application, component version.\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5927/comments",
+    "author": "justforstudy-A",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-12-01T01:10:30Z",
+        "body": "Ignore yours or ignore all tracing of the Kafka plugin?"
+      },
+      {
+        "user": "justforstudy-A",
+        "created_at": "2020-12-01T01:27:35Z",
+        "body": "> Ignore yours or ignore all tracing of the Kafka plugin?\r\n\r\nJust for the plugin of  mine,not for all tracing"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-12-01T01:43:13Z",
+        "body": "No, there is no such mechanism. Tracing means tracing all related. You can't partial OFF, because they are the same at the instrumentation level. The plugin can't tell who is using it."
+      }
+    ]
+  },
+  {
+    "number": 5854,
+    "title": "Slow statements dashboard slow SQL statistics is not complete, SQL only shows half why",
+    "created_at": "2020-11-17T06:12:47Z",
+    "closed_at": "2020-11-17T07:06:07Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5854",
+    "body": "Skywalking version\uff1a8.1.0\r\nProblem description\uff1aSlow statements dashboard slow SQL statistics is not complete, SQL only shows half why\r\nProblem phenomenon\uff1aOpen the browser console (F12), select the corresponding slow SQL in the tab, and the content in the label is also half displayed\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5854/comments",
+    "author": "qiang33161312",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-11-17T07:06:07Z",
+        "body": "We truncate the SQL to protect the memory at the agent side. "
+      }
+    ]
+  },
+  {
+    "number": 5636,
+    "title": "skywalking-ui: jvm metrics only have one number per day?",
+    "created_at": "2020-10-09T09:10:55Z",
+    "closed_at": "2020-10-09T09:14:35Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5636",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n\r\nversion: V6.3\r\n\r\n1. on UI page:\r\nsuch as JVM GC counts, Heap, etc,  only has a number per day\uff0c  I guess the display is per day, where I can change to per hour for example?\r\n\r\n2. is there any doc to show such configuration/introdction for JVM metrics?  (also the database metrics...)\r\n\r\n3. what's the CLR means on page?  (CLR is beside JVM on UI), it's for .NET ?\r\n\r\nthanks!\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n\r\n- Which company or project?\r\n\r\n- What happened?\r\nIf possible, provide a way to reproduce the error. e.g. demo application, component version.\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5636/comments",
+    "author": "worldwalk",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-10-09T09:14:35Z",
+        "body": "> on UI page:\r\nsuch as JVM GC counts, Heap, etc, only has a number per day\uff0c I guess the display is per day, where I can change to per hour for example?\r\n\r\nChoose the right time duration.\r\n\r\n> is there any doc to show such configuration/introdction for JVM metrics? (also the database metrics...)\r\n\r\nIt is auto.\r\n\r\n> what's the CLR means on page? (CLR is beside JVM on UI), it's for .NET ?\r\n\r\nCLR is .NET concept."
+      }
+    ]
+  },
+  {
+    "number": 5545,
+    "title": "alarm's count properties real meaning?",
+    "created_at": "2020-09-23T08:54:01Z",
+    "closed_at": "2020-09-23T10:47:07Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5545",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\ni see official document and official alarm-setting.yml, count is represent as Frequency of occurrence or time[minute]?\r\nfor example:\r\n\r\n1\u3001official document \r\nCount. In the period window, if the number of values over threshold(by OP), reaches count, alarm should send\r\n\r\n2\u3001official alarm-setting.yml\r\n  service_sla_rule:\r\n    # Metrics value need to be long, double or int\r\n    metrics-name: service_sla\r\n    op: \"<\"\r\n    threshold: 8000\r\n    # The length of time to evaluate the metrics\r\n    period: 10\r\n    # How many times after the metrics match the condition, will trigger alarm\r\n    count: 2\r\n    # How many times of checks, the alarm keeps silence after alarm triggered, default as same as period.\r\n    silence-period: 3\r\n    message: **Successful rate of service {name} is lower than 80% in 2 minutes of last 10 minutes**\r\n\r\n- Why do you submit this issue?\r\n- [ ] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n\r\n- Which company or project?\r\n\r\n- What happened?\r\nIf possible, provide a way to reproduce the error. e.g. demo application, component version.\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5545/comments",
+    "author": "killGC",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-09-23T10:47:07Z",
+        "body": "Consider the period is a moving window caching the metrics. Every minute is a slot in the window. \r\nAlarm core checks the window every minute. Count means the minimal count of value in the slot over threshold."
+      }
+    ]
+  },
+  {
+    "number": 5397,
+    "title": "Skywalking 8+ causes Elasticsearch 6 failed to parse field [service_id] of type [integer]",
+    "created_at": "2020-08-27T06:14:40Z",
+    "closed_at": "2020-08-27T06:36:52Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5397",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ ] Question or discussion\r\n- [x] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\nSkyWalking:8.1.0-es6 and 8.0.1-es6  (docker.io/apache/skywalking-oap-server:8.x.x)\r\nOS :Red Hat 4.8.5-36(Linux version 3.10.0-957.21.3.el7.x86_64)\r\nJRE:OpenJDK Runtime Environment (IcedTea 3.8.0) (Alpine 8.171.11-r0)\r\n\r\n\r\n- Which company or project?\r\nChengdu Eventec Technological Innovation Co.Ltd\r\n\r\n- What happened?\r\nIf possible, provide a way to reproduce the error. e.g. demo application, component version.\r\nES6.6 throws MapperParsingException: failed to parse field [service_id] of type [integer], when skywalking-ui requests the skywalking-oap-server for data, even these causes ES cannot query any data from any index. \r\nI have made the following efforts several times:\r\n1. Delete ES indexs refer to Skywalking if exists.\r\n2. Deploy the skywalking-oap-server, skywalking-ui and our application.\r\n3.Open skywalking-ui website, then I can see its DashBoard works fine(shows data), but other four Tabs(Topological Diagram, etc.) have no data.(The direct reason is that the network interface requests respond error.)\r\n\r\nOur first application written with Springboot uses agent in apache-skywalking-apm-8.x.x.tar.gz to collect infomation. I cannot change SkyWalking version to below 8, because I have application written by Python, whose agent requires SkyWalking 8+.\r\n\r\nThe problem is urgent. Please contact me if possible , my wechat & mobile is 18551601581, thanks. \r\n\r\nExceptions of ES are as belows :\r\n\r\n1.\r\n[2020-08-27T11:38:16,711][DEBUG][o.e.a.b.TransportShardBulkAction] [node-1] [eventec_endpoint_sla-20200827][0] failed to execute bulk item (index) index {[eventec_endpoint_sla-20200827][type][2020082711_c2VydmljZS1nYXRld2F5LWF1dGhlbn\r\nRpY2F0aW9u.1_L3NlcnZpY2UtanNvbnN5bmMvc3luYy9jb2xsZWN0aW9uL2V2ZW50cw==], source[{\"total\":3,\"service_id\":\"c2VydmljZS1nYXRld2F5LWF1dGhlbnRpY2F0aW9u.1\",\"percentage\":10000,\"match\":3,\"time_bucket\":2020082711,\"entity_id\":\"c2VydmljZS1nYXRld2\r\nF5LWF1dGhlbnRpY2F0aW9u.1_L3NlcnZpY2UtanNvbnN5bmMvc3luYy9jb2xsZWN0aW9uL2V2ZW50cw==\"}]}\r\norg.elasticsearch.index.mapper.MapperParsingException: failed to parse field [service_id] of type [integer]\r\n        at org.elasticsearch.index.mapper.FieldMapper.parse(FieldMapper.java:303) ~[elasticsearch-6.6.0.jar:6.6.0]\r\n........\r\nCaused by: java.lang.NumberFormatException: For input string: \"c2VydmljZS1nYXRld2F5LWF1dGhlbnRpY2F0aW9u.1\"\r\n        at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:2043) ~[?:?]\r\n\r\n2.\r\n[2020-08-27T11:38:16,706][DEBUG][o.e.a.b.TransportShardBulkAction] [node-1] [eventec_endpoint_relation_cpm-20200827][1] failed to execute bulk item (index) index {[eventec_endpoint_relation_cpm-20200827][type][202008271138_VXNlcg==.0\r\n-VXNlcg==-c2VydmljZS1nYXRld2F5LWF1dGhlbnRpY2F0aW9u.1-L3NlcnZpY2UtY2hhc3Npc21vbml0b3IvZGV2aW5mbw==], source[{\"child_endpoint_name\":\"/service-chassismonitor/devinfo\",\"total\":1,\"service_id\":\"VXNlcg==.0\",\"child_service_id\":\"c2VydmljZS1nY\r\nXRld2F5LWF1dGhlbnRpY2F0aW9u.1\",\"time_bucket\":202008271138,\"entity_id\":\"VXNlcg==.0-VXNlcg==-c2VydmljZS1nYXRld2F5LWF1dGhlbnRpY2F0aW9u.1-L3NlcnZpY2UtY2hhc3Npc21vbml0b3IvZGV2aW5mbw==\",\"value\":1,\"source_endpoint_name\":\"User\"}]}\r\norg.elasticsearch.index.mapper.MapperParsingException: failed to parse field [service_id] of type [integer]\r\n\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5397/comments",
+    "author": "ohworld",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-27T06:36:52Z",
+        "body": "The index is old version. You can't use it both for v7 and v8."
+      },
+      {
+        "user": "ohworld",
+        "created_at": "2020-08-27T06:53:50Z",
+        "body": "> The index is old version. You can't use it both for v7 and v8.\r\n\r\nBut these indexs are built by Skywalking 8.0.1 or 8.1.0 themselves, not other skywalking version."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-27T07:02:13Z",
+        "body": "The logs say there is integer id, which is for 7- only."
+      },
+      {
+        "user": "ohworld",
+        "created_at": "2020-08-27T07:03:36Z",
+        "body": "> > The index is old version. You can't use it both for v7 and v8.\r\n> \r\n> But these indexs are built by Skywalking 8.0.1 or 8.1.0 themselves, not other skywalking version.\r\n\r\nIn other words, Skywalking has not works correctly except for 'Dashboard' Tab. And even the worse, ES will not respond to any request after I click 'Topological Diagram' Tab. Every time when I restart new whole installation, I deleted any indexes built by Skywalking."
+      },
+      {
+        "user": "ohworld",
+        "created_at": "2020-08-27T07:05:02Z",
+        "body": "> The logs say there is integer id, which is for 7- only.\r\n\r\nBut I've never deployed versions below v8."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-27T07:08:57Z",
+        "body": "I could only tell you why the error happens. "
+      },
+      {
+        "user": "ohworld",
+        "created_at": "2020-08-27T07:22:26Z",
+        "body": "I deleted indexes built by skywalking(those index names startwith namespace eventec) and then restart it just now, now I see logs below are printed by oap-server 8.0.1. We can see these indexes are built by v8 indeed:\r\n\r\n2020-08-27 15:14:25,839 - org.apache.skywalking.oap.server.core.storage.model.ModelInstaller -43223 [main] INFO  [] - table: instance_clr_available_worker_threads does not exist\r\n2020-08-27 15:14:25,839 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.base.StorageEsInstaller -43223 [main] INFO  [] - index eventec_instance_clr_available_worker_threads's columnTypeEsMapping builder str: {type={properties={service_id={type=keyword}, time_bucket={type=long}, entity_id={type=keyword}, value={type=long}}}}\r\n2020-08-27 15:14:26,094 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.base.StorageEsInstaller -43478 [main] INFO  [] - create instance_clr_available_worker_threads-20200827 index finished, isAcknowledged: true\r\n2020-08-27 15:14:26,477 - org.apache.skywalking.oap.server.core.storage.model.ModelInstaller -43861 [main] INFO  [] - table: instance_clr_max_completion_port_threads does not exist\r\n2020-08-27 15:14:26,477 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.base.StorageEsInstaller -43861 [main] INFO  [] - index eventec_instance_clr_max_completion_port_threads's columnTypeEsMapping builder str: {type={properties={service_id={type=keyword}, time_bucket={type=long}, entity_id={type=keyword}, value={type=long}}}}\r\n2020-08-27 15:14:26,770 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.base.StorageEsInstaller -44154 [main] INFO  [] - create instance_clr_max_completion_port_threads-20200827 index finished, isAcknowledged: true"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-27T07:24:09Z",
+        "body": "There are also templates, not just indexes."
+      },
+      {
+        "user": "ohworld",
+        "created_at": "2020-08-27T08:45:18Z",
+        "body": "Great, after I rebuild and deploy all the components dockers completely, all the UI Tab display correctly, although the oap-server still log some \"listener timeout after waiting for [30000] ms\".\r\nI'm puzzled I've never deloyed skywalking v7.x.x.\r\nThank you for instruction."
+      },
+      {
+        "user": "lixaviers",
+        "created_at": "2020-12-04T07:57:42Z",
+        "body": "Switch versions and get ElasticSearch templates"
+      }
+    ]
+  },
+  {
+    "number": 5375,
+    "title": "Minimal Requirements",
+    "created_at": "2020-08-24T14:21:10Z",
+    "closed_at": "2020-08-24T15:35:19Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5375",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n\r\nWhat is the minimal requirements to run SkyWalking?\r\n\r\nI am trying to run SW on a Kubernetes cluster using MySQL as database. I defined OAP server with memory limits equal to 1024Mi and it crashes after ~40min. If I use H2 as database, it crashes after ~5min.\r\n\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n\r\n7.0.0-es7\r\n\r\n- Which company or project?\r\n\r\nPrivate project.\r\n\r\n- What happened?\r\n\r\nK8s kills pod with status OOMKilled.\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5375/comments",
+    "author": "wandersonwhcr",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-24T15:35:19Z",
+        "body": "Per document, we statemented the h2 is for demo only. Usually, Java app requires 4~8g as minimal recommended memory.\r\n\r\nAlso, we recommend you to use v8 for better performance. "
+      }
+    ]
+  },
+  {
+    "number": 5344,
+    "title": "How to access the same skywalking service in multiple environments?",
+    "created_at": "2020-08-18T03:02:00Z",
+    "closed_at": "2020-08-18T03:14:09Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5344",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ ] Question or discussion\r\n- [ ] Bug\r\n- [X] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n- [X] How to access the same skywalking service in multiple environments?\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n\r\n- Which company or project?\r\n\r\n- What happened?\r\nIf possible, provide a way to reproduce the error. e.g. demo application, component version.\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5344/comments",
+    "author": "gyjx",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-18T03:14:09Z",
+        "body": "What do you mean by how to access? We don't set any limitation for this."
+      },
+      {
+        "user": "gyjx",
+        "created_at": "2020-08-18T04:00:21Z",
+        "body": "I'm sorry, maybe I didn't make it clear. I mean, if I have three links: development, testing and pre release, but I just want to deploy a skywalking service, how will I divide it?"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-18T04:01:16Z",
+        "body": "No, we don't have that. Management is not our agenda today."
+      },
+      {
+        "user": "gyjx",
+        "created_at": "2020-08-18T04:03:52Z",
+        "body": "Does SK not support service partitioning? Do I need to deploy three SK services? dev test pre ...."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-18T04:15:42Z",
+        "body": "You could do anything you want. I just say, we don't have that concept. Why need APM in the tesr and dev env? Strange thing."
+      },
+      {
+        "user": "gyjx",
+        "created_at": "2020-08-18T07:52:37Z",
+        "body": "Because some of our interfaces have to go through pressure test before going online, we hope SK can help us do something."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-18T07:55:29Z",
+        "body": "If you are going to do load test, then use a separate SW cluster. It is recommended."
+      }
+    ]
+  },
+  {
+    "number": 5333,
+    "title": "\u2018Service Avg Throughput\u2019 cpm less than  all 'Running ServiceInstance' cpm of sum, why equals?",
+    "created_at": "2020-08-17T09:14:09Z",
+    "closed_at": "2020-08-17T09:24:55Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/5333",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [x] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\nwhy \u2018Service Avg Throughput\u2019 cpm less than  all 'Running ServiceInstance' cpm of sum in version 7.0.0?\r\nexample:\r\na service cpm is 22525.13cpm , but this service has 8 machine isntances,and every instance cpm is about 16800\uff0c\r\nso why 22525.12 != 16800 * 8?\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n\r\n- Which company or project?\r\n\r\n- What happened?\r\nIf possible, provide a way to reproduce the error. e.g. demo application, component version.\r\n\r\n___\r\n### Requirement or improvement\r\n- Please describe your requirements or improvement suggestions.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/5333/comments",
+    "author": "vcvinci",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-17T09:24:19Z",
+        "body": "This is hard to tell. Do you run SkyWalking in the cluster mode? Are you using the cluster coordinator?"
+      },
+      {
+        "user": "vcvinci",
+        "created_at": "2020-08-17T09:32:24Z",
+        "body": "> This is hard to tell. Do you run SkyWalking in the cluster mode? Are you using the cluster coordinator?\r\n\r\nyes,cluster uses 3 zookeeper, oap has 3 instances. "
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-17T09:34:24Z",
+        "body": "Do you use the real IP rather than `0.0.0.0` for OAP node?"
+      },
+      {
+        "user": "vcvinci",
+        "created_at": "2020-08-17T09:38:52Z",
+        "body": "> Do you use the real IP rather than `0.0.0.0` for OAP node?\r\n\r\nno, i use 0.0.0.0 "
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-17T09:43:08Z",
+        "body": "Then, that is the issue. You must use the unique and real IP for that."
+      },
+      {
+        "user": "vcvinci",
+        "created_at": "2020-08-17T09:45:01Z",
+        "body": "> Then, that is the issue. You must use the unique and real IP for that.\r\n\r\nthank you very much. if a machine launch 2 oap , one oap set grpc port 11800 other one set grpc port 11801, Will it happen the problem of title?"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-08-17T12:22:09Z",
+        "body": "> thank you very much. if a machine launch 2 oap , one oap set grpc port 11800 other one set grpc port 11801, Will it happen the problem of title?\r\n\r\nThis is not about the one VM or more. The key is the IP you registered must accessible from other OAP nodes. That is the OAP cluster."
+      }
+    ]
+  },
+  {
+    "number": 4860,
+    "title": "[Question] ES Client Version",
+    "created_at": "2020-06-04T15:03:25Z",
+    "closed_at": "2020-06-04T15:55:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/4860",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [x] Question\r\n\r\n\r\n- What happen?\r\nI found the maven dependency tree is worng \u3002 es7 dist use elasticsearch client 6.x\r\nrun \r\n`./mvnw dependency:tree`\r\noutput\r\n```\r\n[INFO] --- maven-dependency-plugin:3.1.1:tree (default-cli) @ apache-skywalking-apm-es7 ---\r\n[INFO] org.apache.skywalking:apache-skywalking-apm-es7:pom:8.0.0-SNAPSHOT\r\n[INFO] +- org.apache.skywalking:apm-agent:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  \\- org.apache.skywalking:apm-agent-core:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |     +- org.apache.skywalking:apm-network:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |     |  +- io.grpc:grpc-netty:jar:1.26.0:compile\r\n[INFO] |     |  |  +- io.netty:netty-codec-http2:jar:4.1.42.Final:compile (version selected from constraint [4.1.42.Final,4.1.42.Final])\r\n[INFO] |     |  |  \\- io.netty:netty-handler-proxy:jar:4.1.42.Final:compile\r\n[INFO] |     |  |     \\- io.netty:netty-codec-socks:jar:4.1.42.Final:compile\r\n[INFO] |     |  +- io.grpc:grpc-protobuf:jar:1.26.0:compile\r\n[INFO] |     |  |  +- io.grpc:grpc-api:jar:1.26.0:compile\r\n[INFO] |     |  |  |  \\- io.grpc:grpc-context:jar:1.26.0:compile\r\n[INFO] |     |  |  +- com.google.protobuf:protobuf-java:jar:3.11.0:compile\r\n[INFO] |     |  |  +- com.google.api.grpc:proto-google-common-protos:jar:1.12.0:compile\r\n[INFO] |     |  |  \\- io.grpc:grpc-protobuf-lite:jar:1.26.0:compile\r\n[INFO] |     |  +- io.grpc:grpc-stub:jar:1.26.0:compile\r\n[INFO] |     |  \\- io.netty:netty-tcnative-boringssl-static:jar:2.0.26.Final:compile\r\n[INFO] |     +- org.apache.skywalking:apm-util:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |     +- net.bytebuddy:byte-buddy:jar:1.10.7:compile\r\n[INFO] |     \\- org.apache.skywalking:apm-datacarrier:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] +- org.apache.skywalking:server-starter-es7:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  +- org.apache.skywalking:server-bootstrap:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  |  +- org.apache.skywalking:server-core:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  |  |  +- org.yaml:snakeyaml:jar:1.18:compile\r\n[INFO] |  |  |  +- org.apache.skywalking:library-module:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  |  |  +- org.apache.skywalking:telemetry-api:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  |  |  +- org.apache.skywalking:configuration-api:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  |  |  +- org.apache.skywalking:library-util:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  |  |  |  +- joda-time:joda-time:jar:2.10.5:compile\r\n[INFO] |  |  |  |  \\- com.google.protobuf:protobuf-java-util:jar:3.11.4:compile\r\n[INFO] |  |  |  +- org.apache.skywalking:library-client:jar:8.0.0-SNAPSHOT:compile\r\n[INFO] |  |  |  |  +- com.zaxxer:HikariCP:jar:3.1.0:compile\r\n[INFO] |  |  |  |  +- commons-dbcp:commons-dbcp:jar:1.4:compile\r\n[INFO] |  |  |  |  |  \\- commons-pool:commons-pool:jar:1.5.4:compile\r\n[INFO] |  |  |  |  +- org.elasticsearch.client:elasticsearch-rest-high-level-client:jar:6.3.2:compile\r\n```\r\n\r\nBut i found the  es client lib in `oap-server/server-starter-es7/target/skywalking-oap-assembly/skywalking-oap/libs`  is 7.0.0 \u3002 \r\n\r\nI m confused. \r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/4860/comments",
+    "author": "dominicqi",
+    "comments": [
+      {
+        "user": "kezhenxu94",
+        "created_at": "2020-06-04T15:55:49Z",
+        "body": "@dominicqi we use `dependencyManagement` to manage the dependencies here, and the `man dependency:tree` doesn't resolve that, but the package goal does, and the final dependencies versions are therefore correct"
+      }
+    ]
+  },
+  {
+    "number": 4747,
+    "title": "endpoint maximum number ",
+    "created_at": "2020-05-06T08:17:13Z",
+    "closed_at": "2020-05-06T08:34:54Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/4747",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ ] Question or discussion\r\n___\r\n### Question\r\n- What do you want to know?\r\n**Is the maximum number of endpoint is 10000? In Web UI 'Global Brief'**",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/4747/comments",
+    "author": "smilesheep",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-05-06T08:34:54Z",
+        "body": "It has been removed in 8.0. And it could be more than 10k."
+      }
+    ]
+  },
+  {
+    "number": 4496,
+    "title": "Application will not quit after main() done",
+    "created_at": "2020-03-11T16:02:38Z",
+    "closed_at": "2020-03-12T03:42:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/4496",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\nHere is the example, assume that we have a class `Hello` as defined here\r\n\r\n```java\r\npublic class Hello {\r\n    public static void main(String[] args) {\r\n        System.out.println(\"Hello, World!\");\r\n    }\r\n}\r\n```\r\n\r\nafter doing this\r\n\r\n```bash\r\n java -javaagent:skywalking-agent.jar Hello\r\n```\r\nwe should got `Hello, World!` at terminal stdout, and then the application should quit with status code `0` (which means process quit without any errors)\r\n\r\nHowever, what I got is:\r\n1. the stdout is ok\r\n2. the application KEEPS RUNNING until I trigger `CTRL-C`.  \r\n\r\nMaybe it's a normal circumstance when some non-daemon background threads are still running, but it's still quite a wired phenomenon where the application has done it's work and keeps running without any response for common developer.\r\n___\r\n### Requirement or improvement\r\n- Please describe about your requirements or improvement suggestions.",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/4496/comments",
+    "author": "liuhaoXD",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-03-11T16:21:02Z",
+        "body": "Could you do Thread dump to find out which thread is there? Typically, the agent works for server."
+      },
+      {
+        "user": "liuhaoXD",
+        "created_at": "2020-03-12T02:33:20Z",
+        "body": "Here is the full thread dump:\r\n\r\n```\r\nFull thread dump Java HotSpot(TM) 64-Bit Server VM (25.121-b13 mixed mode):\r\n\r\n\"Attach Listener\" #24 daemon prio=9 os_prio=0 tid=0x00007facbc001000 nid=0x15b46 waiting on condition [0x0000000000000000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"grpc-default-worker-ELG-1-4\" #22 daemon prio=5 os_prio=0 tid=0x00007facac232000 nid=0x15aed runnable [0x00007facd9a37000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\tat sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)\r\n\tat sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)\r\n\tat sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)\r\n\tat sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)\r\n\t- locked <0x00000000f9b863c8> (a org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySet)\r\n\t- locked <0x00000000f9b87430> (a java.util.Collections$UnmodifiableSet)\r\n\t- locked <0x00000000f9b86330> (a sun.nio.ch.EPollSelectorImpl)\r\n\tat sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:755)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:410)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:884)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"grpc-default-worker-ELG-1-3\" #21 daemon prio=5 os_prio=0 tid=0x00007faca40e4800 nid=0x15aec runnable [0x00007facd9b38000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\tat sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)\r\n\tat sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)\r\n\tat sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)\r\n\tat sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)\r\n\t- locked <0x00000000f9b94650> (a org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySet)\r\n\t- locked <0x00000000f9b95708> (a java.util.Collections$UnmodifiableSet)\r\n\t- locked <0x00000000f9b94558> (a sun.nio.ch.EPollSelectorImpl)\r\n\tat sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:755)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:410)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:884)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"grpc-default-worker-ELG-1-2\" #20 daemon prio=5 os_prio=0 tid=0x00007fac9c035000 nid=0x15aeb runnable [0x00007facda242000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\tat sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)\r\n\tat sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)\r\n\tat sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)\r\n\tat sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)\r\n\t- locked <0x00000000f9b9a658> (a org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySet)\r\n\t- locked <0x00000000f9b9b6c0> (a java.util.Collections$UnmodifiableSet)\r\n\t- locked <0x00000000f9b9a5c0> (a sun.nio.ch.EPollSelectorImpl)\r\n\tat sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:755)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:410)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:884)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"grpc-default-worker-ELG-1-1\" #18 daemon prio=5 os_prio=0 tid=0x00007fac9c02d800 nid=0x15ae9 runnable [0x00007facda444000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\tat sun.nio.ch.EPollArrayWrapper.epollWait(Native Method)\r\n\tat sun.nio.ch.EPollArrayWrapper.poll(EPollArrayWrapper.java:269)\r\n\tat sun.nio.ch.EPollSelectorImpl.doSelect(EPollSelectorImpl.java:93)\r\n\tat sun.nio.ch.SelectorImpl.lockAndDoSelect(SelectorImpl.java:86)\r\n\t- locked <0x00000000f9b9fce8> (a org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySet)\r\n\t- locked <0x00000000f9ba10a0> (a java.util.Collections$UnmodifiableSet)\r\n\t- locked <0x00000000f9b9fbf0> (a sun.nio.ch.EPollSelectorImpl)\r\n\tat sun.nio.ch.SelectorImpl.select(SelectorImpl.java:97)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.SelectedSelectionKeySetSelector.select(SelectedSelectionKeySetSelector.java:62)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.select(NioEventLoop.java:755)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:410)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:884)\r\n\tat org.apache.skywalking.apm.dependencies.io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"DestroyJavaVM\" #17 prio=5 os_prio=0 tid=0x00007facf0009800 nid=0x15ad7 waiting on condition [0x0000000000000000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"Service Thread\" #16 daemon prio=9 os_prio=0 tid=0x00007facf0782800 nid=0x15ae7 runnable [0x0000000000000000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"C1 CompilerThread1\" #15 daemon prio=9 os_prio=0 tid=0x00007facf0780000 nid=0x15ae6 waiting on condition [0x0000000000000000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"C2 CompilerThread0\" #14 daemon prio=9 os_prio=0 tid=0x00007facf077e800 nid=0x15ae5 waiting on condition [0x0000000000000000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"pool-1-thread-1\" #12 prio=5 os_prio=0 tid=0x00007facf077b800 nid=0x15ae4 waiting on condition [0x00007facdaf71000]\r\n   java.lang.Thread.State: WAITING (parking)\r\n\tat sun.misc.Unsafe.park(Native Method)\r\n\t- parking to wait for  <0x00000000e3f57810> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)\r\n\tat java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)\r\n\tat java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2039)\r\n\tat java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:442)\r\n\tat org.apache.skywalking.apm.agent.core.commands.CommandService.run(CommandService.java:67)\r\n\tat org.apache.skywalking.apm.util.RunnableWithExceptionProtection.run(RunnableWithExceptionProtection.java:36)\r\n\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\r\n\tat java.util.concurrent.FutureTask.run(FutureTask.java:266)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- <0x00000000e3f575e0> (a java.util.concurrent.ThreadPoolExecutor$Worker)\r\n\r\n\"SkywalkingAgent-5-ServiceAndEndpointRegisterClient-0\" #11 daemon prio=5 os_prio=0 tid=0x00007facf0779000 nid=0x15ae3 waiting on condition [0x00007facdb272000]\r\n   java.lang.Thread.State: TIMED_WAITING (parking)\r\n\tat sun.misc.Unsafe.park(Native Method)\r\n\t- parking to wait for  <0x00000000e3f51938> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)\r\n\tat java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)\r\n\tat java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)\r\n\tat java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"SkywalkingAgent-4-JVMService-consume-0\" #10 daemon prio=5 os_prio=0 tid=0x00007facf0777000 nid=0x15ae2 waiting on condition [0x00007facdb373000]\r\n   java.lang.Thread.State: TIMED_WAITING (parking)\r\n\tat sun.misc.Unsafe.park(Native Method)\r\n\t- parking to wait for  <0x00000000e3f51378> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)\r\n\tat java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)\r\n\tat java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)\r\n\tat java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"SkywalkingAgent-3-JVMService-produce-0\" #9 daemon prio=5 os_prio=0 tid=0x00007facf0775000 nid=0x15ae1 waiting on condition [0x00007facdb474000]\r\n   java.lang.Thread.State: TIMED_WAITING (parking)\r\n\tat sun.misc.Unsafe.park(Native Method)\r\n\t- parking to wait for  <0x00000000e3f50de0> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)\r\n\tat java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)\r\n\tat java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)\r\n\tat java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"SkywalkingAgent-2-GRPCChannelManager-0\" #8 daemon prio=5 os_prio=0 tid=0x00007facf0773000 nid=0x15ae0 waiting on condition [0x00007facdb575000]\r\n   java.lang.Thread.State: TIMED_WAITING (parking)\r\n\tat sun.misc.Unsafe.park(Native Method)\r\n\t- parking to wait for  <0x00000000e3f560f8> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)\r\n\tat java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)\r\n\tat java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)\r\n\tat java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"DataCarrier.DEFAULT.Consumser.0.Thread\" #7 daemon prio=5 os_prio=0 tid=0x00007facf0771800 nid=0x15adf sleeping[0x00007facdb676000]\r\n   java.lang.Thread.State: TIMED_WAITING (sleeping)\r\n\tat java.lang.Thread.sleep(Native Method)\r\n\tat org.apache.skywalking.apm.commons.datacarrier.consumer.ConsumerThread.run(ConsumerThread.java:72)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"SkywalkingAgent-1-LogFileWriter-0\" #6 daemon prio=5 os_prio=0 tid=0x00007facf0215000 nid=0x15ade waiting on condition [0x00007facdb7ac000]\r\n   java.lang.Thread.State: TIMED_WAITING (parking)\r\n\tat sun.misc.Unsafe.park(Native Method)\r\n\t- parking to wait for  <0x00000000e3cc5060> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)\r\n\tat java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:215)\r\n\tat java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2078)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1093)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:809)\r\n\tat java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1067)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1127)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"Signal Dispatcher\" #4 daemon prio=9 os_prio=0 tid=0x00007facf0139800 nid=0x15add runnable [0x0000000000000000]\r\n   java.lang.Thread.State: RUNNABLE\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"Finalizer\" #3 daemon prio=8 os_prio=0 tid=0x00007facf0107000 nid=0x15adc in Object.wait() [0x00007facdbaf9000]\r\n   java.lang.Thread.State: WAITING (on object monitor)\r\n\tat java.lang.Object.wait(Native Method)\r\n\t- waiting on <0x00000000e3bb5700> (a java.lang.ref.ReferenceQueue$Lock)\r\n\tat java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:143)\r\n\t- locked <0x00000000e3bb5700> (a java.lang.ref.ReferenceQueue$Lock)\r\n\tat java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:164)\r\n\tat java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"Reference Handler\" #2 daemon prio=10 os_prio=0 tid=0x00007facf0102000 nid=0x15adb in Object.wait() [0x00007facdbbfa000]\r\n   java.lang.Thread.State: WAITING (on object monitor)\r\n\tat java.lang.Object.wait(Native Method)\r\n\t- waiting on <0x00000000e3bbbd48> (a java.lang.ref.Reference$Lock)\r\n\tat java.lang.Object.wait(Object.java:502)\r\n\tat java.lang.ref.Reference.tryHandlePending(Reference.java:191)\r\n\t- locked <0x00000000e3bbbd48> (a java.lang.ref.Reference$Lock)\r\n\tat java.lang.ref.Reference$ReferenceHandler.run(Reference.java:153)\r\n\r\n   Locked ownable synchronizers:\r\n\t- None\r\n\r\n\"VM Thread\" os_prio=0 tid=0x00007facf00fa800 nid=0x15ada runnable \r\n\r\n\"GC task thread#0 (ParallelGC)\" os_prio=0 tid=0x00007facf001e800 nid=0x15ad8 runnable \r\n\r\n\"GC task thread#1 (ParallelGC)\" os_prio=0 tid=0x00007facf0020800 nid=0x15ad9 runnable \r\n\r\n\"VM Periodic Task Thread\" os_prio=0 tid=0x00007facf0786000 nid=0x15ae8 waiting on condition \r\n\r\nJNI global references: 276\r\n```"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-03-12T02:47:38Z",
+        "body": "I noticed this \r\n```\r\n\r\n\"pool-1-thread-1\" #12 prio=5 os_prio=0 tid=0x00007facf077b800 nid=0x15ae4 waiting on condition [0x00007facdaf71000]\r\n   java.lang.Thread.State: WAITING (parking)\r\n\tat sun.misc.Unsafe.park(Native Method)\r\n\t- parking to wait for  <0x00000000e3f57810> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)\r\n\tat java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)\r\n\tat java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2039)\r\n\tat java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:442)\r\n\tat org.apache.skywalking.apm.agent.core.commands.CommandService.run(CommandService.java:67)\r\n\tat org.apache.skywalking.apm.util.RunnableWithExceptionProtection.run(RunnableWithExceptionProtection.java:36)\r\n\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\r\n\tat java.util.concurrent.FutureTask.run(FutureTask.java:266)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\n   Locked ownable synchronizers:\r\n\t- <0x00000000e3f575e0> (a java.util.concurrent.ThreadPoolExecutor$Worker)\r\n```\r\n\r\nBut the strange is, `CommandService#shutdown` already has `executorService.shutdown();`"
+      },
+      {
+        "user": "liuhaoXD",
+        "created_at": "2020-03-12T03:20:10Z",
+        "body": "I did a test, actually it seems that `ServiceManager.INSTANCE.shutdown()` was not invoked, so did the `executorService.shutdown()` :\r\n\r\n```java\r\n        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {\r\n            @Override public void run() {\r\n                System.out.println(\"skywalking agent shutting down\");\r\n                ServiceManager.INSTANCE.shutdown();\r\n                System.out.println(\"skywalking agent shut down\");\r\n            }\r\n        }, \"skywalking service shutdown thread\"));\r\n```\r\n\r\nafter I called `System.exit(0)` in enhanced Application explicitly, everything works well and the addShutdownHook was executed too."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-03-12T03:42:13Z",
+        "body": "Yes. You should call exit in jre1.8+"
+      },
+      {
+        "user": "kezhenxu94",
+        "created_at": "2020-03-12T09:21:32Z",
+        "body": "From my point of view, as an agent, all threads should be daemon? @wu-sheng "
+      }
+    ]
+  },
+  {
+    "number": 4492,
+    "title": "Is 6.6 oap cluster can receive  trace from 6.5 Agent \uff1f",
+    "created_at": "2020-03-11T08:42:32Z",
+    "closed_at": "2020-03-11T08:56:17Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/4492",
+    "body": "\r\n### Question\r\n- What do you want to know?\r\nIs 6.6 oap cluster can receive  trace from 6.5 Agent .\r\nI update my cluster from 6.5 to 6.6. But  some agent is 6.5 \u3002\r\nThe oap clusters  can run . But some trace is bad. Service can not show right name ,It it show VNode....",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/4492/comments",
+    "author": "seifeHu",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-03-11T08:56:17Z",
+        "body": "I don't think that is related to 6.5->6.6. It is compatible, and agent should be able hot reboot if you erase all data int the storage.\r\n\r\nI am not sure what do you mean bad. VNode is a UI enhancement to tell you, some part of the traces has not been reported."
+      }
+    ]
+  },
+  {
+    "number": 4404,
+    "title": "Whether Java agent supports fetching exception stack trace?",
+    "created_at": "2020-02-24T02:30:36Z",
+    "closed_at": "2020-02-24T02:35:24Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/4404",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ x ] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\nWhether Java agent supports fetching exception stack trace?\r\n___",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/4404/comments",
+    "author": "long187",
+    "comments": [
+      {
+        "user": "long187",
+        "created_at": "2020-02-24T08:27:11Z",
+        "body": "No I haven't. \r\nSometimes, developers catch exceptions, but they don't print them to the log. Can SkyWalking Java Agent catch these Exceptions?"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-02-24T08:29:02Z",
+        "body": "If they catched, there is nothing we could do. Instrumenting exception is not a good idea, if you were thinking about this. This should be inside the coding style scope, can't be taken care of by the APM system."
+      }
+    ]
+  },
+  {
+    "number": 4233,
+    "title": "how long will  modify  the SW_STORAGE_ES_RECORD_DATA_TTL  do effect ?",
+    "created_at": "2020-01-14T07:12:54Z",
+    "closed_at": "2020-01-14T07:24:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/4233",
+    "body": "### Question\r\n- What do you want to know?\r\nFirst My cluster 's SW_STORAGE_ES_RECORD_DATA_TTL is default value (7 days)\r\nnow I change the value to 3 days .\r\n\r\nI restart all my skywalking cluster nodes .But the index segment-****  still have 7  indeies.\r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/4233/comments",
+    "author": "seifeHu",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2020-01-14T07:24:37Z",
+        "body": "It will active at middle night."
+      }
+    ]
+  },
+  {
+    "number": 2907,
+    "title": "[BUG] Can not locate agent jar file",
+    "created_at": "2019-06-19T04:12:08Z",
+    "closed_at": "2019-06-19T05:30:48Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/2907",
+    "body": "when i use grpc register service find a problem\uff0cin my project add pom\r\n<dependency>\r\n    <groupId>org.apache.skywalking</groupId>\r\n    <artifactId>apm-agent-core</artifactId>\r\n    <version>6.1.0</version>\r\n</dependency>\r\nand apm-agent-core.jar in WEB-INF/lib/\r\nuse main func run GRPCChannelManager connect success\r\nbut build my project as war in tomcat run connect fair  \r\nerror:Can not locate agent jar file\r\ni found AgentPackagePath.findPath use ClassLoader.getSystemClassLoader.getResource get URL\r\nin my project return null so get error:Can not locate agent jar file\r\ni change this code to \r\nURL resource = ClassLoader.getSystemClassLoader().getResource(classResourcePath); \r\nif (resource == null) {\r\n   resource = AgentPackagePath.class.getClassLoader().getResource(classResourcePath); \r\n}\r\nin tomcat run connect success\r\nbut i am not sure this way is the best  can your give me some suggest",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/2907/comments",
+    "author": "zou79189747",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-06-19T05:30:48Z",
+        "body": "Don't put agent.jar or any other SkyWalking plugin jars in your classpath. SkyWalking loads them automatically."
+      },
+      {
+        "user": "zou79189747",
+        "created_at": "2019-06-20T01:11:00Z",
+        "body": "\u6211\u8fd9\u8fb9\u7684\u573a\u666f\u662f\u5168\u94fe\u8def\u5206\u6790\uff0c\u6709C\u5199\u7684\u7f51\u5173\uff0c\u6709java\u5199\u7684\u5fae\u670d\u52a1\uff0cjava\u5fae\u670d\u52a1\u90a3\u5feb\u6ca1\u4ec0\u4e48\u95ee\u9898\u76f4\u63a5-javaagent\u5c31\u53ef\u4ee5\u4e86\uff0c\u4f46\u662fC\u8fd9\u8fb9\u6211\u4eec\u7684\u65b9\u6848\u662f \u901a\u8fc7\u4e00\u4e2a\u6389\u7528\u4e00\u4e2ajava\u540e\u53f0\u63d0\u8fc7\u7684http\u63a5\u53e3\u6765\u6ce8\u518c\u670d\u52a1\uff0c \u8be5\u63a5\u53e3\u8c03\u7528skywalking grpc \u6765\u6ce8\u518c\u670d\u52a1\uff0c\u63d0\u8fc7java\u63a5\u53e3\u7684\u540e\u53f0\u662f\u4e00\u4e2aweb\u5de5\u7a0b\uff0c\u4e14\u5728tomcat catalin.bat\u91cc\u9762\u6ca1\u6709\u4f7f\u7528-javaagent \uff0c\u8fd9\u4e2a\u573a\u666f\u4e0b\u6211\u5c31\u5f15\u7528\u4e86apm-agent-core\u8fd9\u4e2a\u4f9d\u8d56\uff0c\u8c03\u7528doServiceRegister\u6ce8\u518c\u670d\u52a1\uff0c\u7136\u540e\u5728tomcat\u73af\u5883\u4e0b \u62a5Can not locate agent jar file\u8fd9\u4e2a\u9519\uff0c\u8c03\u8bd5\u53d1\u73b0URL resource = ClassLoader.getSystemClassLoader().getResource(classResourcePath); resource\u4e3anull ,\u60f3\u8bf7\u95ee\u4e00\u4e0b\u8fd9\u4e2a\u573a\u666f\u6211\u4fee\u6539\u6e90\u7801\u6709\u95ee\u9898\u5417\uff0c\u8fd8\u662f\u6709\u5176\u4ed6\u66f4\u597d\u7684\u65b9\u5f0f\u89e3\u51b3"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-06-20T01:13:28Z",
+        "body": "English only. I have said what is the issue. `-javaagent` is also needed in Tomcat, and don't put agent in Tomcat lib or your application lib, a.k.a. not in any classpath of JVM."
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-06-20T03:45:59Z",
+        "body": "> thanks ! as you said do , it is ok now. but this way i have to use skywalking in my web project , this data is not needed\r\n\r\nWhat do you mean `data is not needed`? Confusing."
+      },
+      {
+        "user": "zou79189747",
+        "created_at": "2019-06-21T06:05:15Z",
+        "body": "I don't need use skywalking to monitor the web project , if add -javaagent in tomcat  , it will send my web project monitor data to ES , like Service \u3001ServiceInstance \u3001segment , this datas is no use to me. "
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-06-21T06:08:34Z",
+        "body": "I am totally lost. If you don't need, why add SkyWalking there? Why ask a question in SkyWalking community?"
+      },
+      {
+        "user": "zou79189747",
+        "created_at": "2019-06-21T07:26:35Z",
+        "body": "I use SkyWalking in other Microservices \uff0cIn this web project just provide restful Interface to Third party\uff0chelp them  register service \u3001serviceInstance  and send trace segment to skywalking storage \uff0cthis web project it's not must be monitor"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-06-22T02:37:55Z",
+        "body": "The same question, if you don't need it, just don't attach the agent to JVM.\r\n\r\nAre you asking severl web apps in one Tomcat container? Some are monitoring targets, others are not? I am just guessing because you don't give me a very clear context."
+      }
+    ]
+  },
+  {
+    "number": 2876,
+    "title": "I can't find the article  \u201cPerformance Test\u201d.",
+    "created_at": "2019-06-14T09:58:50Z",
+    "closed_at": "2019-06-14T10:00:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/2876",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [X] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n I found the article **\u2018Performance Test\u2019** in docs some time ago.but can't find int now because the old link can't be opened.  Can you give it to me? many thanks. \r\n",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/2876/comments",
+    "author": "gzshilu",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-06-14T10:00:13Z",
+        "body": "Go to agent setup document. They are at the bottom of the page."
+      }
+    ]
+  },
+  {
+    "number": 2310,
+    "title": "Top 20 Slow Traces show issue",
+    "created_at": "2019-03-02T10:01:53Z",
+    "closed_at": "2019-03-02T10:12:38Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/2310",
+    "body": "How can I see the Top 20 Slow data before today,now I only can see today data.",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/2310/comments",
+    "author": "Stephen-sen",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-03-02T10:12:38Z",
+        "body": "It doesn't release yet. From I known, that is based on time duration of whole page. No difference. Also, it is affected by record ttl, so could be deleted because you set ttl short for segment."
+      },
+      {
+        "user": "Stephen-sen",
+        "created_at": "2019-03-02T10:14:34Z",
+        "body": "where I can set ttl ?"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-03-02T10:15:32Z",
+        "body": "application.yml in config. You should know, this could make you storage huge data, if you set ttl long."
+      },
+      {
+        "user": "Stephen-sen",
+        "created_at": "2019-03-02T10:18:28Z",
+        "body": "is recordDataTTL?from application.yml I see it is 90 minute"
+      }
+    ]
+  },
+  {
+    "number": 2248,
+    "title": "agent can not work after upgrade from 6.0.0-beta to 6.0.0-GA",
+    "created_at": "2019-02-15T09:53:53Z",
+    "closed_at": "2019-02-15T10:26:05Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/2248",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\nsw agent can not work after upgrade from 6.0.0-beta to 6.0.0-GA (we have upgraded all agents, oap and webapp service). they all worked before upgraded.\r\n\r\nhere is the agent's log:\r\nDEBUG 2019-02-15 17:49:15:828 ServiceAndEndpointRegisterClient :  ServiceAndEndpointRegisterClient running, status:CONNECTED.\r\nERROR 2019-02-15 17:49:15:833 ServiceAndEndpointRegisterClient :  ServiceAndEndpointRegisterClient execute fail.\r\norg.apache.skywalking.apm.dependencies.io.grpc.StatusRuntimeException: UNKNOWN\r\n\tat org.apache.skywalking.apm.dependencies.io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:222)\r\n\tat org.apache.skywalking.apm.dependencies.io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:203)\r\n\tat org.apache.skywalking.apm.dependencies.io.grpc.stub.ClientCalls.blockingUnaryCall(ClientCalls.java:132)\r\n\tat org.apache.skywalking.apm.network.register.v2.RegisterGrpc$RegisterBlockingStub.doServiceInstanceRegister(RegisterGrpc.java:393)\r\n\tat org.apache.skywalking.apm.agent.core.remote.ServiceAndEndpointRegisterClient.run(ServiceAndEndpointRegisterClient.java:126)\r\n\tat org.apache.skywalking.apm.util.RunnableWithExceptionProtection.run(RunnableWithExceptionProtection.java:36)\r\n\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\r\n\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java:308)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)\r\n\tat java.lang.Thread.run(Thread.java:745)",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/2248/comments",
+    "author": "foxracle",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-02-15T10:26:05Z",
+        "body": "This error looks no related to version update. More likely, your backend does not startup right. The models of backend have been changed, so recheck your backend."
+      },
+      {
+        "user": "foxracle",
+        "created_at": "2019-02-15T11:02:49Z",
+        "body": "3q\r\nthis is the backend's log:\r\n\r\n2019-02-15 18:56:53,801 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.lock.RegisterLockDAOImpl - 71 [DataCarrier.IndicatorPersistentWorker.endpoint_inventory.Consumser.0.Thread] WARN  [] - Try to lock the row with the id 16 failure, error message: null\r\n2019-02-15 18:56:53,812 - org.apache.skywalking.oap.server.core.register.worker.RegisterPersistentWorker - 98 [DataCarrier.IndicatorPersistentWorker.endpoint_inventory.Consumser.0.Thread] INFO  [] - EndpointInventory inventory register try lock and increment sequence failure.\r\n2019-02-15 18:56:53,810 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.cache.ServiceInventoryCacheEsDAO - 86 [grpc-default-executor-4] ERROR [] - null\r\njava.lang.NullPointerException: null\r\n        at org.apache.skywalking.oap.server.core.register.ServiceInventory$Builder.map2Data(ServiceInventory.java:207) ~[server-core-6.0.0-GA.jar:6.0.0-GA]\r\n        at org.apache.skywalking.oap.server.storage.plugin.elasticsearch.cache.ServiceInventoryCacheEsDAO.get(ServiceInventoryCacheEsDAO.java:81) [storage-elasticsearch-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n        at org.apache.skywalking.oap.server.core.cache.ServiceInventoryCache.get(ServiceInventoryCache.java:100) [server-core-6.0.0-GA.jar:6.0.0-GA]\r\n        at org.apache.skywalking.oap.server.core.register.service.ServiceInventoryRegister.heartbeat(ServiceInventoryRegister.java:111) [server-core-6.0.0-GA.jar:6.0.0-GA]\r\n        at org.apache.skywalking.oap.server.receiver.register.provider.handler.v6.grpc.ServiceInstancePingServiceHandler.doPing(ServiceInstancePingServiceHandler.java:59) [skywalking-register-receiver-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n        at org.apache.skywalking.apm.network.register.v2.ServiceInstancePingGrpc$MethodHandlers.invoke(ServiceInstancePingGrpc.java:210) [apm-network-6.0.0-GA.jar:6.0.0-GA]\r\n        at io.grpc.stub.ServerCalls$UnaryServerCallHandler$UnaryServerCallListener.onHalfClose(ServerCalls.java:171) [grpc-stub-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl.halfClosed(ServerCallImpl.java:283) [grpc-core-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener$1HalfClosed.runInContext(ServerImpl.java:707) [grpc-core-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:37) [grpc-core-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:123) [grpc-core-1.15.1.jar:1.15.1]\r\n        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) [?:1.8.0_181]\r\n        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) [?:1.8.0_181]\r\n        at java.lang.Thread.run(Thread.java:748) [?:1.8.0_181]\r\n2019-02-15 18:56:53,812 - org.apache.skywalking.oap.server.core.register.service.ServiceInventoryRegister - 118 [grpc-default-executor-4] WARN  [] - Service 9 heartbeat, but not found in storage.\r\n2019-02-15 18:56:53,813 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.lock.RegisterLockDAOImpl - 71 [DataCarrier.IndicatorPersistentWorker.endpoint_inventory.Consumser.0.Thread] WARN  [] - Try to lock the row with the id 16 failure, error message: null\r\n2019-02-15 18:56:53,813 - org.apache.skywalking.oap.server.core.register.worker.RegisterPersistentWorker - 98 [DataCarrier.IndicatorPersistentWorker.endpoint_inventory.Consumser.0.Thread] INFO  [] - EndpointInventory inventory register try lock and increment sequence failure.\r\n2019-02-15 18:56:53,814 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.lock.RegisterLockDAOImpl - 71 [DataCarrier.IndicatorPersistentWorker.endpoint_inventory.Consumser.0.Thread] WARN  [] - Try to lock the row with the id 16 failure, error message: null\r\n2019-02-15 18:56:53,814 - org.apache.skywalking.oap.server.core.register.worker.RegisterPersistentWorker - 98 [DataCarrier.IndicatorPersistentWorker.endpoint_inventory.Consumser.0.Thread] INFO  [] - EndpointInventory inventory register try lock and increment sequence failure.\r\n"
+      },
+      {
+        "user": "foxracle",
+        "created_at": "2019-02-15T11:06:55Z",
+        "body": "it seems that the problem related to es, any hints? during the upgrade and restart, we did not change anything for es"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-02-15T11:18:22Z",
+        "body": "The es models changes. You need to change that manually, or use a new empty es."
+      },
+      {
+        "user": "foxracle",
+        "created_at": "2019-02-18T05:44:38Z",
+        "body": "after delete all old indexes of es, it works. thank you.\r\nIs there any document for upgrade?\r\nhere is my upgrade procedure for upgrading from 6.0.0-beta to 6.0.0-GA(it may not be the best practice)\r\n1: stop all backend servers\r\n2: delete all old indexes of sw(you can delete all indexes that starting with the value of storage.elasticsearch.nameSpace)\r\n3: upgrade all backend servers\r\n4: upgrade all agent and restart all application that start with javaagent (I used sw for java app)\r\n5: start all backend servers\r\n"
+      }
+    ]
+  },
+  {
+    "number": 2224,
+    "title": "org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2",
+    "created_at": "2019-01-30T08:20:58Z",
+    "closed_at": "2019-01-30T08:28:48Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/2224",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [ ] Question or discussion\r\n- [\u2705 ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\n\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n6.0.0GA for JDK1.8\u3001CentOS7 64bit\r\n\r\n- Which company or project?\r\n\r\n- What happen?\r\n\r\nI've 4 Server Application config the anget,but the Webpage is 0\u3002\r\nshow me the Skywaking server log.\r\n`\r\n2019-01-30 16:00:42,699 - org.apache.skywalking.oap.server.storage.plugin.elasticsearch.cache.ServiceInventoryCacheEsDAO - 86 [grpc-default-executor-0] ERROR [] - null\r\njava.lang.NullPointerException: null\r\n2019-01-30 16:00:42,699 - org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2 - 111 [grpc-default-executor-0] ERROR [] - null\r\njava.lang.NullPointerException: null\r\n\tat org.apache.skywalking.oap.server.receiver.trace.provider.parser.standardization.SpanIdExchanger.exchange(SpanIdExchanger.java:119) ~[skywalking-trace-receiver-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n\tat org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2.preBuild(SegmentParseV2.java:146) ~[skywalking-trace-receiver-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n\tat org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2.parse(SegmentParseV2.java:89) [skywalking-trace-receiver-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n\tat org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2$Producer.send(SegmentParseV2.java:265) [skywalking-trace-receiver-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n\tat org.apache.skywalking.oap.server.receiver.trace.provider.handler.v6.grpc.TraceSegmentReportServiceHandler$1.onNext(TraceSegmentReportServiceHandler.java:58) [skywalking-trace-receiver-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n\tat org.apache.skywalking.oap.server.receiver.trace.provider.handler.v6.grpc.TraceSegmentReportServiceHandler$1.onNext(TraceSegmentReportServiceHandler.java:50) [skywalking-trace-receiver-plugin-6.0.0-GA.jar:6.0.0-GA]\r\n\tat io.grpc.stub.ServerCalls$StreamingServerCallHandler$StreamingServerCallListener.onMessage(ServerCalls.java:248) [grpc-stub-1.15.1.jar:1.15.1]\r\n\tat io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl.messagesAvailable(ServerCallImpl.java:263) [grpc-core-1.15.1.jar:1.15.1]\r\n\tat io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener$1MessagesAvailable.runInContext(ServerImpl.java:683) [grpc-core-1.15.1.jar:1.15.1]\r\n\tat io.grpc.internal.ContextRunnable.run(ContextRunnable.java:37) [grpc-core-1.15.1.jar:1.15.1]\r\n\tat io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:123) [grpc-core-1.15.1.jar:1.15.1]\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149) [?:1.8.0_144]\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) [?:1.8.0_144]\r\n\tat java.lang.Thread.run(Thread.java:748) [?:1.8.0_144]\r\n`\r\n___\r\n### Requirement or improvement\r\n- Please describe about your requirements or improvement suggestions.",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/2224/comments",
+    "author": "xiaour",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-01-30T08:28:48Z",
+        "body": "This isn't bug. It is caused by the data deleted from storage, but agent doesn't restart."
+      },
+      {
+        "user": "yijiuping",
+        "created_at": "2019-06-27T14:47:10Z",
+        "body": "I'm using 6.1.0, and still have this issue. :)\r\n\r\n2019-06-26 21:08:58,569 - org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2 - 114 [grpc-default-executor-0] ERROR [] - null\r\njava.lang.NullPointerException: null\r\n        at org.apache.skywalking.oap.server.receiver.trace.provider.parser.standardization.SpanIdExchanger.exchange(SpanIdExchanger.java:119) ~[skywalking-trace-receiver-plugin-6.1.0.jar:6.1.0]\r\n        at org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2.preBuild(SegmentParseV2.java:149) ~[skywalking-trace-receiver-plugin-6.1.0.jar:6.1.0]\r\n        at org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2.parse(SegmentParseV2.java:92) [skywalking-trace-receiver-plugin-6.1.0.jar:6.1.0]\r\n        at org.apache.skywalking.oap.server.receiver.trace.provider.parser.SegmentParseV2$Producer.send(SegmentParseV2.java:270) [skywalking-trace-receiver-plugin-6.1.0.jar:6.1.0]\r\n        at org.apache.skywalking.oap.server.receiver.trace.provider.handler.v6.grpc.TraceSegmentReportServiceHandler$1.onNext(TraceSegmentReportServiceHandler.java:58) [skywalking-trace-receiver-plugin-6.1.0.jar:6.1.0]\r\n        at org.apache.skywalking.oap.server.receiver.trace.provider.handler.v6.grpc.TraceSegmentReportServiceHandler$1.onNext(TraceSegmentReportServiceHandler.java:50) [skywalking-trace-receiver-plugin-6.1.0.jar:6.1.0]\r\n        at io.grpc.stub.ServerCalls$StreamingServerCallHandler$StreamingServerCallListener.onMessage(ServerCalls.java:248) [grpc-stub-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.ServerCallImpl$ServerStreamListenerImpl.messagesAvailable(ServerCallImpl.java:263) [grpc-core-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.ServerImpl$JumpToApplicationThreadServerStreamListener$1MessagesAvailable.runInContext(ServerImpl.java:683) [grpc-core-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.ContextRunnable.run(ContextRunnable.java:37) [grpc-core-1.15.1.jar:1.15.1]\r\n        at io.grpc.internal.SerializingExecutor.run(SerializingExecutor.java:123) [grpc-core-1.15.1.jar:1.15.1]\r\n        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [?:1.8.0_131]\r\n        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [?:1.8.0_131]\r\n        at java.lang.Thread.run(Thread.java:748) [?:1.8.0_131]\r\n\r\n@wu-sheng "
+      },
+      {
+        "user": "stalary",
+        "created_at": "2019-12-12T11:13:39Z",
+        "body": "I've had this problem too, but I don't know which clients are using it. What should I do"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2019-12-12T14:49:58Z",
+        "body": "> I've had this problem too, but I don't know which clients are using it. What should I do\r\n\r\nI think it is impossible to know, unless to open the logs(will be tons of logs, be careful). That is why the latest releases have agent hot reboot."
+      }
+    ]
+  },
+  {
+    "number": 2065,
+    "title": "DiscoveryRestServiceClient :  Find server list fail",
+    "created_at": "2018-12-18T11:58:27Z",
+    "closed_at": "2018-12-18T12:12:18Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/2065",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- What do you want to know?\r\nConfiguring the collection server failed\r\n___\r\n### Bug\r\n- Which version of SkyWalking, OS and JRE?\r\n6.0.0\r\n- Which company or project?\r\n\r\n- What happen?\r\n\r\n1. I completed the SkyWalking deployment on a server, which can be verified from the three ports that were launched.\r\n2. I started the application on another server and expect to send the data to the server through the proxy. But unfortunately the following error has occurred:\r\n```\r\nERROR 2018-12-18 19:40:50:358 DiscoveryRestServiceClient :  Find server list fail. \r\norg.apache.skywalking.apm.agent.core.remote.RESTResponseStatusError: Unexpected service response code: 404\r\n\tat org.apache.skywalking.apm.agent.core.remote.DiscoveryRestServiceClient.findServerList(DiscoveryRestServiceClient.java:92)\r\n\tat org.apache.skywalking.apm.agent.core.remote.DiscoveryRestServiceClient.run(DiscoveryRestServiceClient.java:77)\r\n\tat org.apache.skywalking.apm.util.RunnableWithExceptionProtection.run(RunnableWithExceptionProtection.java:36)\r\n\tat java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)\r\n\tat java.util.concurrent.FutureTask.runAndReset(FutureTask.java:308)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$301(ScheduledThreadPoolExecutor.java:180)\r\n\tat java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:294)\r\n\tat java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)\r\n\tat java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)\r\n\tat java.lang.Thread.run(Thread.java:748)\r\n```\r\n3. I started to detect if I could connect to the other end on this server. The answer is yes. I can verify this problem with TELNET.\r\n```\r\n[root@dev /www/test-service]# telnet 10.0.0.0 11800\r\nTrying 10.0.0.0...\r\nConnected to 10.0.0.0.\r\nEscape character is '^]'.\r\n```\r\n4. Since the target port is connectable, why doesn't SkyWalking think so?\r\n```\r\ncollector.servers=10.0.0.0:11800\r\n```",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/2065/comments",
+    "author": "tianmingxing",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2018-12-18T12:12:18Z",
+        "body": "No service discovery in 6.x. Are you using 5.x agent to connect 6's backend?"
+      },
+      {
+        "user": "tianmingxing",
+        "created_at": "2018-12-18T12:15:42Z",
+        "body": "Yes, the version of the agent I use is 5.x. Is it normal after upgrading to 6.x?"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2018-12-18T12:18:18Z",
+        "body": "For considering cloud native, the load balance is not skywalking agent responsibility. So removed in 6.x. If you want to use 6.x backend, please upgrade the agents. No big change in agent core."
+      }
+    ]
+  },
+  {
+    "number": 1771,
+    "title": "Some questions about the agent collecting data",
+    "created_at": "2018-10-16T06:10:37Z",
+    "closed_at": "2018-10-16T15:13:35Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/1771",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n\r\n- [x] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [x] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n- How often does the agent report data to the collector?Can it be configured?\uff08\u63a2\u9488\u53d1\u9001\u6570\u636e\u7684\u65f6\u95f4\u95f4\u9694\u662f\u591a\u5c11\uff1f\u662f\u5426\u80fd\u914d\u7f6e\uff1f\uff09\r\n- How big is the agent buffer setting? Can it be configured?\uff08\u63a2\u9488\u6536\u96c6\u7684\u6570\u636e\u7f13\u5b58\u8bbe\u7f6e\u4e86\u591a\u5927\uff1f\u662f\u5426\u80fd\u914d\u7f6e\uff1f\uff09\r\n\r\n___\r\n### Requirement or improvement\r\n- Can you provide a custom collection strategy? Can do special requests will be collected\u3002\uff08\u80fd\u5426\u63d0\u4f9b\u81ea\u5b9a\u4e49\u6536\u96c6\u7b56\u7565\uff0c\u53ef\u4ee5\u505a\u5230\u6307\u5b9a\u7279\u6b8a\u8bf7\u6c42\u90fd\u4f1a\u6536\u96c6\uff09\r\n\r\nthank",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/1771/comments",
+    "author": "cyejing",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2018-10-16T15:13:35Z",
+        "body": "> How often does the agent report data to the collector? Can it be configured?\r\n\r\nConsume per 20 ms. See `TraceSegmentServiceClient#L69`. We use DataCarrier's default settings. It is not open now.\r\n\r\n> How big is the agent buffer setting? Can it be configured?\r\n\r\nSee `org.apache.skywalking.apm.agent.core.conf.Config#Buffer`. Default channelSize * bufferSize. You could set anything in Config through `agent.config`"
+      },
+      {
+        "user": "cyejing",
+        "created_at": "2018-10-18T08:45:48Z",
+        "body": "This helped me.\r\nConsume per 20 ms. I think this is a problem. if 20ms have a lot of data into DataCarrier . datacarrier will be discarded data . datacarrier buffer strategy is `BufferStrategy.IF_POSSIBLE`. \r\nHow improve\uff1f"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2018-10-18T08:47:26Z",
+        "body": "How many traces do you intend to add into the buffer in 20ms cycle? I am confusing."
+      }
+    ]
+  },
+  {
+    "number": 1545,
+    "title": "Is motan rpc supported from skywaking version 5.x?",
+    "created_at": "2018-08-14T03:22:11Z",
+    "closed_at": "2018-08-16T02:04:59Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/1545",
+    "body": "Hi. Is motan rpc supported from skywaking version 5.x?\r\n\r\nBecause 5.x is not stable version, I download the version 3.2.6, but not found the motan support. Then I looked over the issue history, it seems motan rpc is not supported before skywalking version 5.x according to the issue timestamp.\r\n\r\nExpect to your answer, 3q much.",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/1545/comments",
+    "author": "hepyu",
+    "comments": [
+      {
+        "user": "hepyu",
+        "created_at": "2018-08-14T03:29:13Z",
+        "body": "BTW, is there some docs about how to integrate motan rpc into skywalking? I still not found the motan config in application.yml from apache-skywalking-apm-incubating-5.0.0-beta2.tar.gz that the latest version, or I am in the wrong way?"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2018-08-14T03:42:40Z",
+        "body": "I think 5.0.0-beta2 is stable enough. Feel free to use that. And for SkyWalking auto instrument, no need to set anything particular for motan, just follow documents to set agent, the motan will effect automatically.\r\n\r\n:P Magic part of auto instrument agent."
+      },
+      {
+        "user": "hepyu",
+        "created_at": "2018-08-14T10:11:38Z",
+        "body": "Actually, I still want to know if skywalking version 3.2.6 support motan rpc, sorry to disturb you again, I am the obsession...3q~"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2018-08-14T10:47:57Z",
+        "body": "I can't remember that. You can switch to that tag, if no plugin source codes, that is the answer."
+      },
+      {
+        "user": "hepyu",
+        "created_at": "2018-08-16T02:03:43Z",
+        "body": "I looked over the code according to your advice, version 3.2.6 support motan, and deploy it to validate, it works. 3QS a lot~~"
+      }
+    ]
+  },
+  {
+    "number": 1237,
+    "title": "Does the alarm have documentation?",
+    "created_at": "2018-05-17T09:59:22Z",
+    "closed_at": "2018-05-21T08:35:33Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/1237",
+    "body": "Please answer these questions before submitting your issue.\r\n\r\n- Why do you submit this issue?\r\n- [1 ] Question or discussion\r\n- [ ] Bug\r\n- [ ] Requirement\r\n- [ ] Feature or performance improvement\r\n\r\n___\r\n### Question\r\n\r\nSee the alarm function, but do not know how to use\r\n--using Google Translate",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/1237/comments",
+    "author": "tangmingming",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2018-05-17T12:33:57Z",
+        "body": "Please look your `application.yml` in your collector config directory. The following settings are alarm related. And I think it is easy to understand. \r\n\r\n```yaml\r\n# alarm threshold\r\n    applicationApdexThreshold: 2000\r\n    serviceErrorRateThreshold: 10.00\r\n    serviceAverageResponseTimeThreshold: 2000\r\n    instanceErrorRateThreshold: 10.00\r\n    instanceAverageResponseTimeThreshold: 2000\r\n    applicationErrorRateThreshold: 10.00\r\n    applicationAverageResponseTimeThreshold: 2000\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 546,
+    "title": "druid + mysql\uff1acompatibility problem?",
+    "created_at": "2017-10-26T01:56:38Z",
+    "closed_at": "2017-10-27T02:51:35Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/546",
+    "body": "### What version of sky-walking are you using?\r\n(the latest version of sky-walkiing) + druid-1.0.17.jar + mysql-connector-java-5.1.13.jar\r\n----------------------------------------------------\r\n\r\nWhen druid database source init, he will validate every connection he create. He invoke method  **pingInternal** in **com.mysql.jdbc.MySQLConnection** as default.But using sky-walking,the connection is proxy by **org.skywalking.apm.plugin.jdbc.SWConnection**,then druid execute the below code has different result.\r\n// clazz == com.mysql.jdbc.MySQLConnection\r\n// conn == org.skywalking.apm.plugin.jdbc.SWConnection\r\n     clazz.isAssignableFrom(conn.getClass())\r\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n\u4e5f\u5c31\u662f\u8bf4druid\u6846\u67b6\u5728\u68c0\u6d4b\u6570\u636e\u5e93\u8fde\u63a5\u65f6\u60f3\u7528\u5230MySQLConnection\u7684\u7279\u6709\u65b9\u6cd5\uff0c\u5bfc\u81f4\u7a0b\u5e8f\u6709\u70b9\u4e0d\u517c\u5bb9\uff0c\u4e0d\u4f7f\u7528ping\u65b9\u6cd5\u68c0\u67e5\u8fde\u63a5\u3002\u521a\u624ddruid-1.0.17\u7684\u68c0\u6d4bsql\u4e3a\u7a7a\u62a5\u9519\uff0c\u4e4b\u540e\u7684\u7248\u672c\u90fd\u6709\u9ed8\u8ba4\u7684sql\u3002\r\n\u6211\u60f3\u95ee\u4e00\u4e0b\uff0c\u6709\u6ca1\u6709\u4ec0\u4e48\u529e\u6cd5\u4ecesky-walking\u6846\u67b6\u5c42\u6b21\u6765\u89e3\u51b3\u8fd9\u4e2a\u95ee\u9898\uff0c\u5c3d\u53ef\u80fd\u517c\u5bb9\u5df2\u6709\u7684\u5e94\u7528\uff0c\u540c\u65f6\u4e0d\u60f3\u589e\u52a0\u5bf9mysql-connector-java\u5305\u7684\u4f9d\u8d56\u3002\u76ee\u524dSWConnection\u53ea\u662fjava.sql.Connection\u7684\u5b50\u7c7b\uff0c\u6ca1\u60f3\u5230\u7279\u522b\u597d\u7684\u65b9\u6cd5\u3002\r\n\r\n\u5176\u4ed6\u89e3\u51b3\u65b9\u6cd5\uff1a\u5176\u5b9e\u53ef\u4ee5\u5347\u7ea7druid\u6846\u67b6\u6216\u8005\u589e\u52a0\u68c0\u6d4bsql=\"select 1\"\u89e3\u51b3\u95ee\u9898\u3002\r\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>  \r\n\r\n        ` if (usePingMethod) {\r\n            if (conn instanceof DruidPooledConnection) {\r\n                conn = ((DruidPooledConnection) conn).getConnection();\r\n            }\r\n            if (conn instanceof ConnectionProxy) {\r\n                conn = ((ConnectionProxy) conn).getRawObject();\r\n            }\r\n            if (clazz.isAssignableFrom(conn.getClass())) {\r\n                if (validationQueryTimeout < 0) {\r\n                    validationQueryTimeout = DEFAULT_VALIDATION_QUERY_TIMEOUT;\r\n                }\r\n                try {\r\n                    ping.invoke(conn, true, validationQueryTimeout);\r\n                    return true;\r\n                } catch (InvocationTargetException e) {\r\n                    Throwable cause = e.getCause();\r\n                    if (cause instanceof SQLException) {\r\n                        return false;\r\n                    }\r\n                    LOG.warn(\"Unexpected error in ping\", e);\r\n                    return false;\r\n                } catch (Exception e) {\r\n                    LOG.warn(\"Unexpected error in ping\", e);\r\n                    return false;\r\n                }\r\n            }\r\n        }`",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/546/comments",
+    "author": "neeuq",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2017-10-26T01:59:15Z",
+        "body": "\u662f\u7684\uff0c\u4f60\u53ef\u4ee5\u5c1d\u8bd5\u4e00\u4e0b3.2.3\u7248\u672c\uff0c\u6211\u4eec\u5df2\u7ecf\u4e0d\u518d\u66ff\u6362Connection."
+      },
+      {
+        "user": "neeuq",
+        "created_at": "2017-10-26T06:26:54Z",
+        "body": "\u66f4\u65b0\u4e86\u4ee3\u7801\uff0c\u8fd9\u4e2a\u5e94\u8be5\u6ca1\u95ee\u9898\u4e86\uff0c\u53d1\u73b0\u4ee3\u7801\u7ed3\u6784\u6709\u4e9b\u53d8\u52a8\u3002\u8865\u5145\u4e2a\u95ee\u9898\uff1a\r\n1\u3001\u662f\u57fa\u4e8e\u4ec0\u4e48\u8003\u8651\uff0c\u628ajdbc\u76d1\u63a7\u4fee\u6539\u4e86\r\n2\u3001\u63d2\u4ef6\u5305\u73b0\u5728\u653e\u5728\u5916\u9762\u4e86\uff0c\u662f\u65b9\u4fbf\u589e\u51cf\uff0c\u90fd\u5b9e\u9645\u90e8\u7f72\u65f6\u611f\u89c9\u96c6\u6210\u81f3\u4e00\u4e2ajar\u5305\u66f4\u65b9\u4fbf\uff0c\u7ea0\u7ed3\u4e86"
+      },
+      {
+        "user": "wu-sheng",
+        "created_at": "2017-10-27T02:51:35Z",
+        "body": "> 1\u3001\u662f\u57fa\u4e8e\u4ec0\u4e48\u8003\u8651\uff0c\u628ajdbc\u76d1\u63a7\u4fee\u6539\u4e86\r\n\r\n\u4e3b\u8981\u89e3\u51b3\u7684\u662f\u8fd9\u79cd\u8fde\u63a5\u6821\u9a8c\u7684\u95ee\u9898\u3002\u9664\u4e86Druid\u4e4b\u5916\uff0c\u6709\u4e9bdatasource\u4e5f\u76d1\u6d4b\u8fd9\u4e2a\u3002\r\n\r\n> 2\u3001\u63d2\u4ef6\u5305\u73b0\u5728\u653e\u5728\u5916\u9762\u4e86\uff0c\u662f\u65b9\u4fbf\u589e\u51cf\uff0c\u90fd\u5b9e\u9645\u90e8\u7f72\u65f6\u611f\u89c9\u96c6\u6210\u81f3\u4e00\u4e2ajar\u5305\u66f4\u65b9\u4fbf\uff0c\u7ea0\u7ed3\u4e86\r\n\r\n\u8fd9\u4e2a\u6211\u4e2a\u4eba\u8ba4\u4e3a\uff0c\u589e\u51cf\u662f\u4e3b\u8981\u7279\u6027\uff0c\u4f60\u53ea\u662f\u591a\u4e86\u4e00\u4e2a`tar`\u7684\u64cd\u4f5c\uff0c\u6211\u89c9\u5f97\u6ca1\u6709\u5fc5\u8981\u7ea0\u7ed3\u3002\r\n\r\n\u53e6\u5916\uff0c\u56e0\u4e3a\u6b64\u95ee\u9898\u5df2\u89e3\u51b3\uff0c\u6211\u5c06\u5173\u95ed\u6b64\u95ee\u9898\u3002"
+      }
+    ]
+  },
+  {
+    "number": 498,
+    "title": "Tomcat8 + spring mvc\uff1aone http request create on span?",
+    "created_at": "2017-10-10T12:06:34Z",
+    "closed_at": "2017-10-11T01:19:45Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/apache/skywalking/issues/498",
+    "body": "Please answer these questions before submitting your issue.\r\n### What version of sky-walking are you using?\r\n\u6700\u65b0\u7248\u672c\r\n\r\n### What did you do?\r\n\u6280\u672f\u70b9\uff1atomcat8 + spring mvc\r\n\u53ef\u80fd\u662f\u6211\u4e0d\u592a\u7406\u89e3\u8bbe\u8ba1\u601d\u8def\uff0c\u4e00\u4e2ahttp\u8bf7\u6c42\u53ea\u4f1a\u4ea7\u751f\u4e00\u4e2aspan\uff0c\u800c\u4e0d\u662ftomcat 8\u548cspring controller\u5728\u5404\u81ea\u7684\u5207\u9762\u4ea7\u751f\u5404\u81ea\u7684span\u3002\u867d\u5404\u81ea\u7c7b\u90fd\u80fd\u6b63\u5e38\u62e6\u622a\uff0c\u4f46\u5f15\u7528\u7684\u662f\u540c\u4e00\u4e2aspan\uff0c\u662f\u4e0d\u662f\u540c\u4e00\u4e2a\u7ebf\u7a0b\u7684\u5173\u7cfb\u5417\uff1f",
+    "comments_url": "https://api.github.com/repos/apache/skywalking/issues/498/comments",
+    "author": "neeuq",
+    "comments": [
+      {
+        "user": "wu-sheng",
+        "created_at": "2017-10-10T13:45:35Z",
+        "body": "\u4e00\u6b21\u8c03\u7528\u4e2d\uff0ctomcat8\u548cspringmvc\u90fd\u5c5e\u4e8eEntrySpan\uff0c\u6240\u4ee5\u4f1a\u8fdb\u884c\u81ea\u52a8\u5408\u5e76\u3002\u8fd9\u662f\u6211\u4eec\u7684\u4e00\u4e2a\u6027\u80fd\u4f18\u5316\u7b56\u7565\u3002"
+      }
+    ]
+  }
+]

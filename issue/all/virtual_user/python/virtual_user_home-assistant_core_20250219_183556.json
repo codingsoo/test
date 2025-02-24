@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/home-assistant/core/issues/512",
+    "source": {
+      "issue_number": 512
+    },
+    "initial_question": {
+      "title": "Option for button instead of toggle for switches",
+      "body": "I have a pi connected to my garage door opener. I am using a command line switch option to open/close my garage door. I am using the same command to both open and close the door, because all it does is turn on a relay for a few seconds and then back off. Would it be possible to have just a push button with one command option. Then maybe in history just show an event and not lable them as on/off?\n"
+    },
+    "satisfaction_conditions": [
+      "Single command execution triggers the door operation regardless of current state",
+      "Control must be able to coexist with door state sensor in interface",
+      "Control must be groupable with other interface elements"
+    ],
+    "created_at": "2015-10-12T00:57:50Z"
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "https://github.com/infiniflow/ragflow/issues/5071",
+    "source": {
+      "issue_number": 5071
+    },
+    "initial_question": {
+      "title": "[Question]: \u6570\u636e\u96c6\u5728embedding \u89e3\u6790\u7684\u8fc7\u7a0b\u4e2d\uff0c\u4e3a\u4ec0\u4e48\u53ea\u8c03\u7528\u4e86CPU\uff0c\u6ca1\u6709\u8c03\u7528GPU\u8d44\u6e90",
+      "body": "### Describe your problem\n\n\u6570\u636e\u96c6\u5728embedding \u89e3\u6790\u7684\u8fc7\u7a0b\u4e2d\uff0c\u4e3a\u4ec0\u4e48\u53ea\u8c03\u7528\u4e86CPU\uff0c\u6ca1\u6709\u8c03\u7528GPU\u8d44\u6e90\n"
+    },
+    "satisfaction_conditions": [
+      "Container configuration includes GPU support"
+    ],
+    "created_at": "2025-02-18T06:16:44Z"
+  },
+  {
+    "id": "https://github.com/infiniflow/ragflow/issues/3317",
+    "source": {
+      "issue_number": 3317
+    },
+    "initial_question": {
+      "title": "[Question]: How to use GPU to run OCR model",
+      "body": "### Describe your problem\n\n\u5982\u9898\uff0c\u8bf7\u6559"
+    },
+    "satisfaction_conditions": [
+      "OCR model execution is functional",
+      "ONNX runtime environment is properly configured"
+    ],
+    "created_at": "2024-11-10T03:52:22Z"
+  },
+  {
+    "id": "https://github.com/infiniflow/ragflow/issues/3148",
+    "source": {
+      "issue_number": 3148
+    },
+    "initial_question": {
+      "title": "[Question]: How to obtain detailed backend logs\uff1f",
+      "body": "### Describe your problem\n\n# I have started ragflow from the source code\r\n- `docker logs -f ragflow-server` cannot meet the logging requirements. I need to obtain logs of front-end operations on the webpage, including logs from conversations and more details on file parsing. I hope to distinguish between the details of the conversation and the file. I use `Olama` as an API service provider\r\n- I used xinference as rerank provider. I saw the effect of rerank in the `test retrieval` of the knowledge base. Does this part also have background logs?\r\n- I hope that in the question, there is a more detailed check method for the situation that the documents cannot be retrieved, such as viewing the slice of the hits\r\n- Is there a more detailed document for viewing logs?"
+    },
+    "satisfaction_conditions": [
+      "Log files must be accessible and contain detailed backend operations"
+    ],
+    "created_at": "2024-11-01T07:52:23Z"
+  },
+  {
+    "id": "https://github.com/infiniflow/ragflow/issues/3095",
+    "source": {
+      "issue_number": 3095
+    },
+    "initial_question": {
+      "title": "[Question]: Chat assistant not retrieving any chunks",
+      "body": "### Describe your problem\r\n\r\nI have added a document to a new KB and chucked it using the 'General' method. When I do retrieval testing on the KB, it retrieves the correct chucks. I have also created a chat assistant on my knowledge base, when I ask the same question as I did during retrieval testing it returns no results. I have tried all different types of configuration on the assistant but it doesn't seem to work. Is there any way I can see what the query the assistant is sending?"
+    },
+    "satisfaction_conditions": [
+      "Query inspection capability is accessible",
+      "Query debugging information is visible"
+    ],
+    "created_at": "2024-10-29T14:38:01Z"
+  },
+  {
+    "id": "https://github.com/infiniflow/ragflow/issues/1563",
+    "source": {
+      "issue_number": 1563
+    },
+    "initial_question": {
+      "title": "[Question]: Why is the token count fixed at 128 when using the Ollama embedding model, instead of being based on the text content?",
+      "body": "### Describe your problem\n\nWhy is the token count fixed at 128 when using the Ollama embedding model, instead of being based on the text content?"
+    },
+    "satisfaction_conditions": [
+      "Explanation accurately reflects Ollama's embedding model behavior"
+    ],
+    "created_at": "2024-07-17T05:53:35Z"
+  },
+  {
+    "id": "https://github.com/infiniflow/ragflow/issues/1012",
+    "source": {
+      "issue_number": 1012
+    },
+    "initial_question": {
+      "title": "[Question]: How to improve the parallelism of file parsing?",
+      "body": "### Describe your problem\n\nI found that when I am processing multiple files at the same time, the parsing block is serial. \r\nAfter checking the server.py file, I found that the number of workers is only 1, and the parameters are not exposed in the configuration file.\r\n Is there any other way to improve the efficiency of parsing documents besides improving workers"
+    },
+    "satisfaction_conditions": [
+      "Worker count is configurable",
+      "Configuration can be modified without code changes"
+    ],
+    "created_at": "2024-05-31T08:12:12Z"
+  },
+  {
+    "id": "https://github.com/infiniflow/ragflow/issues/448",
+    "source": {
+      "issue_number": 448
+    },
+    "initial_question": {
+      "title": "[Question]: How to start RagFlow manually ?",
+      "body": "### Describe your problem\n\nHow to prevent RagFlow from auto startng, and instead start it manually when needed? My system is Ubuntu."
+    },
+    "satisfaction_conditions": [
+      "RagFlow service does not start automatically when the system boots",
+      "RagFlow service can be started manually when needed",
+      "Configuration changes persist across system restarts",
+      "Solution works on Ubuntu operating system"
+    ],
+    "created_at": "2024-04-19T05:25:13Z"
+  }
+]

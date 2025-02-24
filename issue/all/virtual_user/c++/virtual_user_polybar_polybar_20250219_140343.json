@@ -1,0 +1,32 @@
+[
+  {
+    "id": "https://github.com/polybar/polybar/issues/2241",
+    "source": {
+      "issue_number": 2241
+    },
+    "initial_question": {
+      "title": "is possible to remove system tray?",
+      "body": "I want to remove the system tray from the polybar, to display only the bar itself.\r\n\r\nIs that possible?\r\n\r\nIf yes, how to make."
+    },
+    "satisfaction_conditions": [
+      "System tray is no longer visible in the polybar display",
+      "Configuration change is persistent across polybar restarts"
+    ],
+    "created_at": "2020-11-11T21:28:16Z"
+  },
+  {
+    "id": "https://github.com/polybar/polybar/issues/1290",
+    "source": {
+      "issue_number": 1290
+    },
+    "initial_question": {
+      "title": "polybar order",
+      "body": "is there a way to control polybar order? lets say i have two polybar's on top, how would i control which would be top and which bottom?\r\n\r\nat the moment its randomly loading their position and i have to reload launch.sh and hope it gets to the right position."
+    },
+    "satisfaction_conditions": [
+      "Multiple polybars display in a consistent, predictable order",
+      "Order remains stable across multiple launches/reloads"
+    ],
+    "created_at": "2018-06-19T09:35:28Z"
+  }
+]

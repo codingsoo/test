@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/run-ai/runai-model-streamer/issues/17",
+    "source": {
+      "issue_number": 17
+    },
+    "initial_question": {
+      "title": "PyPI Package Not Found",
+      "body": "(llm) shubhamsaboo@Shubham-Saboo's-Macbook-Pro ~ % pip install runai_model_streamer\r\n\r\nERROR: Could not find a version that satisfies the requirement runai_model_streamer (from versions: none)\r\nERROR: No matching distribution found for runai_model_streamer"
+    },
+    "satisfaction_conditions": [
+      "Package name uses correct format with hyphens for installation",
+      "Package can be imported using underscore format"
+    ],
+    "created_at": "2024-11-06T01:47:02Z"
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "number": 898,
+    "title": "Documentation Issue - \"Build the Code\" section",
+    "created_at": "2019-05-19T14:10:32Z",
+    "closed_at": "2019-05-21T21:44:23Z",
+    "labels": [
+      "Help Wanted",
+      "Issue-Docs",
+      "Area-Build",
+      "Product-Meta"
+    ],
+    "url": "https://github.com/microsoft/terminal/issues/898",
+    "body": "`/README.md` needs to be updated to show correct path of build tools in `Building the Code` section. Following the current version of instruction the user will get\r\n```\r\n'bcz' is not recognized as an internal or external command, operable program or batch file.\r\n```\r\n\r\nSide note: after using `bcz` command from within `tools` folder it looks it is being added to the path for the current session.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/microsoft/terminal/issues/898/comments",
+    "author": "coderitual",
+    "comments": [
+      {
+        "user": "DHowett-MSFT",
+        "created_at": "2019-05-19T20:28:40Z",
+        "body": "If you use `.\\tools\\razzle` from within CMD, `bcz` will be on your path.\r\nIf you use it from within PowerShell, don't do that. The `razzle` tool somewhat expects that it's been run from CMD.\r\nThere's a (somewhat underdocumented!) PowerShell module @adiviness maintains for building this code."
+      },
+      {
+        "user": "coderitual",
+        "created_at": "2019-05-19T20:44:18Z",
+        "body": "Thanks @DHowett-MSFT ! Didn't know that. I have run both commands from within `git-bash`. What do you suggest to have this fixed? Maybe a simple comment that `cmd.exe` is recommended would work?\r\n\r\nDo you want me to push this PR further and edit according to the comment I received from @oising ?"
+      },
+      {
+        "user": "zadjii-msft",
+        "created_at": "2019-05-20T15:12:53Z",
+        "body": "Yea, I'd change the PR to simply mention that the commands should be called from `cmd.exe`."
+      }
+    ]
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/sivaprasadreddy/spring-modular-monolith/issues/32",
+    "source": {
+      "issue_number": 32
+    },
+    "initial_question": {
+      "title": "Query about RabbitMQ implementation",
+      "body": "I see RabbitMQ configuration done in the code but i don\u2019t is where it is used in the code . Could you explain how can we use RabbitMQ in spring modulith through the Externalized annotation approach."
+    },
+    "satisfaction_conditions": [
+      "Events must be successfully published to an external message broker",
+      "Spring Modulith events must be properly integrated with the message broker system",
+      "Event routing configuration must be correctly specified",
+      "Required dependencies and configurations must be present"
+    ],
+    "created_at": "2025-01-09T03:49:18Z"
+  }
+]

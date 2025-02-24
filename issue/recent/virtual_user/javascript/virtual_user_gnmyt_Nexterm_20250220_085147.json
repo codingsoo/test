@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/gnmyt/Nexterm/issues/56",
+    "source": {
+      "issue_number": 56
+    },
+    "initial_question": {
+      "title": "[Bug] Error on 1.0.1",
+      "body": "### General\n\n- [X] I have updated to the latest version of Nexterm.\n- [X] My bug has not been reported yet.\n\n### The Bug\n\nLatest version 1.0.1 don't start , it log a error:\r\nError: Could not find a free port for Guacamole\r\n\n\n### What device are you using to access the page?\n\nIn the browser\n\n### Which operating system is your Nexterm instance running on?\n\nLinux"
+    },
+    "satisfaction_conditions": [
+      "Container deployment remains persistent across system restarts",
+      "Data persistence is maintained",
+      "Application remains accessible via web browser",
+      "Solution works on Linux environment"
+    ],
+    "created_at": "2024-09-04T08:02:31Z"
+  }
+]

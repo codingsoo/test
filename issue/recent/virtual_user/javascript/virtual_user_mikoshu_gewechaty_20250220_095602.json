@@ -1,0 +1,51 @@
+[
+  {
+    "id": "https://github.com/mikoshu/gewechaty/issues/35",
+    "source": {
+      "issue_number": 35
+    },
+    "initial_question": {
+      "title": "bot.Contact.findAll()\u8fd4\u56de\u7a7a\u5217\u8868",
+      "body": "bot.Contact.findAll()\u8fd4\u56de\u7a7a\u5217\u8868\u4e3a\u4ec0\u4e48\uff1f\u6211\u662f\u7531\u7528\u6237\u7684\u3002\u800c\u4e14\uff0c\u53d1\u9001\u6d88\u606f\u65f6\uff0c\u6b63\u786e\u7684id\uff0c\u4e5f\u65e0\u6cd5\u53d1\u9001\u6d88\u606f\uff0c\u4f46\u662f\u4f7f\u7528gewe\u63a5\u53e3\u5c31\u80fd\u6b63\u786e\u53d1\u9001\u3002"
+    },
+    "satisfaction_conditions": [
+      "Contact list data must be successfully retrieved and populated",
+      "Contact cache must be properly initialized",
+      "System must provide a way to refresh/sync contact data"
+    ],
+    "created_at": "2025-02-06T03:36:35Z"
+  },
+  {
+    "id": "https://github.com/mikoshu/gewechaty/issues/18",
+    "source": {
+      "issue_number": 18
+    },
+    "initial_question": {
+      "title": "\u5173\u4e8e\u5fae\u4fe1\u63a5\u53d7\u56fe\u7247\u6587\u4ef6 \u89e3\u6790\u5185\u5bb9",
+      "body": "\u5927\u4f6c\uff0c\u4f60\u597d\uff0c\u6211\u60f3\u7528\u672c\u9879\u76ee\u767b\u9646\u673a\u5668\u4eba\u540e\uff0c\u63a5\u6536\u56fe\u7247\uff0c\u56fe\u7247\u4e2d\u5305\u542b\u4e86\u6211\u9700\u8981\u7684\u4fe1\u606f\uff0c\u6bd4\u5982\u56fe\u724711\u4f4d\u6570\u5b57\u4fe1\u606f\u7b49\u7b49\r\n\u6211\u73b0\u5728\u6709\u4e2a\u96be\u70b9\u5c31\u662f\uff0c\u673a\u5668\u4eba\u4e00\u76f4\u65e0\u6cd5\u89e3\u6790\u56fe\u7247\uff0c\u56e0\u4e3a\u901a\u8baf\u662f\u52a0\u5bc6\u4e86\u7684\uff0c\u6211\u73b0\u5728\u4e0d\u77e5\u9053\u600e\u4e48\u5f04\uff0c\u624d\u80fd\u628a\u5fae\u4fe1\u63a5\u6536\u5230\u7684\u56fe\u7247\uff0c\u6b63\u5e38\u4fdd\u5b58\u4e0b\u6765\uff0c\u6216\u8005\u76f4\u63a5\u89e3\u6790\uff0c\u6211\u8bd5\u8fc7ocr\u7684\u63d2\u4ef6\uff0c\u5355\u7eaf\u7684\u5728\u672c\u5730\u4e0a\u89e3\u6790\u56fe\u7247\u6ca1\u6709\u95ee\u9898\u3002\u6211\u662f\u5728linux\u4e0a\u8dd1\u7684\u673a\u5668\u4eba\u3002\r\n\u6c42\u6559\u5927\u4f6c\u7ed9\u4e2a\u601d\u8def\u3002"
+    },
+    "satisfaction_conditions": [
+      "Successfully receive and access encrypted image content from WeChat messages",
+      "Image data must be processable for text extraction",
+      "Integration with existing bot functionality"
+    ],
+    "created_at": "2024-12-22T08:54:22Z"
+  },
+  {
+    "id": "https://github.com/mikoshu/gewechaty/issues/17",
+    "source": {
+      "issue_number": 17
+    },
+    "initial_question": {
+      "title": "\u83b7\u53d6\u901a\u8baf\u5f55\u4e2d\u7684\u7fa4\u804a",
+      "body": "\u8c03\u7528 `bot.Contact.findAll()` \u83b7\u53d6\u5230\u4f3c\u4e4e\u53ea\u6709\u597d\u53cb\u3002\u4fdd\u5b58\u5230\u901a\u8baf\u5f55\u4e2d\u7684\u7fa4\u804a\u6ca1\u6709\u83b7\u53d6\u5230\u3002\u662f\u6709\u5176\u4ed6\u63a5\u53e3\u6765\u83b7\u53d6\u901a\u8baf\u5f55\u4e2d\u7684\u7fa4\u804a\u5417\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Successfully retrieves group chat information from contacts",
+      "Database access provides complete group chat records",
+      "Retrieved group chat objects can be instantiated for further operations",
+      "Works with locally stored contact information"
+    ],
+    "created_at": "2024-12-20T01:44:10Z"
+  }
+]

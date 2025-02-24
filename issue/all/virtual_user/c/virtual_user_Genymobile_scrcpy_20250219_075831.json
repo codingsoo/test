@@ -1,0 +1,83 @@
+[
+  {
+    "id": "https://github.com/Genymobile/scrcpy/issues/1510",
+    "source": {
+      "issue_number": 1510
+    },
+    "initial_question": {
+      "title": "how to update - Windows 10",
+      "body": "Hi,\r\nI don't quite understand how to update: I downloaded the \"scrcpy-win64-v1.14.zip\" file... Now I just replace the content of the previous version's folder? \r\nExcuse me for the dumb question (and yes, this is a question, not a bug report: I don't know how to label it)\r\n\r\nThank you"
+    },
+    "satisfaction_conditions": [
+      "Previous version files are no longer active",
+      "New version files are properly installed in the system",
+      "No remnant files from previous version cause conflicts"
+    ],
+    "created_at": "2020-06-15T13:20:06Z"
+  },
+  {
+    "id": "https://github.com/Genymobile/scrcpy/issues/1477",
+    "source": {
+      "issue_number": 1477
+    },
+    "initial_question": {
+      "title": "Question: what version of ADB is needed for 1.14?",
+      "body": "Sorry to post a bug report when it's actually a question. I couldn't find where I could post a question. :)\r\n\r\nIn 1.14 you say:\r\n\r\n> Upgrade platform-tools to 30.0.0 (adb) in Windows releases\r\n\r\nWill I be able to use Scrcpy 1.14 with an older version of ADB? Say version 1.0.36? Unfortunately I have a need to use that version of ADB.\r\n\r\nIf not, should I stay at my current version of Scrcpy which is 1.12 or can I upgrade to 1.13?"
+    },
+    "satisfaction_conditions": [
+      "Scrcpy must be able to locate and use a custom ADB version",
+      "ADB version selection must be configurable"
+    ],
+    "created_at": "2020-06-05T13:54:04Z"
+  },
+  {
+    "id": "https://github.com/Genymobile/scrcpy/issues/1131",
+    "source": {
+      "issue_number": 1131
+    },
+    "initial_question": {
+      "title": "Specifying which device to connect to over TCP/IP",
+      "body": "Hi, I'm sorry if this isn't the right place for this. I read the instructions and they say that if you have more than one device under `adb devices` you have to specify the serial number of which device you want to connect to. But is there a way to specify which device you want to connect to over TCP/IP when you have multiple devices connected without using the serial number? Like just by specifying the IP address of the device or something like that? \r\n\r\nThe reason I ask is because when devices are connected over USB the serial number is listed when you do `adb devices` (I'm pretty sure that's the serial number... right?) which makes it easy to then input as `scrcpy -s whateveryourserialnumberis` but when devices are connected over TCP/IP it just shows the IP. So you either have to have your serial number written down and saved somewhere or possibly run an adb command to get it (although I can't seem to get any to work). \r\n\r\nIt's not a big deal for someone like me who is only ever really connecting to 2 devices, my phone and my tablet, but I'm interested in if there's a way to do this entirely within the command line rather than having to input the serial number from a saved file or a sticky note or something like that."
+    },
+    "satisfaction_conditions": [
+      "Device must be uniquely identifiable without requiring pre-stored serial numbers",
+      "Connection method must work for TCP/IP connected devices",
+      "Command must be executable entirely from the command line",
+      "Device selection must work when multiple devices are connected",
+      "Device identifier must be visible in standard device listing commands"
+    ],
+    "created_at": "2020-02-06T15:39:28Z"
+  },
+  {
+    "id": "https://github.com/Genymobile/scrcpy/issues/850",
+    "source": {
+      "issue_number": 850
+    },
+    "initial_question": {
+      "title": "Creating a .bat File For Recording",
+      "body": "Hello. I am interested in creating a Batch File to make scrcpy record a Video. What can I do?"
+    },
+    "satisfaction_conditions": [
+      "Creates a functional batch file that launches scrcpy with recording capability",
+      "Recording output is saved to a video file",
+      "Supports combining multiple scrcpy command options"
+    ],
+    "created_at": "2019-10-08T17:45:44Z"
+  },
+  {
+    "id": "https://github.com/Genymobile/scrcpy/issues/680",
+    "source": {
+      "issue_number": 680
+    },
+    "initial_question": {
+      "title": "thankyou",
+      "body": "How to remove the title bar, let me know which file to edit it, thank you"
+    },
+    "satisfaction_conditions": [
+      "Window displays without a title bar",
+      "Window remains functional and usable",
+      "Change is made at window creation/initialization"
+    ],
+    "created_at": "2019-08-02T01:40:21Z"
+  }
+]

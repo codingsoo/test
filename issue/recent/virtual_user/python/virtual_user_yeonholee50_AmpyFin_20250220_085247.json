@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/yeonholee50/AmpyFin/issues/18",
+    "source": {
+      "issue_number": 18
+    },
+    "initial_question": {
+      "title": "Setup problems",
+      "body": "I face a lot of issues when settings this up.\r\n\r\nFirst off, where do I place the config.py? In the base directory? running mongo_setup.py results in a No module named config when doing this.\r\n\r\nI also get AttributeError: module 'datetime' has no attribute 'now' when running mongo_setup.py fixing this by adding \"from datetime import datetime\"\r\n\r\nNext error is this: \r\n\r\npython3.10 helper_files/mongo_setup.py\r\nTraceback (most recent call last):\r\n  File \"/Users/x/Documents/trading/AmpyFin/helper_files/mongo_setup.py\", line 90, in <module>\r\n    initialize_market_setup()\r\n  File \"/Users/x/Documents/trading/AmpyFin/helper_files/mongo_setup.py\", line 83, in initialize_market_setup\r\n    collection.insert_one({\"market_status\": \"closed\"})\r\n  File \"/opt/homebrew/lib/python3.10/site-packages/pymongo/synchronous/collection.py\", line 401, in __call__\r\n    raise TypeError(\r\nTypeError: 'Collection' object is not callable. If you meant to call the 'insert_one' method on a 'Database' object it is failing because no such method exists.\r\n\r\nHelp is appreciated!! "
+    },
+    "satisfaction_conditions": [
+      "Configuration file must be accessible from the execution context",
+      "All required Python dependencies must be properly imported",
+      "MongoDB collection operations must use correct syntax",
+      "Project file structure must maintain proper module relationships"
+    ],
+    "created_at": "2024-12-06T14:21:23Z"
+  }
+]

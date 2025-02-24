@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/sherlock-project/sherlock/issues/296",
+    "source": {
+      "issue_number": 296
+    },
+    "initial_question": {
+      "title": "Username with Space",
+      "body": "How I can search a Username with a Space\r\n"
+    },
+    "satisfaction_conditions": [
+      "Username with spaces must be properly escaped or quoted in the command",
+      "Command successfully processes the username as a single complete string",
+      "Search functionality executes without syntax errors",
+      "User is informed about potential username validity limitations"
+    ],
+    "created_at": "2019-08-03T20:00:24Z"
+  }
+]

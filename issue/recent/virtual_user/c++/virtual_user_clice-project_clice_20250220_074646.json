@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/clice-project/clice/pull/43",
+    "source": {
+      "issue_number": 43
+    },
+    "initial_question": {
+      "title": "Fix build with xmake.",
+      "body": null
+    },
+    "satisfaction_conditions": [
+      "Debug build configuration correctly handles shared library settings on Linux",
+      "Platform-specific build settings are properly differentiated",
+      "Build configuration parameters are correctly locked from modification"
+    ],
+    "created_at": "2025-01-16T17:55:06Z"
+  }
+]

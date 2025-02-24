@@ -1,0 +1,34 @@
+[
+  {
+    "id": "https://github.com/balazik/ComfyUI-PuLID-Flux/issues/7",
+    "source": {
+      "issue_number": 7
+    },
+    "initial_question": {
+      "title": " only one picture is generated each time",
+      "body": "Thank you for your great work!\r\nBut would you like to ask if only one picture is generated each time? If I generate two pictures, the following message will appear?\r\n\r\n# ComfyUI Error Report\r\n## Error Details\r\n- **Node Type:** SamplerCustomAdvanced\r\n- **Exception Type:** RuntimeError\r\n- **Exception Message:** Boolean value of Tensor with more than one value is ambiguous\r\n## Stack Trace\r\n```\r\n File \"C:\\Users\\ntzon\\Projects\\ComfyUI\\execution.py\", line 323, in execute\r\n output_data, output_ui, has_subgraph = get_output_data(obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb)\r\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^\r\n..........\r\n.............\r\n## Additional Context\r\n(Please add any additional context or steps to reproduce the error here)"
+    },
+    "satisfaction_conditions": [
+      "Multiple images can be generated simultaneously in a single execution",
+      "No runtime errors occur during batch processing",
+      "Batch processing works with different batch generation methods",
+      "System maintains compatibility with latest ComfyUI version"
+    ],
+    "created_at": "2024-10-02T05:44:57Z"
+  },
+  {
+    "id": "https://github.com/balazik/ComfyUI-PuLID-Flux/issues/6",
+    "source": {
+      "issue_number": 6
+    },
+    "initial_question": {
+      "title": "RuntimeError: expected scalar type Half but found BFloat16 when executing SamplerCustomAdvanced node",
+      "body": "ComfyUI_windows\\python_embeded\\Lib\\site-packages\\torch\\nn\\functional.py\", line 2573, in layer_norm\r\n    return torch.layer_norm(input, normalized_shape, weight, bias, eps, torch.backends.cudnn.enabled)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nRuntimeError: expected scalar type Half but found BFloat16"
+    },
+    "satisfaction_conditions": [
+      "Data type compatibility between model and hardware is achieved",
+      "Automatic detection of appropriate data type for the system"
+    ],
+    "created_at": "2024-10-02T04:49:31Z"
+  }
+]

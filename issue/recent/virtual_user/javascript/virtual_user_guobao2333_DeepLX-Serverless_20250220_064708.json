@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/guobao2333/DeepLX-Serverless/issues/1",
+    "source": {
+      "issue_number": 1
+    },
+    "initial_question": {
+      "title": "sometimes an error",
+      "body": "Cannot read properties of undefined (reading 'alternatives').\r\n\r\nseems to add a adjustment for this property.\r\n\r\nthank u."
+    },
+    "satisfaction_conditions": [
+      "Property 'alternatives' must have a valid default value when undefined",
+      "Configuration allows for customization of the alternatives value"
+    ],
+    "created_at": "2024-08-14T07:56:45Z"
+  }
+]

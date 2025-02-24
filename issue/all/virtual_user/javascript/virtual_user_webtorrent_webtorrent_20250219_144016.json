@@ -1,0 +1,51 @@
+[
+  {
+    "id": "https://github.com/webtorrent/webtorrent/issues/1533",
+    "source": {
+      "issue_number": 1533
+    },
+    "initial_question": {
+      "title": "Is it possible to createServer without waiting to finish hash checks?",
+      "body": "F.e. if 10 GB movie is already downloaded, it takes almost a minute to hash torrent and only then i can `torrent. createServer`. If it's a new torrent I can start playback in 10 seconds so it's faster to delete files and start over.\r\nWould it be possible to start `createServer` while hashing is still in progress?"
+    },
+    "satisfaction_conditions": [
+      "Server creation must be possible without waiting for complete hash verification",
+      "System must maintain ability to distinguish between complete and incomplete downloads",
+      "Method must be available to handle previously downloaded files differently from new downloads",
+      "State persistence across application restarts must be supported"
+    ],
+    "created_at": "2018-10-26T08:59:37Z"
+  },
+  {
+    "id": "https://github.com/webtorrent/webtorrent/issues/665",
+    "source": {
+      "issue_number": 665
+    },
+    "initial_question": {
+      "title": "filesystem paths do not work in the browser",
+      "body": "- WebTorrent version: latest \n- Node.js version: 4.0\n- Browser name/version (if using WebTorrent in the browser): Chrome/Electron\n\nI am unable to seed the torrent file as it throws me an error \"filesystem paths do not work in the browser\". Electron as wrapped file system with path attribute after uploading file. Is there any way to get around this problem.\n"
+    },
+    "satisfaction_conditions": [
+      "File system access functionality must be properly available in the Electron environment",
+      "WebTorrent library must be integrated in a way that preserves native Electron capabilities"
+    ],
+    "created_at": "2016-03-10T07:01:40Z"
+  },
+  {
+    "id": "https://github.com/webtorrent/webtorrent/issues/357",
+    "source": {
+      "issue_number": 357
+    },
+    "initial_question": {
+      "title": "When seeding a file/folder from disk, don't perform extra copy to /tmp",
+      "body": "Hi !\n\nIf I want to seed a file from (just an example) _/home/me/videos/awesome.webm_ I see that webtorrent copy it as _/tmp/webtorrent/xxx/xxx.webm_. I wanted to know if this was really needed, since the file is already on the disk. \n\nThis could be annoying with big videos (1Go), disk space would rapidly decrease and the seeding would take much time since the disk should copy 1Go before it.\n\nThanks :)\n"
+    },
+    "satisfaction_conditions": [
+      "File seeding must not require unnecessary file copying to temporary storage",
+      "Direct access to the original file location must be maintained",
+      "Seeding performance must not be degraded by file copying operations",
+      "Available disk space must not be reduced by duplicate copies"
+    ],
+    "created_at": "2015-06-12T14:10:10Z"
+  }
+]

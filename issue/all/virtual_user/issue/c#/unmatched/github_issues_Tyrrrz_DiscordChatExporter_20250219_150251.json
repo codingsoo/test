@@ -1,0 +1,22 @@
+[
+  {
+    "number": 975,
+    "title": "Token getting instructions don't work",
+    "created_at": "2022-12-31T02:24:46Z",
+    "closed_at": "2022-12-31T07:43:38Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/Tyrrrz/DiscordChatExporter/issues/975",
+    "body": "### Version\n\n2.36.4\n\n### Flavor\n\nGUI (Graphical User Interface)\n\n### Export format\n\n_No response_\n\n### Details\n\nI followed the instructions on both firefox and chromium and \"messages?limit=50\" didn't appear when searching in the network tab of either and refreshing. I followed what I believe are the old instructions and went to the application tab > local storage > discord.com, refreshed and searched for \"token\" and tokens showed up but they disappeared too fast to copy them\n\n### Steps to reproduce\n\nthe instructions on the program",
+    "comments_url": "https://api.github.com/repos/Tyrrrz/DiscordChatExporter/issues/975/comments",
+    "author": "SavantSusi",
+    "comments": [
+      {
+        "user": "Tyrrrz",
+        "created_at": "2022-12-31T06:35:43Z",
+        "body": "What if you click around the app, switch to a different server etc., does `messages?limit=50` show up?"
+      }
+    ]
+  }
+]

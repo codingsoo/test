@@ -1,0 +1,33 @@
+[
+  {
+    "id": "https://github.com/microsoft/vscode/issues/20769",
+    "source": {
+      "issue_number": 20769
+    },
+    "initial_question": {
+      "title": "Ctrl-C kills VSCode if started from command prompt",
+      "body": "- VSCode Version: 1.9.1\r\n- OS Version: Windows 10 Anniversary Update\r\n\r\nSteps to Reproduce:\r\n\r\n1. From the command prompt, run \"C:\\Program Files (x86)\\Microsoft VS Code\\Code.exe\". \r\n2. Press Ctrl-C from command prompt, VSCode exits immediately"
+    },
+    "satisfaction_conditions": [
+      "VSCode must remain running when Ctrl-C is pressed in the parent command prompt",
+      "VSCode must be launched in a way that isolates it from the parent command prompt's control signals",
+      "The launch method must work from a command prompt on Windows 10"
+    ],
+    "created_at": "2017-02-16T22:41:00Z"
+  },
+  {
+    "id": "https://github.com/microsoft/vscode/issues/7701",
+    "source": {
+      "issue_number": 7701
+    },
+    "initial_question": {
+      "title": "[loc][Query][DevDiv] Translatability of Code",
+      "body": "Hi, we have a question from our translator. Can you help please?\n\nSource:\nPlease restart Code before reinstalling {0}.\n\nFile Name:\nsrc\\vs\\platform\\extensionManagement\\node\\extensionManagementService.nls.resx\n\nResource ID:\n\".resx\", 0; \"restartCode\"\n\nQuery:\nIs Code translatable?   Cristina Carrasco   6/9/2016 9:18:45 AM\n"
+    },
+    "satisfaction_conditions": [
+      "The localization status must be clearly indicated",
+      "A path forward must be provided if translation is needed"
+    ],
+    "created_at": "2016-06-15T08:45:45Z"
+  }
+]

@@ -1,0 +1,606 @@
+[
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/12020",
+    "source": {
+      "issue_number": 12020
+    },
+    "initial_question": {
+      "title": "Deleted sysadmin user by mistake",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n * Generic\r\n\r\n**Description**\r\nIt is a super silly question, but, my coworker removed the sysadmin user by mistake from the Thingsboard database. How can I create it again?\r\n\r\n**Environment**\r\n<!-- Add information about your environment and ThingsBoard version if applicable -->\r\n * OS:  Ubuntu 22.04\r\n * ThingsBoard: 3.8\r\n"
+    },
+    "satisfaction_conditions": [
+      "A user account must have SYS_ADMIN authority level in the system",
+      "The user must have correct database associations (tenant_id and customer_id)",
+      "The changes must be persistent in the ThingsBoard database"
+    ],
+    "created_at": "2024-11-07T08:35:15Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/11620",
+    "source": {
+      "issue_number": 11620
+    },
+    "initial_question": {
+      "title": "View entities in descending order in \"Update Multiple Attributes\" widget",
+      "body": "**Component**\r\n\r\n * UI\r\n\r\n**Description**\r\nBy default, the \"Update Multiple Attributes\" widget will display entities in an ascending order. If I have an alias that contains three devices named Employee 1, Employee 2, and Employee 3, then the widget will display Employee 3 at the top and Employee 1 at the bottom. I would like to display entities in a descending order instead, such that Employee 1 is at the top and Employee 3 is at the bottom, is there a way to do this?\r\n\r\n**Environment**\r\n * ThingsBoard: 3.7.0"
+    },
+    "satisfaction_conditions": [
+      "Entities must display in descending order based on their numeric identifiers",
+      "The ordering must be maintained consistently in the Update Multiple Attributes widget",
+      "The ordering solution must work within ThingsBoard version 3.7.0"
+    ],
+    "created_at": "2024-09-11T00:33:55Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/11367",
+    "source": {
+      "issue_number": 11367
+    },
+    "initial_question": {
+      "title": "How to store our data at widgetContext to use it globally as variable?",
+      "body": "**Cant we store some of our data at widgetContext to use it globally**\r\n\r\nIf possible, so please let me know how and where.\r\nThank you."
+    },
+    "satisfaction_conditions": [
+      "Data must persist across different widget instances",
+      "Data must be accessible from any widget in the application",
+      "Data must be modifiable and retrievable at runtime",
+      "Storage mechanism must work with both custom and provided widgets"
+    ],
+    "created_at": "2024-08-06T13:18:23Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/11213",
+    "source": {
+      "issue_number": 11213
+    },
+    "initial_question": {
+      "title": "How to extract device-gateway data in rulechain?",
+      "body": "**Component**\r\n * Rule Engine\r\n\r\n**Question**\r\nHow can I get information about GATEWAY originator in rulechain.\r\n\r\n**Description**\r\nI have device that serves as Gateway. It uses MQTT, topic v1/gateway/telemetry to send messages about sensors like:\r\n\r\n`{\r\n\"dev_11\":\r\n[{\r\n\"Temperature\":23.9,\r\n\"RSSI\":-105,\r\n\"Battery\":153\r\n}]\r\n}`\r\n\r\nWorks great - it posts telemetry to rulechain with originator \"dev_11\" but I'd like to save name of the Gateway device that initiated the message. \r\n\r\n\r\n**Environment** \r\n * ThingsBoard: version 3.6.4 CE\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The retrieved gateway information must be accessible within the rule chain processing flow",
+      "The solution must work with the gateway telemetry format using v1/gateway/telemetry MQTT topic"
+    ],
+    "created_at": "2024-07-16T08:59:34Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/10906",
+    "source": {
+      "issue_number": 10906
+    },
+    "initial_question": {
+      "title": "Reset User Password without mail",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n\r\n * Generic\r\n\r\n**Description**\r\nHi,\r\nI need to reset a forgotten password for a customer who can't receive email, so he can't receive the link for resetting. How can I change his password as tenant administrator without knowing his previous password?\r\nThanks for your answers,\r\n\r\n**Environment**\r\n<!-- Add information about your environment and ThingsBoard version if applicable -->\r\n\r\n * ThingsBoard: 3.5.1 PE\r\n\r\n\r\n___________________________________________________________\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "New password can be set without requiring the previous password",
+      "Solution works without email verification",
+      "Action can be performed by tenant administrator"
+    ],
+    "created_at": "2024-05-31T09:22:09Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/10788",
+    "source": {
+      "issue_number": 10788
+    },
+    "initial_question": {
+      "title": "How to read response from \"sendTwoWayRpcCommand(entityId,requestBody)\"",
+      "body": "Hello dears,\r\n\r\ni have a problem for reading response in method in \"sendTwoWayRpcCommand(entityId,requestBody)\" in  \"Latest Value\" type widgets.\r\nI want to press a button, wait for the device to response and display the data returned from the device in the widget.\r\n\r\nIs there a way to solve this specification?"
+    },
+    "satisfaction_conditions": [
+      "RPC command response data must be successfully captured and processed",
+      "Asynchronous response handling must be implemented",
+      "Error states must be properly handled"
+    ],
+    "created_at": "2024-05-14T10:52:34Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/10179",
+    "source": {
+      "issue_number": 10179
+    },
+    "initial_question": {
+      "title": "[Question] How can I get the last telemetry value before the time window?",
+      "body": "**Component**\r\n * UI\r\n\r\n**Description**\r\nI am developing a widget to show the time in which an attribute has been in a state, the problem I have is that I need the previous state before the time window to know if there has been any change, how could I get this value?\r\n\r\n**Environment**\r\nOS: Windows 11 Pro 23H2\r\nThingsBoard: 3.6\r\nBrowser: Microsoft Edge 120.0.2210.133\r\n"
+    },
+    "satisfaction_conditions": [
+      "Query retrieves telemetry data from before a specified time window",
+      "Data retrieval works within ThingsBoard UI widget context",
+      "Retrieved data includes state information for the specified entity",
+      "Query results can be processed within the widget's logic"
+    ],
+    "created_at": "2024-02-14T08:25:00Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/7433",
+    "source": {
+      "issue_number": 7433
+    },
+    "initial_question": {
+      "title": "[Question] Saving Attribute From Custom Widget",
+      "body": "I'm trying to save a value as an attribute.\r\nI'm using\r\n```\r\nattributeService = self.ctx.$scope.$injector.get('attributeService');\r\nattributeService.saveEntityAttributes(entityId,attributeScope,attributes);\r\n```\r\nI get this error\r\n```\r\nUncaught NullInjectorError: R3InjectorError(class extends o{})[attributeService -> attributeService -> attributeService -> attributeService]: \r\n  NullInjectorError: No provider for attributeService!\r\n```\r\nWhat is the solution for this?"
+    },
+    "satisfaction_conditions": [
+      "Attribute service must be correctly injected without throwing NullInjectorError",
+      "Entity ID must be provided in the correct format"
+    ],
+    "created_at": "2022-10-17T10:11:25Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/7344",
+    "source": {
+      "issue_number": 7344
+    },
+    "initial_question": {
+      "title": "Remove sign up from thingsboard login",
+      "body": "Kindly suggest how to remove sign up option on the thingsboard white labelled login page. I have explored self registration option, but i couldn't see any option to disable sign up."
+    },
+    "satisfaction_conditions": [
+      "Sign up option is not visible to users on the login page",
+      "Login page remains fully functional",
+      "Changes persist across page reloads",
+      "Solution works within white-labeled interface"
+    ],
+    "created_at": "2022-09-28T05:47:53Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/7160",
+    "source": {
+      "issue_number": 7160
+    },
+    "initial_question": {
+      "title": "Can we use authService with or without $injector inside the custom widget?",
+      "body": "**Component**\r\n * UI\r\n * Generic\r\n\r\n**Description**\r\nCan we use authService inside the custom widget?\r\n\r\n**Environment**\r\n * ThingsBoard: PE and CE\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Authentication service is successfully accessed within the custom widget",
+      "Widget maintains proper scope and context access",
+      "Service injection mechanism is compatible with ThingsBoard's architecture"
+    ],
+    "created_at": "2022-08-27T06:28:08Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6789",
+    "source": {
+      "issue_number": 6789
+    },
+    "initial_question": {
+      "title": "[Question] Add user to multiple groups (PE)",
+      "body": "**Component**\r\n\r\n * UI\r\n\r\n**Description**\r\nPE user guide states that \"One user can simultaneously belong to several user groups\"\r\nHow it is possible to manage user<->relationship ?\r\n\r\n**Environment**\r\n * OS:  any\r\n * ThingsBoard: 3.2.2 PE\r\n * Browser: any\r\n"
+    },
+    "satisfaction_conditions": [
+      "UI must provide a mechanism to manage user-group relationships",
+      "Group assignment action must be accessible from the user management interface",
+      "User selection must be possible before group assignment"
+    ],
+    "created_at": "2022-06-22T11:20:43Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6738",
+    "source": {
+      "issue_number": 6738
+    },
+    "initial_question": {
+      "title": "Custom Validator  on FormArray-level prevents submit in custom action?",
+      "body": "I've managed to include a custom validator into my form within a custom-action with html-template.\r\nFor this, I've simply defined a class and created an object from it:\r\n\r\n```\r\n    class customValidator {\r\n        constructor(){\r\n            this.isModelValid=true;\r\n        }\r\n        validate(c){        \r\n            let vals = c.value.map(item=>item.field2);\r\n            let sum = vals.reduce((previousValue, currentValue) => previousValue + currentValue,0);\r\n            return sum != 100 ? {'adduperror':true}: {'adduperror':false};\r\n        }\r\n        \r\n    }\r\n    vm.addupValidator= new customValidator();\r\n```\r\n\r\nThis validator was added to the fb.array-method of the instance.\r\n\r\n```\r\n     vm.addEntityFormGroup = vm.fb.group({\r\n     entityName: [''],\r\n     entityType: ['DEVICE'],\r\n     entityLabel: [null],\r\n\r\n     // similar to how relations-list is constructed\r\n     myarr: vm.fb.array([     vm.fb.group({\r\n        field1: [null, [vm.validators.required]],\r\n        field2 [null, [vm.validators.required,\r\n                      vm.validators.pattern(/^[0-9][0-9]?$|^100$/),\r\n                      ]]\r\n     })],[vm.addupValidator])\r\n     \r\n    });\r\n```\r\nValidation does indeed work as expected. However, the validator somehow doesn't allow me to submit the form (greyed out submit button)\r\n\r\nWhat am I missing?\r\nIs there another method I need to add to my validator class?"
+    },
+    "satisfaction_conditions": [
+      "Sum validation logic correctly identifies when values total 100",
+      "Validator integrates properly with FormArray structure"
+    ],
+    "created_at": "2022-06-17T09:53:57Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6622",
+    "source": {
+      "issue_number": 6622
+    },
+    "initial_question": {
+      "title": "[Question] How to specify sortOrder from custom widget",
+      "body": "**Component**\r\n\r\n * UI\r\n\r\n**Description**\r\nI try to specify a sortOrder into a pageLink to get my results sorted (in this case devices sorted by name).\r\n\r\n**Environment**\r\n * OS:  name and version\r\n * ThingsBoard: 3.1 PE\r\n * Browser: Firefox\r\n\r\nWhen developing custom widget you can request devices assigned to a certain customer using this call:\r\n`self.ctx.deviceService.getCustomerDevices(customerId, pageLink).subscribe(....`\r\n\r\nThis works fine with default pageLink that you obtain like this:\r\n\r\n`self.ctx.pageLink()`; \r\n\r\nor even like this \r\n\r\n`self.ctx.pageLink(200, 0, '', null);  `\r\n\r\nwhere 200 is the max page size, 0 is the current page, '' is the search string and I guess last parameter is the sortOrder.\r\n\r\nNow I don't know how to specify sortOrder. The closest I got was with this:\r\n```\r\n       var pl = self.ctx.pageLink(200, 0, '', null);\r\n       pl['sortOrder'] = {};\r\n       pl.sortOrder['direction'] = 'ASC';\r\n       pl.sortOrder['key'] = {};\r\n       pl.sortOrder.key['key'] = 'name';\r\n       pl.sortOrder.key['type'] = 'ENTITY_FIELD';\r\n```\r\n\r\nwhich succeed to inject sortOrder in the request but not the sortProperty.\r\n\r\n/devices?pageSize=200&page=0&sortProperty=undefined&sortOrder=ASC&type=\r\n\r\nLogically resulting in a 500 server error with that error:\r\n\r\n`org.hibernate.QueryException: could not resolve property: undefined of: org.thingsboard.server.dao.model.sql.DeviceEntity [SELECT d FROM org.thingsboard.server.dao.model.sql.DeviceEntity d WHERE d.tenantId = :tenantId AND d.customerId = :customerId AND LOWER(d.searchText) LIKE LOWER(CONCAT(:searchText, '%')) order by d.undefined asc]; nested exception is java.lang.IllegalArgumentException: org.hibernate.QueryException: could not resolve property: undefined of: org.thingsboard.server.dao.model.sql.DeviceEntity [SELECT d FROM org.thingsboard.server.dao.model.sql.DeviceEntity d WHERE d.tenantId = :tenantId AND d.customerId = :customerId AND LOWER(d.searchText) LIKE LOWER(CONCAT(:searchText, '%')) order by d.undefined asc]`\r\n\r\nSo what is the proper way of performing this request with sort order on a field?"
+    },
+    "satisfaction_conditions": [
+      "The request must successfully retrieve customer devices"
+    ],
+    "created_at": "2022-06-01T13:08:04Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6547",
+    "source": {
+      "issue_number": 6547
+    },
+    "initial_question": {
+      "title": "How to set device label in the gateway?",
+      "body": "Hi\uff0c Is there any way to set device label when send telemetry in gateway?"
+    },
+    "satisfaction_conditions": [
+      "Device label functionality is correctly identified as unavailable",
+      "Available device identification options are clearly specified",
+      "Response addresses gateway-specific telemetry context"
+    ],
+    "created_at": "2022-05-13T07:56:10Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6527",
+    "source": {
+      "issue_number": 6527
+    },
+    "initial_question": {
+      "title": "How to show date and time with the value in the Simple card widget?",
+      "body": "I am using the Simple Card widget to show the values but I also want to show the timestamp/ time in the dd-mm-yy hh-mm format.\r\nWhen the telemetry doesn't have any latest data the client is not able to differentiate whether it is latest or old data. Need timestamp to differentiate it.\r\n\r\nHow to show both the value and the time?\r\n\r\nI'm using Thingsboard version 3.3.2 \r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The widget must display both the telemetry value and timestamp simultaneously",
+      "The timestamp must be displayed in a human-readable format",
+      "The combined display must work within the Simple Card widget's constraints",
+      "The display must clearly distinguish between the value and timestamp components",
+      "The solution must work with Thingsboard version 3.3.2"
+    ],
+    "created_at": "2022-05-05T10:47:36Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6355",
+    "source": {
+      "issue_number": 6355
+    },
+    "initial_question": {
+      "title": "[Question] How can thingsboard gateway connect multiple OPC servers?",
+      "body": "The usage scenario is as follows: each device has an independent OPC server. Now I can correctly collect the device through the thingsboard gateway, but opcua In the configuration of JSON, the address of an OPC server corresponding to each device cannot be configured.\r\nIn the seemingly TB configuration, the \"opc-ua\" scenario only supports one server corresponding to multiple devices.\r\nHow can I configure the gateway to support one configuration and access all devices?\r\n\r\nI need to configure an array \"server\"\uff1f\r\nor\r\nI need to configure multiple \"opcua. json\"\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Gateway must be able to connect to multiple distinct OPC servers simultaneously",
+      "Each OPC server connection must be independently configurable",
+      "Gateway configuration must maintain unique identification for each OPC server connection",
+      "Solution must work within Thingsboard gateway's existing configuration system"
+    ],
+    "created_at": "2022-04-01T06:17:56Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6187",
+    "source": {
+      "issue_number": 6187
+    },
+    "initial_question": {
+      "title": "[Question] Show Button in Entities Table widget depending on attribute value of entity",
+      "body": "Hello,\r\n\r\nI have an Entities table widget which displays all my Customers.\r\nIf some Customers are Service Providers, they have an boolean attribute \"is_service_provider\" equal to true. \r\nThis attribute is false otherwise.\r\nI would like to show or hide a button depending on the value of the attribute \"is_service_provider\".\r\nI have tried this code in the show/hide function of button but it does not work.\r\n\r\n```\r\n let $injector = widgetContext.$scope.$injector;\r\nlet attributeService = $injector.get(widgetContext.servicesMap.get('attributeService'));\r\n\r\nattributeService.getEntityAttributes(data.id, 'SERVER_SCOPE', ['is_service_provider']).subscribe(\r\n                   function (attributes) {\r\n\t\t\t\tif(attributes[0]) {\r\n\t\t\t\t\treturn attributes[0].value;\r\n\t\t\t\t}   \r\n\t\t  }\r\n);\r\n```\r\n\r\nIs it because the return is inside the subscribe ?\r\nIs there any other way to do what I want ?\r\nBest Regards,\r\n\r\nLucas"
+    },
+    "satisfaction_conditions": [
+      "Button visibility must correctly reflect the service provider status",
+      "Data access must be synchronous in the show/hide function",
+      "Service provider status must be accessible within the widget's context",
+      "Boolean comparison must handle string or boolean type correctly"
+    ],
+    "created_at": "2022-03-02T15:00:34Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/6053",
+    "source": {
+      "issue_number": 6053
+    },
+    "initial_question": {
+      "title": "Is it safe to use Delay Rule Node or Do I need to use something else ?",
+      "body": "Hello,\r\n\r\nI have created a RuleChain that is triggered when attributes are updated. This RuleChain makes an API call to nominatim and get the latitude and longitude from an adress and a city in the attributes of the asset.\r\nI also have a dashboard which can create assets for customers. Those asset are of two types : building and equipment.\r\nWhat I try to do is to have a Rule Chain which places the asset in the good asset group of the customer. I do this by using the \"add to group\" node, and I use it for each type of asset. I want the assets to be placed in the \"buildings\" and \"equipments\" asset groups.\r\nThe thing is sometimes it works, and sometimes it doesn't. But in the debug of the Rule Chain it tells Success everytime.\r\nI just saw that an asset group \"equipments\" was created at the root level of the tenant, but is empty. So it seems to mean that my asset is placed in this group, then is transfered in the \"all\" group of the customer assets.\r\n\r\nNote : I change the asset owner programmatically in my widget using custom action.\r\nThe code is this.\r\n\r\n```\r\nvm.save = function() {\r\n  vm.addEquipementFormGroup.markAsPristine();\r\n\t\tlet asset = {\r\n\t\t\tname: vm.addEquipementFormGroup.get('equipementName').value,\r\n\t\t\ttype: vm.addEquipementFormGroup.get('assetType').value,\r\n\t\t\tlabel: vm.addEquipementFormGroup.get('equipementName').value\r\n\t\t};\r\n        \r\n               assetService.saveAsset(asset).subscribe(\r\n                 function (asset) {\r\n\t\t\t\twidgetContext.rxjs.forkJoin([\r\n                                 saveAttributes(asset.id),\r\n\t\t\t\tsaveRelations(asset.id)\r\n\t\t\t\t]).subscribe(\r\n                                   function () {\r\n                                                //The owner is the client in which I am located in the dashboard\r\n\t\t\t\t\t\tvar owner = widgetContext.stateController.stateObject[1].params.entityId;\r\n\t\t\t\t\t\tentityGroupService.changeEntityOwner(owner,asset.id).subscribe(\r\n\t\t\t\t\t\t\tfunction () {\r\n\t\t\t\t\t\t\t\twidgetContext.updateAliases();\r\n\t\t\t\t\t\t\t\tvm.dialogRef.close(null);\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t);\r\n                                 }\r\n\t\t\t    );\r\n              }\r\n           );\r\n  };\r\n```\r\n\r\nBest regards,\r\n\r\nLucas\r\n"
+    },
+    "satisfaction_conditions": [
+      "Single event trigger for related operations"
+    ],
+    "created_at": "2022-02-08T09:05:50Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/5689",
+    "source": {
+      "issue_number": 5689
+    },
+    "initial_question": {
+      "title": "[Question] how to setup a staging environment in clustered mode - licence key conflict",
+      "body": "**Component**\r\n * Installation\r\n\r\n**Description**\r\nI'm trying to setup a staging environment in my company to test changes for my tenants before applying them on the production environment.\r\nBoth environments are running TB PE 3.3.1 with hybrid storage (postgres+cassandra).\r\nI want the staging environment to be a copy of the production environment data-wise, so I purchased another TB licence to run the staging environment, then tried to dump & restore the postgres database from the production instance on the staging instance.\r\nHowever the production database somehow contains the licence information embedded in it.\r\nNow my staging environment does not start and I have no idea how to reapply my 2nd license key while keeping the rest of the data.\r\n\r\nHow should I proceed ?\r\n\r\n**Environment**\r\n * OS:  ubuntu\r\n * ThingsBoard: 3.3.1PE running on docker-compose\r\n"
+    },
+    "satisfaction_conditions": [
+      "The staging environment must successfully start with its own valid license",
+      "Production data must be successfully transferred to staging without license conflicts",
+      "Each environment (production and staging) must maintain its distinct license identity"
+    ],
+    "created_at": "2021-12-06T16:51:43Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/5508",
+    "source": {
+      "issue_number": 5508
+    },
+    "initial_question": {
+      "title": "Device Profile Alarm Rule - alarm severity cannot be change from Critical to Major",
+      "body": "Consider the following device profile alarm rule:\r\ncreation condition 1: if device temperature > 4, create High Temperature alarm with Critical severity\r\ncreation condition 2: if device temperature > 0 and temperature <=4, create High Temperature alarm with Major severity\r\nclear condition: if device temperature < 0\r\n\r\nTest result:\r\n1. device temperature = 2, new alarm with Major severity is created => OK\r\n2. device temperature = 5, alarm is updated with Critical Severity => OK\r\n3. device temperature = 2 again, no update to alarm severity => NOT OK\r\n4. device temperature = -1, alarm is cleared => OK\r\n\r\nQuestion: in step 3,  should the alarm be updated with severity set to Major?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Alarm severity must maintain the highest recorded severity level until cleared",
+      "Alarm creation and clearing must follow the defined temperature thresholds",
+      "Multiple alarm conditions for the same alarm type must update the existing alarm rather than create new ones"
+    ],
+    "created_at": "2021-11-07T07:58:07Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/5445",
+    "source": {
+      "issue_number": 5445
+    },
+    "initial_question": {
+      "title": "[Question] HTML/Markdown card widget conditional display based on attributes",
+      "body": "I have created a navigation menu bar using the HTML/Markdown card widget and it works great.\r\n\r\nI would like to control the visibility of some of the menu items based on my custom Server Attributes.\r\nfor example `if ${showTemperaturePage} == true` then display an object in the menu.\r\n\r\nI'm not sure how to put some java script into the widget to alter the visibility in CSS\r\n\r\nRegards\r\nGed\r\n"
+    },
+    "satisfaction_conditions": [
+      "Menu items must conditionally display based on server attribute values",
+      "Solution must work within HTML/Markdown card widget context"
+    ],
+    "created_at": "2021-10-27T03:01:06Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/4863",
+    "source": {
+      "issue_number": 4863
+    },
+    "initial_question": {
+      "title": "[Question] Close opened MQTT connection",
+      "body": "**Component**\r\n\r\n * Generic\r\n\r\n**Description**\r\n\r\nSuppose we have a broken device that is sending a huge amount of data. I want to close the current connection on a specific device.\r\n\r\nI'm not finding a way to close an open connection, and I would like to know if is possible.\r\n\r\nThank you in advance\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The MQTT connection from the problematic device must be terminated",
+      "The solution must work without physical access to the device",
+      "The connection termination must be achievable through server-side actions",
+      "The solution must prevent the device from continuing to send data through the existing session"
+    ],
+    "created_at": "2021-07-05T15:14:19Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/4817",
+    "source": {
+      "issue_number": 4817
+    },
+    "initial_question": {
+      "title": "[Question] Button Action Code to Post latest telemetry value to another key?",
+      "body": "**Component**\r\nThingsboard Webpage\r\n * UI\r\nWidget Actions\r\n\r\n**Description**\r\nI want to copy the value of the telemetry key distributionImage to distributionRefImage when they press the action button.\r\n\r\nI don't have much more than starting with \r\n\r\n_let $injector = widgetContext.$scope.$injector;\r\nlet attributeService = $injector.get(widgetContext.servicesMap.get('attributeService'));_\r\n\r\nThen I assume this but I don't know how I should translate that to javascript??\r\n(Get latest value and post it again on other key)\r\n\r\n_var sourcekey = 'distributionImage'\r\nvalue = get /api/plugins/telemetry/{entityType}/{entityId}/values/timeseries{?keys,useStrictDataTypes}_ \r\n\r\n_var targetkey = 'distributionRefImage'\r\npost /api/plugins/telemetry/{entityType}/{entityId}/timeseries/{scope}_ \r\n\r\nThanks\r\n\r\n**Environment**\r\n * OS:  Windows 10\r\n * ThingsBoard: 3.2.2\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Operation executes in response to button action",
+      "Properly interfaces with ThingsBoard's service architecture",
+      "Handles asynchronous operations correctly"
+    ],
+    "created_at": "2021-06-29T12:43:15Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/4614",
+    "source": {
+      "issue_number": 4614
+    },
+    "initial_question": {
+      "title": "how to use ctx attribute service to call getEntityTimeseries ",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n * Generic\r\n\r\n**Description**\r\n Hi,\r\nI want to call ctx.attributeservice.getEntityTimeseries  to get sum of timseries as a column in EntityTable-widget. so I called that in \r\nadvanced javascript section of widget column.\r\n\r\n\r\n**_e = entity.id; //entityId\r\nt = [\"lat\"]; //keys keys=gas,temperature\r\nn = 1479735870785; //startTs\r\ni = 1479735871858; //endTs\r\na = 100; //limit\r\no = \"SUM\" //agg\r\nu = 60000; //interval\r\np = \"AVG\"; //orderBy\r\nd = false; //useStrictDataTypes\r\nm = 1; //config\r\n\r\nsum= ctxmain.attributeService.getEntityTimeseries(\r\n    entityId = e, keys = t, startTs = n, endTs = i,\r\n    agg = o, interval = u , limit=a);        \r\nreturn sum;_**\r\n\r\n but i am witnessed this result:\r\n\r\n**_e {_isScalar: false, source: e, operator: e}\r\noperator: e {project: \u0192, thisArg: undefined}\r\nsource: e {_isScalar: false, source: e, operator: e}\r\n_isScalar: false\r\n__proto__: Object_**\r\n\r\ni expect to get a number or list of number as output, please give me a solution\r\nthanks in advance\r\n\r\n**Environment**\r\n<!-- Add information about your environment and ThingsBoard version if applicable -->\r\n\r\n * ThingsBoard: CE \r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The function must handle asynchronous data retrieval",
+      "The returned data must be properly parsed to access timeseries values",
+      "The service must be correctly accessed through the ThingsBoard context",
+      "The function must return numerical values or arrays of numerical values",
+      "The query parameters (entityId, keys, timestamps, etc.) must be properly passed to the service call"
+    ],
+    "created_at": "2021-05-22T14:57:32Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/4544",
+    "source": {
+      "issue_number": 4544
+    },
+    "initial_question": {
+      "title": "REST API call 'getCustomerDevices' has changed",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n * Installation\r\n * REST API\r\n\r\n**Description**\r\nREST API call 'getCustomerDevices' has changed after updating TB from **v2.4.3** to **v.3.2.2**\r\nIn v2.4.3. it was:\r\n_get /api/customer/{customerId}/devices{?type,textSearch,idOffset,textOffset,limit}_\r\n\r\nIn v3.2.2 it is\r\n_get /api/customer/{customerId}/devices{?type,textSearch,sortProperty,sortOrder,pageSize,page}_ \r\n\r\nThe problem is that with v2.4.3 API I was able to get a list of all devices that are assigned to the customer. With v.3.2.2 I have to iterate through the pages to get a complete list of assigned devices. \r\n\r\nWe use our own developped MES to show devices that are assigned to specific customers which is not possible anymore. \r\nIs there a way to use the old REST API version from v2.4.3 with the new v3.2.2?\r\n\r\n**Environment**\r\n<!-- Add information about your environment and ThingsBoard version if applicable -->\r\n * OS:  Kybernetes installation\r\n * ThingsBoard: 3.2.2\r\n * Browser: Firefox\r\n"
+    },
+    "satisfaction_conditions": [
+      "API request must return complete device list for a customer in a single response",
+      "Solution must work with ThingsBoard v3.2.2"
+    ],
+    "created_at": "2021-05-06T09:44:33Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/4308",
+    "source": {
+      "issue_number": 4308
+    },
+    "initial_question": {
+      "title": "[Question] make customer vie group dashboard puplic",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n * Rule Engine\r\n\r\n**Description**\r\nHi, I like to organize dashboards and devices in Customer Groups.\r\nIs there a possibility to make a puplic dashboard / puplic device? I can\u00b4t find the \"make puplic\" button and don\u00b4t find a workaround.\r\n\r\nCheers!\r\n\r\n**Environment**\r\n<!-- Add information about your environment and ThingsBoard version if applicable -->\r\n * OS:  Ubuntu 18\r\n * ThingsBoard: Professional (Version...have to ask our admin...)\r\n * Browser: FireFox 78.9.0esr\r\n"
+    },
+    "satisfaction_conditions": [
+      "Dashboard must be accessible to public users",
+      "Solution must work within ThingsBoard Professional Edition constraints",
+      "Device organization structure must remain functional",
+      "Group-level access control must be configurable"
+    ],
+    "created_at": "2021-03-25T17:25:38Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3923",
+    "source": {
+      "issue_number": 3923
+    },
+    "initial_question": {
+      "title": "REST API Properties",
+      "body": "Hello All,\r\n\r\n    What is sort Property in Swagger URL REST API Link.\r\n\r\n /api/user/devices{?type,textSearch,sortProperty,sortOrder,pageSize,page}\r\n\r\nWhat property to be set for \r\ntextSearch and sortProperty"
+    },
+    "satisfaction_conditions": [
+      "API query parameters must support text-based device search",
+      "API must support result sorting through sortProperty parameter",
+      "API must support pagination",
+      "API response must return tenant-specific device data",
+      "API documentation must clearly specify valid sort properties"
+    ],
+    "created_at": "2021-01-08T10:06:08Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3848",
+    "source": {
+      "issue_number": 3848
+    },
+    "initial_question": {
+      "title": "ThingsBoard Create Device with custom Access token",
+      "body": "**_### hi all\r\n\r\ni would like to create new device from admin device widget and change its access token while creation.\r\ncode i am using_**\r\n\r\nlet $injector = widgetContext.$scope.$injector;\r\nlet customDialog = $injector.get(widgetContext.servicesMap.get('customDialog'));\r\nlet deviceService = $injector.get(widgetContext.servicesMap.get('deviceService'));\r\nlet attributeService = $injector.get(widgetContext.servicesMap.get('attributeService'));\r\n\r\nopenAddDeviceDialog();\r\n\r\nfunction openAddDeviceDialog() {\r\n    customDialog.customDialog(htmlTemplate, AddDeviceDialogController).subscribe();\r\n}\r\n\r\nfunction AddDeviceDialogController(instance) {\r\n    let vm = instance;\r\n    \r\n    vm.addDeviceFormGroup = vm.fb.group({\r\n      deviceName: ['', [vm.validators.required]],\r\n      deviceType: ['', [vm.validators.required]],\r\n      deviceLabel: [''],\r\n      attributes: vm.fb.group({\r\n          latitude: [null],\r\n          longitude: [null]\r\n      })      \r\n    });\r\n    \r\n    vm.cancel = function() {\r\n        vm.dialogRef.close(null);\r\n    };\r\n    \r\n    vm.save = function() {\r\n        vm.addDeviceFormGroup.markAsPristine();\r\n        let device = {\r\n            name: vm.addDeviceFormGroup.get('deviceName').value,\r\n            type: vm.addDeviceFormGroup.get('deviceType').value,\r\n            label: vm.addDeviceFormGroup.get('deviceLabel').value\r\n        };\r\n        let device2 = {\r\n            createdTime: 0,\r\n            credentialsId: \"string\",\r\n            credentialsType: \"ACCESS_TOKEN\",\r\n            credentialsValue: \"123\",\r\n            id:\"string\"\r\n            \r\n            \r\n        };\r\n        deviceService.saveDevice(device).subscribe(\r\n            function (device) {\r\n                saveAttributes(device.id).subscribe(\r\n                    function () {\r\n                        widgetContext.updateAliases();\r\n                        vm.dialogRef.close(null);\r\n                    }\r\n                );\r\n            }\r\n        );\r\n       deviceService.saveDeviceCredentials(device2).subscribe();\r\n        \r\n           \r\n    }\r\n    function saveAttributes(entityId) {\r\n        let attributes = vm.addDeviceFormGroup.get('attributes').value;\r\n        let attributesArray = [];\r\n        for (let key in attributes) {\r\n            attributesArray.push({key: key, value: attributes[key]});\r\n        }\r\n        if (attributesArray.length > 0) {\r\n            return attributeService.saveEntityAttributes(entityId, \"SERVER_SCOPE\", attributesArray);\r\n        } else {\r\n            return widgetContext.rxjs.of([]);\r\n        }\r\n    }\r\n}\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Device creation request must include a custom access token parameter",
+      "Device creation must successfully store basic device properties",
+      "Device attributes must be saved after successful device creation",
+      "UI must update to reflect the new device creation",
+      "Dialog must close after successful device creation"
+    ],
+    "created_at": "2020-12-14T12:18:58Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3758",
+    "source": {
+      "issue_number": 3758
+    },
+    "initial_question": {
+      "title": "Is there a way to hide a widget based on device type?",
+      "body": "**Component**\r\nDashboard states\r\n\r\n * UI\r\nMultiple dashboard for devices\r\n\r\n**Description**\r\nIs there a way to hide a widget based on the device type that's clicked?  For Example I have an entity list widget with all my devices on my first landing page dashboard.  The user clicks on the device and it goes to a dashboard state with detailed info.  I have devices that are very similar but may or may not have an extra feature such as humidity.  So basically if I have a device with temperature and humidity I want to show the graphs of temperature and humidity when I click on that type of device.  If I have a device with only temperature the info dashboard should have no humidity graph.  \r\n\r\nIs the only way to do this with multiple dashboards?  The issue I have with that is there are several other widgets on the info page and if I make a change to one of those other widgets I now have to duplicate the change on the other dashboards....\r\n\r\n**Environment**\r\n * OS:  Windows Server 2016\r\n * ThingsBoard: 2.3.4\r\n * Browser: Chrome (latest version)"
+    },
+    "satisfaction_conditions": [
+      "Widget visibility must dynamically change based on device capabilities",
+      "Navigation between device views must maintain data context",
+      "Common widget configurations must remain consistent across different device views",
+      "Solution must work within a single dashboard interface",
+      "Device-specific data must be correctly filtered"
+    ],
+    "created_at": "2020-11-19T18:46:47Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3636",
+    "source": {
+      "issue_number": 3636
+    },
+    "initial_question": {
+      "title": "Issue with Label and Tooltip Functions at PE 3.1.1",
+      "body": "**Component**\r\n * UI\r\n\r\n**Environment**\r\n * OS:  Ubuntu 20\r\n * ThingsBoard: PE 3.1.1\r\n * Browser: Chrome\r\n\r\n**Description**\r\nHi Guys, I am trying to use Label Functions to customize my assets labels and colors at a Latest Value OpenStreetMap widget. At Dashboard Advanced Parameters tab, we have as default function the following. \r\n\r\nvar deviceType = dsData[dsIndex]['deviceType'];\r\nif (typeof deviceType !== undefined) {\r\n    if (deviceType == \"energy meter\") {\r\n        return '<span style=\"color:orange;\">${entityName}, ${energy:2} kWt</span>';\r\n    } else if (deviceType == \"thermometer\") {\r\n        return '<span style=\"color:blue;\">${entityName}, ${temperature:2} \u00b0C</span>';\r\n    }\r\n}\r\n\r\nSo, my doubts are:\r\n\r\n1) Which options are possible to read as dsData[dsIndex]? I mean, hoa can I get a list of possible keys?\r\n2) I tried to alter this function for assetType instead of deviceType, once my aliasses were created filtering my assets types, but it did not work. What I am trying to run is the following, but instead of create colors differenciation it is not returning any label for any asset. Without using label function the labels work fine (without any differenciation).\r\n\r\nvar assetType = dsData[dsIndex]['assetType'];\r\nif (typeof assetType !== undefined) {\r\n    if (assetType == \"ABC\") {\r\n        return '<span style=\"color:orange;\">${entityName}</span>';\r\n    } else if (assetType == \"DEF\") {\r\n        return '<span style=\"color:blue;\">${entityName}</span>';\r\n    }\r\n}\r\n\r\nThanks for your help sharing your tips and comments."
+    },
+    "satisfaction_conditions": [
+      "Label function must correctly access entity type information",
+      "Data source keys must be correctly referenced",
+      "Label function must return valid HTML/text output"
+    ],
+    "created_at": "2020-10-26T14:42:14Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3541",
+    "source": {
+      "issue_number": 3541
+    },
+    "initial_question": {
+      "title": "How to use Attribute data in Map tooltip widget?",
+      "body": "Hi guys\r\n\r\nI am trying to do some logic and to display attribute values in the map tooltip / map color function\r\n\r\nit works for timeseries data, but I cannot make it work for attributes:\r\n\r\nfor attribute key 'active' that is selected in the data source for the widget.\r\n\r\n\tvar active = dsData[dsIndex]['active'];\r\ndoesn't work\r\nwhile the same works for temperature time series in the data sources.\r\n\r\n\tvar temperature = dsData[dsIndex]['temperature'];\r\n\r\nWhat is the correct method here?\r\n\r\n@YevhenBondarenko "
+    },
+    "satisfaction_conditions": [
+      "Attribute values must be correctly accessed from the data source object",
+      "String comparison must be used for boolean attribute values",
+      "Data type compatibility must be maintained between source and comparison operations",
+      "Map tooltip/color function must correctly display the processed attribute values"
+    ],
+    "created_at": "2020-10-05T07:52:46Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3448",
+    "source": {
+      "issue_number": 3448
+    },
+    "initial_question": {
+      "title": "[Question] Transform Payload in Rule Engine",
+      "body": "**Component**\r\n * Rule Engine\r\n\r\n**Description**\r\nI need to generate a new JSON in the Root Rule Chain, this new JSON is different from the input. I am using the script node to add new nodes.\r\n\r\nI need to add JSON node names with @, for example:\r\n\r\ninput message > { \"temperature\" : 24}\r\noutput message > { \"@temp\": 24}\r\n\r\nHow can achieve this?\r\n\r\n**Environment**\r\n * OS:  Ubuntu 18.04\r\n * ThingsBoard: 3.1.1\r\n * Browser: Chrome\r\n"
+    },
+    "satisfaction_conditions": [
+      "The output JSON contains field names prefixed with '@' symbol",
+      "Original field values are preserved in the transformation",
+      "The transformation is performed within ThingsBoard's Rule Chain environment",
+      "Original field names are removed from the output"
+    ],
+    "created_at": "2020-09-11T09:33:30Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3440",
+    "source": {
+      "issue_number": 3440
+    },
+    "initial_question": {
+      "title": "trying to --loaddemo in ubuntu giving syntax error while running schema-entities.sql for v3.1.1 is installation guide not updated?",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n * Installation\r\n\r\n**Description**\r\nTrying to loaddemo data for v3.1.1 as per ubuntu installation guide. its giving below error. same happening with docker installation as well. so i pulled v3.0.1 in docker which works fine.\r\n\r\nInstalling DataBase schema for entities...\r\nInstalling SQL DataBase schema part: schema-entities.sql\r\nUnexpected error during ThingsBoard installation!\r\norg.postgresql.util.PSQLException: The connection attempt failed.\r\n\r\n\r\n**Environment**\r\n * OS:  ubuntu 16.04.7 LTS\r\n * ThingsBoard: 3.1.1\r\n"
+    },
+    "satisfaction_conditions": [
+      "PostgreSQL version 12 or higher must be the only active PostgreSQL instance",
+      "Database connection must be properly established",
+      "SQL schema installation must complete without syntax errors",
+      "ThingsBoard demo data load command must complete successfully"
+    ],
+    "created_at": "2020-09-10T12:12:08Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3265",
+    "source": {
+      "issue_number": 3265
+    },
+    "initial_question": {
+      "title": "[Question] How to choose descending sort order in dashboard Device Admin Table widget's advanced form's Default sort order field",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n * UI\r\n\r\n\r\n**Description**\r\nI specified lastAcitivityTime in Dashboard->Widget->Device admin table->Advanced->Default sort order. That seems to be working. How can one specify descending order along with name? Default seems to be ascending and I have to click to choose descending every time I open the dashboard.\r\n\r\n**Environment**\r\n<!-- Add information about your environment and ThingsBoard version if applicable -->\r\n * OS:  Ubuntu LTS 18.04\r\n * ThingsBoard: 3.0.1\r\n * Browser: Chrome\r\n"
+    },
+    "satisfaction_conditions": [
+      "Dashboard table widget displays data in descending order by default",
+      "Sort order preference persists across dashboard sessions",
+      "Sort configuration is specifiable through the widget's advanced settings",
+      "Sort order applies to the specified column/attribute"
+    ],
+    "created_at": "2020-08-09T19:16:15Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3184",
+    "source": {
+      "issue_number": 3184
+    },
+    "initial_question": {
+      "title": "[Question] DomSanitzer in Widget for base64 encoded data",
+      "body": "**Component**\r\n\r\n<!-- Choose one of the following and delete all others. -->\r\n * UI\r\n * Widget\r\n \r\n**Description**\r\nMy IoT application acquires audio signals from deployed devices. The short audio clips (<500KB) are base64 encoded and sent to TB as a JSON key/value. My goal is to provide access to the latest recordings on the dashboard so the user can quickly evaluate and take necessary action.\r\n\r\nSo I created a new widget to display the html5 audio element and set its src to the base64 encoded data string like this:`src=\"data:audio/wav;base64,UklGRgh3AQBXQVZFZm10IBAAAAAB \u2026 /6//q/+T/3P/g/9v/4//a/+j/3f/o/+X/6P/t//D/9v/3/w==\"`. However, Angular does not permit this because it is considered an unsafe url and disables it by prepending `unsafe` to the string like this: `src=\"unsafe:data:audio/wav;base64,UklGRgh3AQBXQVZFZm10IBAAAAAB \u2026 /6//q/+T/3P/g/9v/4//a/+j/3f/o/+X/6P/t//D/9v/3/w==\"`.\r\n\r\nThe obvious solution is to use Angular's DomSanitizer (`domSanitizer.bypassSecurityTrustUrl()`) but it is not accessible within the widget's scope and it cannot be imported at runtime. A search of this repo shows numerous usages of the DomSanitizer, including in various widget components (ui-ngx/src/app/modules/home/components/widget/lib/alarms-table-widget.component.ts, ui-ngx/src/app/modules/home/components/widget/lib/entities-table-widget.component.ts, ui-ngx/src/app/modules/home/components/widget/lib/timeseries-table-widget.component.ts, etc.). \r\n\r\nIs it possible to access the DomSanitizer in a Widget? If so, how? If not, what other options can I try?\r\n\r\n**Environment**\r\n<!-- Add information about your environment and ThingsBoard version if applicable -->\r\n * OS:  AWS EC2 \r\n * ThingsBoard: PE 3.0.1\r\n * Browser: Chrome 84\r\n"
+    },
+    "satisfaction_conditions": [
+      "URL sanitization bypass must be available within widget scope"
+    ],
+    "created_at": "2020-07-28T18:28:47Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3147",
+    "source": {
+      "issue_number": 3147
+    },
+    "initial_question": {
+      "title": "How to pass entityName when using openDashBoardState() in custom Action",
+      "body": "Hi Guys, in the map widget we are using this following code to switch to dashboard state based on device type. But we cannot figure out how to pass entityName to the state so we can use the alias option 'Entity taken from dashboard state parameters'\r\n\r\nany help would be greatly appreciated \r\n\r\nversion: thingsboard 3.0.1PE\r\n\r\n```\r\n\r\nvar $injector = widgetContext.$scope.$injector;\r\n$injector.get(widgetContext.servicesMap.get('deviceService')).getDevice(entityId.id).subscribe(function(device) {\r\n        if (device.type == 'SCC-2D') {\r\n            openDashboardState('SCC_2D')\r\n        }\r\n        else if(device.type == 'SCC-2T') {\r\n            openDashboardState('SCC_2T')\r\n        }\r\n        else if(device.type == 'SCC-DT')  {\r\n            openDashboardState('SCC_DT')\r\n        }\r\n});\r\n\r\nfunction openDashboardState(stateId) {\r\n    var params = {\r\n        entityId: entityId,\r\n        entityName: entityName\r\n    }\r\n\r\n    widgetContext.stateController.openState(stateId, params, false);\r\n}\r\n\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Device name must be successfully retrieved from the device service response",
+      "Dashboard state transition must occur with both entityId and entityName parameters",
+      "Device type-based conditional routing must execute correctly",
+      "Device service injection must be successful within the widget context"
+    ],
+    "created_at": "2020-07-23T21:47:03Z"
+  },
+  {
+    "id": "https://github.com/thingsboard/thingsboard/issues/3017",
+    "source": {
+      "issue_number": 3017
+    },
+    "initial_question": {
+      "title": "[Question] How to exploit JSON Support in Widgets and Dashboards [2.5.2]",
+      "body": "The latest 2.5+ versions of TB support JSON in Telemetries & Attributes.\r\nHowever, there seems to be no added feature to access these datasets in the widgets Datasource section.\r\n\r\nI've tried dot notation with no luck, and I've also tried to use the Post-processing function to return sub-values of the JSON data, but the editor keeps demanding that the function must return a value.\r\n\r\nSample functions:\r\n\r\n    return value.key1; //Fails to compile\r\n    return value[\"key1\"]; //Fails\r\n    return JSON.parse(value).key1; //Also fails\r\n\r\nHow can we access inner fields in a JSON on the dashboards?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Successfully extracts nested values from JSON data in widget datasources",
+      "Returns a valid value that the widget can process",
+      "Handles potential undefined/missing JSON fields gracefully",
+      "Works within ThingsBoard's widget datasource configuration system"
+    ],
+    "created_at": "2020-06-28T23:42:46Z"
+  }
+]

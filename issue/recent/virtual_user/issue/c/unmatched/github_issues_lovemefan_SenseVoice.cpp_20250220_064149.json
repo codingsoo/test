@@ -1,0 +1,38 @@
+[
+  {
+    "number": 14,
+    "title": "failed to read WAV file 'SenseVoice.cpp/data/test1.wav'",
+    "created_at": "2024-09-16T13:16:50Z",
+    "closed_at": "2024-10-06T14:46:17Z",
+    "labels": [],
+    "url": "https://github.com/lovemefan/SenseVoice.cpp/issues/14",
+    "body": "Expected subchunk1_id 0x20746d66. Given: 0x4b4e554a\r\nerror: failed to read WAV file 'SenseVoice.cpp/data/test1.wav'\r\n\r\n\u6211\u7535\u8111\u4e0a\u5f55\u4e86\u4e00\u4e2aWAV\u683c\u5f0f\u97f3\u9891\uff0c\u63a8\u7406\u7684\u65f6\u5019\u63d0\u793a\u4ee5\u4e0a\u9519\u8bef\uff0c\u60f3\u95ee\u4e0b\u662f\u4ec0\u4e48\u539f\u56e0\u5462\u3002\r\n",
+    "comments_url": "https://api.github.com/repos/lovemefan/SenseVoice.cpp/issues/14/comments",
+    "author": "brisyramshere",
+    "comments": [
+      {
+        "user": "lovemefan",
+        "created_at": "2024-09-16T15:41:14Z",
+        "body": "\u786e\u4fdd\u97f3\u9891\u4e3a 16kHz\uff0c\u5355\u901a\u9053\u7684wav\uff0c\u53ef\u4ee5\u4f7f\u7528ffmpeg\u8f6c\u6362\r\n\r\n```\r\nffmpeg -i /path/test1.wav -ar 16000 -ac 1 /path/output.wav\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 3,
+    "title": "Can't run in macos Apple M2 Ultra",
+    "created_at": "2024-08-21T10:16:05Z",
+    "closed_at": "2024-08-21T12:48:17Z",
+    "labels": [],
+    "url": "https://github.com/lovemefan/SenseVoice.cpp/issues/3",
+    "body": "build in macos\uff0c\r\n\r\nthe log as following\uff1a\r\n```\r\n(base) fanmac@M2-Ultra-Lan SenseVoice.cpp % ./build/bin/sense-voice-main -m ./models/gguf-fp32-sense-voice-small.bin ./asr_example_zh.wav -t 4\r\nsense_voice_small_init_from_file_with_params_no_state: loading model from './models/gguf-fp32-sense-voice-small.bin'\r\nsense_voice_init_with_params_no_state: use gpu    = 1\r\nsense_voice_init_with_params_no_state: flash attn = 0\r\nsense_voice_init_with_params_no_state: gpu_device = 0\r\nsense_voice_model_load: version:      3\r\nsense_voice_model_load: alignment:   32\r\nsense_voice_model_load: data offset: 444480\r\nsense_voice_model_load: loading model\r\nsense_voice_model_load: n_vocab = 25055\r\nsense_voice_model_load: n_encoder_hidden_state = 512\r\nsense_voice_model_load: n_encoder_linear_units = 2048\r\nsense_voice_model_load: n_encoder_attention_heads  = 4\r\nsense_voice_model_load: n_encoder_layers = 50\r\nsense_voice_model_load: n_mels  = 80\r\nsense_voice_model_load: ftype  = 1\r\nsense_voice_model_load: vocab[25055] loaded\r\nsense_voice_model_load: Metal total size =   935.21 MB\r\nsense_voice_model_load: n_tensors: 1197\r\nsense_voice_model_load: load SenseVoiceSmall takes 0.317000 second \r\nsense_voice_backend_init_gpu: using Metal backend\r\nggml_metal_init: allocating\r\nggml_metal_init: found device: Apple M2 Ultra\r\nggml_metal_init: picking default device: Apple M2 Ultra\r\nggml_metal_init: using embedded metal library\r\nggml_metal_init: GPU name:   Apple M2 Ultra\r\nggml_metal_init: GPU family: MTLGPUFamilyApple8  (1008)\r\nggml_metal_init: GPU family: MTLGPUFamilyCommon3 (3003)\r\nggml_metal_init: GPU family: MTLGPUFamilyMetal3  (5001)\r\nggml_metal_init: simdgroup reduction support   = true\r\nggml_metal_init: simdgroup matrix mul. support = true\r\nggml_metal_init: hasUnifiedMemory              = true\r\nggml_metal_init: recommendedMaxWorkingSetSize  = 154618.82 MB\r\nsense_voice_init_state: kv pad  size  =    3.67 MB\r\nggml_backend_metal_buffer_type_alloc_buffer: error: failed to allocate buffer, size =     0.00 MiB\r\nggml_gallocr_reserve_n: failed to allocate Metal buffer of size 0\r\nzsh: segmentation fault  ./build/bin/sense-voice-main -m ./models/gguf-fp32-sense-voice-small.bin  -t \r\n```",
+    "comments_url": "https://api.github.com/repos/lovemefan/SenseVoice.cpp/issues/3/comments",
+    "author": "edisonzf2020",
+    "comments": [
+      {
+        "user": "lovemefan",
+        "created_at": "2024-08-21T12:45:18Z",
+        "body": "Unfortunately, the Metal GPU backend is not supported yet, only the CPU can be used for now. I\u2019ll do my best to adapt it."
+      }
+    ]
+  }
+]

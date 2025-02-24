@@ -1,0 +1,36 @@
+[
+  {
+    "id": "https://github.com/skaiui2/SKRTOS_sparrow/issues/7",
+    "source": {
+      "issue_number": 7
+    },
+    "initial_question": {
+      "title": "\u52a8\u6001\u5efa\u7acbtask",
+      "body": "\u662f\u5426\u80fd\u5b9e\u73b0\u4e00\u4e2a\u5728\u8c03\u5ea6\u5668\u542f\u52a8\u540e\uff0c\u4ecetask\u4e2d\u5efa\u7acb\u4e00\u4e2atask\u529f\u80fd\uff1f\u8df3\u51fa\u8c03\u5ea6\u5668\uff0c\u5728\u4e2d\u65ad\u4e2d\u5efa\u7acb\u4e00\u4e2atask\uff0c\u4e0d\u77e5\u884c\u4e0d\u884c\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Tasks can be created dynamically after scheduler initialization",
+      "Task creation must be possible from interrupt context",
+      "Interrupt processing can be deferred to task context",
+      "Support for inter-task communication mechanism"
+    ],
+    "created_at": "2025-01-06T06:09:06Z"
+  },
+  {
+    "id": "https://github.com/skaiui2/SKRTOS_sparrow/issues/6",
+    "source": {
+      "issue_number": 6
+    },
+    "initial_question": {
+      "title": "\u961f\u5217\u6ee1\u7684\u673a\u5236",
+      "body": "\u5f53\u5411\u961f\u5217\u5199\u5165\u6570\u91cf\u8fbe\u5230\u8bbe\u5b9a\u503c\uff0csend\u7684tick\u5927\u4e8e0\uff0c\u961f\u5217\u6ee1\u7684\u60c5\u51b5\u4e0b\uff0c\u5982\u679c\u4e0dqueue_receive\u4e00\u6761\uff0c\u5219\u53d1\u9001task\u4f1a\u5728\u8fd9while(temp == schedule_PendSV)\uff0c\u4e00\u76f4\u7b49\u5f85\u3002schedule_PendSV\u4e00\u76f4\u4e0d\u4f1a\u6709\u53d8\u5316\uff0c\u8c03\u5ea6\u5668\u4e5f\u4f1a\u505c\u6b62\u3002\r\n\u662f\u6709\u610f\u8fd9\u4e48\u8bbe\u8ba1\u4e48\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Queue operations in interrupt contexts must complete without blocking",
+      "Queue timeout parameters must be zero when used in interrupts",
+      "Scheduler operation must continue unimpeded when queues are full",
+      "Documentation must clearly specify interrupt usage constraints"
+    ],
+    "created_at": "2025-01-04T02:36:57Z"
+  }
+]

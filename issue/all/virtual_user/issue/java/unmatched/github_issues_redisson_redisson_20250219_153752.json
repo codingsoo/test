@@ -1,0 +1,507 @@
+[
+  {
+    "number": 6315,
+    "title": "Redisson is shutdown",
+    "created_at": "2024-12-04T02:54:58Z",
+    "closed_at": "2024-12-04T09:40:48Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/6315",
+    "body": "### Redisson Version\r\n3.13.2\r\n\r\n### What is the Actual behavior?\r\nan error is reported by refreshing the local cache through Redis when the k8s pod is destroyed\r\n\r\n### Redisson configuration\r\n\r\n\r\n    @Bean\r\n    public StringRedisTemplate stringRedisTemplateMenu() {\r\n        StringRedisTemplate template = new StringRedisTemplate();\r\n        template.setConnectionFactory(redissonMenuConnectionFactory());\r\n        return template;\r\n    }\r\n    @Bean\r\n    public RedisConnectionFactory redissonMenuConnectionFactory() {\r\n        return new RedissonConnectionFactory(redissonMenu());\r\n    }\r\n    @Bean(destroyMethod = \"shutdown\")\r\n    public RedissonClient redissonMenu() {\r\n        if (StringUtils.isBlank(redissonMenuProperties.getSingleServerConfig().getPassword())) {\r\n            redissonMenuProperties.getSingleServerConfig().setPassword(null);\r\n        }\r\n        Config config = null;\r\n        try {\r\n            config = Config.fromJSON(JSON.toJSONString(redissonMenuProperties));\r\n        } catch (Exception e) {\r\n            log.error(\"spring.redisson-menu \u914d\u7f6e\u5f02\u5e38:{}\", e.getMessage(), e);\r\n            throw new BaseBizException(BaseErrorEnum.UNKNOW_SYSTEM_ERROR, \"spring.redisson-menu \u914d\u7f6e\u8bfb\u53d6\u5f02\u5e38\");\r\n        }\r\n        config.setCodec(new org.redisson.client.codec.StringCodec());\r\n        return Redisson.create(config);\r\n    }\r\n\r\n### Additional information\r\n`nested exception is org.redisson.RedissonShutdownException: Redisson is shutdown org.springframework.dao.InvalidDataAccessApiUsageException: Redisson is shutdown; nested exception is org.redisson.RedissonShutdownException: Redisson is shutdown\\n\\tat org.redisson.spring.data.connection.RedissonExceptionConverter.convert(RedissonExceptionConverter.java:48)\\n\\tat org.redisson.spring.data.connection.RedissonExceptionConverter.convert(RedissonExceptionConverter.java:35)\\n\\tat org.springframework.data.redis.PassThroughExceptionTranslationStrategy.translate(PassThroughExceptionTranslationStrategy.java:44)\\n\\tat org.redisson.spring.data.connection.RedissonConnection.transform(RedissonConnection.java:217)\\n\\tat org.redisson.spring.data.connection.RedissonConnection.syncFuture(RedissonConnection.java:212)\\n\\tat org.redisson.spring.data.connection.RedissonConnection.sync(RedissonConnection.java:378)\\n\\tat org.redisson.spring.data.connection.RedissonConnection.read(RedissonConnection.java:759)\\n\\tat org.redisson.spring.data.connection.RedissonConnection.get(RedissonConnection.java:493)\\n\\tat org.springframework.data.redis.connection.DefaultStringRedisConnection.get(DefaultStringRedisConnection.java:404)\\n\\tat org.springframework.data.redis.core.DefaultValueOperations$1.inRedis(DefaultValueOperations.java:57)\\n\\tat org.springframework.data.redis.core.AbstractOperations$ValueDeserializingRedisCallback.doInRedis(AbstractOperations.java:60)\\n\\tat org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:228)\\n\\tat org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:188)\\n\\tat org.springframework.data.redis.core.AbstractOperations.execute(AbstractOperations.java:96)\\n\\tat org.springframework.data.redis.core.DefaultValueOperations.get(DefaultValueOperations.java:53)\\n ...`\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/6315/comments",
+    "author": "LHH7049",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2024-12-04T06:30:24Z",
+        "body": "This is an expected behavior since pod is shutdown."
+      }
+    ]
+  },
+  {
+    "number": 5333,
+    "title": "an RedisNodeNotFoundException was encountered when using redisson",
+    "created_at": "2023-09-26T08:15:54Z",
+    "closed_at": "2023-10-13T05:47:06Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/5333",
+    "body": "\r\n#server version\r\nredis server : 5.0.14\r\n#redisson client version\r\n3.13.6\r\n#describ\r\n    private volatile Map<String, RedissonClient> redissonClientMap = null;\r\n\r\nbefore our app link redis sentinel nodes,now our app will change link redis cluster nodes,implementation method is our app has a map to store two RedissonClient\r\none redisson client link redis sentinel nodes,another redisson client link redis cluster nodes, the map switcher is a key to routing a RedissonClient\r\nbut when we change key route to redis cluster nodes,After after a few minutes,app sometimes will print log \r\n\r\n\tNode for slot: 1712 hasn't been discovered yet. Check cluster slots coverage using CLUSTER NODES command. Increase value of retryAttempts and/or retryInterval settings.org.redisson.client.RedisNodeNotFoundException: Node for slot: 1712 hasn't been discovered yet. Check cluster slots coverage using CLUSTER NODES command. Increase value of retryAttempts and/or retryInterval settings.\r\n\tat org.redisson.connection.MasterSlaveConnectionManager.createNodeNotFoundFuture(MasterSlaveConnectionManager.java:579)\r\n\tat org.redisson.connection.MasterSlaveConnectionManager.connectionReadOp(MasterSlaveConnectionManager.java:563)\r\n\tat org.redisson.command.RedisExecutor.getConnection(RedisExecutor.java:644)\r\n\tat org.redisson.command.RedisExecutor.execute(RedisExecutor.java:116)\r\n\tat org.redisson.command.RedisExecutor$2.run(RedisExecutor.java:244)\r\n\tat io.netty.util.HashedWheelTimer$HashedWheelTimeout.expire(HashedWheelTimer.java:668)\r\n\tat io.netty.util.HashedWheelTimer$HashedWheelBucket.expireTimeouts(HashedWheelTimer.java:743)\r\n\tat io.netty.util.HashedWheelTimer$Worker.run(HashedWheelTimer.java:471)\r\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.lang.Thread.run(Thread.java:745)\r\n\r\nguided by logs,when we invoke CLUSTER NODES command, the redis cluster nodes status is health\r\n\r\ntip:sometimes the app will print the following warning level logs\r\n[2023-09-12 22:47:33.978][INFO][698][redisson-netty-5-14] traceLogId:[null] dstTraceId:[] TxId:[] SpanId:[] call [org.redisson.cluster.ClusterConnectionManager][checkSlotsMigration] 294 slots removed from\r\n\r\n\r\n\r\nhow to solve this RedisNodeNotFoundException,because it affects normal business logic,thanks help me\r\n",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/5333/comments",
+    "author": "repeatthink123yuchao",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2023-09-26T08:19:42Z",
+        "body": "incorrect slots added,slots removed messages in Redis Cluster mode fixed in 3.23.4 version. Can you try it?"
+      },
+      {
+        "user": "repeatthink123yuchao",
+        "created_at": "2023-09-26T08:35:29Z",
+        "body": "> incorrect slots added,slots removed messages in Redis Cluster mode fixed in 3.23.4 version. Can you try it?\r\n\r\nwe increased the redisson version number from 3.11.1 to 3.13.6, but the problem(removed/added/RedisNodeNotFoundException) still exists,\r\nand the problem(removed/added) does not affect normal business logic,but the RedisNodeNotFoundException is fatal,the RedisNodeNotFoundException affects normal business logic and intolerable\r\ncan you help me see how to solve this RedisNodeNotFoundException?\r\n\r\n\r\n\r\n\r\n#slave\r\n011fd2e3aae7e69fc636bd1744642ed14bf0a1a7 132.18.54.81:36421@46421 slave 9831b60c5422cc961b05cb5d7bcd0cc7a1b7db4e 0 1693492105000 28 connected\r\nc0419f9492793b3c74aa4b1eb083ff34278b5a6f 132.18.54.80:36421@46421 slave f3db2e899fd14bfd2feae35e9191fbee478691df 0 1693492106255 29 connected\r\nd577fe7c71839dccd8bb315dfedd1724632111fe 132.18.54.79:36421@46421 slave b08aebda64e150fb181ff219d42ac487b8f7d7d6 0 1693492108258 30 connected\r\n5b3f227a49333b7e801a5af9436557ae764e7920 132.18.54.78:36421@46421 slave b8448e2164cb778dc345570a75380ee185b11afa 0 1693492104000 31 connected\r\n955cc718b66cdee9c8b954e57ef4509c6547b8c4 132.18.54.72:36421@46421 slave 9bfa406d12fbe4c0e62b5fc2f89a73ff0d19b5d4 0 1693492102000 33 connected\r\nba3b09daae54d1ebe566df5ca3a81f223782a302 132.18.54.103:36421@46421 slave 1d00caa09fbd95d4ad41641e6bb3245e4914c51e 0 1693492103000 34 connected\r\n5fa0c68c0026523f00c0ccbc133608adfdb636ce 132.18.54.102:36421@46421 slave ccddafeae47a5bd158186cbb200a1b987b495583 0 1693492109058 35 connected\r\n55b1dc3b3df8c5d59f7c8ad98fcad1d3f9405027 132.18.54.101:36421@46421 slave 3f0b3ba5f1c788f128c6acc0a0cd571d4369e00c 0 1693492103000 36 connected\r\n2e02ed575914c7f73b7c84a51a1bd26d9ec2c91b 132.18.54.81:36420@46420 slave 1e1120e053191601c89fd13df61e3b4e2d134736 0 1693492099000 37 connected\r\nc69eac6ebaa7ff5fd507e78a99e727622dfc8ab3 132.18.54.80:36420@46420 slave 4e148762f55cebbf868d7470d08a8d5a40ae6c5f 0 1693492109058 38 connected\r\n0d16b771126d4ae678d4fd7e3ddaa731633894b5 132.18.54.79:36420@46420 slave 8f3b44a94478da8b13c2f6af5f29531188b89128 0 1693492102000 39 connected\r\nd74232d907bcc9fed8358f5aec3ad235ddce0d70 132.18.54.78:36420@46420 slave 2ba474e9dff15d0eadc321f176d9b00c4be003db 0 1693492112264 40 connected\r\ne818ec452949eea5d9bf555dac71d419060bc106 132.18.54.72:36420@46420 slave 4232dcc072f4d85fbbd1bb3c9db4a7adc8d94418 0 1693492104000 42 connected\r\ne202c2c6b70941929f64af0817415c361aff81a3 132.18.54.103:36420@46420 slave 3032dc89587eb306f483d48830b26234daefde0d 0 1693492109259 43 connected\r\n1b6fb1c857c2ea338c43dafa66eae2524286d6e2 132.18.54.102:36420@46420 slave 0047baedc6bfe230e6349a53e5fab107df4d5539 0 1693492101247 44 connected\r\n9c7bd034a843b2dbadb9a444d3f173b570d6f247 132.18.54.101:36420@46420 slave 523e0488ddcb9458fc9973d813d2221f554ff0ab 0 1693492101047 45 connected\r\naf217275cad115c62eacfdc7f83895e1ef84c94d 132.18.54.81:36419@46419 slave 191ba25cd354b2569fa8e2f66a6c46b111e51472 0 1693492106000 46 connected\r\nb391f09b3060559c4788df01e1748525159905bb 132.18.54.73:36419@46419 slave 83272084566a40203df40f211cd3ab4cbd8dbaff 0 1693492104000 47 connected\r\n0415bf16cf7d1c68fdcc0809e53cee6a52490fcf 132.18.54.101:36419@46419 myself,slave 64ee11fa98839f32835b4c353c7b19b5d52f4273 0 1693492105000 48 connected\r\n668e91b0faea4bbec903c2e38331c65d67d5792c 132.18.54.78:36419@46419 slave 00ad2de54a96130ddfc3e00cd8a2b36b9ae54a47 0 1693492103000 50 connected\r\ne16f19c158fcece008187abad13f1007ea5c713f 132.18.54.102:36419@46419 slave 7c7bbaec4ec51da66454c049e782181d3ea027a6 0 1693492106000 51 connected\r\n02ad5435c83076fa6f32d39ae3517d84bbb49814 132.18.54.80:36419@46419 slave df25fb86078cd9bd3b10e2bfd16a22d3b0068766 0 1693492103000 52 connected\r\nabaa6870de92564ef8559fa21bb09586caa61e83 132.18.54.103:36419@46419 slave be76a5ad93584314d29f1ef3df38c1d2f214cb5e 0 1693492108057 53 connected\r\n12f5809cbe0cdc6f9a20f8b79421e69650b01c65 132.18.54.79:36419@46419 slave 4295acbd0ec852e4d15f0a7a333613769fd8c616 0 1693492109000 54 connected\r\n589f646ac44fd61e36af58cde5bf15190e353a2c 132.18.54.72:36419@46419 slave 8805ecc5cc2eed1d3d116054d7225601e8cf52b5 0 1693492108000  connected\r\nded38affee582fe80208547a08c3656777eb621d 132.18.54.73:36421@46421 slave a60bd125a894c2293b97c8533c27ca265dc04fde 0 1693492104251 8 connected\r\n5644e2eac432138794416b812cdee1a83ca5659b 132.18.54.73:36420@46420 slave fade84654be507439b00fee41e96a565c3115dc7 0 1693492106000 25 connected\r\n#master\r\nccddafeae47a5bd158186cbb200a1b987b495583 132.18.54.101:36424@46424 master - 0 1693492101000 1 connected 0-606\r\n1d00caa09fbd95d4ad41641e6bb3245e4914c51e 132.18.54.102:36424@46424 master - 0 1693492108000 2 connected 607-1213\r\n9bfa406d12fbe4c0e62b5fc2f89a73ff0d19b5d4 132.18.54.103:36424@46424 master - 0 1693492106000 3 connected 1214-1819\r\n83272084566a40203df40f211cd3ab4cbd8dbaff 132.18.54.72:36424@46424 master - 0 1693492109000 4 connected 1820-2426\r\nb8448e2164cb778dc345570a75380ee185b11afa 132.18.54.73:36424@46424 master - 0 1693492107000 5 connected 2427-3033\r\nb08aebda64e150fb181ff219d42ac487b8f7d7d6 132.18.54.78:36424@46424 master - 0 1693492098000 6 connected 3034-3640\r\nf3db2e899fd14bfd2feae35e9191fbee478691df 132.18.54.79:36424@46424 master - 0 1693492109000 7 connected 3641-4247\r\na60bd125a894c2293b97c8533c27ca265dc04fde 132.18.54.80:36424@46424 master - 0 1693492107000 8 connected 4248-4854\r\n523e0488ddcb9458fc9973d813d2221f554ff0ab 132.18.54.81:36424@46424 master - 0 1693492106000 9 connected 4855-5460\r\n0047baedc6bfe230e6349a53e5fab107df4d5539 132.18.54.101:36423@46423 master - 0 1693492107000 10 connected 5461-6067\r\n3032dc89587eb306f483d48830b26234daefde0d 132.18.54.102:36423@46423 master - 0 1693492105000 11 connected 6068-6674\r\n4232dcc072f4d85fbbd1bb3c9db4a7adc8d94418 132.18.54.103:36423@46423 master - 0 1693492111000 12 connected 6675-7281\r\n2ba474e9dff15d0eadc321f176d9b00c4be003db 132.18.54.72:36423@46423 master - 0 1693492107000 13 connected 7282-7888\r\n8f3b44a94478da8b13c2f6af5f29531188b89128 132.18.54.73:36423@46423 master - 0 1693492111061 14 connected 7889-8494\r\n4e148762f55cebbf868d7470d08a8d5a40ae6c5f 132.18.54.78:36423@46423 master - 0 1693492099000 15 connected 8495-9101\r\n9831b60c5422cc961b05cb5d7bcd0cc7a1b7db4e 132.18.54.79:36423@46423 master - 0 1693492110260 16 connected 9102-9708\r\n64ee11fa98839f32835b4c353c7b19b5d52f4273 132.18.54.80:36423@46423 master - 0 1693492111262 17 connected 9709-10315\r\n7c7bbaec4ec51da66454c049e782181d3ea027a6 132.18.54.81:36423@46423 master - 0 1693492110000 18 connected 10316-10922\r\nbe76a5ad93584314d29f1ef3df38c1d2f214cb5e 132.18.54.101:36422@46422 master - 0 1693492104000 19 connected 10923-11528\r\n00ad2de54a96130ddfc3e00cd8a2b36b9ae54a47 132.18.54.102:36422@46422 master - 0 1693492107000 20 connected 11529-12135\r\n4295acbd0ec852e4d15f0a7a333613769fd8c616 132.18.54.103:36422@46422 master - 0 1693492103000 21 connected 12136-12742\r\ndf25fb86078cd9bd3b10e2bfd16a22d3b0068766 132.18.54.72:36422@46422 master - 0 1693492102000 22 connected 12743-13349\r\n8805ecc5cc2eed1d3d116054d7225601e8cf52b5 132.18.54.73:36422@46422 master - 0 1693492106000 23 connected 13350-13956\r\n1e1120e053191601c89fd13df61e3b4e2d134736 132.18.54.78:36422@46422 master - 0 1693492111061 24 connected 13957-14563\r\nfade84654be507439b00fee41e96a565c3115dc7 132.18.54.79:36422@46422 master - 0 1693492107000 25 connected 14564-15169\r\n191ba25cd354b2569fa8e2f66a6c46b111e51472 132.18.54.80:36422@46422 master - 0 1693492111061 26 connected 15170-15776\r\n3f0b3ba5f1c788f128c6acc0a0cd571d4369e00c 132.18.54.81:36422@46422 master - 0 1693492105253 27 connected 15777-16383\r\n"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2023-09-26T13:22:44Z",
+        "body": "RedisNodeNotFoundException may arise if node was removed due to rare issue in topology handling. It was fixed in 3.23.4."
+      }
+    ]
+  },
+  {
+    "number": 4644,
+    "title": "Unable to write command into connection! ",
+    "created_at": "2022-11-01T09:00:28Z",
+    "closed_at": "2022-11-28T06:02:50Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/4644",
+    "body": "Hello, when I used the API RBatch provided by Redison (version: 3.15.6) to add data to Redis, Redison prompted the following error:\r\nUnable to write command into connection!  Node source: NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=1, freeSubscribeConnectionsCounter=value:50:queue:0, freeConnectionsAmount=23, freeConnectionsCounter=value:63:queue:0, freezeReason=null, client=[addr=redis://], nodeType=MASTER, firstFail=0]]], connection:  RedisConnection@186126  [redisClient=[addr=redis://], channel=[id: 0xffb, ], currentCommand=null], command: null, params: null after 3 retry attempts\"\r\nI used a timed task. I called this method once an hour to add 4000 pieces of data to Redis. After testing for a week, this error occurred six times in total. I hope someone can help me answer this question. What should I do?",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/4644/comments",
+    "author": "white-balls",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2022-11-28T06:02:50Z",
+        "body": "Try to increase nettyThreads amount."
+      }
+    ]
+  },
+  {
+    "number": 4281,
+    "title": "Redis is changed to access with password, and trylock takes more time",
+    "created_at": "2022-05-10T09:47:28Z",
+    "closed_at": "2022-05-12T06:58:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/4281",
+    "body": "Redis used to access without password, and then upgraded to access with password. It was found that trylock took more than one second\u3002\r\nredisson version is 3.16.0\r\nThe configuration is as follows\uff1a\r\n`config.useClusterServers()\r\n                    .setPassword(password)\r\n                    .setScanInterval(2000)\r\n                    .addNodeAddress(xxxxx);\r\n            return Redisson.create(config);`\r\nso, I tried to reduce the reission version to 3.11.6, and the time consumption decreased significantly\r\nI don't know what caused this. Is it the wrong way to use the new version?\r\n",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/4281/comments",
+    "author": "XTUxiongda",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2022-05-10T10:02:24Z",
+        "body": "It was caused by introduction of WAIT command to sync with slaves. It seems that sync takes much time in your case."
+      },
+      {
+        "user": "XTUxiongda",
+        "created_at": "2022-05-10T10:24:28Z",
+        "body": "> It was caused by introduction of WAIT command to sync with slaves. It seems that sync takes much time in your case.\r\nIs there any way to solve it? I found this problem after version 3.14.1. Or can I only use the old version, and the new version all has this problem?\r\n"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2022-05-10T12:59:24Z",
+        "body": "Could you set `TRACE` logging level for `org.redisson` package and share output?"
+      },
+      {
+        "user": "XTUxiongda",
+        "created_at": "2022-05-10T13:34:54Z",
+        "body": "[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:16.221 TRACE 20100 [redisson-netty-2-4] [CommandEncoder.java:112] channel: [id: 0x5eda2625, L:/xxx.xx.xx.xx:58206 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7002] message: *2\r\n$7\r\nCLUSTER\r\n$5\r\nNODES\r\n\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:16.235 TRACE 20100 [redisson-netty-2-4] [CommandDecoder.java:113] reply: $775\r\na45ecb9201e0bf48665ed7e5a9846cbe6d753165 xxx.xx.xx.xx:7006@17006 slave f5d943dbd5806937e204ee35ea5f6aa65e46a6ca 0 1652189413455 6 connected\r\nf5d943dbd5806937e204ee35ea5f6aa65e46a6ca xxx.xx.xx.xx:7003@17003 master - 0 1652189414000 3 connected 10923-16383\r\n40e866c9d83596f7d50ff09ee92370f580c9add9 xxx.xx.xx.xx:7001@17001 master - 0 1652189415465 1 connected 0-5460\r\nf226329e04bda39971a532552f18a32bb2c1b7a8 xxx.xx.xx.xx:7005@17005 slave ced813a2fd0db10432dbc999befd3709ac2234a2 0 1652189414460 5 connected\r\neccdd6be867c3fc36a27f2c1cc105c98c2d08879 xxx.xx.xx.xx:7004@17004 slave 40e866c9d83596f7d50ff09ee92370f580c9add9 0 1652189414000 1 connected\r\nced813a2fd0db10432dbc999befd3709ac2234a2 xxx.xx.xx.xx:7002@17002 myself,master - 0 1652189413000 2 connected 5461-10922\r\n\r\n, channel: [id: 0x5eda2625, L:/xxx.xx.xx.xx:58206 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7002], command: CommandData [promise=RedissonPromise [promise=ImmediateEventExecutor$ImmediatePromise@44c15e70(incomplete)], command=(CLUSTER NODES), params=[], codec=null]\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:16.236 DEBUG 20100 [redisson-netty-2-4] [ClusterConnectionManager.java:466] cluster nodes state got from xxx.xx.xx.xx/xxx.xx.xx.xx:7002:\r\na45ecb9201e0bf48665ed7e5a9846cbe6d753165 xxx.xx.xx.xx:7006@17006 slave f5d943dbd5806937e204ee35ea5f6aa65e46a6ca 0 1652189413455 6 connected\r\nf5d943dbd5806937e204ee35ea5f6aa65e46a6ca xxx.xx.xx.xx:7003@17003 master - 0 1652189414000 3 connected 10923-16383\r\n40e866c9d83596f7d50ff09ee92370f580c9add9 xxx.xx.xx.xx:7001@17001 master - 0 1652189415465 1 connected 0-5460\r\nf226329e04bda39971a532552f18a32bb2c1b7a8 xxx.xx.xx.xx:7005@17005 slave ced813a2fd0db10432dbc999befd3709ac2234a2 0 1652189414460 5 connected\r\neccdd6be867c3fc36a27f2c1cc105c98c2d08879 xxx.xx.xx.xx:7004@17004 slave 40e866c9d83596f7d50ff09ee92370f580c9add9 0 1652189414000 1 connected\r\nced813a2fd0db10432dbc999befd3709ac2234a2 xxx.xx.xx.xx:7002@17002 myself,master - 0 1652189413000 2 connected 5461-10922\r\n\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:17.313 DEBUG 20100 [http-nio-8080-exec-3] [ClusterConnectionManager.java:751] slot 2875 for sync_tadata_lock\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:17.314 DEBUG 20100 [http-nio-8080-exec-3] [ClusterConnectionManager.java:751] slot 2875 for sync_tadata_lock\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:17.314 TRACE 20100 [redisson-netty-2-5] [CommandEncoder.java:112] channel: [id: 0x1dd4250d, L:/xxx.xx.xx.xx:58207 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7001] message: *6\r\n$4\r\nEVAL\r\n$339\r\nif (redis.call('exists', KEYS[1]) == 0) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);\r\n$1\r\n1\r\n$16\r\nsync_tadata_lock\r\n$6\r\n600000\r\n$40\r\n8f9cbb23-40dd-4457-a13a-6f8041461ba5:194\r\n\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:17.315 TRACE 20100 [redisson-netty-2-5] [CommandEncoder.java:112] channel: [id: 0x1dd4250d, L:/xxx.xx.xx.xx:58207 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7001] message: *6\r\n$4\r\nEVAL\r\n$339\r\nif (redis.call('exists', KEYS[1]) == 0) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; if (redis.call('hexists', KEYS[1], ARGV[2]) == 1) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call('pexpire', KEYS[1], ARGV[1]); return nil; end; return redis.call('pttl', KEYS[1]);\r\n$1\r\n1\r\n$16\r\nsync_tadata_lock\r\n$6\r\n600000\r\n$40\r\n8f9cbb23-40dd-4457-a13a-6f8041461ba5:194\r\n*3\r\n$4\r\nWAIT\r\n$1\r\n1\r\n$4\r\n1000\r\n\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:17.332 TRACE 20100 [redisson-netty-2-5] [CommandDecoder.java:113] reply: $-1\r\n, channel: [id: 0x1dd4250d, L:/xxx.xx.xx.xx:58207 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7001], command: CommandsData [commands=[CommandData [promise=RedissonPromise [promise=ImmediateEventExecutor$ImmediatePromise@5dfb7633(incomplete)], command=(EVAL), params=[if (redis.call('exists', KEYS[1]) == 0) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call(..., 1, sync_tadata_lock, 600000, 8f9cbb23-40dd-4457-a13a-6f8041461ba5:194], codec=org.redisson.client.codec.LongCodec], CommandData [promise=RedissonPromise [promise=ImmediateEventExecutor$ImmediatePromise@ee60138(incomplete)], command=(WAIT), params=[1, 1000], codec=org.redisson.client.codec.StringCodec]]]\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:18.255 TRACE 20100 [redisson-netty-2-4] [CommandEncoder.java:112] channel: [id: 0x5eda2625, L:/xxx.xx.xx.xx:58206 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7002] message: *2\r\n$7\r\nCLUSTER\r\n$5\r\nNODES\r\n\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:18.271 TRACE 20100 [redisson-netty-2-4] [CommandDecoder.java:113] reply: $775\r\na45ecb9201e0bf48665ed7e5a9846cbe6d753165 xxx.xx.xx.xx:7006@17006 slave f5d943dbd5806937e204ee35ea5f6aa65e46a6ca 0 1652189416468 6 connected\r\nf5d943dbd5806937e204ee35ea5f6aa65e46a6ca xxx.xx.xx.xx:7003@17003 master - 0 1652189414000 3 connected 10923-16383\r\n40e866c9d83596f7d50ff09ee92370f580c9add9 xxx.xx.xx.xx:7001@17001 master - 0 1652189415465 1 connected 0-5460\r\nf226329e04bda39971a532552f18a32bb2c1b7a8 xxx.xx.xx.xx:7005@17005 slave ced813a2fd0db10432dbc999befd3709ac2234a2 0 1652189416000 5 connected\r\neccdd6be867c3fc36a27f2c1cc105c98c2d08879 xxx.xx.xx.xx:7004@17004 slave 40e866c9d83596f7d50ff09ee92370f580c9add9 0 1652189417471 1 connected\r\nced813a2fd0db10432dbc999befd3709ac2234a2 xxx.xx.xx.xx:7002@17002 myself,master - 0 1652189415000 2 connected 5461-10922\r\n\r\n, channel: [id: 0x5eda2625, L:/xxx.xx.xx.xx:58206 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7002], command: CommandData [promise=RedissonPromise [promise=ImmediateEventExecutor$ImmediatePromise@3c593bb7(incomplete)], command=(CLUSTER NODES), params=[], codec=null]\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:18.272 DEBUG 20100 [redisson-netty-2-4] [ClusterConnectionManager.java:466] cluster nodes state got from xxx.xx.xx.xx/xxx.xx.xx.xx:7002:\r\na45ecb9201e0bf48665ed7e5a9846cbe6d753165 xxx.xx.xx.xx:7006@17006 slave f5d943dbd5806937e204ee35ea5f6aa65e46a6ca 0 1652189416468 6 connected\r\nf5d943dbd5806937e204ee35ea5f6aa65e46a6ca xxx.xx.xx.xx:7003@17003 master - 0 1652189414000 3 connected 10923-16383\r\n40e866c9d83596f7d50ff09ee92370f580c9add9 xxx.xx.xx.xx:7001@17001 master - 0 1652189415465 1 connected 0-5460\r\nf226329e04bda39971a532552f18a32bb2c1b7a8 xxx.xx.xx.xx:7005@17005 slave ced813a2fd0db10432dbc999befd3709ac2234a2 0 1652189416000 5 connected\r\neccdd6be867c3fc36a27f2c1cc105c98c2d08879 xxx.xx.xx.xx:7004@17004 slave 40e866c9d83596f7d50ff09ee92370f580c9add9 0 1652189417471 1 connected\r\nced813a2fd0db10432dbc999befd3709ac2234a2 xxx.xx.xx.xx:7002@17002 myself,master - 0 1652189415000 2 connected 5461-10922\r\n\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:18.826 TRACE 20100 [redisson-netty-2-5] [CommandDecoder.java:113] reply: :0\r\n, channel: [id: 0x1dd4250d, L:/xxx.xx.xx.xx:58207 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7001], command: CommandsData [commands=[CommandData [promise=RedissonPromise [promise=ImmediateEventExecutor$ImmediatePromise@5dfb7633(success)], command=(EVAL), params=[if (redis.call('exists', KEYS[1]) == 0) then redis.call('hincrby', KEYS[1], ARGV[2], 1); redis.call(..., 1, sync_tadata_lock, 600000, 8f9cbb23-40dd-4457-a13a-6f8041461ba5:194], codec=org.redisson.client.codec.LongCodec], CommandData [promise=RedissonPromise [promise=ImmediateEventExecutor$ImmediatePromise@ee60138(incomplete)], command=(WAIT), params=[1, 1000], codec=org.redisson.client.codec.StringCodec]]]\r\n[basic-porter-tadata-xxx.xx.xx.xx-0000] 2022-05-10 21:30:18.827 DEBUG 20100 [redisson-netty-2-5] [RedisExecutor.java:522] connection released for command null and params null from slot NodeSource [slot=null, addr=null, redisClient=null, redirect=null, entry=MasterSlaveEntry [masterEntry=[freeSubscribeConnectionsAmount=1, freeSubscribeConnectionsCounter=value:50:queue:0, freeConnectionsAmount=24, freeConnectionsCounter=value:64:queue:0, freezeReason=null, client=[addr=redis://xxx.xx.xx.xx:7001], nodeType=MASTER, firstFail=0]]] using connection RedisConnection@1915911582 [redisClient=[addr=redis://xxx.xx.xx.xx:7001], channel=[id: 0x1dd4250d, L:/xxx.xx.xx.xx:58207 - R:xxx.xx.xx.xx/xxx.xx.xx.xx:7001], currentCommand=null]\r\n\r\n"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2022-05-12T06:13:29Z",
+        "body": "I reproduce your case only if masterauth is not set for slave nodes."
+      }
+    ]
+  },
+  {
+    "number": 3989,
+    "title": " ERR Error running script (call to f_0fd7cdd6c1224471b29d6f7fc503462f3b252f12): @user_script:1: user_script:1: bad argument #2 to 'unpack' (data string too short",
+    "created_at": "2021-11-26T18:24:24Z",
+    "closed_at": "2021-11-30T06:09:02Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/3989",
+    "body": "I am unable to understand this error. Please help.\r\n` Execution exception[[RedisException: ERR Error running script (call to f_0fd7cdd6c1224471b29d6f7fc503462f3b252f12): @user_script:1: user_script:1: bad argument #2 to 'unpack' (data string too short) . channel: [id: 0xd4089e92, L:/10.212.134.41:60921 - R:core-dev-redis.6cbkbd.0001.aps1.cache.amazonaws.com/192.168.2.46:6379] command: (EVAL), params: [local result = {}; local idleKeys = {}; local res; if (#ARGV == 4) then  res = redis.call('hscan', K..., 3, ALLUS_XXX, redisson__timeout__set:{ALLUS_XXX}, redisson__idle__set:{ALLUS_XXX}, 1637948919729, 0, 10]]]\\\r\n`\r\n\r\nI am trying to read using `getMapCache(ALLUS_XXX)`\r\n\r\nalso, in redis cli if I do `hgetall ALLUS_XXX`.  This is the output\r\n\r\n```\r\n 1) \"3\"\r\n 2) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"3\\\",\\\"ax\\\":\\\"21\\\",\\\"bp\\\":331.27,\\\"ap\\\":331.3,\\\"bs\\\":2,\\\"as\\\":1,\\\"t\\\":\\\"1637948895747\\\",\\\"q\\\":\\\"42893371\\\",\\\"z\\\":3}\"\r\n 3) \"2\"\r\n 4) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"2\\\",\\\"ax\\\":\\\"19\\\",\\\"bp\\\":330.03,\\\"ap\\\":330.13,\\\"bs\\\":2,\\\"as\\\":3,\\\"t\\\":\\\"1637949585689\\\",\\\"q\\\":\\\"46053648\\\",\\\"z\\\":3}\"\r\n 5) \"12\"\r\n 6) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"12\\\",\\\"ax\\\":\\\"11\\\",\\\"bp\\\":329.91,\\\"ap\\\":330.25,\\\"bs\\\":1,\\\"as\\\":12,\\\"t\\\":\\\"1637949676507\\\",\\\"q\\\":\\\"46258127\\\",\\\"z\\\":3}\"\r\n 7) \"9\"\r\n 8) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"9\\\",\\\"ax\\\":\\\"15\\\",\\\"bp\\\":330.43,\\\"ap\\\":330.44,\\\"bs\\\":3,\\\"as\\\":3,\\\"t\\\":\\\"1637949113455\\\",\\\"q\\\":\\\"43838492\\\",\\\"z\\\":3}\"\r\n 9) \"15\"\r\n10) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"15\\\",\\\"ax\\\":\\\"12\\\",\\\"bp\\\":330.34,\\\"ap\\\":330.37,\\\"bs\\\":2,\\\"as\\\":4,\\\"t\\\":\\\"1637949549028\\\",\\\"q\\\":\\\"45809932\\\",\\\"z\\\":3}\"\r\n11) \"10\"\r\n12) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"10\\\",\\\"ax\\\":\\\"12\\\",\\\"bp\\\":330.26,\\\"ap\\\":330.37,\\\"bs\\\":1,\\\"as\\\":2,\\\"t\\\":\\\"1637949585833\\\",\\\"q\\\":\\\"46055016\\\",\\\"z\\\":3}\"\r\n13) \"18\"\r\n14) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"18\\\",\\\"ax\\\":\\\"11\\\",\\\"bp\\\":330.15,\\\"ap\\\":330.25,\\\"bs\\\":2,\\\"as\\\":12,\\\"t\\\":\\\"1637949683953\\\",\\\"q\\\":\\\"46258667\\\",\\\"z\\\":3}\"\r\n15) \"1\"\r\n16) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"1\\\",\\\"ax\\\":\\\"17\\\",\\\"bp\\\":330.21,\\\"ap\\\":330.31,\\\"bs\\\":4,\\\"as\\\":1,\\\"t\\\":\\\"1637949583379\\\",\\\"q\\\":\\\"46033150\\\",\\\"z\\\":3}\"\r\n17) \"11\"\r\n18) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"11\\\",\\\"ax\\\":\\\"12\\\",\\\"bp\\\":329.91,\\\"ap\\\":330.2,\\\"bs\\\":4,\\\"as\\\":1,\\\"t\\\":\\\"1637949688637\\\",\\\"q\\\":\\\"46259504\\\",\\\"z\\\":3}\"\r\n19) \"7\"\r\n20) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"7\\\",\\\"ax\\\":\\\"11\\\",\\\"bp\\\":330.15,\\\"ap\\\":330.25,\\\"bs\\\":2,\\\"as\\\":12,\\\"t\\\":\\\"1637949684316\\\",\\\"q\\\":\\\"46258719\\\",\\\"z\\\":3}\"\r\n21) \"20\"\r\n22) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"20\\\",\\\"ax\\\":\\\"12\\\",\\\"bp\\\":330.11,\\\"ap\\\":330.26,\\\"bs\\\":1,\\\"as\\\":1,\\\"t\\\":\\\"1637949586232\\\",\\\"q\\\":\\\"46058248\\\",\\\"z\\\":3}\"\r\n23) \"19\"\r\n24) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"19\\\",\\\"ax\\\":\\\"11\\\",\\\"bp\\\":329.91,\\\"ap\\\":330.25,\\\"bs\\\":2,\\\"as\\\":12,\\\"t\\\":\\\"1637949676537\\\",\\\"q\\\":\\\"46258138\\\",\\\"z\\\":3}\"\r\n25) \"8\"\r\n26) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"8\\\",\\\"ax\\\":\\\"11\\\",\\\"bp\\\":330.06,\\\"ap\\\":330.25,\\\"bs\\\":1,\\\"as\\\":12,\\\"t\\\":\\\"1637949685035\\\",\\\"q\\\":\\\"46258880\\\",\\\"z\\\":3}\"\r\n27) \"17\"\r\n28) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"17\\\",\\\"ax\\\":\\\"17\\\",\\\"bp\\\":329.37,\\\"ap\\\":330.16,\\\"bs\\\":2,\\\"as\\\":2,\\\"t\\\":\\\"1637949606270\\\",\\\"q\\\":\\\"46241118\\\",\\\"z\\\":3}\"\r\n29) \"21\"\r\n30) \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"21\\\",\\\"ax\\\":\\\"12\\\",\\\"bp\\\":330.9,\\\"ap\\\":331.09,\\\"bs\\\":1,\\\"as\\\":1,\\\"t\\\":\\\"1637949581667\\\",\\\"q\\\":\\\"46012327\\\",\\\"z\\\":3}\"\r\n```\r\n\r\n\r\nThis is easlily reproducible,\r\n1. ` HMSET ALLUS_XXX 1 \"{\\\"ev\\\":\\\"Q\\\",\\\"sym\\\":\\\"XXX\\\",\\\"bx\\\":\\\"1\\\",\\\"ax\\\":\\\"20\\\",\\\"bp\\\":157.2,\\\"ap\\\":157.21,\\\"bs\\\":5,\\\"as\\\":1,\\\"t\\\":\\\"1637949207844\\\",\\\"q\\\":\\\"60303179\\\",\\\"z\\\":3}\"`\r\n2. Now try to access this using redisson `getMapCache(\"ALLUS_XXX\").readAllEntrySet()`",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/3989/comments",
+    "author": "ashwinreal",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2021-11-27T05:38:02Z",
+        "body": "use the same codec for data store and reading"
+      },
+      {
+        "user": "ashwinreal",
+        "created_at": "2021-11-27T08:21:47Z",
+        "body": "> use the same codec for data store and reading\r\n\r\nWhat is the codec when we add keys using redis-cli  and want to read using redisson  @mrniko ?  I tried a few at random did not work"
+      },
+      {
+        "user": "SplotyCode",
+        "created_at": "2021-11-27T09:15:05Z",
+        "body": "Have you tried StringCodec?"
+      },
+      {
+        "user": "ashwinreal",
+        "created_at": "2021-11-27T09:17:17Z",
+        "body": " @mrniko  @SplotyCode i have tried both\r\n` redisService.client.getMapCache(key, StringCodec.INSTANCE ).readAllEntrySet()\r\n      redisService.client.getMapCache(key, ByteArrayCodec.INSTANCE ).readAllEntrySet()\r\n`"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2021-11-29T05:48:07Z",
+        "body": "you can insert/update RMapCache entries only through its API or try RMap object"
+      },
+      {
+        "user": "chanhengseang3",
+        "created_at": "2024-06-25T06:29:38Z",
+        "body": "I got this error after added StringCodec.INSTANCE\r\n`redissonClient.getBoundedBlockingQueue(\"key\", StringCodec.INSTANCE)`\r\n```\r\ncom.esotericsoftware.kryo.KryoException: Encountered unregistered class ID: 65\r\n\tat com.esotericsoftware.kryo.util.DefaultClassResolver.readClass(DefaultClassResolver.java:159)\r\n\tat com.esotericsoftware.kryo.Kryo.readClass(Kryo.java:758)\r\n\tat com.esotericsoftware.kryo.Kryo.readClassAndObject(Kryo.java:869)\r\n\tat org.redisson.codec.Kryo5Codec$4.decode(Kryo5Codec.java:144)\r\n\tat org.redisson.client.handler.CommandDecoder.decode(CommandDecoder.java:433)\r\n\tat org.redisson.client.handler.CommandDecoder.decodeList(CommandDecoder.java:490)\r\n\tat org.redisson.client.handler.CommandDecoder.decode(CommandDecoder.java:442)\r\n\tat org.redisson.client.handler.CommandDecoder.decodeCommand(CommandDecoder.java:216)\r\n\tat org.redisson.client.handler.CommandDecoder.decode(CommandDecoder.java:144)\r\n\tat org.redisson.client.handler.CommandDecoder.decode(CommandDecoder.java:120)\r\n\tat io.netty.handler.codec.ByteToMessageDecoder.decodeRemovalReentryProtection(ByteToMessageDecoder.java:529)\r\n\tat io.netty.handler.codec.ReplayingDecoder.callDecode(ReplayingDecoder.java:366)\r\n\tat io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:290)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)\r\n\tat io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)\r\n\tat io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)\r\n\tat io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)\r\n\tat io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)\r\n\tat io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)\r\n\tat io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)\r\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.base/java.lang.Thread.run(Thread.java:840)\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 3546,
+    "title": "Object not added in RSet",
+    "created_at": "2021-04-12T08:04:23Z",
+    "closed_at": "2021-04-13T05:43:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/3546",
+    "body": "In the below code, we are facing intermittent issues where` System.out.println(\"Your Ids: \"+ids1)` is not printed when we add something and RedissionSet reference doesn't contain anything even after adding objects to it.\r\n```\r\nfinal Set<String> homeIds = platformCache.getSet(Home.fetchProductCacheKey(productId));\r\n\r\nList<String> getIds = callToDb.getProductId(productId);\r\n\r\nfor(String ids : getIds) {\r\nhomeIds.add(ids);\r\n}\r\n\r\nfor(String ids1: homeIds) { // This for loop is not run since homeids were empty sometimes.\r\nSystem.out.println(\"Your Ids: \"+ids1);\r\n}\r\n\r\n```\r\n\r\nAre we doing anything wrong? Any help will be appreciated.",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/3546/comments",
+    "author": "vipul1231",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2021-04-12T08:53:19Z",
+        "body": "Try ReadMode.MASTER setting"
+      },
+      {
+        "user": "vipul1231",
+        "created_at": "2021-04-12T10:10:54Z",
+        "body": "I believe this setting will move reading data to master node ?. This will increase traffic to my master node. Please correct me if I am wrong."
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2021-04-12T12:43:20Z",
+        "body": "This issue happens due to replication lag between slave/master nodes."
+      }
+    ]
+  },
+  {
+    "number": 3464,
+    "title": "redis\u91cd\u542f\u4e4b\u540e\u67d0\u4e9b\u670d\u52a1\u5668\u8fde\u63a5redis\u4e00\u76f4\u6ca1\u6062\u590d\u62a5MasterConnectionPool no available Redis entries\u9519\u8bef",
+    "created_at": "2021-03-10T18:30:43Z",
+    "closed_at": "2021-03-25T08:20:37Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/3464",
+    "body": "Caused by: org.redisson.client.RedisConnectionException: MasterConnectionPool no available Redis entries.  Disconnected hosts: [/1**.**.**.**]\r\n\tat org.redisson.connection.pool.ConnectionPool.get(ConnectionPool.java:198)\r\n\tat org.redisson.connection.pool.MasterConnectionPool.get(MasterConnectionPool.java:31)\r\n\tat org.redisson.connection.MasterSlaveEntry.connectionWriteOp(MasterSlaveEntry.java:535)\r\n\tat org.redisson.connection.SingleEntry.connectionReadOp(SingleEntry.java:45)\r\n\tat org.redisson.connection.MasterSlaveConnectionManager.connectionReadOp(MasterSlaveConnectionManager.java:807)\r\n\tat org.redisson.command.CommandAsyncService.async(CommandAsyncService.java:496)\r\n\tat org.redisson.command.CommandAsyncService.readAsync(CommandAsyncService.java:351)\r\n\tat org.redisson.RedissonBucket.getAsync(RedissonBucket.java:102)\r\n\tat org.redisson.RedissonBucket.get(RedissonBucket.java:97)\r\n\t... 146 more\r\n\r\n\r\nredisson\u914d\u7f6e\r\n.setFailedAttempts(1).setConnectTimeout(300).setRetryAttempts(0).setTimeout(100);",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/3464/comments",
+    "author": "cclouds",
+    "comments": [
+      {
+        "user": "cclouds",
+        "created_at": "2021-03-10T18:58:08Z",
+        "body": "version\r\n3.6.0"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2021-03-11T06:03:45Z",
+        "body": "Update to 3.6.5 version."
+      }
+    ]
+  },
+  {
+    "number": 3304,
+    "title": "Why does the first IP of the cluster automatically change to the intranet IP?",
+    "created_at": "2020-12-22T02:34:40Z",
+    "closed_at": "2020-12-28T07:13:49Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/3304",
+    "body": "This is my configration file\r\n```yml\r\nspring:\r\n  redis:\r\n    timeout: 10000\r\n    cluster:\r\n      nodes:\r\n        - 120.79.8.153:7000\r\n        - 120.79.8.153:7001\r\n        - 120.79.8.153:7002\r\n        - 120.79.8.153:7003\r\n        - 120.79.8.153:7004\r\n        - 120.79.8.153:7005\r\n```\r\nThis is my log. note that the ip of port 7000 has changed,\r\n```log\r\na0eb8a93e3ce9a3ac2d15c73a9d8c3bf7064904d 120.79.8.153:7002@17002 master - 0 1608603104000 3 connected 10923-16383\r\ndfc494ff70a7b10af271a8e132899c47e771fecc 120.79.8.153:7004@17004 slave 20e35d1e53f766ae93a7158f5e8ff4ac379ef8a0 0 1608603105000 1 connected\r\n422579dc30a3aa20cc2cc2e119f893691dcfdca7 120.79.8.153:7005@17005 slave 645a4f040a4bb12b91aa52c23373c4b5acc7c84b 0 1608603105945 2 connected\r\n20e35d1e53f766ae93a7158f5e8ff4ac379ef8a0 172.18.40.70:7000@17000 myself,master - 0 1608603106000 1 connected 0-5460\r\nc295c0f4b6bac3cc3b883e73dd53826cb9a48204 120.79.8.153:7003@17003 slave a0eb8a93e3ce9a3ac2d15c73a9d8c3bf7064904d 0 1608603104944 3 connected\r\n645a4f040a4bb12b91aa52c23373c4b5acc7c84b 120.79.8.153:7001@17001 master - 0 1608603106947 2 connected 5461-10922\r\n```\r\nWhen I test the code on my computer, I always get an error: Can't connect to master: redis://172.18.40.70:7000 with slot ranges: [[0-5460]]",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/3304/comments",
+    "author": "HeyChiang",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-12-22T08:12:45Z",
+        "body": "because you have this ip in cluster configuration 172.18.40.70. Check your Redis cluster config"
+      },
+      {
+        "user": "Ljia-ncu",
+        "created_at": "2020-12-27T15:10:08Z",
+        "body": "just replace the intranet ip within nodes.conf of all nodes with the public ip.\r\ne.g.\r\nsed -i 's/172.18.40.70/120.79.8.153/g' /node-${port}/data/nodes.conf"
+      }
+    ]
+  },
+  {
+    "number": 3242,
+    "title": "isHeldByCurrentThread() goes wrong",
+    "created_at": "2020-11-24T08:34:22Z",
+    "closed_at": "2020-12-02T11:10:03Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/3242",
+    "body": "org.redisson.client.RedisException: Unexpected exception while processing command\r\n\tat org.redisson.command.CommandAsyncService.convertException(CommandAsyncService.java:338)\r\n\tat org.redisson.command.CommandAsyncService.get(CommandAsyncService.java:140)\r\n\tat org.redisson.RedissonObject.get(RedissonObject.java:90)\r\n\tat org.redisson.RedissonLock.isHeldByThread(RedissonLock.java:523)\r\n\tat org.redisson.RedissonLock.isHeldByCurrentThread(RedissonLock.java:517)\r\n\tat com.hikvision.ga.vnsc.mls.modules.distribute.redis.RedissonDistributedLocker.unlock(RedissonDistributedLocker.java:49)\r\n\tat com.hikvision.ga.vnsc.mls.modules.distribute.redis.RedissLockUtil.unlock(RedissLockUtil.java:30)\r\n\tat com.hikvision.ga.vnsc.mls.modules.privilege.handler.CountHandler.updateCurrentLink(CountHandler.java:776)\r\n\tat com.hikvision.ga.vnsc.mls.modules.privilege.handler.CountHandler.updateSingleCurrentLink(CountHandler.java:530)\r\n\tat com.hikvision.ga.vnsc.mls.modules.privilege.handler.CountHandler.updateCountByRegister(CountHandler.java:481)\r\n\tat com.hikvision.ga.vnsc.mls.modules.notifier.DefaultNotifier.updateLinkEurl(DefaultNotifier.java:251)\r\n\tat com.hikvision.ga.vnsc.mls.modules.notifier.DefaultNotifier.notify(DefaultNotifier.java:137)\r\n\tat com.hikvision.ga.vnsc.mls.modules.notifier.DefaultNotifier$$FastClassBySpringCGLIB$$b3dd79bb.invoke(<generated>)\r\n\tat org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)\r\n\tat org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:685)\r\n\tat com.hikvision.ga.vnsc.mls.modules.notifier.DefaultNotifier$$EnhancerBySpringCGLIB$$a14831d5.notify(<generated>)\r\n\tat com.hikvision.ga.vnsc.mls.modules.module.media.handler.AbstractMessageHandler.notify(AbstractMessageHandler.java:174)\r\n\tat com.hikvision.ga.vnsc.mls.modules.module.media.handler.RegisterReqHandler.getResponse(RegisterReqHandler.java:140)\r\n\tat com.hikvision.ga.vnsc.mls.modules.module.media.handler.RegisterReqHandler.lambda$doHandle$0(RegisterReqHandler.java:75)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)\r\n\tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)\r\n\tat java.base/java.lang.Thread.run(Thread.java:834)\r\nCaused by: java.lang.NullPointerException: null\r\n\tat org.redisson.client.handler.CommandEncoder.encode(CommandEncoder.java:131)\r\n\tat org.redisson.client.handler.CommandEncoder.encode(CommandEncoder.java:100)\r\n\tat org.redisson.client.handler.CommandEncoder.encode(CommandEncoder.java:56)\r\n\tat io.netty.handler.codec.MessageToByteEncoder.write(MessageToByteEncoder.java:107)\r\n\tat org.redisson.client.handler.CommandEncoder.write(CommandEncoder.java:76)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:716)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite(AbstractChannelHandlerContext.java:708)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:791)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:701)\r\n\tat io.netty.handler.codec.MessageToByteEncoder.write(MessageToByteEncoder.java:120)\r\n\tat org.redisson.client.handler.CommandBatchEncoder.write(CommandBatchEncoder.java:45)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:716)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite(AbstractChannelHandlerContext.java:708)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:791)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:701)\r\n\tat io.netty.channel.ChannelDuplexHandler.write(ChannelDuplexHandler.java:115)\r\n\tat org.redisson.client.handler.CommandsQueue.write(CommandsQueue.java:97)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:716)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWriteAndFlush(AbstractChannelHandlerContext.java:763)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:789)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.writeAndFlush(AbstractChannelHandlerContext.java:757)\r\n\tat io.netty.channel.DefaultChannelPipeline.writeAndFlush(DefaultChannelPipeline.java:1031)\r\n\tat io.netty.channel.AbstractChannel.writeAndFlush(AbstractChannel.java:298)\r\n\tat org.redisson.client.handler.CommandsQueue.sendData(CommandsQueue.java:123)\r\n\tat org.redisson.client.handler.CommandsQueue.write(CommandsQueue.java:100)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite0(AbstractChannelHandlerContext.java:716)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeWrite(AbstractChannelHandlerContext.java:708)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.access$1700(AbstractChannelHandlerContext.java:56)\r\n\tat io.netty.channel.AbstractChannelHandlerContext$AbstractWriteTask.write(AbstractChannelHandlerContext.java:1102)\r\n\tat io.netty.channel.AbstractChannelHandlerContext$WriteAndFlushTask.write(AbstractChannelHandlerContext.java:1149)\r\n\tat io.netty.channel.AbstractChannelHandlerContext$AbstractWriteTask.run(AbstractChannelHandlerContext.java:1073)\r\n\tat io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:163)\r\n\tat io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:416)\r\n\tat io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:515)\r\n\tat io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:918)\r\n\tat io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)\r\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/3242/comments",
+    "author": "VicQwz",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-11-24T10:55:33Z",
+        "body": "check lock name for null value"
+      }
+    ]
+  },
+  {
+    "number": 3229,
+    "title": "redisson-spring-boot-starter\uff0c version 3.13.6  ",
+    "created_at": "2020-11-21T08:11:30Z",
+    "closed_at": "2020-11-22T14:02:09Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/3229",
+    "body": "\r\n<groupId>org.redisson</groupId>\r\n<artifactId>redisson-spring-boot-starter</artifactId>\r\n<version>3.13.6</version>\r\n\r\nWhen I use the following command, an exception is thrown\uff0cI tried a lot of high version, the error message is the same.\r\nI use the  version: 3.5.5, It is work. so why the high version doesn't work ?\r\n\r\ngeo.radiusWithDistance(lon, lat, 3, GeoUnit.KILOMETERS, GeoOrder.ASC, 10);\r\n\r\nException in thread \"main\" org.redisson.client.RedisException: ERR unknown command 'GEORADIUS_RO'. channel: [id: 0x85a94190, L:/127.0.0.1:52892 - R:/127.0.0.1:6379] command: (GEORADIUS_RO)\r\n",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/3229/comments",
+    "author": "seart",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-11-22T14:01:50Z",
+        "body": "GEORADIUS_RO is used to read data from Redis slave. You need to update to Redis to 3.2.10 version or higher to get it work."
+      }
+    ]
+  },
+  {
+    "number": 2766,
+    "title": "RScoredSortedSet.entryRange() can't get entry list under redis cluster\uff1f ",
+    "created_at": "2020-05-13T14:38:36Z",
+    "closed_at": "2020-05-13T17:16:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/2766",
+    "body": "### Redisson version\uff1a3.7.5\r\n### **I created a redis cluster of three masters and three slaves in the virtual machine.**\r\n\r\n192.168.10.139 master  0-5460\r\n192.168.10.140 master  5461-10922\r\n192.168.10.141 master  10923-16383\r\n192.168.10.142 slave\r\n192.168.10.143 slave \r\n192.168.10.144 slave\r\n\r\n### **I want to test whether the scoresortedset supports clustering.So I wrote a unit test class**\r\n\r\n\r\n\r\n@Before\r\n    public void setUp(){\r\n        Config config = new Config();\r\n        config.useClusterServers()\r\n                .setPassword(\"123456\")\r\n                .setScanInterval(2000) // \u96c6\u7fa4\u72b6\u6001\u626b\u63cf\u95f4\u9694\u65f6\u95f4\uff0c\u5355\u4f4d\u662f\u6beb\u79d2\r\n                .addNodeAddress(\"redis://192.168.10.139:6379\", \"redis://192.168.10.140:6379\")\r\n                .addNodeAddress(\"redis://192.168.10.141:6379\", \"redis://192.168.10.142:6379\")\r\n                .addNodeAddress(\"redis://192.168.10.143:6379\", \"redis://192.168.10.144:6379\");\r\n        redissonClient = Redisson.create(config);\r\n    }\r\n\r\n@Test\r\n    public void redisClusterTest(){\r\n        RScoredSortedSet<String> set = redissonClient.getScoredSortedSet(\"xuyikai\");\r\n        for(int i=1;i<=10;i++){\r\n            boolean isAdd = set.tryAdd(i, \"key\uff1a\" + i);\r\n            log.info(\"isAdd:{}\",isAdd);\r\n        }\r\n        log.info(\"set size:{}\",set.size());\r\n        Collection<ScoredEntry<String>> scoredEntries = set.entryRange(0,10);\r\n        for (ScoredEntry<String> entry : scoredEntries) {\r\n            String key = entry.getValue();\r\n            Double score = entry.getScore();\r\n            log.info(\"key:{},score:{}\",key,score);\r\n        }\r\n    }\r\n\r\n### **I found that the key and score can be inserted normally in the scoreportedset, but when I try to read the size of the current scoreportedset, I find that the return value is 0.**\r\n### **This is the output\uff1a**\r\n\r\n\r\n2020-05-13 22:29:17,531 [main] INFO  org.redisson.Version# logVersion : 41 - Redisson 3.7.5\r\n2020-05-13 22:29:18,230 [main] INFO  o.r.cluster.ClusterConnectionManager# <init> : 120 - Redis cluster nodes configuration got from 192.168.10.139/192.168.10.139:6379:\r\n3d1cc11809e1e057a0f4347df55ac5497035bc59 192.168.10.142:6379@16379 slave e1d330c89353464f871e4fe37ed2bb744e26d9f1 0 1589380157345 4 connected\r\ned84d533c89be5b453349be85ea62236b7e388fd 192.168.10.140:6379@16379 master - 0 1589380157553 2 connected 5461-10922\r\ne1d330c89353464f871e4fe37ed2bb744e26d9f1 192.168.10.141:6379@16379 master - 0 1589380156277 3 connected 10923-16383\r\nc699c611bb722a38588acd51a561755598fbdda7 192.168.10.139:6379@16379 myself,master - 0 1589380156000 1 connected 0-5460\r\n68a78c982c84cc39fb0a500be9007cf08df2d1eb 192.168.10.143:6379@16379 slave c699c611bb722a38588acd51a561755598fbdda7 0 1589380157000 5 connected\r\n0bf30336b5397e3172bbc39827375bfbadbd500e 192.168.10.144:6379@16379 slave ed84d533c89be5b453349be85ea62236b7e388fd 0 1589380157764 6 connected\r\n\r\n2020-05-13 22:29:18,252 [redisson-netty-1-2] INFO  o.r.cluster.ClusterConnectionManager# operationComplete : 244 - slaves: [redis://192.168.10.143:6379] added for slot ranges: [[0-5460]]\r\n2020-05-13 22:29:18,256 [redisson-netty-1-5] INFO  o.r.cluster.ClusterConnectionManager# operationComplete : 244 - slaves: [redis://192.168.10.144:6379] added for slot ranges: [[5461-10922]]\r\n2020-05-13 22:29:18,275 [redisson-netty-1-7] INFO  o.r.cluster.ClusterConnectionManager# operationComplete : 244 - slaves: [redis://192.168.10.142:6379] added for slot ranges: [[10923-16383]]\r\n2020-05-13 22:29:18,291 [redisson-netty-1-5] INFO  o.r.c.p.MasterPubSubConnectionPool# operationComplete : 144 - 1 connections initialized for 192.168.10.141/192.168.10.141:6379\r\n2020-05-13 22:29:18,298 [redisson-netty-1-12] INFO  o.r.c.pool.PubSubConnectionPool# operationComplete : 144 - 1 connections initialized for 192.168.10.144/192.168.10.144:6379\r\n2020-05-13 22:29:18,299 [redisson-netty-1-2] INFO  o.r.c.pool.PubSubConnectionPool# operationComplete : 144 - 1 connections initialized for 192.168.10.142/192.168.10.142:6379\r\n2020-05-13 22:29:18,299 [redisson-netty-1-11] INFO  o.r.c.p.MasterPubSubConnectionPool# operationComplete : 144 - 1 connections initialized for 192.168.10.140/192.168.10.140:6379\r\n2020-05-13 22:29:18,343 [redisson-netty-1-8] INFO  o.r.c.pool.PubSubConnectionPool# operationComplete : 144 - 1 connections initialized for 192.168.10.143/192.168.10.143:6379\r\n2020-05-13 22:29:18,345 [redisson-netty-1-9] INFO  o.r.c.pool.MasterConnectionPool# operationComplete : 144 - 32 connections initialized for 192.168.10.140/192.168.10.140:6379\r\n2020-05-13 22:29:18,345 [redisson-netty-1-1] INFO  o.r.c.pool.MasterConnectionPool# operationComplete : 144 - 32 connections initialized for 192.168.10.139/192.168.10.139:6379\r\n2020-05-13 22:29:18,346 [redisson-netty-1-10] INFO  o.r.c.p.MasterPubSubConnectionPool# operationComplete : 144 - 1 connections initialized for 192.168.10.139/192.168.10.139:6379\r\n2020-05-13 22:29:18,348 [redisson-netty-1-10] INFO  o.r.cluster.ClusterConnectionManager# operationComplete : 267 - master: redis://192.168.10.139:6379 added for slot ranges: [[0-5460]]\r\n2020-05-13 22:29:18,352 [redisson-netty-1-2] INFO  o.r.c.pool.SlaveConnectionPool# operationComplete : 144 - 32 connections initialized for 192.168.10.144/192.168.10.144:6379\r\n2020-05-13 22:29:18,352 [redisson-netty-1-3] INFO  o.r.c.pool.SlaveConnectionPool# operationComplete : 144 - 32 connections initialized for 192.168.10.142/192.168.10.142:6379\r\n2020-05-13 22:29:18,352 [redisson-netty-1-5] INFO  o.r.c.pool.MasterConnectionPool# operationComplete : 144 - 32 connections initialized for 192.168.10.141/192.168.10.141:6379\r\n2020-05-13 22:29:18,352 [redisson-netty-1-9] INFO  o.r.cluster.ClusterConnectionManager# operationComplete : 267 - master: redis://192.168.10.140:6379 added for slot ranges: [[5461-10922]]\r\n2020-05-13 22:29:18,354 [redisson-netty-1-5] INFO  o.r.cluster.ClusterConnectionManager# operationComplete : 267 - master: redis://192.168.10.141:6379 added for slot ranges: [[10923-16383]]\r\n2020-05-13 22:29:18,357 [redisson-netty-1-7] INFO  o.r.c.pool.SlaveConnectionPool# operationComplete : 144 - 32 connections initialized for 192.168.10.143/192.168.10.143:6379\r\n2020-05-13 22:29:18,371 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,372 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,373 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,374 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,375 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,376 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,377 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,378 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,379 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,381 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 65 - isAdd:true\r\n2020-05-13 22:29:18,382 [main] INFO  com.mbkj.mall.RedisClusterTest# redisClusterTest : 68 - set size:0\r\n\r\n### **I tried distributed lock under this condition. It seems that there is no problem, so I am confused about the above problems**\r\n### **I hope you can answer my question, thank you**\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/2766/comments",
+    "author": "xuyikai1",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-05-13T17:16:13Z",
+        "body": "Seems there is a replication lag between master and slave. You may try to use `readMode=Master` to avoid this. RLock is always use Redis master."
+      }
+    ]
+  },
+  {
+    "number": 2740,
+    "title": "Idle connection is not killed after timeout",
+    "created_at": "2020-04-30T00:54:00Z",
+    "closed_at": "2020-04-30T20:47:35Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/2740",
+    "body": "clusterServersConfig:\r\n  idleConnectionTimeout: 30000\r\n  pingTimeout: 1000\r\n  subscriptionConnectionMinimumIdleSize: 1\r\n  subscriptionConnectionPoolSize: 10\r\n  slaveConnectionMinimumIdleSize: 1\r\n  slaveConnectionPoolSize: 2\r\n  masterConnectionMinimumIdleSize: 3\r\n  masterConnectionPoolSize: 4\r\n  pingConnectionInterval: 0\r\n  keepAlive: true\r\n\r\nI use the above settings. The connections is always 2 event the idle time is bigger than 20 seconds.\r\n`id=134 addr=172.18.0.1:43642 fd=19 name=MerchantDataService age=1278 idle=1278 flags=r db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=0 obl=0 oll=0 omem=0 events=r cmd=readonly\r\nid=135 addr=172.18.0.1:43696 fd=20 name=MerchantDataService age=1278 idle=1278 flags=r db=0 sub=0 psub=0 multi=-1 qbuf=0 qbuf-free=0 obl=0 oll=0 omem=0 events=r cmd=readonly`\r\n\r\nDid I miss something?\r\n\r\nBtw, for the connections in master node, it always 4 and no connection is closed after idleConnectionTimeout.\r\n",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/2740/comments",
+    "author": "stevenli1217",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-04-30T06:03:20Z",
+        "body": "Redisson opens additional connection per node to retrieve topology information"
+      }
+    ]
+  },
+  {
+    "number": 2726,
+    "title": "Question about retryAttempts&retryInterval",
+    "created_at": "2020-04-24T03:04:00Z",
+    "closed_at": "2020-04-24T07:09:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/2726",
+    "body": "In our environment, we see randomly long time access due to some commands go to 1 time or 2 times retry.  ~1500ms(retryInterval) passed after connection acquired but not able to send command and go to attempt. \r\n\r\nRestart Redis server will recover it. \r\n\r\nI wonder to know:\r\n1. In which possible scenarios Redis command can't be sent to Redis server, and enter retry mode?\r\n2. Why restart Redis server can recover?",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/2726/comments",
+    "author": "empty117",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-04-24T05:14:21Z",
+        "body": "> In which possible scenarios Redis command can't be sent to Redis server, and enter retry mode?\r\n\r\nIf connection became broken due to network issue or Redis CPU 100% spike.\r\nTry to set `pingConnectionInterval` setting"
+      },
+      {
+        "user": "empty117",
+        "created_at": "2020-04-24T05:29:48Z",
+        "body": "@mrniko : What's the usage to set \"pingConnectionInterval\"?\r\nI am sure Redis CPU is not 100% spike. About connections, i set like this:\r\n -  idleConnectionTimeout: 10000\r\n - masterConnectionMinimumIdleSize: 32\r\n - masterConnectionPoolSize: 256\r\n\r\nWhat i understood is if load is not quite high, connection number will back to 32 in case some connections got ldel time more than 10s. But i see connection number  is keeping more than 200 even in very free time."
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2020-04-24T05:57:16Z",
+        "body": "> But i see connection number is keeping more than 200 even in very free time.\r\n\r\nI sure that these connections weren't used for more than 10s? connection pool use them in round robin."
+      },
+      {
+        "user": "empty117",
+        "created_at": "2020-04-24T06:05:02Z",
+        "body": "@mrniko : When Redisson startup, how many connections will be established? masterConnectionMinimumIdleSize: 32 or masterConnectionPoolSize: 256?\r\n\r\nI suppose \"pingConnectionInterval\" is used to detect broken connections. If this was set, in each connection, redisson will regularly execute PING command. Will it impact the connection IDLE time?\r\n\r\nFor instance: If i set pingConnectionInterval=5000, idleConnectionTimeout=10000, Does it mean connection will never been IDEL timeout?"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2020-04-24T06:08:35Z",
+        "body": "> If this was set, in each connection, redisson will regularly execute PING command. Will it impact the connection IDLE time?\r\n\r\nIt shouldn't since PingConnectionHandler doesn't use conneciton pool"
+      }
+    ]
+  },
+  {
+    "number": 2724,
+    "title": "RBlockingQueue\u5ef6\u65f6\u961f\u5217\u5230\u671f\u4e0d\u80fdpoll\u5230\u503c\u3002\u662f\u4e0d\u662f\u6211\u7684\u4f7f\u7528\u65b9\u5f0f\u6709\u95ee\u9898\u3002",
+    "created_at": "2020-04-23T10:36:43Z",
+    "closed_at": "2020-09-23T14:36:21Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/2724",
+    "body": "\u7528offer\u7684\u5f62\u5f0f\u653e\u5165\u5ef6\u65f6\u961f\u5217\uff0c\u518d\u7528poll\u7684\u5f62\u5f0f\u53d6\u503c\u3002\u73b0\u5728\u51fa\u73b0\u7684\u73b0\u8c61\u662f\uff0c\u6709\u65f6\u5019\u5230\u8fc7\u671f\u65f6\u95f4\uff0c\u4f46\u662f\u6ca1\u6709\u53d6\u5230\u503c\uff0c\u9700\u8981\u518d\u6b21\u5f80\u91ccoffer\u7684\u65f6\u5019\u624d\u4f1a\u53d6\u5230\u503c\u503c\u3002\r\n//\u5b58\u7684\u4ee3\u7801\r\n        RBlockingQueue<QueueTask> blockingFairQueue = redisson.getBlockingQueue(task.getQueueName());\r\n        RDelayedQueue<QueueTask> delayedQueue = redisson.getDelayedQueue(blockingFairQueue);\r\n        delayedQueue.offer(task, task.getDelayTime(), task.getTimeUnit() == null ? TimeUnit.MINUTES : task.getTimeUnit());\r\n        delayedQueue.destroy();\r\n\r\n//\u53d6\u7684\u4ee3\u7801\uff1a\r\nwhile (true){\r\n                RBlockingQueue<QueueTask> blockingFairQueue = redisUtils.getRedisson().getBlockingQueue(queueName);\r\n                    task = blockingFairQueue.poll(1,TimeUnit.MINUTES);\r\n            }\r\n\r\n//\u914d\u7f6e\u7684\u96c6\u7fa4\u6a21\u5f0f\r\nconfig.useClusterServers().setScanInterval(2000).addNodeAddress(newNodes.toArray(new String[0]))\r\n                    .setSubscriptionConnectionMinimumIdleSize(subscriptionConnectionMinimumIdleSize)\r\n                    .setSubscriptionConnectionPoolSize(subscriptionConnectionPoolSize)\r\n                    .setSubscriptionsPerConnection(subscriptionsPerConnection)\r\n                    .setClientName(clientName)\r\n                    .setRetryAttempts(retryAttempts)\r\n                    .setRetryInterval(retryInterval)\r\n                    .setTimeout(timeout)\r\n                    .setConnectTimeout(connectTimeout)\r\n                    .setIdleConnectionTimeout(idleConnectionTimeout)\r\n                    .setPassword(password)\r\n                    .setMasterConnectionPoolSize(masterConnectionPoolSize)\r\n                    .setMasterConnectionMinimumIdleSize(masterConnectionMinimumIdleSize)\r\n                    .setSlaveConnectionPoolSize(slaveConnectionPoolSize)\r\n                    .setSlaveConnectionMinimumIdleSize(slaveConnectionMinimumIdleSize);\r\n\r\n//\u5355\u70b9\u6a21\u5f0f\u914d\u7f6e\r\nconfig.useSingleServer().setAddress(address)\r\n                    .setConnectionMinimumIdleSize(connectionMinimumIdleSize)\r\n                    .setConnectionPoolSize(connectionPoolSize)\r\n                    .setDatabase(database)\r\n                    .setDnsMonitoringInterval(dnsMonitoringInterval)\r\n                    .setSubscriptionConnectionMinimumIdleSize(subscriptionConnectionMinimumIdleSize)\r\n                    .setSubscriptionConnectionPoolSize(subscriptionConnectionPoolSize)\r\n                    .setSubscriptionsPerConnection(subscriptionsPerConnection)\r\n                    .setClientName(clientName)\r\n                    .setRetryAttempts(retryAttempts)\r\n                    .setRetryInterval(retryInterval)\r\n                    .setTimeout(timeout)\r\n                    .setConnectTimeout(connectTimeout)\r\n                    .setIdleConnectionTimeout(idleConnectionTimeout)\r\n                    .setPassword(password);\r\n\r\nredisson\u7248\u672c\uff1a3.11.4",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/2724/comments",
+    "author": "LionsArmstrong",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-04-23T11:19:15Z",
+        "body": "It's happening since delayed elements transfered on Redisson side"
+      },
+      {
+        "user": "LionsArmstrong",
+        "created_at": "2020-04-24T01:47:38Z",
+        "body": "\u5982\u4f55\u907f\u514d\u6b64\u7c7b\u95ee\u9898\u7684\u53d1\u751f\u5462\uff1f\u964d\u4f4e\u5ef6\u8fdf\u65f6\u95f4\u5417\uff1f\u4e1a\u52a1\u5ef6\u65f6\u65f6\u95f4\u4e3a30\u523090\u5206\u949f\u4e0d\u7b49\u7684\u3002\u73b0\u5728\u6570\u636e\u7684\u4f7f\u7528\u91cf\u4e0d\u662f\u5f88\u5927\u3002\u7ecf\u5e38\u4f1a\u53d1\u751f\u8fd9\u6837\u7684\u95ee\u9898\u3002"
+      },
+      {
+        "user": "zcs100",
+        "created_at": "2020-05-30T14:35:12Z",
+        "body": "@LionsArmstrong \u6211\u4e5f\u9047\u5230\u4e86\u76f8\u540c\u7684\u95ee\u9898\uff0c\u8fd0\u884c\u4e2d\u4f1a\u6709\u4e22\u6d88\u606f\u7684\u60c5\u51b5\uff0c\u73b0\u5728\u89e3\u51b3\u4e86\u5417\uff1f\u80fd\u5206\u4eab\u4e00\u4e0b\u5417"
+      },
+      {
+        "user": "ManaStuDent",
+        "created_at": "2020-06-30T05:53:50Z",
+        "body": "\u9047\u5230\u540c\u6837\u7684\u95ee\u9898\u5728 2.15.2 \u7248\u672c\u4e2d\uff0c\u6211\u8fd9\u91cc\u548c Springmvc \u6574\u5408\u65f6\u9047\u5230\u7684\u95ee\u9898\uff0cJunit \u5355\u5143\u6d4b\u8bd5\u7684\u65f6\u5019\u5c31\u6ca1\u6709\u95ee\u9898\uff0c\u5728\u4f7f\u7528 Springmvc \u4e2d\u4f7f\u7528 @PostConstruct \u6ce8\u89e3\u4e3a\u6d88\u8d39\u8005\u5f00\u542f\u4e00\u4e2a Thread \u7ebf\u7a0b\u65f6\uff0c\u751f\u4ea7\u8005\u53d1\u9001\u5355\u4e2a\u6d88\u606f\u540e\uff0c\u6d88\u8d39\u8005\u6709\u65f6\u5019\u80fd\u6d88\u8d39\u5230\uff0c\u6709\u65f6\u5019\u6d88\u8d39\u4e0d\u5230\uff0c\u4f46\u662f\u5f53\u751f\u4ea7\u8005\u8fde\u7eed\u53d1\u9001\u591a\u4e2a\u6d88\u606f\uff0c\u6d88\u8d39\u8005\u5c31\u4e00\u5b9a\u80fd\u591f\u6d88\u8d39\u5230\u3002"
+      },
+      {
+        "user": "534519560",
+        "created_at": "2020-09-23T08:33:25Z",
+        "body": "\u4f7f\u7528\u8fd9\u6837\u7684\u65b9\u5f0f\u6dfb\u52a0\u5143\u7d20\u8bd5\u8bd5\u770b,\u6211\u8fd9\u6837\u5c31\u6b63\u5e38\u4e86\r\n`    queue.offer(task, 5, TimeUnit.SECONDS);\r\n        Thread.sleep(1);\r\n        queue.destroy();`"
+      },
+      {
+        "user": "LionsArmstrong",
+        "created_at": "2020-11-09T07:00:01Z",
+        "body": "@zcs100 @1186792881 @ManaStuDent \u53ef\u4ee5\u5c1d\u8bd5\u4e00\u4e0b\uff0c\u4ee5\u4e0b\u65b9\u5f0f\u3002\u57fa\u672c\u53ef\u4ee5\u89e3\u51b3\u5ef6\u65f6\u83b7\u53d6\u4e0d\u5230\u6570\u636e\u7684\u95ee\u9898\u3002\r\nRBlockingQueue<QueueTask> blockingFairQueue = redisUtils.getRedisson().getBlockingQueue(queueName);\r\nredisUtils.getRedisson().getDelayedQueue(blockingFairQueue);\r\ntask = blockingFairQueue.poll(1,TimeUnit.MINUTES);"
+      },
+      {
+        "user": "xrayw",
+        "created_at": "2020-11-10T03:13:48Z",
+        "body": "@LionsArmstrong  \u8001\u54e5, \u662f\u8bf4\u4e2d\u95f4\u8981\u52a0\u4e00\u4e2agetDelayedQueue()\u7684\u65e0\u7528\u4ee3\u7801\u624d\u53ef\u4ee5\u907f\u514d? \u8fd9\u662f\u4ec0\u4e48\u539f\u7406\u554a \ud83d\ude04 "
+      },
+      {
+        "user": "serical",
+        "created_at": "2020-11-10T13:05:54Z",
+        "body": "\u6211\u73b0\u5728\u662f\u8fd9\u4e48\u89e3\u51b3\u7684\ud83d\ude02\r\n```java\r\n    @PostConstruct\r\n    public void init() {\r\n        // 1\u79d2\u949f\u5237\u65b0\u5ef6\u8fdf\u961f\u5217\u4e00\u6b21\r\n        final Timer timer = new Timer();\r\n        timer.schedule(new TimerTask() {\r\n            @Override\r\n            public void run() {\r\n                refresh();\r\n            }\r\n        }, 1000, 1000);\r\n    }\r\n\r\n    /**\r\n     * \u91cd\u542f\u5237\u65b0\u5ef6\u8fdf\u961f\u5217\r\n     */\r\n    private void refresh() {\r\n        RDelayedQueue<String> imageSuitRetryQueue = redissonClient.getDelayedQueue(redissonClient.getBlockingQueue(\"key\"));\r\n        imageSuitRetryQueue.destroy();\r\n    }\r\n```"
+      },
+      {
+        "user": "astorage",
+        "created_at": "2020-11-20T03:14:42Z",
+        "body": "> @zcs100 @1186792881 @ManaStuDent \u53ef\u4ee5\u5c1d\u8bd5\u4e00\u4e0b\uff0c\u4ee5\u4e0b\u65b9\u5f0f\u3002\u57fa\u672c\u53ef\u4ee5\u89e3\u51b3\u5ef6\u65f6\u83b7\u53d6\u4e0d\u5230\u6570\u636e\u7684\u95ee\u9898\u3002\r\n> RBlockingQueue blockingFairQueue = redisUtils.getRedisson().getBlockingQueue(queueName);\r\n> redisUtils.getRedisson().getDelayedQueue(blockingFairQueue);\r\n> task = blockingFairQueue.poll(1,TimeUnit.MINUTES);\r\n\r\n\u51fa\u73b0\u8fd9\u4e2a\u95ee\u9898\u73b0\u8c61\u7684\u539f\u7406\u662f\u4ec0\u4e48\uff1f\u662f\u53d1\u9001\u7aef\u5ef6\u8fdf\u6ca1\u6709\u53d1\u9001\uff0c\u8fd8\u662f\u63a5\u53d7\u65b9\u7684\u95ee\u9898\uff1f"
+      },
+      {
+        "user": "LionsArmstrong",
+        "created_at": "2021-02-09T01:28:21Z",
+        "body": "@astorage \r\n\r\n> > @zcs100 @1186792881 @ManaStuDent \u53ef\u4ee5\u5c1d\u8bd5\u4e00\u4e0b\uff0c\u4ee5\u4e0b\u65b9\u5f0f\u3002\u57fa\u672c\u53ef\u4ee5\u89e3\u51b3\u5ef6\u65f6\u83b7\u53d6\u4e0d\u5230\u6570\u636e\u7684\u95ee\u9898\u3002\r\n> > RBlockingQueue blockingFairQueue = redisUtils.getRedisson().getBlockingQueue(queueName);\r\n> > redisUtils.getRedisson().getDelayedQueue(blockingFairQueue);\r\n> > task = blockingFairQueue.poll(1,TimeUnit.MINUTES);\r\n> \r\n> \u51fa\u73b0\u8fd9\u4e2a\u95ee\u9898\u73b0\u8c61\u7684\u539f\u7406\u662f\u4ec0\u4e48\uff1f\u662f\u53d1\u9001\u7aef\u5ef6\u8fdf\u6ca1\u6709\u53d1\u9001\uff0c\u8fd8\u662f\u63a5\u53d7\u65b9\u7684\u95ee\u9898\uff1f\r\n\r\nredis\u91cc\u9762\u6709\u6570\u636e\uff0c\u63a5\u6536\u65b9\u76d1\u542c\u65ad\u4e86\u3002\u4f46\u662f\u8fd8\u6ca1\u6709\u629b\u51fa\u4efb\u4f55\u5f02\u5e38\u3002\u5c31\u662f\u4e00\u76f4\u90fd\u5728\u76d1\u542c\uff0c\u4f46\u662f\u63a5\u6536\u4e0d\u5230\u6570\u636e\u3002\u7b49\u53d1\u9001\u7aef\u518d\u53d1\u9001\u65b0\u7684\u6570\u636e\u7684\u65f6\u5019\uff0c\u63a5\u53d7\u65b9\u5c31\u80fd\u63a5\u53d7\u4e4b\u524d\u7684\u6570\u636e\u3002\u4f46\u662f\u65f6\u95f4\u5df2\u7ecf\u8d85\u65f6\u4e86\u3002"
+      },
+      {
+        "user": "huangwenyi10",
+        "created_at": "2021-05-12T02:24:37Z",
+        "body": "delayedQueue.destroy();   \u6ce8\u91ca\u6389\u8fd9\u53e5\uff0c\u5e94\u8be5\u5c31\u6ca1\u95ee\u9898\u4e86"
+      }
+    ]
+  },
+  {
+    "number": 2532,
+    "title": "\u5173\u4e8eredisson\u7684watchdog\u91cd\u8fde\u673a\u5236",
+    "created_at": "2020-01-09T09:03:59Z",
+    "closed_at": "2020-01-10T08:44:45Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/2532",
+    "body": "\u6700\u8fd1\u5c06redisson\u7248\u672c\u5347\u5230\u4e863.11.5\uff0c\u7136\u540e\u6d4b\u8bd5\u4e86\u4e00\u4e0bredisson\u7684\u91cd\u8fde\u673a\u5236\uff0c\u7136\u540e\u51fa\u73b0\u4e86\u4e00\u4e2a\u5947\u602a\u7684\u73b0\u8c61\u3002\u5728Linux\u4e0a\u90e8\u7f72redis\u96c6\u7fa4\uff0c\u7136\u540e\u5728\u672c\u5730Windows\u4e0a\u8fdb\u884c\u8fde\u63a5\u6d4b\u8bd5\u3002\u5982\u679c\u4f7f\u7528\u5728Linux\u4e0a\u4f7f\u7528iptables\u5207\u65ad\u8fde\u63a5\uff0c\u5728\u8fde\u63a5\u6062\u590d\u540e\u4e0d\u53ef\u7528\u8fde\u63a5\u4f1a\u91cd\u8fde\uff1b\u4f46\u5982\u679c\u5728Windows\u4e0a\u4f7f\u7528IP\u5b89\u5168\u7b56\u7565\u6765\u5207\u65ad\u8fde\u63a5\uff0c\u5728\u8fde\u63a5\u6062\u590d\u540e\uff0c\u4e0d\u53ef\u7528\u8fde\u63a5\u6ca1\u6709\u91cd\u8fde\u3002\u8bf7\u95ee\u4e00\u4e0b\uff0c\u8fd9\u4e24\u79cd\u65b9\u5f0f\u4e4b\u95f4\u6709\u4ec0\u4e48\u4e0d\u4e00\u6837\u7684\u5730\u65b9\u5417\uff1f",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/2532/comments",
+    "author": "ShosinnFuYW",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-01-10T07:08:24Z",
+        "body": "Did you try to set `setPingConnectionInterval` setting to handle such cases?"
+      }
+    ]
+  },
+  {
+    "number": 2524,
+    "title": "Deserialization the object from redis to RList throws InvocationTargetException",
+    "created_at": "2020-01-07T09:19:40Z",
+    "closed_at": "2020-01-07T09:21:26Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/2524",
+    "body": "Deserialization the object from redis to RList throws InvocationTargetException\r\n\r\nredisson:3.12.0\r\nfst:2.56\r\n1.8.0_152\r\n\r\nstacktrace:\r\n\r\n`\r\nCaused by: java.lang.reflect.InvocationTargetException: null\r\n\tat sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)\r\n\tat sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)\r\n\tat sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)\r\n\tat java.lang.reflect.Constructor.newInstance(Constructor.java:423)\r\n\tat org.redisson.command.RedisExecutor.getCodec(RedisExecutor.java:681)\r\n\t... 109 common frames omitted\r\nCaused by: java.lang.NoSuchMethodError: org.nustaq.serialization.FSTConfiguration.getJsonFieldNames()Lorg/nustaq/serialization/coders/FSTJsonFieldNames;\r\n\tat org.redisson.codec.FstCodec.copy(FstCodec.java:201)\r\n\tat org.redisson.codec.FstCodec.<init>(FstCodec.java:190)\r\n\t... 114 common frames omitted\r\n`\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/2524/comments",
+    "author": "fengzhenxing",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-01-07T09:21:26Z",
+        "body": "`java.lang.NoSuchMethodError: org.nustaq.serialization.FSTConfiguration.getJsonFieldNames`\r\n\r\nmake sure you have latest version of fst codec in classpath"
+      },
+      {
+        "user": "fengzhenxing",
+        "created_at": "2020-01-07T09:29:40Z",
+        "body": "@mrniko I add the lastest fst codec version,then throws NPE.\r\n\r\nstacktrace:\r\n\r\n`\r\njava.io.IOException: java.lang.NullPointerException\r\n\tat org.nustaq.serialization.FSTObjectInput.readObject(FSTObjectInput.java:247)\r\n\tat org.redisson.codec.FstCodec$1.decode(FstCodec.java:250)\r\n\tat org.redisson.client.handler.CommandDecoder.decode(CommandDecoder.java:368)\r\n\tat org.redisson.client.handler.CommandDecoder.decodeCommand(CommandDecoder.java:196)\r\n\tat org.redisson.client.handler.CommandDecoder.decode(CommandDecoder.java:134)\r\n\tat org.redisson.client.handler.CommandDecoder.decode(CommandDecoder.java:104)\r\n\tat io.netty.handler.codec.ByteToMessageDecoder.decodeRemovalReentryProtection(ByteToMessageDecoder.java:493)\r\n\tat io.netty.handler.codec.ReplayingDecoder.callDecode(ReplayingDecoder.java:366)\r\n\tat io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:271)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:377)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:363)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:355)\r\n\tat io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:377)\r\n\tat io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:363)\r\n\tat io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)\r\n\tat io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:163)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:714)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:650)\r\n\tat io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:576)\r\n\tat io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:493)\r\n\tat io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:989)\r\n\tat io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)\r\n\tat io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)\r\n\tat java.lang.Thread.run(Thread.java:748)\r\nCaused by: java.lang.NullPointerException: null\r\n\tat org.nustaq.serialization.FSTObjectInput.readObjectWithHeader(FSTObjectInput.java:357)\r\n\tat org.nustaq.serialization.FSTObjectInput.readObjectInternal(FSTObjectInput.java:331)\r\n\tat org.nustaq.serialization.FSTObjectInput.readObject(FSTObjectInput.java:311)\r\n\tat org.nustaq.serialization.FSTObjectInput.readObject(FSTObjectInput.java:245)\r\n\t... 24 common frames omitted\r\n`"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2020-01-07T09:30:35Z",
+        "body": "is there code example to reproduce it?"
+      },
+      {
+        "user": "fengzhenxing",
+        "created_at": "2020-01-07T09:35:01Z",
+        "body": "Here is some example code:\r\n\r\n`\r\nRList<ExampleObject> serviceUserList = redisson.getList(key);\r\n`\r\nif I add  new properties in ExampleObject,then throws NPE. The properties of exampleObject stored in redis is not equals"
+      },
+      {
+        "user": "mrniko",
+        "created_at": "2020-01-07T09:36:56Z",
+        "body": "> if I add new properties in ExampleObject,then throws NPE. The properties of exampleObject stored in redis is not equals\r\n\r\nConsider to use JacksonCodec for this purpose."
+      }
+    ]
+  },
+  {
+    "number": 2510,
+    "title": "\u8bf7\u95ee\u5982\u4f55\u52a8\u6001\u5207\u6362\u670d\u52a1\u5668\u5730\u5740",
+    "created_at": "2020-01-02T09:45:17Z",
+    "closed_at": "2020-01-03T06:40:51Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/redisson/redisson/issues/2510",
+    "body": "```\r\n@Value(\"${spring.redis.addresses}\")\r\nprivate String addresses;\r\n\r\n@Bean\r\npublic RedissonClient redissonClient() {\r\n            Config config = new Config();\r\n            String[] addressList = addresses.split(\",\");\r\n            config.useClusterServers().addNodeAddress(addressList);\r\n            return Redisson.create(config);\r\n}\r\n```\r\n\r\naddresses\u5730\u5740\u53d1\u751f\u53d8\u5316,redisson\u5982\u4f55\u611f\u77e5\u5230?",
+    "comments_url": "https://api.github.com/repos/redisson/redisson/issues/2510/comments",
+    "author": "laomolaomo",
+    "comments": [
+      {
+        "user": "mrniko",
+        "created_at": "2020-01-03T06:40:51Z",
+        "body": "This feature is not supported. Redisson config is immutable."
+      }
+    ]
+  }
+]

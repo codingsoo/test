@@ -1,0 +1,51 @@
+[
+  {
+    "id": "https://github.com/GoogleChrome/lighthouse/issues/11159",
+    "source": {
+      "issue_number": 11159
+    },
+    "initial_question": {
+      "title": "Is there any step necesary for getting Field Data and Origin Summary to show stats",
+      "body": "I already have search console  and google analytics, is there an additional step in order to display in the future those indicators?"
+    },
+    "satisfaction_conditions": [
+      "Analytics tools are properly configured"
+    ],
+    "created_at": "2020-07-25T00:58:48Z"
+  },
+  {
+    "id": "https://github.com/GoogleChrome/lighthouse/issues/5531",
+    "source": {
+      "issue_number": 5531
+    },
+    "initial_question": {
+      "title": "How to grab/pass the 5 audit score categories",
+      "body": "<!-- We would love to hear anything on your mind about Lighthouse -->\r\n**Summary**\r\nIm trying to find the code related to audit scores of the following categories:\r\n\"id\": \"performance\"\r\n\"id\": \"pwa\"\r\n\"id\": \"accessibility\"\r\n\"id\": \"Best-Practices\"\r\n\"id\": \"seo\"\r\nI need to grab these audit score results and return them similarly to how the following metrics have functions to return their results. \r\n - `ttfcp` - First Contentful Paint\r\n - `ttfmp` - First Meaningful Paint\r\n - `psi` - Perceptual Speed Index\r\n - `fv` - First Visual Change\r\n - `vc` - Visually Complete 100%\r\n - `ttfi` - First Interactive (vBeta)\r\n - `ttci` - Time to Consistently Interactive (vBeta)\r\n - `vc85` - Visually Complete 85%\r\n\r\nIs there any existing code within the project that will help me accomplish this? Any recommendations on how I could accomplish this otherwise? I would like to get the five audit scores I mentioned above, in addition to the available metrics, and update a google spreadsheet with the scores after running the lighthouse test.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Successfully retrieves all 5 audit category scores (performance, pwa, accessibility, best-practices, seo)",
+      "Returns numeric score values for each category",
+      "Works with Lighthouse's JSON output format",
+      "Data can be extracted programmatically"
+    ],
+    "created_at": "2018-06-20T20:36:42Z"
+  },
+  {
+    "id": "https://github.com/GoogleChrome/lighthouse/issues/5466",
+    "source": {
+      "issue_number": 5466
+    },
+    "initial_question": {
+      "title": "how to use existing audits inside a custom audit?",
+      "body": "So I am using lighthouse for custom audits by extending the audits class. I am wondering if its possible to use another existing audits inside my custom audit class? or I have to rely only on gatherers."
+    },
+    "satisfaction_conditions": [
+      "Custom audit must be able to access functionality from existing audits",
+      "Solution must work within Lighthouse's audit extension system",
+      "Audit results must be accessible and usable within the custom audit context",
+      "Implementation must handle asynchronous audit execution",
+      "Solution must maintain version compatibility awareness"
+    ],
+    "created_at": "2018-06-11T08:54:10Z"
+  }
+]

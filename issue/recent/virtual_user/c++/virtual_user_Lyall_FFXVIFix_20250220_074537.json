@@ -1,0 +1,96 @@
+[
+  {
+    "id": "https://github.com/Lyall/FFXVIFix/issues/162",
+    "source": {
+      "issue_number": 162
+    },
+    "initial_question": {
+      "title": "Ultrawide Not Working",
+      "body": "Hello,\r\n\r\nI installed the files in the game folder and when I started up the game it is still locked to 16:9. In game resolution is set to 3440x1440\r\nand windowing is set to fullscreen. I kept the ini file the same so the x,y res values are 0. This is the demo version if that makes a difference.\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Solution is compatible with the demo version of the game"
+    ],
+    "created_at": "2025-01-07T22:54:25Z"
+  },
+  {
+    "id": "https://github.com/Lyall/FFXVIFix/issues/91",
+    "source": {
+      "issue_number": 91
+    },
+    "initial_question": {
+      "title": "Game freezes after tabbing out",
+      "body": "Not sure, if this is known. I didn't find a similar issue, but maybe I have overseen it.\r\n\r\nWhen I tab out of the game into another program or the desktop, the game freezes.\r\nAt least the visual freezes. I can still click and play, but I see just the same freezed frame.\r\n\r\n\r\nmy FFXVI.ini:\r\n```\r\n;;;;;;;;;; Ultrawide/Narrower Fixes ;;;;;;;;;;\r\n\r\n[Fix Resolution]\r\n; Stops borderless and fullscreen resolutions from being scaled to 16:9.\r\n; You can also set a custom resolution to be added to the windowed resolution list. Leave at 0 to use your desktop resolution.\r\nEnabled = true\r\nWindowedResX = 0\r\nWindowedResY = 0\r\n\r\n[Fix HUD]\r\n; Fixes HUD scaling issues and removes pillarboxing/letterboxing.\r\nEnabled = true\r\n; Set HUDSize to 0, 1, 2, 3 or 4 to adjust the size of the gameplay HUD.\r\n; 0 = Automatic (spans screen), 1 = 4:3, 2 = 16:10, 3 = 16:9 (game default), 4 = 21:9\r\nHUDSize = 3\r\n\r\n[Fix Movies]\r\n; Fixes stretched movie sequences.\r\nEnabled = true\r\n\r\n[Fix FOV]\r\n; Fixes cropped FOV when using a narrower than 16:9 resolution. (4:3, 16:10 for example)\r\nEnabled = true\r\n\r\n;;;;;;;;;; General ;;;;;;;;;;\r\n\r\n[Gameplay Camera]\r\n; Add to gameplay vFOV in degrees. Default = 0 (Valid range: -40 to 140)\r\n; I recommend a figure between 5 to 15 for a wider view.\r\nAdditionalFOV = 10\r\n; Adjust character camera position horizontally. \r\n; Above 0 has the character on the left, below 0 on the right. Centered = 0 , Default = 0.95 (Valid range: -5 to 5)\r\nHorizontalPos = 0.95\r\n; Adjust character camera position vertically. \r\n; Higher values bring the the camera up, lower values bring the camera down. Default = -0.65 (Valid range: -5 to 5)\r\nVerticalPos = -0.65\r\n; Adjust gameplay camera distance with a multiplier. Default = 1 (Valid range: 0.1 to 10)\r\nDistanceMultiplier = 1\r\n\r\n[Game Window]\r\n; Set \"BackgroundAudio\" to true to enable audio when alt+tabbed/focus is lost.\r\nBackgroundAudio = false\r\n; Set \"LockCursor\" to true to force the mouse cursor to be locked to the game window when in focus.\r\nLockCursor = false\r\n; Set \"Resizable\" to true to make the game window resizable in windowed mode.\r\nResizable = false\r\n; Set \"DisableScreensaver\" to true to stop your display from going to sleep mid-game.\r\nDisableScreensaver = true\r\n\r\n[JPEG XL Tweaks]\r\n; Set \"NumThreads\" to control the amount of worker threads used when taking JXL screenshots. (Game default = Max threads)\r\n; This can reduce hitching when taking screenshots by setting the value to 4 on a modern CPU.\r\n; Set \"Quality\" between 1-100 to adjust the compression level. (Game default = 75)\r\nNumThreads = 4\r\nQuality = 99.5\r\n\r\n;;;;;;;;;; Graphics ;;;;;;;;;;\r\n\r\n[Motion Blur + Frame Generation]\r\n; Set \"Enabled\" to true to unlock the ability to use motion blur while having frame generation enabled.\r\nEnabled = false\r\n\r\n[Disable Depth of Field]\r\n; Set \"Enabled\" to true to force depth of field off at all times.\r\nEnabled = false\r\n\r\n[Disable Cinematic Effects]\r\n; Set \"Enabled\" to true to disable cinematic effects (vignette, film grain and chromatic aberration) during cutscenes/photo mode.\r\nEnabled = false\r\n\r\n[Dynamic Resolution]\r\n; Set dynamic resolution parameters. It scales based off your set framerate target in-game.\r\n; Set \"MaxResolution\" (Default: 95) or \"MinResolution\" (Default: 50) to adjust the min/max resolution scale percentage. (Valid range: 50 to 100)\r\nMaxResolution = 100\r\nMinResolution = 50\r\n\r\n[Level of Detail]\r\n; Adjust multiplier to increase/decrease level of detail draw distance. (Valid range: 0.1 to 10)\r\n; Note that adjusting this higher will impact performance.\r\nMultiplier = 1\r\n\r\n;;;;;;;;;; Performance ;;;;;;;;;;\r\n\r\n[Remove 30FPS Cap]\r\n; Set \"Enabled\" to true to disable 30FPS cap in cutscenes/photo mode.\r\n; Alternatively, set \"Enabled\" to false and enter a desired framerate to limit cutscene framerate.\r\n; Remember that this framerate value is set before frame generation so set half of your desired framerate if using cutscene frame generation.\r\nEnabled = true\r\nFramerate = 29.97\r\n\r\n[Custom Framerate]\r\n; Set enabled to true to replace the \"30.00 FPS\" frame rate option in-game with a custom value set below.\r\n; Bear in mind that this framerate value is applied prior to frame generation.\r\nEnabled = false\r\nFramerate = 30\r\n\r\n[Cutscene Frame Generation]\r\n; Set \"Enabled\" to true to permit frame generation during real-time cutscenes.\r\nEnabled = true\r\n\r\n[Disable Graphics Debugger Check]\r\n; Set \"Enabled\" to true to disable graphics debugger check. \r\n; Can help with performance issues on Linux machines.\r\nEnabled = true\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Game visual display resumes normal updating after alt-tab/window switching",
+      "Game input functionality remains unaffected",
+      "Configuration change persists after game restart",
+      "Solution works in fullscreen mode"
+    ],
+    "created_at": "2024-09-29T11:53:05Z"
+  },
+  {
+    "id": "https://github.com/Lyall/FFXVIFix/issues/50",
+    "source": {
+      "issue_number": 50
+    },
+    "initial_question": {
+      "title": "Trojan detected",
+      "body": "Trojan detected on file: C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY XVI\\FFXVIFix.asi\r\n\r\nTrojan:Win32/Wacatac.B!ml"
+    },
+    "satisfaction_conditions": [
+      "Anti-virus software no longer blocks the file",
+      "File is accessible and usable in the game directory",
+      "User understands the nature of the detection"
+    ],
+    "created_at": "2024-09-19T21:55:52Z"
+  },
+  {
+    "id": "https://github.com/Lyall/FFXVIFix/issues/35",
+    "source": {
+      "issue_number": 35
+    },
+    "initial_question": {
+      "title": "The mouse is not locked in screen",
+      "body": "If you use the windowed full screen to have ultra-wide, the mouse is no longer locked on the screen and get out in other monitors.\r\nIt's unplayable, especially in combat."
+    },
+    "satisfaction_conditions": [
+      "Mouse cursor remains confined to the game window during gameplay",
+      "Ultra-wide resolution display is maintained",
+      "Game remains playable during combat scenarios"
+    ],
+    "created_at": "2024-09-19T00:13:02Z"
+  },
+  {
+    "id": "https://github.com/Lyall/FFXVIFix/issues/24",
+    "source": {
+      "issue_number": 24
+    },
+    "initial_question": {
+      "title": "Windows cannot find unable to load game.",
+      "body": "I'm having an error with the steam version.  I put the command in and it sends back an error.  Windows cannot find WINEDLLOVERRIDE=\"dinput8=n,b\".  I maybe just stupid from being sick but can't figure out for the life of me what is wrong."
+    },
+    "satisfaction_conditions": [
+      "Launch commands are appropriate for the operating system"
+    ],
+    "created_at": "2024-09-17T21:37:08Z"
+  },
+  {
+    "id": "https://github.com/Lyall/FFXVIFix/issues/20",
+    "source": {
+      "issue_number": 20
+    },
+    "initial_question": {
+      "title": "Cannot get this to work",
+      "body": "I feel like I am missing a step here. I am downloading the game again to try to clear anything I may have messed up, but in the meantime hoping someone can assist.\r\n\r\nMy steps: download game, download Zip file. Extract Zip file to game file, launch game\r\n\r\nWhen I do this, I still have black bars when setting resolution to 3440x1440. Am I missing something here? Do I need to be changing something in these files?"
+    },
+    "satisfaction_conditions": [
+      "All required files must be present in the game directory",
+      "Security software must not interfere with the fix files",
+      "Game displays without black bars at 3440x1440 resolution",
+      "Fix configuration is accessible and modifiable"
+    ],
+    "created_at": "2024-09-17T20:33:19Z"
+  }
+]

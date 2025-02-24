@@ -1,0 +1,342 @@
+[
+  {
+    "number": 2545,
+    "title": "Blender 2.64 Using Node Editor for Material Editing... Export Has No mapDiffuse etc",
+    "created_at": "2012-10-21T20:40:55Z",
+    "closed_at": "2012-10-23T07:52:43Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/2545",
+    "body": "Hey guys, I've imported a .obj file into Blender 2.64 and applied spec, color and bump to it using the Node Editor, then when exporting no image files are specified in the .js.\n\nI'm a total Blender to Three.js newbie so maybe I'm doing something wrong.\n\nWhen I apply a material and texture to the object without using the Node Editor, the output to .js is as expected and includes the file I used as the texture in the js as the mapDiffuse property.\n\nNot really sure if this is something I'm doing wrong or a bug! :)\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/2545/comments",
+    "author": "Irrelon",
+    "comments": [
+      {
+        "user": "alteredq",
+        "created_at": "2012-10-22T23:20:58Z",
+        "body": "There is no support in Blender exporter for materials defined in Node Editor, only material parameters that are defined in straightforward regular simple materials would get exported (and even there just some very specific subset of parameters works, it's difficult to match completely different material systems).\n"
+      }
+    ]
+  },
+  {
+    "number": 2040,
+    "title": "Cannot access properties of meshes in member array of mootools object",
+    "created_at": "2012-06-07T21:12:43Z",
+    "closed_at": "2012-06-11T21:55:05Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/2040",
+    "body": "I'm having trouble accessing properties of a mesh once I create it and store it in a member variable.  \nI'm using three.js + mootools and 'objects' is a member variable of my class in the following:\n\n```\n    var  geometry = new THREE.CubeGeometry(10,10,10);\n\n    var material =  new THREE.MeshLambertMaterial( { color:0xffffff, \n        map: THREE.ImageUtils.loadTexture( 'texture.jpg' ),\n        shading: THREE.FlatShading } );\n\n\n    for ( var i = 0; i < 2; i ++ )\n    {\n\n            this.objects[i] = new THREE.Mesh( geometry, material );\n            this.objects[i].position.x = ( Math.random() - 0.5 ) * 100;\n            this.objects[i].position.y = ( Math.random() - 0.5 ) *100;\n            this.objects[i].position.z = ( Math.random() - 0.5 ) * 100;\n            this.objects[i].updateMatrix();\n            this.objects[i].matrixAutoUpdate = false;\n\n            this.scene.add( this.objects[i] );\n    }\n```\n\nObjects render fine, but when I attempt\nWhen I try to do something like this: \nalert( this . objects[ i ] . position . x );\n\nI get an error in my js debug console: \nUncaught TypeError: Cannot read property 'position' of undefined\n\nAny ideas would be greatly appreciated. Thank you\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/2040/comments",
+    "author": "jahneeM3",
+    "comments": [
+      {
+        "user": "ColasMarko",
+        "created_at": "2012-06-08T09:44:09Z",
+        "body": "If you want to use `this.objects`as an array you should do something like that\n\n``` javascript\n    var  geometry = new THREE.CubeGeometry(10,10,10);\n\n    var material =  new THREE.MeshLambertMaterial( { color:0xffffff, \n        map: THREE.ImageUtils.loadTexture( 'texture.jpg' ),\n        shading: THREE.FlatShading } );\n\n    this.objects = [];\n\n    for ( var i = 0; i < 2; i ++ )\n    {\n        var mesh = new THREE.Mesh( geometry, material );\n        mesh.position.x = ( Math.random() - 0.5 ) * 100;\n        mesh.position.y = ( Math.random() - 0.5 ) *100;\n        mesh.position.z = ( Math.random() - 0.5 ) * 100;\n        mesh.updateMatrix();\n        mesh.matrixAutoUpdate = false;\n\n        this.scene.add( mesh );\n        this.objects.push( mesh );\n    }\n```\n\nIf it does not work better check that your `this` is still valid (beware of closure and local function that have thier own `this` in javascript)\n"
+      }
+    ]
+  },
+  {
+    "number": 1957,
+    "title": "Input Field Selection and Trackball Issues",
+    "created_at": "2012-05-21T16:21:19Z",
+    "closed_at": "2012-05-21T18:32:16Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1957",
+    "body": "I'm trying to render an HTML form over the top of a webgl renderer instance. The problem I'm running into is that the input fields are not selectable. I can tab into them, and I can click on the submit button (and other links sitting on top of the rendered), but I can't click on them with the mouse to activate them. \n\nI've tried to debug my code and found that if I turn off the TrackballControls I can click into the input fields (but then I can't control my scene with the awesome built-in controls). Has anyone else come across this issue or have an idea on how to fix this issue?\n\nThanks!\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1957/comments",
+    "author": "shadyhill",
+    "comments": [
+      {
+        "user": "chandlerprall",
+        "created_at": "2012-05-21T17:35:55Z",
+        "body": "When you create the TrackballControls you can specify what element the controls should bind to:\n\n`controls = new THREE.TrackballControls( camera, renderer.domElement );`\n"
+      }
+    ]
+  },
+  {
+    "number": 1929,
+    "title": "Toggle between flat and smooth shading at runtime",
+    "created_at": "2012-05-16T22:20:07Z",
+    "closed_at": "2012-05-16T23:26:25Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1929",
+    "body": "Hi!\nIs there a way to change shading type after a model has loaded (without entirely recreating the geometry)?\n\nAssume I have a model which starts with smooth shading by default (i.e., does all the computeFaceNormals and computeVertexNormals magic on load). Then, at some point, I want to toggle the shading type to THREE.FlatShading.\n\nThings I tried and didn't work:\n- simply setting the mesh.material.shading = THREE.FlatShading\n- mesh.material = new THREE.Material({ ... shading: THREE.FlatShading });\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1929/comments",
+    "author": "victorporof",
+    "comments": [
+      {
+        "user": "mrdoob",
+        "created_at": "2012-05-16T23:04:26Z",
+        "body": "With `WebGLRenderer` you can't. You'll need to have 2 geometries.\n"
+      },
+      {
+        "user": "victorporof",
+        "created_at": "2012-05-16T23:07:37Z",
+        "body": "Thanks.\nI kinda feel like there should be an efficient way to get around this. Essentially, it would be nice to just switch shaders whenever we want for a particular mesh, if not material. Out of curiosity, why doesn't a material change work?\n"
+      },
+      {
+        "user": "mrdoob",
+        "created_at": "2012-05-16T23:25:07Z",
+        "body": "If I remember correctly it is because the buffer gets constructed out of the needs of the material. So only face normals get in the buffer if it's `FlatShaded` and only vertex normals if it's `SmoothShaded`.\n"
+      }
+    ]
+  },
+  {
+    "number": 1612,
+    "title": "Smooth shading on MeshFaceMaterial",
+    "created_at": "2012-03-31T11:42:40Z",
+    "closed_at": "2012-04-01T08:43:53Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1612",
+    "body": "How can I get smooth shading on a JSON files wich loads multiple textures?\n\nI am loading the mesh like this:\n\n``` javascript\nvar material = new THREE.MeshFaceMaterial();\nvar mesh = new THREE.Mesh( geometry, material );\n```\n\nWhat do I have to add? I tried with material.shading = TREE.PhongShading and adding to my JSON file \"shading\" : \"Phong\", but neither of those worked.\n\nIs it better to use ShaderMaterial in this case? or what do you recommend?\n\nThank you.\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1612/comments",
+    "author": "elfrank",
+    "comments": [
+      {
+        "user": "mrdoob",
+        "created_at": "2012-03-31T12:48:56Z",
+        "body": "I think there should be a `geometry.materials` object that you can play with.\n"
+      },
+      {
+        "user": "alteredq",
+        "created_at": "2012-03-31T16:10:40Z",
+        "body": "Smooth shading is the default one (`material.shading = THREE.SmoothShading`).\n\nProblem is more likely normals - smooth shading depends on having proper vertex normals - either you need to have them already present in the JSON file from the export / conversion or you need to compute them manually after loading the file:\n\n```\ngeometry.computeVertexNormals();\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 1605,
+    "title": "Small particles flicker when moved",
+    "created_at": "2012-03-30T00:04:18Z",
+    "closed_at": "2012-03-30T11:37:06Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1605",
+    "body": "Hi, I'm using a particle system to create a star field for a background in my project. When the basic texture was applied to them they rotated smoothly, though now I have added a very simple circle png image to them, the very small stars flicker profusely. I've found this to happen slightly in Chrome, although more obviously in Safari and Firefox.\n\nI wondered if there was a reason this is happening and if there is any way I could prevent it happening while retaining the circular shape of the stars?\n\nThanks!\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1605/comments",
+    "author": "creativekidney",
+    "comments": [
+      {
+        "user": "mrdoob",
+        "created_at": "2012-03-30T01:37:18Z",
+        "body": "I think it's because the texture is 20x20 and the textures need to be power of two in order to use mipmap filtering. Try with 16x16.\n"
+      }
+    ]
+  },
+  {
+    "number": 1473,
+    "title": "strange problem with __dirtyVertices = true!",
+    "created_at": "2012-03-08T18:32:01Z",
+    "closed_at": "2012-03-09T00:35:29Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1473",
+    "body": "hey guys, i got a really strange problem with procedurally changing vertices positions when the mouse button is pressed. \n\ni got 2 jquery handlers for mouse down and mouse up recognition that set a global mouseDownPos variable to the mouse coordinates and to undefined respectively. here they are:\n\n``` javascript\n// MOUSE DOWN HANDLER\n$(renderer.domElement).mousedown(function(event) {\n    mouseDownPos = new THREE.Vector2(event.pageX, event.pageY);\n}); \n\n// MOUSE UP HANDLER\n$(renderer.domElement).mouseup(function(event) {\n    mouseDownPos = undefined;\n});\n```\n\nnow in my render loop, if I put the following piece of code, the respective object won't move a micron, not when the mouse is pressed nor when it is released.\n\n``` javascript\nif (shapes.length > 0 && mouseDownPos != undefined) {\n    console.log(mouseDownPos);\n\n    var object = shapes[0];\n\n    console.log(object.geometry.vertices[0].position.x );\n\n    for (var i = 0; i < object.geometry.vertices.length; i++) {\n        object.geometry.vertices[i].position.x += 5;\n    }\n\n    object.geometry.dynamic = true;\n    object.geometry.__dirtyVertices = true;\n}\n```\n\nstrangely, however, when I leave out the mouseDownPos != undefined part, it will move constantly as expected, regardless of whether mouse is pressed or not. and even more strangeley, when I turn it into mouseDownPos == undefined it will only move if the mouse button is released - as expected again! And even one step more strangely :D in the above version when I console.log the respecitve positions of the vertices they will increase, but they are not updated for presentation.\n\ncould someone tell me what I am overseeing here, please?? :D I would be really grateful! :)\n\nmike\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1473/comments",
+    "author": "VelvetValve",
+    "comments": [
+      {
+        "user": "alteredq",
+        "created_at": "2012-03-08T20:14:33Z",
+        "body": "This should go at the init time, just after you create the object, before the first rendering:\n\n``` javascript\nobject.geometry.dynamic = true;\n```\n"
+      },
+      {
+        "user": "alteredq",
+        "created_at": "2012-03-08T23:51:36Z",
+        "body": "`dynamic` flag tells renderer to keep its internal typed array buffers used to create WebGL objects. These are otherwise thrown away after transferring data to GPU so it doesn't matter which value this flag has afterwards.\n\nWe do this to avoid wasting memory for static objects (while keeping performance for dynamic ones).\n"
+      }
+    ]
+  },
+  {
+    "number": 1449,
+    "title": "Defined normals from JSON were not used",
+    "created_at": "2012-03-05T19:11:09Z",
+    "closed_at": "2012-03-06T18:23:04Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1449",
+    "body": "Hi,\nI have a small JSON file with two colored triangles. Both triangles have different windings but the same normal vector. So I expect both with the same color / shading. But one triangle ist right colored, the other one is black.\nIt seems, that not the defined normals are used, but the normals are calculated by the winding of the vertices. What do I have to change to use the defined normals? Reason: I have a large set of triangles with switching windings. But I know the normals.\n\nBtw: If I switch the first triangle definition from <code>80, 2, 1, 3, 0, 0,</code> to <code>80, 2, 3, 1, 0, 0,</code>, both windings are equal and the colors are perfect for both triangles. So I'm absolutely sure, that not the defined normals are used. How can I make three.js to use the normals from the JSON file?\n\nHere is the JSON file:\n\n``` json\n{\n    \"metadata\":{\n        \"formatVersion\": 3\n    },\n    \"materials\":[],\n    \"vertices\":[\n        -250.000000, 250.000000, 0.000000,\n        -250.000000, -250.000000, 0.000000,\n        250.000000, -250.000000, 0.000000,\n        250.000000, 250.000000, 0.000000\n    ],\n    \"morphTargets\":[],\n    \"normals\":[\n        0.707106, -0.707106, 0.000000\n    ],\n    \"colors\":[\n        16711680\n    ],\n    \"uvs\":[[]],\n    \"faces\":[\n         80, 2, 1, 3, 0, 0,\n         80, 1, 3, 0, 0, 0\n    ]\n}\n```\n\nAnd this is the HTML page:\n\n``` javascript\nvar container = document.getElementById('WebGLCanvas')\nvar CANVAS_WIDTH = container.offsetWidth;\nvar CANVAS_HEIGHT = container.offsetHeight;\nvar stats;\nvar camera;\nvar scene;\nvar renderer;\nvar mesh;\nvar controls; \nvar directionalLight;\n\ninit();\nanimate();\n\nfunction init(){\n    // SCENE\n    scene = new THREE.Scene();\n\n    // CAMERA\n    camera = new THREE.PerspectiveCamera(25, CANVAS_WIDTH / CANVAS_HEIGHT, 1, 10000);\n    camera.position.set(0, 0, 100);\n    scene.add(camera);\n\n    // RENDERER\n    renderer = new THREE.WebGLRenderer({\n        antialias            : true,    // to get smoother output\n        preserveDrawingBuffer: true,    // to allow screenshot\n    });\n    renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);\n    renderer.domElement.style.position = \"relative\";\n    renderer.autoClear = true;\n    container.appendChild(renderer.domElement);\n\n    // LOADED GEOMETRY\n    var loader = new THREE.JSONLoader();\n    loader.load(\"test.json\", function(geometry){\n                 mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({\n            vertexColors: THREE.FaceColors,\n            shading     : THREE.SmoothShading\n        }));\n        mesh.scale.set(0.05, 0.05, 0.05);\n        mesh.matrixAutoUpdate = false;\n        mesh.doubleSided = true;\n        mesh.updateMatrix();\n        scene.add(mesh);\n    });\n\n    // LIGHT\n    directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);\n    directionalLight.position = camera.position;\n    scene.add(directionalLight);\n\n    // CONTROLS\n    controls = new THREE.TrackballControls(camera, renderer.domElement);            }\n\nfunction animate(){\n    requestAnimationFrame(animate);\n    render();\n}\n\nfunction render(){\n    controls.update();\n    renderer.render(scene, camera);\n    directionalLight.position = camera.position;\n}\n```\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1449/comments",
+    "author": "JoeHH",
+    "comments": [
+      {
+        "user": "WestLangley",
+        "created_at": "2012-03-05T20:23:36Z",
+        "body": "Are you using the curent release (r48)?\n"
+      }
+    ]
+  },
+  {
+    "number": 1257,
+    "title": "Render Order of Primitives appears accidentally",
+    "created_at": "2012-02-06T11:59:25Z",
+    "closed_at": "2012-02-06T12:44:06Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1257",
+    "body": "Hey Guys,\ni am having trouble while trying to render a compositition of primitive-geometries. Some Faces which should be hidden by other Faces, because they are placed behind them in my scene, forces to be rendered in foreground.\nMy composition has a tree-architecture and it seems as if the render-order follows the order of my tree-nodes, but i am not quite sure. In any case the depth-order isn't maintained.\nI don't know if it is important, but i turned off the matrixAutoUpdate flag for geometries in my tree.\n\nThanks for any help.\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1257/comments",
+    "author": "RaoulSchaffranek",
+    "comments": [
+      {
+        "user": "mrdoob",
+        "created_at": "2012-02-06T12:01:55Z",
+        "body": "`CanvasRenderer`?\n"
+      },
+      {
+        "user": "RaoulSchaffranek",
+        "created_at": "2012-02-06T12:04:31Z",
+        "body": "Yes, is that an known issue with CanvasRender? \n"
+      },
+      {
+        "user": "mrdoob",
+        "created_at": "2012-02-06T12:44:06Z",
+        "body": "Yep... #65 \n"
+      }
+    ]
+  },
+  {
+    "number": 1048,
+    "title": "Display object name",
+    "created_at": "2012-01-08T08:54:14Z",
+    "closed_at": "2012-01-15T20:10:38Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/1048",
+    "body": "Hi, \nI\u00b4m trying to display the name of the selected Object via onDocumentMouseDown. But it won\u00b4t work. How can I define the name for an object? I\u00b4ve tried directly in the Collada Loader but still it\u00b4s undefined.\n\nThanks for any help.\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/1048/comments",
+    "author": "kor86",
+    "comments": [
+      {
+        "user": "mrdoob",
+        "created_at": "2012-01-08T13:57:31Z",
+        "body": "Can you share the code you've so far?\n"
+      },
+      {
+        "user": "kor86",
+        "created_at": "2012-01-14T19:26:56Z",
+        "body": "I\u00b4m trying to set the name via\n\n``` javascript\ncube2 = new THREE.Mesh(new THREE.SphereGeometry(15, 15, 15), material);\ncube2.name = \"Cube12\";\ncube2.overdraw = true;\n\ncube2.position.x=250;\ncube2.position.y=70;\ncube2.position.z=100;\nscene.add(cube2);\n```\n\nBut it does not work. Shows the error Uncaught TypeError: Cannot read property 'name' of undefined...\n"
+      },
+      {
+        "user": "mrdoob",
+        "created_at": "2012-01-14T19:38:32Z",
+        "body": "Maybe you can share the whole code, and also tell us which line in the code is reporting that error.\nThe more information you share the better.\n"
+      },
+      {
+        "user": "kor86",
+        "created_at": "2012-01-14T19:57:22Z",
+        "body": "Ok, I\u00b4ve managed to get the cube example going but after trying with JSONloader there\u00b4s the same problem again:\n\nFirt I\u00b4am loading the .js model:\n\n``` javascript\nvar loader5 = new THREE.JSONLoader( true );\nloader5.load( \"models/astronomy.js\", function( geometry ) {\n\n    mesh2 = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x946538 } ) );\n    mesh2.name='Astroid2';\n    mesh2.position.x=300;\n    mesh2.position.y=100;\n    mesh2.position.z=150;\n    mesh2.scale.set( 0.1, 0.1, 0.1 );   \n    scene.add( mesh2 );\n\n} );\n```\n\nAnd after that I want to load the name into a div container\n\n``` javascript\nvar info = document.createElement( 'div' );\ninfo.style.position = 'absolute';\ninfo.style.top = '10px';\ninfo.style.width = '100%';\ninfo.style.textAlign = 'center';\ninfo.innerHTML = mesh2.name;\ncontainer.appendChild( info );\n```\n\nboth codes are in the init function.\nThe model loads perfect\n"
+      },
+      {
+        "user": "mrdoob",
+        "created_at": "2012-01-14T20:05:32Z",
+        "body": "Chances are you're trying to access `mesh2` before it has been created (before object has been loaded).\n"
+      }
+    ]
+  },
+  {
+    "number": 699,
+    "title": "How to rotate object >90* in canvas.",
+    "created_at": "2011-10-29T09:33:58Z",
+    "closed_at": "2011-10-30T04:16:21Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/699",
+    "body": "when I try rotate the object in 90 degree or less. but nothing happen on my screen when I rotate more than 90.\n\ne.g. \nI want to flip my image with this code.\n\n``` javascript\nmycamera.position.z=500;\nobject.rotation.x=Math.PI;\n```\n\nNothing appear on my screen.\nobject.position.z still equal 0.\nbut when I set mycamera.position.z to -500 and set mycamera.lookAt(scene.position) It's work!! my flip image appear on screen.\nHow to I bring my image to current camera position (mycamera.position.z=500);\nAny idea?\nSorry for bad English.\nThank you in advance. \n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/699/comments",
+    "author": "zissnar",
+    "comments": [
+      {
+        "user": "mrdoob",
+        "created_at": "2011-10-29T11:10:31Z",
+        "body": "Do this `object.doubleSide = true` and you will see what's happening :)\n"
+      }
+    ]
+  },
+  {
+    "number": 439,
+    "title": "__dirtyVertices = true kills my mesh",
+    "created_at": "2011-08-20T12:39:39Z",
+    "closed_at": "2011-08-20T13:51:33Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/439",
+    "body": "Hi guys,\nFirst I want to thank you all for your amazing work.\nI downloaded the r43 a couple of days ago and tried to get started with Three.js. I created a simple plane, added a texture and called it sky. Next I made the scene itself resizable. So far so good. I tried to find out how to update the vertices of a mesh, because I want to resize the sky as well. I added 2 lines of code and one of them seems to break everything. _geom.dynamic = true_ is fine, but uncommenting  ___dirtyVertices = true_ makes my sky disappear.\n\n``` javascript\nif ( ! Detector.webgl ) Detector.addGetWebGLMessage();\n\nvar container,\n    camera, scene, renderer,\n    skyMesh, skyGeom, skyMat;\n\ninit();\nanimate();\n\nfunction init() {\n  container = document.createElement('div');\n  document.body.appendChild(container);\n\n  camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );\n  camera.position.z = 800;\n\n  scene = new THREE.Scene();\n\n  skyGeom = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight, 1, 1 );\n  skyGeom.dynamic = true;\n\n  skyMat = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/sky.jpg' ) } );\n  skyMesh = new THREE.Mesh( skyGeom, skyMat ); \n  scene.addObject( skyMesh );\n\n  renderer = new THREE.WebGLRenderer();\n  renderer.setSize( window.innerWidth, window.innerHeight );\n\n  container.appendChild( renderer.domElement );\n}\n\nfunction animate() {\n  requestAnimationFrame( animate );\n  render();\n}\n\nfunction render() {\n  // here we go :(\n  // skyMesh.skyGeom.__dirtyVertices = true;\n\n  renderer.render( scene, camera );\n}\n\nwindow.addEventListener( 'resize', onWindowResize, false );\n\nfunction onWindowResize() {\n  camera.aspect = window.innerWidth / window.innerHeight;\n  camera.updateProjectionMatrix();\n\n  renderer.setSize( window.innerWidth, window.innerHeight );\n}\n```\n\nI'm almost entirely sure I miss something, or just made some kind of stupid mistake. And I'm pretty sure most of you guys know what to do. Thank you! Oh btw, just setting the bools and not actually update any vertices should just work right? As far as I understand it's just like a dynamic VBO - slower than a static VBO but still just a VBO.\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/439/comments",
+    "author": "lboecker",
+    "comments": [
+      {
+        "user": "mrdoob",
+        "created_at": "2011-08-20T13:34:32Z",
+        "body": "What do you mean you want to resize the sky? Can't you do it with `skyMesh.scale.x = 2`?\n\nEither way... this line\n\n``` javascript\nskyMesh.skyGeom.__dirtyVertices = true;\n```\n\nshould just be\n\n``` javascript\nskyGeom.__dirtyVertices = true;\n```\n\nor\n\n``` javascript\nskyMesh.geometry.__dirtyVertices = true;\n```\n"
+      }
+    ]
+  },
+  {
+    "number": 311,
+    "title": "is there a \"right\" sequence to add objects with children to the scene?",
+    "created_at": "2011-07-01T09:02:50Z",
+    "closed_at": "2011-11-20T15:29:39Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/mrdoob/three.js/issues/311",
+    "body": "Hi there guys, \n\nI have a few scripts with the same problem: the objects of my scene sometimes appeare and others don't. Sometimes I need to hit refresh 3-4 times until all of the objects are visible.\n\nI read in some old issue that if you add a child to an object that was already added to the scene, the object (or child or both, not sure anymore) won't be visible. I guess that was fixed because I add the objects to the scene before and after I added children to it, for testing, and in both cases all objects and children were visible.\n\nBut, I was wondering if there is still some bug there or if there was like a good/right way or sequence to add the objects with children to the scene. \n\nOr maybe it has something to do with my PC? It isn't fast enough, graphics sucks? my scripts sucks? xD\nI haven't test them in others PC, I'll do that later today and post here whatever I get  :-)\n\nI'll appreciate any comments =)\nRegards, \nJulio\n",
+    "comments_url": "https://api.github.com/repos/mrdoob/three.js/issues/311/comments",
+    "author": "ajullz",
+    "comments": [
+      {
+        "user": "alteredq",
+        "created_at": "2011-07-01T13:05:12Z",
+        "body": "Hmmm, having different results on different reloads points to some asynchronicity / timing issues.\n\nThis can be tricky to figure out just from description, could you post your example somewhere?\n\nAny errors in console?\n\nQuick guess would be that maybe you try to do things with objects before they are actually available. This is always something to watch out for when loading multiple resources asynchronously, especially if there are dependencies between objects.\n"
+      },
+      {
+        "user": "ajullz",
+        "created_at": "2011-07-04T07:32:12Z",
+        "body": "alteredq, thx for your answer and sry that it took me so long to get back (you know, weekend xD) ... \n\nI didnt take the asynchronously into account and maybe that's it. how can I be sure that the object i need is loaded? jquery .ready() method? I havent checked the console for that.\n\ni'm not sure if i can just post my script somewhere on the open xD, but i can post an example of how i do things. Where should i send them to? or should i just post it here?\n"
+      },
+      {
+        "user": "ajullz",
+        "created_at": "2011-07-04T09:09:35Z",
+        "body": "well, I'll just post it here :)\n\n``` javascript\n//first I load some info I need in order to know which objects to load later\nfunction loadInfo(){\n                $.getJSON('info.json', function(data) { \n                    init(data);\n                });\n            }\n\n/* in the init function i add to the scence 2 new meshes and load 4 objects. The last object will be the parent of the other 3, and it will also be added as a child to the mesh already added to the scene (gloabl1). Then i call function that loads other objects and they are then added to the same mesh, global1*/\n\nfunction init() {               \n\n                //camera, lights and everything added to the scene,\n                                var object;\n                                object = global1 = new THREE.Mesh(cylinder, material);\n                scene.addObject( object );\n\n                object = global2 = new THREE.Mesh( cylinder, material);\n                scene.addObject( object );\n\n                var loader = new THREE.JSONLoader();    \n\n                // partA,B,C are children of \"parent\"\n                var callbackPartA = function( geometry ) { partA( geometry ) };\n                loader.load( { model: \"js/partA.js\", callback: callbackPartA } );\n\n                var callbackPartB = function( geometry ) { partB( geometry ) };\n                loader.load( { model: \"js/partB.js\", callback: callbackPartB } );\n\n                var callbackPartC = function( geometry ) { partC( geometry ) };\n                loader.load( { model: \"js/partC.js\", callback: callbackPartC } );\n\n                var callbackParent = function( geometry ) { parent( geometry ) };\n                loader.load( { model: \"js/parent.js\", callback: callbackParent} );\n\n                createOtherObjects();\n\n                projector = new THREE.Projector();\n\n                renderer = new THREE.WebGLRenderer( {antialias: true} );        \n                renderer.setSize( window.innerWidth , window.innerHeight );\n\n                document.body.appendChild( renderer.domElement );\n            }\n\n//partA,B and C are the same but with its respective part1, 2 and 3 arrays\nvar part1 = [];\nfunction partA( geometry ) {\n\n    for(var i = 0; i < data; i++){\n\n        var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );\n        object.overdraw = true;\n        object.updateMatrix();          \n\n        part1.push(object);\n    }\n}\n\n\nfunction parent( geometry ) {\n\n        for( var i = 0; i < data; i++){ \n\n            var object = parents[i] = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );\n            object.scale.x = object.scale.y = object.scale.z = 95;\n            object.rotation.x = Math.PI/2;\n            object.position.x = Math.cos( data ) \n            object.position.y = Math.sin( data ) \n            object.position.z = -30;\n            object.overdraw = true;\n            object.updateMatrix();                      \n\n            object.addChild(part1[i]);\n            object.addChild(part2[i]);\n            object.addChild(part3[i]);\n\n            gloabl1.addChild( parents[i] );\n        }\n}\n\n/* btw, i do this with the arrays part1, 2 and 3 because i can't add the same object to diferent parents. Is there a another way? this is an off-topic question xD */\n\n/* in anotherObjects() I do a \"switch\" inside a \"for\" to get the info from \"data\" and then know what to load. Once I know, I just call a function -- loadobject1, that corresponds to case 1 of the switch, for example -- this function calls 1, 2 or more json objects. In every call the objects are added to the globla1 mesh */\n\n\nfunction loadObject1( i ){\n\n    var loader = new THREE.JSONLoader();\n\n    var callbackSupport = function( geometry ) { createSupport ( geometry ) };\n    loader.load( { model: \"js/object1.js\", callback: callbackSupport } );   \n\n    var callbackObject = function( geometry ) { createObjects ( geometry ) };\n    loader.load( { model: \"js/object1_1.js\", callback: callbackObject} );                           \n    loader.load( { model: \"js/object1_2.js\", callback: callbackObject} );                           \n    loader.load( { model: \"js/object1_3.js\", callback: callbackObject} );\n}\n\n/* in \"createSupport()\" and \"createObjects()\" i just place them somewhere depending on the object and \"data\" and then i add them to mesh global1 as said before*/\n```\n\nThe problem is that sometimes the first set of objects (partA,B,C and parents) is drawn and the second set of objects is not, and viceversa. (A lot of times all of the objects are drawn)\n\nAnother off-topic question. It just happend to me once. I run one of the script on firefox and then I left the page \"on\" for a lot of time, 3 hours I dont know, and went do something else in PPT or WORD, when I came back to firefox it broke!! any ideas of why that could have happend? some memory issues there in the GPU? \n\nthx for any help xD\n"
+      },
+      {
+        "user": "alteredq",
+        "created_at": "2011-07-05T20:44:06Z",
+        "body": "Yes, this looks like it would make problems. You are not guaranteed to have loading complete in the same order as you initiate it. Loader just fires up request, but this can complete at any time.\n\nIf you need to create something with dependencies, you need to take this into account. \n\nOne pattern that can be used is to call final creation callback in every part load callback, checking if all dependencies weren't already loaded. \n"
+      },
+      {
+        "user": "ajullz",
+        "created_at": "2011-07-06T07:22:02Z",
+        "body": "final creation callback? is that like a built-in function or you mean something that I should create? xD\n\nI had already thought using flags once the dependancies were completed ... is something like that what you mean? xD\n"
+      },
+      {
+        "user": "ajullz",
+        "created_at": "2011-07-06T14:01:55Z",
+        "body": "hi there, \n\nI managed to get it work for the first set of dependant objects. I just called the parent first, inside the parent I called the first child, inside it I called the second child and so on. This is possible because I know how many objects this set has, 4 in total.\n\nBut, with the second set of objects I dont know how many objects will form the whole set. It will allways be diffrent. So, I'm really kind of lost here, I'd appreciate any help xD\n\nthis is the function that calls a random number of objects to form a whole new object.\n\n``` javascript\nfunction loadObject1( ){\n\nvar loader = new THREE.JSONLoader();\n\nvar callbackObject = function( geometry ) { createObjects ( geometry ) };\nloader.load( { model: \"js/object1_1.js\", callback: callbackObject} );                           \nloader.load( { model: \"js/object1_2.js\", callback: callbackObject} );                           \nloader.load( { model: \"js/object1_3.js\", callback: callbackObject} );\n//maybe more, maybe less objects\n}\n```\n\ncreateObjects ( geometry ) just adds them all as children to a global object ... But, in doesnt get the chance to do it :(\n\nthx in advance for any help :)\n"
+      },
+      {
+        "user": "alteredq",
+        "created_at": "2011-07-06T17:14:25Z",
+        "body": "> final creation callback? is that like a built-in function or you mean something that I should create?\n\nSomething where you would create thing that needs dependencies. For example:\n\n``` javascript\nvar parts = { count: 0, objects: {} };\nvar partsTotal = 4;\n\nloader.load( { model: \"part1.js\", callback: function( geometry ) { callback( geometry, \"part1\" ) } } );\nloader.load( { model: \"part2.js\", callback: function( geometry ) { callback( geometry, \"part2\" ) } } );\nloader.load( { model: \"part3.js\", callback: function( geometry ) { callback( geometry, \"part3\" ) } } );\nloader.load( { model: \"parent.js\", callback: function( geometry ) { callback( geometry, \"parent\" ) } } );\n\nfunction callback( geometry, id ) {\n\n  parts.objects[ id ] = createObject( geometry );\n  parts.count ++;\n\n  if ( parts.count == partsTotal ) {\n     createHierarchy();\n  }\n\n}\n\nfunction createObject( geometry ) {\n\n  var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );\n  return object;\n\n}\n\nfunction createHierarchy() {\n\n    var parent = parts.objects[ \"parent\" ];\n    parent.addChild( parts.objects[ \"part1\" ] );\n    parent.addChild( parts.objects[ \"part2\" ] );\n    parent.addChild( parts.objects[ \"part3\" ] );\n\n}\n```\n\nYou could chain load requests (if I understood well, that's what you do now) but then all loading would take longer, as objects wouldn't be loaded in parallel.\n"
+      }
+    ]
+  }
+]

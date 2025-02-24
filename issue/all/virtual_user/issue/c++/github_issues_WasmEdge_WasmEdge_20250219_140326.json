@@ -1,0 +1,46 @@
+[
+  {
+    "number": 3503,
+    "title": "O_TRUNC print bug.",
+    "created_at": "2024-06-24T07:52:21Z",
+    "closed_at": "2024-07-24T11:08:07Z",
+    "labels": [
+      "bug",
+      "good first issue",
+      "help wanted",
+      "WASI",
+      "fuzz-different-behavior"
+    ],
+    "url": "https://github.com/WasmEdge/WasmEdge/issues/3503",
+    "body": "### Summary\r\n\r\nThe file is opened with O_RDWR and O_TRUNC, but do not print`Access mode: O_TRUNC`.\r\nI'm not sure whether this is a bug.\r\n\r\n### Current State\r\n\r\nWasmEdge print:\r\n```\r\nGet file descriptor of file subdir_2/subfile_3 succeed!\r\nAccess mode: Read/Write\r\nEnter function fd_fdstat_set_flags_00018_ZJtyU\r\nSetting flags succeed!\r\nAfter setting flags\r\nAccess mode: Read/Write\r\nAccess mode: O_APPEND\r\n```\r\n\r\n### Expected State\r\nPrint:\r\n```\r\nGet file descriptor of file subdir_2/subfile_3 succeed!\r\nAccess mode: Read/Write\r\nAccess mode: O_TRUNC\r\nEnter function fd_fdstat_set_flags_00018_ZJtyU\r\nSetting flags succeed!\r\nAfter setting flags\r\nAccess mode: Read/Write\r\nAccess mode: O_TRUNC\r\nAccess mode: O_APPEND\r\n```\r\n\r\n### Reproduction steps\r\n\r\nThe test case is :\r\n```\r\n\r\n#include <stdio.h>\r\n#include <stdlib.h>\r\n#include <fcntl.h>\r\n#include <unistd.h>\r\n\r\nint get_fd(const char *filename, int flags) {\r\n    int fd = open(filename, flags);\r\n    \r\n    if (fd == -1) {\r\n        printf(\"Get file descriptor of file %s failed!\\n\", filename);\r\n        return -1;\r\n    } else {\r\n        printf(\"Get file descriptor of file %s succeed!\\n\", filename);\r\n        return fd;\r\n    }\r\n}\r\n\r\nvoid closebyfd(int fd) {\r\n    if (close(fd) == -1) {\r\n        printf(\"Close the file %d by descriptor failed!\\n\", fd);\r\n    }\r\n}\r\n\r\nvoid fd_fdstat_set_flags_00018_ZJtyU(int fd) {\r\n    printf(\"Enter function fd_fdstat_set_flags_00018_ZJtyU\\n\");\r\n\r\n    int flags = fcntl(fd, F_GETFL);\r\n    flags = flags | O_APPEND;\r\n    \r\n    if (fcntl(fd, F_SETFL, flags) == -1) {\r\n        printf(\"Setting flags failed!\\n\");\r\n    } else {\r\n        printf(\"Setting flags succeed!\\n\");\r\n    }\r\n}\r\n\r\n\r\n    \r\nvoid print_flags(int fd){\r\n    int flags1 = fcntl(fd, F_GETFL);\r\n    int access_mode1 = flags1 & O_ACCMODE;\r\n    if (access_mode1 == O_RDONLY) {\r\n        printf(\"Access mode: Read Only\\n\");\r\n    }\r\n    if (access_mode1 == O_WRONLY) {\r\n        printf(\"Access mode: Write Only\\n\");\r\n    }\r\n    if (access_mode1 == O_RDWR) {\r\n        printf(\"Access mode: Read/Write\\n\");\r\n    }\r\n    if (flags1 & O_TRUNC) {\r\n        printf(\"Access mode: O_TRUNC\\n\");\r\n    }\r\n    if (flags1 & O_APPEND) {\r\n        printf(\"Access mode: O_APPEND\\n\");\r\n    }\r\n    if (flags1 & O_CREAT) {\r\n        printf(\"Access mode: O_CREAT\\n\");\r\n    }\r\n    if (flags1 & O_EXCL) {\r\n        printf(\"Access mode: O_EXCL\\n\");\r\n    }\r\n    if (flags1 & O_NONBLOCK) {\r\n        printf(\"Access mode: Non-blocking\\n\");\r\n    }\r\n    if (flags1 & O_SYNC) {\r\n        printf(\"Access mode: Synchronous Write\\n\");\r\n    }\r\n    if (flags1 & O_DSYNC) {\r\n        printf(\"Access mode: Data Synchronization Write\\n\");\r\n    }\r\n}\r\n    \r\nint main() {\r\n    \r\n    int fd = get_fd(\"subdir_2/subfile_3\", O_RDWR | O_TRUNC);\r\n\r\n    if (fd == -1) {\r\n        return 1;\r\n    }\r\n\r\n    \r\n    print_flags(fd);\r\n    fd_fdstat_set_flags_00018_ZJtyU(fd);\r\n    printf(\"After setting flags\\n\");\r\n    print_flags(fd);\r\n\r\n\r\n    closebyfd(fd);\r\n\r\n    return 0;\r\n}\r\n\r\n```\r\n\r\nSteps to reproduce:\r\n(1)compile to wasm:`./wasi-sdk-21.0/bin/clang --target=wasm32-unkown-wasi --sysroot=./wasi-sdk-21.0/share/wasi-sysroot test.c -o test.wasm`\r\n\r\n(2)Running wasm:\r\n(Before run the Wasm file, subdir_2/subfile_3 exists.)\r\nwasmedge --dir=. test.wasm\r\n\r\n\r\n\r\n### Components\r\n\r\nCLI\r\n\r\n### WasmEdge Version or Commit you used\r\n\r\n0.13.5 and 0.13.3\r\n\r\n### Operating system information\r\n\r\nUbuntu 20.04\r\n\r\n### Hardware Architecture\r\n\r\nx86_64\r\n",
+    "comments_url": "https://api.github.com/repos/WasmEdge/WasmEdge/issues/3503/comments",
+    "author": "Userzxcvbvnm",
+    "comments": [
+      {
+        "user": "ayushrakesh",
+        "created_at": "2024-06-28T07:50:47Z",
+        "body": "@Userzxcvbvnm In which file is error coming?"
+      },
+      {
+        "user": "Userzxcvbvnm",
+        "created_at": "2024-06-29T02:33:11Z",
+        "body": "> @Userzxcvbvnm In which file is error coming?\r\n\r\nWasmEdge does not print \"Access mode: O_TRUNC\""
+      },
+      {
+        "user": "arujjval",
+        "created_at": "2024-07-02T05:26:12Z",
+        "body": "@Userzxcvbvnm Can you give more info on the `subdir_2/subfile_3` file? I guess the file above is reading it. "
+      },
+      {
+        "user": "Userzxcvbvnm",
+        "created_at": "2024-07-03T04:33:39Z",
+        "body": "It is a file with random generated string as the content \"asadsdwedfwe34r34r\""
+      },
+      {
+        "user": "guojidan",
+        "created_at": "2024-07-17T07:50:58Z",
+        "body": "This is not a bug. `O_TRUNC` is not a flag of `fcntl`, so the `fcntl` function cannot be used to obtain this flag.  \r\nEven if we run this test case directly, such as `gcc test.c -o test` and then `./test`, it still does not output the text `Access mode: O_APPEND`.  \r\n\r\nand, I ran this test case mentioned above and it worked well, the size of `subdir_2/subfile_3` is 0"
+      }
+    ]
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "https://github.com/Perfare/AssetStudio/issues/948",
+    "source": {
+      "issue_number": 948
+    },
+    "initial_question": {
+      "title": "Cannot open game pass game, throws UnauthorizedAccessException",
+      "body": "I'm fairly new to all of this, but I do program for a living. I'm playing through a, uh, _foxy_ new game released this week and wished to export the manual pages from within the game to give myself a nice version of them for translation efforts, printing, etc.\r\n\r\nI've installed it via Game Pass/the Xbox app, which means it's thrown in with all the rest of the app store binaries under `C:\\Program Files\\WindowsApps\\`. This directory is typically unreadable by most users, so after working up the guts from reading enough tutorials to make me think it safe, I changed that entire directory's owner to the _Administrators_ group. Since I'm an admin, I can now browse it (in e.g. Windows Explorer) fine, even without _Run as Administrator_.\r\n\r\nHowever, attempting to _Load Folder_ from Asset Studio (I downloaded the `net5` variant) results in the following error:\r\n\r\n```\r\n************** Exception Text **************\r\nSystem.UnauthorizedAccessException: Access to the path 'C:\\Program Files\\WindowsApps\\Finji.TUNIC_1.0.8.0_x64__tys0ffscxatjj\\Secret Legend.exe' is denied.\r\n   at System.IO.FileStream.ValidateFileHandle(SafeFileHandle fileHandle)\r\n   at System.IO.FileStream.CreateFileOpenHandle(FileMode mode, FileShare share, FileOptions options)\r\n   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options)\r\n   at AssetStudio.AssetsManager.Load(String[] files) in C:\\projects\\assetstudio\\AssetStudio\\AssetsManager.cs:line 51\r\n   at AssetStudio.AssetsManager.LoadFolder(String path) in C:\\projects\\assetstudio\\AssetStudio\\AssetsManager.cs:line 36\r\n   at AssetStudioGUI.AssetStudioGUIForm.<>c__DisplayClass52_0.<loadFolder_Click>b__0() in C:\\projects\\assetstudio\\AssetStudioGUI\\AssetStudioGUIForm.cs:line 163\r\n   at System.Threading.Tasks.Task.InnerInvoke()\r\n   at System.Threading.Tasks.Task.<>c.<.cctor>b__277_0(Object obj)\r\n   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)\r\n--- End of stack trace from previous location ---\r\n   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)\r\n   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)\r\n--- End of stack trace from previous location ---\r\n   at AssetStudioGUI.AssetStudioGUIForm.loadFolder_Click(Object sender, EventArgs e) in C:\\projects\\assetstudio\\AssetStudioGUI\\AssetStudioGUIForm.cs:line 163\r\n   at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__140_0(Object state)\r\n```\r\n\r\nThe program does this whether or not I launch it with _Run As Administrator_. The program seems to be able to open other files in that same directory tree just fine, but the `exe` itself is a problem. Its owner and group don't seem problematic, and I can launch and play the game myself just fine.\r\n\r\nIs this expected, or am I doing something wrong?"
+    },
+    "satisfaction_conditions": [
+      "Asset Studio must be able to access and process the game files without UnauthorizedAccessException",
+      "The solution must not interfere with normal game functionality",
+      "The tool must be able to extract the desired game assets"
+    ],
+    "created_at": "2022-03-22T19:55:54Z"
+  },
+  {
+    "id": "https://github.com/Perfare/AssetStudio/issues/857",
+    "source": {
+      "issue_number": 857
+    },
+    "initial_question": {
+      "title": "UnityStudio V.0.9.0 crashing when loading assets from another folder or local disk space",
+      "body": "Hi @Perfare\r\nUnity Studio V.0.9.0 crashes when I try to load a Unity game's assets from another local disk space or folder.\r\nIs this a error or bug?\r\nCan it get fixed?\r\nThe game I'm trying to rip is Ben 10 (2017 Reboot Game)."
+    },
+    "satisfaction_conditions": [
+      "Software version is compatible with current usage requirements"
+    ],
+    "created_at": "2021-10-11T16:53:34Z"
+  },
+  {
+    "id": "https://github.com/Perfare/AssetStudio/issues/735",
+    "source": {
+      "issue_number": 735
+    },
+    "initial_question": {
+      "title": "How to export MonoBehaviour with dummy DLL?",
+      "body": "In  the README.md, you mentioned AssetStudio can export MonoBehaviour with assembly DLL. But when I first select MonoBehaviour, it doesn't ask me the directory where the assembly is located. How to specify the dummy folder?\r\n\r\n\u60a8\u597d\uff0c\r\n  \u60a8\u5728README\u4e2d\u63d0\u5230\uff0c\u5f53\u7b2c\u4e00\u6b21\u9009\u62e9\u4e00\u4e2aMonoBehaviour\u8d44\u6e90\u65f6\uff0cAssetStudio\u4f1a\u63d0\u793a\u6307\u5b9adll\u6587\u4ef6\u5939\u5728\u54ea\u91cc\u3002\u5bf9\u4e8eil2cpp\u800c\u8a00\uff0c\u9700\u8981\u6307\u5b9adummyDLL\u6587\u4ef6\u5939\u3002\u4f46\u662f\u6211\u9009\u62e9\u4e86\u4e00\u4e2aMonoBehaviour\u4e4b\u540e\uff0c\u5e76\u6ca1\u6709\u8981\u6c42\u6211\u6307\u5b9a\u5bf9\u5e94\u7684\u6587\u4ef6\u5939\u3002\u8bf7\u95ee\u5e94\u8be5\u5982\u4f55\u6307\u5b9a\u6587\u4ef6\u5939\uff0c\u5bfc\u51fa\u6b63\u786e\u7684\u6587\u4ef6\uff1f"
+    },
+    "satisfaction_conditions": [
+      "MonoBehaviour structure information is correctly accessed",
+      "System correctly determines whether external DLL files are needed",
+      "Error feedback is provided when MonoBehaviour reading fails",
+      "MonoBehaviour content is displayed accurately"
+    ],
+    "created_at": "2021-05-03T13:54:57Z"
+  },
+  {
+    "id": "https://github.com/Perfare/AssetStudio/issues/504",
+    "source": {
+      "issue_number": 504
+    },
+    "initial_question": {
+      "title": "How to extract game with two data.unity3d files?",
+      "body": "The game is Angry Birds Evolution, both the APK and OBB have data.unity3d files. How would I load both of them at once without manual extraction? Rename them temporarily?"
+    },
+    "satisfaction_conditions": [
+      "Both Unity asset bundle files must be accessible for processing",
+      "Asset name conflicts must be handled appropriately",
+      "Asset loading system must recognize both files as valid Unity bundles"
+    ],
+    "created_at": "2020-03-23T04:28:45Z"
+  }
+]

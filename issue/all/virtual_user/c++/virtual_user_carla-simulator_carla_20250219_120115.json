@@ -1,0 +1,269 @@
+[
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/4790",
+    "source": {
+      "issue_number": 4790
+    },
+    "initial_question": {
+      "title": "Difference between GNSS sensor data and transform_to_geolocation function ",
+      "body": "Hi Team ,\r\n\r\nis there any difference between the lat long alt values we obtain from GNSS sensor attached to vehicle and the transform to geo location function in maps not considering the offset with respect to parent actor\r\n\r\nCARLA version:0.9.11\r\nPlatform/OS:Ubuntu 18.04"
+    },
+    "satisfaction_conditions": [
+      "Coordinate transformation accuracy matches between methods",
+      "Parent actor offset handling is excluded from comparison"
+    ],
+    "created_at": "2021-10-25T11:58:22Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/4087",
+    "source": {
+      "issue_number": 4087
+    },
+    "initial_question": {
+      "title": "Quickstart not working",
+      "body": "The documentation in the quickstart does not specify how to install the package carla, so the examples in pythonapi/examples exit with an error. However spectator mode still works.\r\n\r\nWindows 10, Carla 0.9.10"
+    },
+    "satisfaction_conditions": [
+      "Python version compatibility must match the installed CARLA package",
+      "CARLA module must be accessible to Python environment",
+      "Examples must execute without ModuleNotFoundError"
+    ],
+    "created_at": "2021-04-13T16:44:31Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/3998",
+    "source": {
+      "issue_number": 3998
+    },
+    "initial_question": {
+      "title": "Initialization of current_state.velocity in PIDController.h",
+      "body": "Hi, @jackbart94, \r\n\r\nWhen I read code related to PID controller used in traffic manager,\r\nI find that in `StateUpdate` function, the `current_state.velocity` is initialized as `(current_velocity - target_velocity) / target_velocity`, which seems not to be a valid velocity. \r\nCould you tell me why `current_state.velocity` is initialized this way?\r\n"
+    },
+    "satisfaction_conditions": [
+      "The explanation must clarify that the variable represents an error term rather than an actual velocity",
+      "The explanation must justify why the error calculation is valid for PID control",
+      "The explanation must address why the error term is scaled/normalized",
+      "The response must confirm that the ultimate goal is error minimization"
+    ],
+    "created_at": "2021-03-18T08:21:21Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/2960",
+    "source": {
+      "issue_number": 2960
+    },
+    "initial_question": {
+      "title": "How can i get radar resolution in Carla?",
+      "body": "Is the radar resolution available in Carla? I can't find it anywhere.\r\nPlease tell me how can i get it, thanks very much!"
+    },
+    "satisfaction_conditions": [
+      "Understanding of Carla's radar data model is clarified",
+      "Radar data points interpretation is explained",
+      "Expectations about radar capabilities are properly set"
+    ],
+    "created_at": "2020-06-17T02:53:20Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/2849",
+    "source": {
+      "issue_number": 2849
+    },
+    "initial_question": {
+      "title": "Custom background vehicle model in Carla",
+      "body": "Hello,\r\n\r\nThanks for making a great simulator. I am doing a project in which I need to **customize all vehicles' dynamic models** in the Carla environment (for example, the vehicle will get the ground truth information and decide to change the lane or change the acceleration).\r\n\r\nIn order to get information about all the vehicles, I use the following codes:\r\n```\r\nwaypoint_list = [world.get_map().get_waypoint(v.get_location(), project_to_road=True) for v in vehicles_list]\r\n```\r\n\r\nAs I have about 200 vehicles in the Town04 map, I noticed that the line above cost me about 5 seconds each time, which can not meet the real-time requirements. My Carla version is 0.9.9 and runs on Ubuntu 18.04 with i9-9900k and 64 Gb RAM.\r\n\r\nI wonder if there are other solutions to let me **customize the control model** of the vehicles using the **provided PythonAPI**, or I may need to modify the source code of Carla to reach my purpose?\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Vehicle information retrieval must complete within real-time constraints",
+      "System must provide access to surrounding vehicle information for each vehicle",
+      "Vehicles must maintain proper road following behavior",
+      "Custom vehicle dynamics model must be able to control individual vehicle movements"
+    ],
+    "created_at": "2020-05-12T18:27:53Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/1123",
+    "source": {
+      "issue_number": 1123
+    },
+    "initial_question": {
+      "title": "does running Carla's docker image require the installation of Unreal engine?",
+      "body": "I'm pretty much new to Docker, do I need to install the Unreal engine 4 before running the Carla container on my machine?"
+    },
+    "satisfaction_conditions": [
+      "Carla container successfully runs without Unreal Engine installation",
+      "Container operates as a standalone binary package"
+    ],
+    "created_at": "2019-01-11T02:12:38Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/1121",
+    "source": {
+      "issue_number": 1121
+    },
+    "initial_question": {
+      "title": "Increase Framerate of the Server (0.9.2)",
+      "body": "Hi,\r\nwhen I use a modified manual_control.py script with two RGB (800x600) cameras the servers frame rate drops to 14-17 FPS.\r\nI was wondering if there is any possibility to increase the frame rate of the server in v0.9.2 (with Epic graphic settings). Or is this simply the frame rate I can expect with a setup like mine?\r\nThank you\r\n\r\nMy setup:\r\n- Ubuntu 18.04.1 \r\n- Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz\r\n- GeForce GTX 1080 Ti\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Server frame rate must be optimized within hardware capabilities",
+      "Solution must support dual RGB camera setup at 800x600 resolution",
+      "Performance expectations must be clearly communicated",
+      "Solution must be compatible with CARLA version 0.9.2",
+      "Performance trade-offs must be explained if suggested"
+    ],
+    "created_at": "2019-01-10T18:00:08Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/1021",
+    "source": {
+      "issue_number": 1021
+    },
+    "initial_question": {
+      "title": "no effect with FPS and benchmark flag",
+      "body": "Hi,\r\nI started the carla server in this way:\r\n    ./CarlaUE4.sh -benchmark -fps=10 -windowed\r\n\r\nAnd then run manual_control.py. I'm sure manual_control.py is connecting to the carla server started just now in that I can see the same vehicle in the same position in pygame and server scene. But in the hud, the server FPS is always around 30 despite the value of fps flag, which is almost the same as when I started the carla server without benchmark and fps flags. I'm very confused about it. Appreciate any suggestion. Thanks.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Simulation time and real time must be correctly distinguished",
+      "FPS display must accurately reflect the configured simulation rate",
+      "Sensor callbacks must operate according to simulation time",
+      "Simulation speed must scale inversely with FPS setting"
+    ],
+    "created_at": "2018-12-08T09:09:59Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/671",
+    "source": {
+      "issue_number": 671
+    },
+    "initial_question": {
+      "title": "Available vehicle library and Default vehicle",
+      "body": "Hello everyone,\r\n\r\nI am using CARLA 0.8.4 and I am trying to run it by changing default vehicle to two wheeled vehicle, but I am not able to.\r\n\r\nI have seen that I can change the model in initial settings at, 'PlayerVehicle', like this\r\n\"PlayerVehicle=/Game/Blueprints/Vehicles/BmwGrandTourer/BmwGranTourer.BmwGranTourer_C\"\r\n\r\nBut my problem is, I am not able to find these blueprints (Since I have not built CARLA from source, but just using pre-compiled versions). Can someone help me in finding models for bike?\r\n\r\nNote: As it is easy enough to change the default vehicle by knowing the models and path, I think it would be good idea to have a text file with all the vehicle models available. It will make it easier for the documentation.\r\n\r\nPS: Please excuse me if this question is really basic or if there is already such file existing. I have not been in touch with CARLA from past few months."
+    },
+    "satisfaction_conditions": [
+      "Vehicle model path format is correctly specified",
+      "Available vehicle models are clearly listed",
+      "Vehicle type categorization is clear",
+      "Configuration syntax is provided with examples",
+      "File naming conventions are explained"
+    ],
+    "created_at": "2018-08-12T19:30:35Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/568",
+    "source": {
+      "issue_number": 568
+    },
+    "initial_question": {
+      "title": "Vehicles and Map Dimensions",
+      "body": "Hi CARLA team,\r\n\r\nI have a few question about the model and maps dimensions.\r\n\r\n1. Based on some previous issues, I knew that that the pixel density is 0.1643 m/pixel. #262 . Can I use this to calculate the distance traveled by measuring the pixels traveled?\r\n\r\n2. Since I am interested in how far away the vehicle is from the intersection, could you give some information about the dimensions( Height, Width and Length) of both vehicles (Mustang and Model 3)? I am assuming that the GPS info of the vehicle is always located at the center of the vehicle according to your documentation.\r\n\r\n3. How to measure the dimension(actual lenght) of both maps? Could you let me know what is size of maps in the unit of pixel so that I can calculate the length on my own? \r\n\r\n4. If I want to make the distance to intersection in town 1 and town 2 the same, should I use the same pixel and node density? Also, what is the dimensions of map town 2?\r\n\r\nI greatly appreciate every effort of your development team.\r\n\r\nSincerely,"
+    },
+    "satisfaction_conditions": [
+      "Distance calculations must be possible using map pixel measurements",
+      "Vehicle dimensions must be obtainable",
+      "Map dimensions must be available in real-world units",
+      "Vehicle position reference point must be consistently defined",
+      "Distance measurements must be obtainable between any two points on the map"
+    ],
+    "created_at": "2018-07-06T15:42:18Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/519",
+    "source": {
+      "issue_number": 519
+    },
+    "initial_question": {
+      "title": "How can I change manual_control.py into third-person view?",
+      "body": "Hi.\r\n\r\nWhen I run `manual_control.py`, it starts as first person view game.\r\nHowever, I want change it into third-person view like carla-server mode.\r\nI mean, I want to debug my environment, so It's fine as long as I have the way to control vehicle manually, while outputting data.\r\nI think `VehicleControl()` is effective but I'm not sure about it.\r\nIs there any way?"
+    },
+    "satisfaction_conditions": [
+      "Camera view must be positioned behind and above the vehicle",
+      "Manual vehicle control functionality must be preserved",
+      "Environment data collection must remain functional",
+      "Camera perspective change must not interfere with existing data collection systems"
+    ],
+    "created_at": "2018-06-20T10:10:39Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/505",
+    "source": {
+      "issue_number": 505
+    },
+    "initial_question": {
+      "title": "binocular vision ",
+      "body": "How many cameras on the car? \r\nCan I get two images from two cameras(left camera and right camera, if there is)?\r\n\r\nthanks!"
+    },
+    "satisfaction_conditions": [
+      "Multiple cameras must be configurable in the system",
+      "Cameras must support distinct left and right positioning",
+      "Each camera must be individually configurable for image capture"
+    ],
+    "created_at": "2018-06-15T07:38:54Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/461",
+    "source": {
+      "issue_number": 461
+    },
+    "initial_question": {
+      "title": "Where is /Game/Maps/Town02 located, Windows version?",
+      "body": "I just beginning to use the simulator, and did some work with the default `Town01`, my question is where is `Town02` located I can't find it anywhere, I must be missing something.\r\n"
+    },
+    "satisfaction_conditions": [
+      "The specified town map (Town02) must be accessible and loadable by the simulator",
+      "The correct map loading command syntax must be used for the installed version",
+      "Map files must be present in a location recognized by the CARLA installation",
+      "The solution must work with the Windows build version of CARLA"
+    ],
+    "created_at": "2018-05-30T14:31:26Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/449",
+    "source": {
+      "issue_number": 449
+    },
+    "initial_question": {
+      "title": "Error of Compiling Image_Converter ",
+      "body": "Hi everyone,\r\nI have an error when compiling the image_converter script following the instructions in the post #165 .\r\nCan someone help me out?\r\nThe following is the error I got when running \"make\" under the directory of /carla/Util/ImageConverter/:\r\n\r\n```\r\nclang++ -Wall -Wextra -std=c++14 -fopenmp -O3 -DNDEBUG -o bin/image_converter main.cpp -lboost_system -lboost_filesystem -lboost_program_options -lpng -ljpeg -ltiff\r\nIn file included from main.cpp:16:\r\nIn file included from ./image_converter.h:10:\r\n./image_io.h:174:5: error: static_assert failed \"I/O format not supported!\"\r\n    static_assert(IO_READER::is_supported, \"I/O format not supported!\");\r\n    ^             ~~~~~~~~~~~~~~~~~~~~~~~\r\nmain.cpp:54:35: note: in instantiation of template class\r\n      'image_converter::image_file<image_converter::tiff_io,\r\n      image_converter::tiff_io, boost::gil::image<boost::gil::pixel<unsigned\r\n      char, boost::gil::layout<boost::mpl::vector3<boost::gil::red_t,\r\n      boost::gil::green_t, boost::gil::blue_t>, boost::mpl::range_c<int, 0, 3> >\r\n      >, false, std::allocator<unsigned char> > >' requested here\r\n  image_converter::image_file<IO> file_io(in_filename);\r\n                                  ^\r\nmain.cpp:71:7: note: in instantiation of function template specialization\r\n      'parse_image<image_converter::tiff_io>' requested here\r\n      parse_image<ic::tiff_io>(in_filename, out_filename, converter);\r\n      ^\r\n1 error generated.\r\nMakefile:11: recipe for target 'release' failed\r\nmake: *** [release] Error 1\r\n```\r\n\r\nBTW, I have followed the README to install all necessary libs. \r\n\r\nAny helps are highly appreciated!\r\nBest regards,\r\nTaylor\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "TIFF format support libraries are properly installed and accessible",
+      "Compilation completes without static assertion errors",
+      "Development headers for image processing are available"
+    ],
+    "created_at": "2018-05-24T20:34:23Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/94",
+    "source": {
+      "issue_number": 94
+    },
+    "initial_question": {
+      "title": "Navigation",
+      "body": "How do the AI cars navigate in Carla?\r\n\r\nI have checked some navigation tutorials for UE4, but it seems Carla is using something more complex."
+    },
+    "satisfaction_conditions": [
+      "Vehicles must follow road lanes and paths defined in the map",
+      "Vehicles must respond to traffic control elements (lights, signs, speed limits)",
+      "Vehicles must handle intersections with appropriate turning behavior",
+      "Vehicles must be spawned at valid starting positions"
+    ],
+    "created_at": "2017-12-19T09:43:11Z"
+  },
+  {
+    "id": "https://github.com/carla-simulator/carla/issues/56",
+    "source": {
+      "issue_number": 56
+    },
+    "initial_question": {
+      "title": "How to get camera intrinsic matrix?",
+      "body": "Thank you for publishing this great drive simulator code.\r\nI am trying to map depth points(u,v,depth) from Pixel coordinates to World coordinates(x,y,z).\r\nTo do this, Camera intrinsic parameter is necessary. I found that \"CameraFOV(horizontal field of view) and ImageSize (in ```CarlaSettings.ini```)\" is parameters for calculating camera intrinsic matrix. I thought as following.\r\n```\r\nFocus_length = ImageSizeX /(2 * tan(CameraFOV * \u03c0 / 360))\r\nCenter_X = ImageSizeX / 2\r\nCenter_Y = ImageSizeY / 2\r\n```\r\nBut I found this intrinsic matrix is not correct enough because 3D points (transformed from depth points(u,v,depth) by this matrix) has some distortion. \r\n\r\nCould you tell me how to get camera intrinsic matrix? \r\n\r\n(Now I think Focus_length_per_pixel (fx, fy) or distortion parameter is necessary for this. )\r\n\r\n[P.S.]\r\nTo confirm whether my implementation is correct, please tell me the definition of depth length in each image pixel. I think this depth is the length from Camera coordinate original point to each point.\r\n(not simply z value in Camera coordinate)"
+    },
+    "satisfaction_conditions": [
+      "Camera intrinsic matrix correctly maps between pixel and world coordinates",
+      "Depth values are correctly interpreted relative to the camera projection plane",
+      "Matrix calculation accounts for camera focal length and image center points",
+      "Resulting 3D point cloud shows minimal or no distortion"
+    ],
+    "created_at": "2017-11-28T07:29:33Z"
+  }
+]

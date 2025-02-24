@@ -1,0 +1,20 @@
+[
+  {
+    "id": "https://github.com/Yohann0617/oci-helper/issues/1",
+    "source": {
+      "issue_number": 1
+    },
+    "initial_question": {
+      "title": "\u6559\u7a0b\u771f\u7684\u662f\u4e00\u8a00\u96be\u5c3d\uff0c\u521b\u5efaapi\u65f6\u751f\u6210\u7684\u914d\u7f6e\u653e\u54ea\uff1f",
+      "body": null
+    },
+    "satisfaction_conditions": [
+      "PEM key file is accessible to the service",
+      "Configuration supports multiple regions",
+      "Configuration validation is performed",
+      "Region-specific server display functionality",
+      "Configuration persistence across sessions"
+    ],
+    "created_at": "2024-11-15T10:10:29Z"
+  }
+]

@@ -1,0 +1,116 @@
+[
+  {
+    "id": "https://github.com/AvaloniaUI/Avalonia/issues/14901",
+    "source": {
+      "issue_number": 14901
+    },
+    "initial_question": {
+      "title": "textbox height has no effect when sets value below 30",
+      "body": "### Describe the bug\n\nwhen i tried to changed the textbox's height to a value less than 30, i didn't see any changes.\r\nbut if i sets it to a bigger value , the  height of textbox changed.\n\n### To Reproduce\n\n\t<TextBox Height=\"20\" FontSize=\"12\" Width=\"199\"></TextBox>\n\n### Expected behavior\n\n_No response_\n\n### Avalonia version\n\n11.0.10\n\n### OS\n\nWindows\n\n### Additional context\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "TextBox height can be reduced below 30 pixels",
+      "Control respects explicitly set height values",
+      "Visual appearance matches specified dimensions"
+    ],
+    "created_at": "2024-03-10T07:23:47Z"
+  },
+  {
+    "id": "https://github.com/AvaloniaUI/Avalonia/issues/14034",
+    "source": {
+      "issue_number": 14034
+    },
+    "initial_question": {
+      "title": "Dynamically add a usercontrol to a grid, the control didn't show!",
+      "body": "this is my usercontrol :\r\n    public class TestControl : TextBox\r\n    {\r\n    }\r\n\r\ni added the control to the grid, it didn't appear!\r\ncodes:\r\nvar ctl = new TestControl();\r\nGrid.SetRow(ctl,0);\r\nGrid.SetColumn(ctl,0);\r\n\r\nbut if i use textbox,and it appeares in the grid;\r\nvar ctl = new TextBox();\r\nGrid.SetRow(ctl,0);\r\nGrid.SetColumn(ctl,0);\r\n\r\nis this a bug?\r\n\r\navalonia 11.0.6, .net8\r\n"
+    },
+    "satisfaction_conditions": [
+      "Custom control must be visible in the grid when added",
+      "Custom control must inherit visual styling from its parent class",
+      "Control must maintain proper layout integration with Avalonia Grid",
+      "Style resolution must be properly configured"
+    ],
+    "created_at": "2023-12-25T17:39:20Z"
+  },
+  {
+    "id": "https://github.com/AvaloniaUI/Avalonia/issues/3199",
+    "source": {
+      "issue_number": 3199
+    },
+    "initial_question": {
+      "title": "ComboBox.SelectedItem only returns the typename and not the selected Value When using a Datatemplate",
+      "body": "I have a combobox configured like so\r\n\r\n```\r\n      <ComboBox SelectedItem=\"{Binding SelectedModule, Mode=OneWayToSource}\" Grid.Column=\"0\" BorderBrush=\"Black\" Grid.Row=\"2\" Height=\"25\" Margin=\"5\" Items=\"{Binding SubCommands}\">\r\n        <ComboBox.ItemTemplate>\r\n          <DataTemplate>\r\n            <TextBlock Text=\"{Binding DisplayName}\" ToolTip.Tip=\"{Binding Description}\"/>\r\n          </DataTemplate>\r\n        </ComboBox.ItemTemplate>\r\n      </ComboBox>\r\n```\r\nAnd the viewmodel is \r\n```\r\n        public string SelectedModule\r\n        {\r\n            get => selectedModule;\r\n            private set\r\n            {\r\n                var res = value;\r\n                this.RaiseAndSetIfChanged(ref selectedModule, value);\r\n            }\r\n        }\r\n```\r\nI am getting back the typename of the Items property instead of the value of the textblock text. How can I get that WPF mentions DisplayMemberName but that doesn't seem to exist in Avalonia.\r\n\r\nI also tried \r\n`SelectionBoxItem=\"{Binding SelectedModule, Mode=OneWayToSource}\" `\r\nbut that didn't work either "
+    },
+    "satisfaction_conditions": [
+      "ComboBox must maintain its visual display using the DataTemplate while providing proper selection functionality"
+    ],
+    "created_at": "2019-11-01T23:08:19Z"
+  },
+  {
+    "id": "https://github.com/AvaloniaUI/Avalonia/issues/3162",
+    "source": {
+      "issue_number": 3162
+    },
+    "initial_question": {
+      "title": "KeyGesture not having empty ctor on 0.9 ",
+      "body": "Hey,\r\n\r\nTrying out 0.9 preview 4 and noticed KeyGesture doesn't have empty ctor, is there any reason for it?\r\nSince I can no longer serialize it\r\n\r\nThanks"
+    },
+    "satisfaction_conditions": [
+      "KeyGesture object must be successfully serializable",
+      "Solution must work with immutable KeyGesture objects",
+      "Created KeyGesture must contain valid state",
+      "Solution must be compatible with version 0.9"
+    ],
+    "created_at": "2019-10-25T20:47:40Z"
+  },
+  {
+    "id": "https://github.com/AvaloniaUI/Avalonia/issues/2554",
+    "source": {
+      "issue_number": 2554
+    },
+    "initial_question": {
+      "title": "IMarkupExtension",
+      "body": "Can I suggest that Avalonia supports IMarkupExtension (as well as MarkupExtension from Portable.Xaml.Markup)?\r\n\r\nAt the moment you can't create a markup extension that has bindable properties as you can't inherit from both MarkupExtension and AvaloniaObject. By implementing an interface version of MarkupExtension you could have bindable properties which would be extremely useful.\r\n\r\n`public interface IMarkupExtension\r\n{\r\n    object ProvideValue(IServiceProvider serviceProvider);\r\n}\r\n`\r\n"
+    },
+    "satisfaction_conditions": [
+      "Custom markup extensions must be able to have bindable properties",
+      "The solution must not require simultaneous inheritance from both MarkupExtension and AvaloniaObject",
+      "A ProvideValue method with appropriate signature must be accessible",
+      "The implementation must work within Avalonia's XAML processing system"
+    ],
+    "created_at": "2019-05-20T15:41:04Z"
+  },
+  {
+    "id": "https://github.com/AvaloniaUI/Avalonia/issues/1677",
+    "source": {
+      "issue_number": 1677
+    },
+    "initial_question": {
+      "title": "How to get Containers right after setting ItemsControl.Items",
+      "body": "When I set ItemsControl.Items= someList, it seems that ItemContainerGenerator generates the containers asynchronously. What is the best way to wait for complete materialization, so I can access the containers?\r\nRight now I'm using Materialized event, and have to check ItemContainerGenerator.Containers.Count to make all item has been materialized. This seems less than ideal, is there a better way to do this?"
+    },
+    "satisfaction_conditions": [
+      "UI elements must correctly reflect the state of their data source",
+      "Changes to collection items must be properly displayed without depending on container materialization timing",
+      "State management must work with virtualized UI elements",
+      "Data binding architecture must follow proper separation of concerns"
+    ],
+    "created_at": "2018-06-13T04:56:07Z"
+  },
+  {
+    "id": "https://github.com/AvaloniaUI/Avalonia/issues/275",
+    "source": {
+      "issue_number": 275
+    },
+    "initial_question": {
+      "title": "Accessing list or collection of containers using ItemsContainerGenerater",
+      "body": "With WPF I could iterate through containers using the following:\n\n`itemsControl.ItemContainerGenerator.Items.Count`\n\nHowever I do not see a way to iterate with our current implementation.\n\nMaybe I am just missing something?\n"
+    },
+    "satisfaction_conditions": [
+      "Access to container collection is available",
+      "Compatible framework version is used",
+      "Container enumeration capability exists"
+    ],
+    "created_at": "2015-10-15T17:32:16Z"
+  }
+]

@@ -1,0 +1,84 @@
+[
+  {
+    "id": "https://github.com/jy0205/Pyramid-Flow/issues/206",
+    "source": {
+      "issue_number": 206
+    },
+    "initial_question": {
+      "title": "2. Inference Code \u592a\u6162\u4e86",
+      "body": "\u4f7f\u7528\u6700\u65b0readme\u91cc\u9762\u7684Inference Code\u548cflux\u6a21\u578b\u3002A800\u663e\u5361\u9700\u89811h\u51fa\u7ed3\u679c\uff0c\u600e\u4e48\u56de\u4e8b\uff0c\u5f88\u6162\u3002\u539f\u59cb\u6a21\u578b\u5728\u54ea\u5462\u3002\u611f\u8c22"
+    },
+    "satisfaction_conditions": [
+      "Inference processing time is reduced to acceptable levels (around 1 minute per video)",
+      "GPU resources are properly utilized without CPU bottlenecks",
+      "Model configuration settings are optimized for performance"
+    ],
+    "created_at": "2024-12-05T02:32:55Z"
+  },
+  {
+    "id": "https://github.com/jy0205/Pyramid-Flow/issues/170",
+    "source": {
+      "issue_number": 170
+    },
+    "initial_question": {
+      "title": "[WARNING]",
+      "body": "[WARNING] Required file 'config.json' missing in 'D:\\Pyramid-Flow-main\\pyramid_flow_model\\diffusion_transformer_768p'."
+    },
+    "satisfaction_conditions": [
+      "System continues to function despite the warning message",
+      "User understands warning is non-critical",
+      "Expected functionality maintained without config.json"
+    ],
+    "created_at": "2024-11-10T21:33:10Z"
+  },
+  {
+    "id": "https://github.com/jy0205/Pyramid-Flow/issues/119",
+    "source": {
+      "issue_number": 119
+    },
+    "initial_question": {
+      "title": "About training detail",
+      "body": "Hi, thanks for sharing the great project.\r\n\r\nI have found the mmdit in your method can accept different stages as input, and different stage are concatenated in token dimension. This may require the timestep to be same in different stages but different stages have their respective timestep interval. I wonder if the training sampled for each batch only include one stage, or my understanding is wrong in something. Looking forward for your reply, and thanks again for the excellent project!"
+    },
+    "satisfaction_conditions": [
+      "Training batches must support multiple stages simultaneously",
+      "Stage distribution in batches must be controlled and defined"
+    ],
+    "created_at": "2024-10-18T08:19:35Z"
+  },
+  {
+    "id": "https://github.com/jy0205/Pyramid-Flow/issues/107",
+    "source": {
+      "issue_number": 107
+    },
+    "initial_question": {
+      "title": "text encoder network details?",
+      "body": "I noticed that in your code, for the text encoder part, you used the clip and T5 models. Based on this, I have two questions: 1. Will the clip and T5 models update parameters during training? 2. What is the difference between these two clip models?\r\nLooking forward to your answer, thank you"
+    },
+    "satisfaction_conditions": [
+      "Model parameter update behavior must be clearly defined for each component",
+      "The distinct roles of the two CLIP models must be explained",
+      "Training state of all major components (CLIP, T5, VAE, MM-DiT) must be specified",
+      "Origin/source of each model component must be identified",
+      "VAE architecture details must be accurately described"
+    ],
+    "created_at": "2024-10-16T07:16:21Z"
+  },
+  {
+    "id": "https://github.com/jy0205/Pyramid-Flow/issues/18",
+    "source": {
+      "issue_number": 18
+    },
+    "initial_question": {
+      "title": "Can you fix the demo huggingface please?",
+      "body": "the question is solved thanks for replying! not sure how to delete the issue im sorry"
+    },
+    "satisfaction_conditions": [
+      "User has control over frame rate settings",
+      "Frame generation stays within platform resource limits",
+      "Animation playback is functional",
+      "User acknowledges issue resolution"
+    ],
+    "created_at": "2024-10-10T18:45:15Z"
+  }
+]

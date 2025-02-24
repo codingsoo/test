@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/voideditor/void/issues/48",
+    "source": {
+      "issue_number": 48
+    },
+    "initial_question": {
+      "title": "Build error no such file or directory markdown-language-features/preview-src/src",
+      "body": "After preparing everything by following the instructions in CONTRIBUTING.md, running `npm run watch` return this error:\r\n```\r\n[watch-extensions] [20:45:55] 'watch-extensions' errored after 949 ms\r\n[watch-extensions] [20:45:55] Error: ENOENT: no such file or directory, scandir '/home/x/void/extensions/markdown-language-features/preview-src/src'\r\nERROR: \"watch-extensions\" exited with 1.\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Project setup follows the correct operating system conventions"
+    ],
+    "created_at": "2024-09-21T13:49:23Z"
+  }
+]

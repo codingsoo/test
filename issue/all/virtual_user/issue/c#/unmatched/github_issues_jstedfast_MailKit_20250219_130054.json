@@ -1,0 +1,232 @@
+[
+  {
+    "number": 1479,
+    "title": "You are trying to install this package into a project that targets '.NETFramework,Version=v4.5', but the package does not contain any assembly references or content files that are compatible with that framework",
+    "created_at": "2022-12-02T07:00:26Z",
+    "closed_at": "2022-12-02T13:31:16Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/1479",
+    "body": "Trying to Install using NuGet and keep getting the error...\r\n\r\nInstall-Package : Could not install package 'MailKit 3.4.3'. You are trying to install this package into a project that targets '.NETFramework,Version=v4.5', but the package does not contain any assembly references or content files that are compatible with that framework. For more information, contact the package author.\r\n\r\nI seem to have .NET 4.5 frameworks under my 'References', so I'm not sure what's going on here.\r\n",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/1479/comments",
+    "author": "raeldor",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2022-12-02T13:31:16Z",
+        "body": "Your project is targeting .NET v4.5 but MailKit no longer supports .NET v4.5 because it is so old that even Microsoft has stopped supporting it.\r\n\r\nThe minimum version of .NET Framework that Microsoft (and MailKit) support right now is v4.6.2 but I would highly recommend updating to .NET 4.8 or better yet, .NET Core 6.0"
+      },
+      {
+        "user": "jstedfast",
+        "created_at": "2022-12-02T17:01:16Z",
+        "body": "Yea, Microsoft dropped support for .NET v4.5.2 back in April (MailKit stopped supporting it in, I think, May).\r\n\r\nAt this point, I would consider .NET Framework <= 4.8.x to be \"Legacy\" and would recommend avoiding it unless you specifically need to for some reason.\r\n\r\nThe .NET Core 6.0 platform is long-term supported (as opposed to .NET 5.0 which has already been dropped)."
+      }
+    ]
+  },
+  {
+    "number": 1417,
+    "title": "Failed to convert the object type \"MimeKit.MimePart\" to the type \"MimeKit.TextPart\"",
+    "created_at": "2022-08-22T05:14:47Z",
+    "closed_at": "2022-08-22T13:37:08Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/1417",
+    "body": "Failed to cast the object type \"MimeKit.MimePart\" to the type \"MimeKit.TextPart\".\r\n\r\n```\r\n        client.GetFolder(\"FOLDER\").Open(FolderAccess.ReadOnly);\r\n\r\n        var uids = client.GetFolder(\"FOLDER\").Search(SearchQuery.DeliveredAfter(parseDateTime));\r\n\r\n        var messages = client.GetFolder(\"FOLDER\").Fetch(uids, MessageSummaryItems.Envelope | MessageSummaryItems.BodyStructure);\r\n\r\n        if (messages != null && messages.Count > 0)\r\n        {\r\n            foreach (var msg in messages)\r\n            {\r\n                var body = (TextPart)client.GetFolder(\"FOLDER\").GetBodyPart(msg.UniqueId, msg.BodyParts.First());\r\n```\r\n\r\nOn the last line of the code an error is called (topic name). The catch is that the code works! But for some reason an error popped up when parsing mail for a certain day. How can it be related? Maybe you know another way to get the message body out of the folder?",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/1417/comments",
+    "author": "konstantinLyang",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2022-08-22T13:37:08Z",
+        "body": "Well, the first BodyPart is not always the text body and you are casting whatever it finds to a TextPart which is why you are getting a cast exception.\r\n\r\nThere are 2 convenience properties: TextBody and HtmlBody that, when non-null, use heuristics to get the text/plain and text/html body parts."
+      }
+    ]
+  },
+  {
+    "number": 1320,
+    "title": "POP3Client GetMessage throw Download Exceed",
+    "created_at": "2022-01-14T06:39:29Z",
+    "closed_at": "2022-01-14T14:23:40Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/1320",
+    "body": "**Describe the bug**\r\nI turned on a cron task that runs every 5 minutes.\r\nEvery time I do a scheduled task, I reconnect to the pop3 mail service and do the authentication.\r\nThen get the number of emails, and use the index to get the uid and message of each email according to the number of emails. When I call _**GetMessage(int index)**_ it throws an exception\r\n\r\n**Platform (please complete the following information):**\r\n - OS: Windows 10,   Windows Server 2016\r\n - .NET Runtime: [e.g. CoreCLR, Mono]\r\n - .NET Framework: .net  framework 4.8\r\n - MailKit Version: 3.0.0\r\n\r\n**Exception**\r\nMailKit.Net.Pop3.Pop3CommandException: POP3 server did not respond with a +OK response to the RETR command.\r\n   \u5728 MailKit.Net.Pop3.Pop3Client.DownloadContext`1.<DownloadItemAsync>d__13.MoveNext() \u4f4d\u7f6e D:\\src\\MailKit\\MailKit\\Net\\Pop3\\Pop3Client.cs:\u884c\u53f7 2507\r\n--- \u5f15\u53d1\u5f02\u5e38\u7684\u4e0a\u4e00\u4f4d\u7f6e\u4e2d\u5806\u6808\u8ddf\u8e2a\u7684\u672b\u5c3e ---\r\n   \u5728 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   \u5728 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   \u5728 System.Runtime.CompilerServices.ConfiguredTaskAwaitable.ConfiguredTaskAwaiter.GetResult()\r\n   \u5728 MailKit.Net.Pop3.Pop3Client.DownloadContext`1.<DownloadAsync>d__14.MoveNext() \u4f4d\u7f6e D:\\src\\MailKit\\MailKit\\Net\\Pop3\\Pop3Client.cs:\u884c\u53f7 2518\r\n--- \u5f15\u53d1\u5f02\u5e38\u7684\u4e0a\u4e00\u4f4d\u7f6e\u4e2d\u5806\u6808\u8ddf\u8e2a\u7684\u672b\u5c3e ---\r\n   \u5728 System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   \u5728 System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   \u5728 System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()\r\n   \u5728 MailKit.Net.Pop3.Pop3Client.GetMessage(Int32 index, CancellationToken cancellationToken, ITransferProgress progress) \u4f4d\u7f6e D:\\src\\MailKit\\MailKit\\Net\\Pop3\\Pop3Client.cs:\u884c\u53f7 2905\r\n   \u5728 iPlatform.MailService.controls.uBaseCtrol.DownloadEmail(Boolean filterToday) \u4f4d\u7f6e D:\\ACIP\\Documents\\Repositories\\iPlatform\\iPlatform.MailService\\controls\\uBaseCtrol.cs:\u884c\u53f7 12\r\n\r\n**Code Snippets**\r\nIf applicable, add code snippets to help explain your problem.\r\n\r\n```csharp\r\n                messageCount = pop3Client.GetMessageCount(); \r\n                var guid = string.Empty;\r\n                for (int i = messageCount - 1; i >= 0; i--)\r\n                {\r\n                    try\r\n                    {\r\n                        guid = pop3Client.GetMessageUid(i);\r\n                        LogWorker.Log($\"message guid: {guid}\");\r\n                        if (guids.ContainsKey(guid)) continue;\r\n                \r\n                        var messageModel = new MailBodyModel();\r\n\r\n                        //  throw  exception  by this step\r\n                        var message = pop3Client.GetMessage(i);\r\n\r\n                        .....\r\n                    }\r\n                 }\r\n```\r\n\r\n**Protocol Logs**\r\nC: LIST 3715\r\nS: +OK 3715 79471\r\nC: UIDL 3714\r\nS: +OK 3714 AGoAQQAjE3Rj83HljEAskKoS\r\nC: RETR 3714\r\nS: -ERR Download exceed. msg=3714\r\n",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/1320/comments",
+    "author": "ROMYIM",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2022-01-14T14:23:40Z",
+        "body": "That error comes from the POP3 server, not from MailKit. You need to contact the admin of your POP3 server and ask him/her what the issue is.\r\n\r\nI suspect that you have exceeded some limit of the number of times you are allowed to connect and download messages from the POP3 server in a short span of time.\r\n\r\nTry changing your timer to 10 minutes instead of 5 minutes."
+      }
+    ]
+  },
+  {
+    "number": 1099,
+    "title": "IMAP connect error: syntax error / forbids use of this system for unsolicited....",
+    "created_at": "2020-11-13T16:23:43Z",
+    "closed_at": "2020-11-13T20:44:03Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/1099",
+    "body": "I'm trying to connect to a Rackspace IMAP server using the following code.\r\n\r\n    using (var client = new ImapClient(new ProtocolLogger(logfile)))\r\n    {\r\n        client.Connect(account.Server, 587, SecureSocketOptions.StartTls);\r\n        client.Authenticate(account.Username, `account.Password);\r\n\r\nI get an error:\r\n**Syntax error in IMAP server greeting. Unexpected token: [atom: 220]**\r\n\r\nThe log file reads:\r\n\r\n_Connected to imap://fakemailserver.com:587/?starttls=always\r\nS: 220 fakemailserver.com ESMTP - VA Code Section 18.2-152.3:1 forbids use of this system for unsolicited bulk electronic mail (Spam)_\r\n\r\nNote: I currently connect to this server successfully with MailSystem.NET library. I'm trying to switch over.\r\n\r\nHow do I resolve this?",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/1099/comments",
+    "author": "rivdiv",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2020-11-13T20:44:03Z",
+        "body": "You are trying to use the ImapClient to connect to an SMTP port.\r\n\r\nEither use an SmtpClient or connect to an IMAP port (143 or 993)."
+      }
+    ]
+  },
+  {
+    "number": 1045,
+    "title": "Outlook: Unicode problems in header",
+    "created_at": "2020-07-08T15:49:28Z",
+    "closed_at": "2020-07-08T19:47:53Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/1045",
+    "body": "**Describe the bug**\r\nIf a message is sent with a UTF8 or unicode encoding in the subject or in the from/to, outlook will display it as garbage characters. I do use the Encoding.UTF8 as the first parameter of MailboxAddress. GMail also displays it correctly.\r\nIs this an outlook bug or is there something else I can do to ensure that they display it correctly?\r\n```cs\r\n                var msg = new MimeMessage();\r\n\r\n                msg.From.Add(new MailboxAddress(Encoding.UTF8, sender.Name, sender.MailAddress));\r\n                msg.To.Add(new MailboxAddress(Encoding.UTF8, receiver.Name, receiver.MailAddress));\r\n                msg.Subject = subject;\r\n\r\n                var builder = new BodyBuilder() { TextBody = content };\r\n\r\n                if (attachments != null)\r\n                    foreach (var attachment in attachments)\r\n                        builder.Attachments.Add(attachment.Name, attachment.Data);\r\n\r\n                msg.Body = builder.ToMessageBody();\r\n\r\n                var options = FormatOptions.Default.Clone();\r\n\r\n                options.International = true;\r\n                options.AllowMixedHeaderCharsets = true;\r\n\r\n                client.Send(options, msg);\r\n```\r\n\r\n**Platform (please complete the following information):**\r\n - OS: Windows 10 1909 18363.900 and Outlook on Android 10 (possibly elsewhere)\r\n - .NET Runtime: No clue.\r\n - .NET Framework: .NET Core 3.1\r\n - MailKit Version: 2.7.0\r\n\r\n**To Reproduce**\r\nSend mail with the example above where the name is unicode and open Outlook.\r\n\r\n**Expected behavior**\r\nOutlook should display it the same as GMail (which does work on both firefox and GMail app).\r\n\r\n**Screenshots**\r\nN.A. Just the general character mess you get if unicode isn't read properly.\r\n\r\n**Additional context**\r\n-\r\n",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/1045/comments",
+    "author": "Nielsbishere",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2020-07-08T19:47:12Z",
+        "body": "Don't use the following code snippet:\r\n\r\n```csharp\r\noptions.International = true;\r\noptions.AllowMixedHeaderCharsets = true;\r\n```\r\n\r\noptions.International tells MimeKit/MailKit not to encode the headers (i.e. it sends raw UTF-8 which probably breaks Outlook) and options.AllowMixedHeaderCharsets tells MimeKit/MailKit to mix-and-match UTF-8, US-ASCII and ISO-8859-1 in the same header. In other words, if the Subject (for example) is really long and needs to be broken up into multiple encoded-word tokens, this option allows MimeKit/MailKit to choose US-ASCII and/or ISO-8859-1 for each individual encoded-word even if you've specified UTF-8, thereby making it *possible* that you end up with a Subject like this:\r\n\r\n```\r\nSubject: =?us-ascii?q?This_is_ascii_?= =?iso-8859-1?q?and_this_is_fran=CAes?= =?utf-8?b?<base64>?=\r\n```\r\n\r\nSome clients do not deal well with this scenario even though the specification requires support for that."
+      }
+    ]
+  },
+  {
+    "number": 987,
+    "title": "Unable to parse status code returned by the server",
+    "created_at": "2020-02-22T08:32:41Z",
+    "closed_at": "2020-02-22T14:58:05Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/987",
+    "body": "MailKit.Net.Smtp.SmtpProtocolException: 'Unable to parse status code returned by the server.'\r\n\r\nlog:\r\n\r\nConnected to smtp://xx.xx.com:1800/?starttls=when-available\r\nS: +OK Welcome to MailEnable POP3 Server\r\n\r\nstack:\r\n\r\n   at MailKit.Net.Smtp.SmtpStream.<ReadResponseAsync>d__46.MoveNext()\r\n   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()\r\n   at MailKit.Net.Smtp.SmtpStream.ReadResponse(CancellationToken cancellationToken)\r\n   at MailKit.Net.Smtp.SmtpClient.<ConnectAsync>d__74.MoveNext()\r\n   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n   at MailKit.Net.Smtp.SmtpClient.Connect(String host, Int32 port, SecureSocketOptions options, CancellationToken cancellationToken)\r\n   at xx.SendEmailAsync(String email, String subject, String message) in xx\\EmailSender.cs:line 34",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/987/comments",
+    "author": "carlhoogstoel",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2020-02-22T14:58:05Z",
+        "body": "That's because you are trying to connect to a POP3 server using the SmtpClient.\r\n\r\nYou need to use the Pop3Client to connect to a POP3 server."
+      }
+    ]
+  },
+  {
+    "number": 643,
+    "title": "Not possible to load NuGet package MailKit",
+    "created_at": "2018-02-05T13:55:16Z",
+    "closed_at": "2018-02-05T16:10:29Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/643",
+    "body": "Hello,\r\n\r\nI tried to load the NuGet package MailKit Version 2.0.1 and I get the following error:\r\n\r\nThe \"MailKit 2.0.1\" package could not be installed. You are trying to install this package into a project that refers to \". NETPortable, Version=v4.5, Profile=Profile259\", but the package does not contain assembly references or content files that are compatible with this framework. For more information, please contact the package manufacturer.\r\n\r\nEs wird versucht, Abh\u00e4ngigkeitsinformationen f\u00fcr das Paket \"MailKit.2.0.1\" bez\u00fcglich des Projekts \"SePem300TestApp.Android\" mit dem Ziel \"MonoAndroid,Version=v7.0\" zu erfassen.\r\nDas Erfassen von Abh\u00e4ngigkeitsinformationen hat 5,7 sec gedauert.\r\nEs wird versucht, Abh\u00e4ngigkeiten f\u00fcr das Paket \"MailKit.2.0.1\" mit dem DependencyBehavior \"Lowest\" aufzul\u00f6sen.\r\nDas Aufl\u00f6sen von Abh\u00e4ngigkeitsinformationen hat 0 ms gedauert.\r\nAktionen zum Installieren des Pakets \"MailKit.2.0.1\" werden aufgel\u00f6st.\r\nAktionen zum Installieren des Pakets \"MailKit.2.0.1\" wurden aufgel\u00f6st.\r\nDas Paket \"MailKit 2.0.1\" wird aus \"nuget.org\" abgerufen.\r\nInstallationsfehler. Ein Rollback wird ausgef\u00fchrt...\r\nDas Paket \"MailKit.2.0.1\" ist im Projekt \"SePem300TestApp\" nicht vorhanden.\r\nDas Paket \"MailKit.2.0.1\" ist im Ordner \"D:\\Entwicklung\\TestApp\\packages\" nicht vorhanden.\r\nDas Ausf\u00fchren von NuGet-Aktionen hat 505,81 ms gedauert.\r\nDas Paket \"MailKit 2.0.1\" konnte nicht installiert werden. Sie versuchen, dieses Paket in ein Projekt zu installieren, das sich auf \".NETPortable,Version=v4.5,Profile=Profile259\" bezieht, das Paket enth\u00e4lt aber keine Assemblyverweise oder Inhaltsdateien, die mit diesem Framework kompatibel sind. Wenden Sie sich an den Paketersteller, um weitere Informationen zu erhalten.\r\nVerstrichene Zeit: 00:00:07.0376147\r\n========== Abgeschlossen ==========\r\n\r\n\r\nWhat can I do load it correctly?\r\n\r\n\r\nThank you very much,\r\n\r\nEmjay71",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/643/comments",
+    "author": "MartinJakober",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2018-02-05T16:10:29Z",
+        "body": "MailKit doesn't support PCL Profile 259.\r\n\r\nPortable Class Libraries have been deprecated in favor of NET Standard by Microsoft, so I would recommend making the switch away from PCL as you'll find more and more nugets dropping support for PCL as time goes on."
+      }
+    ]
+  },
+  {
+    "number": 624,
+    "title": "ASP.NET Core 2.0 Trying to send email with O365 account",
+    "created_at": "2018-01-06T16:51:18Z",
+    "closed_at": "2018-01-06T17:41:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/624",
+    "body": "Hi \r\nHope some one can point me to what i could be doing wrong. Trying to send email with MailKit using below sample code but seems to fail. I'm using an Office 365 account. \r\n\r\nI've tried different ports, 25, 587, 465, set useSSL to false, true, SecureSocketOptions.StartTls, SecureSocketOptions.StartTlsWhenAvailable. But zero success.\r\n\r\n`client.ServerCertificateValidationCallback = (s, c, h, e) => true;\r\n client.Connect(\"mydomain.mail.protection.outlook.com\", 25, true);\r\nclient.Authenticate(\"username\", \"password\");\r\nclient.Send(message);\r\nclient.Disconnect(true);`\r\n\r\nI've also tried using `client.AuthenticationMechanisms.Remove (\"XOAUTH2\"); ` in the code but make no difference. \r\n\r\nThe error i'm getting is mainly \"The SMTP server does not support authentication\", but sometime \"The handshake failed due to an unexpected packet format.\"\r\n\r\nI have an older web API project where i'm using the .net smtp to connect with above details with no issue. Is this an account setting thing or issue in my code???\r\n\r\nThanks in advance\r\n  ",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/624/comments",
+    "author": "Mike-tech",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2018-01-06T17:41:36Z",
+        "body": "You need to match the useSsl value with the port otherwise things are bound to fail.\r\n\r\nPort 465 is the *only* port you are *likely* to want to use `useSsl = true` with.\r\n\r\nThat explains the \"unexpected packet format\" error you got.\r\n\r\nThe \"server does not support authentication\" error means precisely that, the server does not support authentication. Which means don't call `client.Authenticate()` :)"
+      }
+    ]
+  },
+  {
+    "number": 525,
+    "title": "Unable to code Connect Method (Socket, String, Int32, SecureSocketOptions, CancellationToken)",
+    "created_at": "2017-06-15T20:01:52Z",
+    "closed_at": "2017-06-15T20:08:16Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/525",
+    "body": "Hello,\r\n\r\nIf I try to use this code to connect an Imap client:\r\n```csharp\r\nSocket tcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);\r\nclient.ServerCertificateValidationCallback = (s, c, h, e) => true;\r\nclient.Connect(tcpSocket, mailbox.Host, mailbox.ServerPortNumber, mailbox.UseSsl);\r\nclient.AuthenticationMechanisms.Remove(\"XOAUTH2\");\r\nclient.Authenticate(mailbox.User, mailbox.Password);\r\nvar inbox = client.Inbox;\r\ninbox.Open(FolderAccess.ReadOnly);\r\n```\r\n\r\n\r\nThe **tcpSocket** in the client.Connect statement, gives the error: **Argument 1: cannot convert from 'System.Net.Sockets.Socket' to 'string'**\r\n\r\nI think I am coding this in the correct way, but I am not sure of why the intellisense will not allow me to do that.\r\n\r\nI expected that it would be accepted since the first parameter of the Connect method is typed as a System.Net.Sockets.Socket.\r\n\r\nAny help that you can provide to resolve this issue would be gratefully appreciated.\r\n\r\nThanks,\r\nTony",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/525/comments",
+    "author": "Carneno",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2017-06-15T20:05:48Z",
+        "body": "Please provide the exact exception message and the StackTrace value. Thanks"
+      },
+      {
+        "user": "jstedfast",
+        "created_at": "2017-06-15T20:08:16Z",
+        "body": "Oh, I bet the problem is that you are using a `bool` value for `useSsl` and there is no `Connect` method that takes a `Socket` and a `bool` for `useSsl`. You need to replace your `mailbox.UseSsl` with a `SecureSocketOptions` value."
+      }
+    ]
+  },
+  {
+    "number": 518,
+    "title": "Imap client.connect not giving exception when using bad port number",
+    "created_at": "2017-06-07T14:23:27Z",
+    "closed_at": "2017-06-07T15:00:01Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/518",
+    "body": "\r\nHello,\r\n\r\nWhen I use this to connect to an IMAP server using SSL and port 993, it works fine.\r\n`try\r\n               {\r\n                    Mailbox mailbox = db.Mailboxes.Find(mbid);\r\n                    int mailboxcount = db.Mailboxes.Count();\r\n                    using (var client = new ImapClient())\r\n                    {\r\n                         client.ServerCertificateValidationCallback = (s, c, h, e) => true;\r\n                         client.Connect(mailbox.Host, mailbox.ServerPortNumber, mailbox.UseSsl);\r\n                         client.AuthenticationMechanisms.Remove(\"XOAUTH2\");\r\n                         client.Authenticate(mailbox.User, mailbox.Password);\r\n                         var inbox = client.Inbox;\r\n                         inbox.Open(FolderAccess.ReadOnly);\r\n`\r\n\r\nIf I change the port number to something like 994, it never gets to the **client.AuthenticationMechanisms.Remove(\"XOAUTH2\");** statement.  It does not execute any of the exception catches.  It just exits the method completely.\r\n\r\nI used the Visual Studio 2017 debugger and it makes it to the **client.Connect(mailbox.Host, mailbox.ServerPortNumber, mailbox.UseSsl);** line, but when I continue execution, it never gives any kind of error message.\r\n\r\nI tried it in IE 11 and Mozilla Firefox.\r\n\r\nIs there a way to catch an exception message for this error?\r\n\r\nThanks,\r\nTony",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/518/comments",
+    "author": "Carneno",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2017-06-07T15:00:01Z",
+        "body": "Why would you try to connect to port 994?\r\n\r\nAnd yes, it will eventually throw an exception. Same as Socket.Connect() will. It just takes several minutes because of the standard TCP timeout."
+      }
+    ]
+  },
+  {
+    "number": 488,
+    "title": "Invalid local-part at offset 0",
+    "created_at": "2017-04-10T15:38:03Z",
+    "closed_at": "2017-04-10T15:43:42Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/jstedfast/MailKit/issues/488",
+    "body": "I get a `Invalid local-part at offset 0 (MimeKit.ParseException)` exception at `new MailboxAddress`. Could a leading whitespace cause this exception?\r\n\r\nI have updated via NuGet to the latest version today. Surprisingly with the old version (1.10), the whitespace mail address worked.",
+    "comments_url": "https://api.github.com/repos/jstedfast/MailKit/issues/488/comments",
+    "author": "TJDev",
+    "comments": [
+      {
+        "user": "jstedfast",
+        "created_at": "2017-04-10T15:43:42Z",
+        "body": "The address string that you pass to `new MailboxAddress` should be in its canonical form.\r\n\r\nSo yes, leading spaces could cause this to fail.\r\n\r\nMimeKit got a bit stricter here because it now also adds support for IDN addresses which means it actually has to parse the strings in order to break the string into its component pieces."
+      }
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "https://github.com/microsoft/terminal/issues/898",
+    "source": {
+      "issue_number": 898
+    },
+    "initial_question": {
+      "title": "Documentation Issue - \"Build the Code\" section",
+      "body": "`/README.md` needs to be updated to show correct path of build tools in `Building the Code` section. Following the current version of instruction the user will get\r\n```\r\n'bcz' is not recognized as an internal or external command, operable program or batch file.\r\n```\r\n\r\nSide note: after using `bcz` command from within `tools` folder it looks it is being added to the path for the current session.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Documentation clearly specifies the correct command shell environment",
+      "Documentation addresses path-related requirements",
+      "Shell-specific limitations or requirements are explicitly documented"
+    ],
+    "created_at": "2019-05-19T14:10:32Z"
+  }
+]

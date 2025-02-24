@@ -1,0 +1,46 @@
+[
+  {
+    "id": "https://github.com/obot-platform/obot/issues/1691",
+    "source": {
+      "issue_number": 1691
+    },
+    "initial_question": {
+      "title": "[question] how to add new auth provider?",
+      "body": "i understand that i will need to fork the tools repo and add one there.\n\nhowever, i'm not sure what other step do i need in order for it to show up in auth provider web admin.\n\nany pointers are much appreciated"
+    },
+    "satisfaction_conditions": [
+      "Auth provider is properly registered in configuration",
+      "Provider reference points to valid implementation location"
+    ],
+    "created_at": "2025-02-10T07:06:59Z"
+  },
+  {
+    "id": "https://github.com/obot-platform/obot/issues/642",
+    "source": {
+      "issue_number": 642
+    },
+    "initial_question": {
+      "title": "Knowledge - Restrict syncing files larger than certain size to prevent 100% cpu consumption on ingestion of these files.",
+      "body": "When trying to ingest knowledge files ( from onedrive location in my casew) which have audio and video files > 100 MB large, it results in 100% cpu consumption making the server unresponsive.\r\n\r\n**Expected Behavior:**\r\nWe should be able to restrict syncing files larger than certain size to prevent 100% cpu consumption on ingestion of these files."
+    },
+    "satisfaction_conditions": [
+      "System prevents synchronization of files above a defined size threshold",
+      "Smaller files continue to sync normally"
+    ],
+    "created_at": "2024-11-20T18:05:23Z"
+  },
+  {
+    "id": "https://github.com/obot-platform/obot/issues/311",
+    "source": {
+      "issue_number": 311
+    },
+    "initial_question": {
+      "title": "Knowledge - `[SHOULD NOT HAPPEN] failed to update managedFields  error=` seen in logs when deleting agent when ingestion of files is still in progress.",
+      "body": "**Steps to reproduce the problem**\r\n1. Create an agent with few local knowledge files.\r\n2. When ingestion is still in progress, delete the agent.\r\n\r\nFollowing errors are seen in logs:\r\n\r\n```\r\nERRO[3460] [SHOULD NOT HAPPEN] failed to update managedFields  error=\"failed to convert new object (default/wksp1vw2g9; otto.gptscript.ai/v1, Kind=Workspace) to smd typed: .status.currentIngestionRunName: field not declared in schema\" name=wksp1vw2g9 namespace=default versionKind=\"{\\\"Group\\\":\\\"otto.gptscript.ai\\\",\\\"Version\\\":\\\"v1\\\",\\\"Kind\\\":\\\"Workspace\\\"}\"\r\nINFO[3460] Handling request: method POST, path /workspaces/create  id=27674f36-5175-4683-93b6-f60004474e31\r\nINFO[3460] Handled request: method POST, path /workspaces/create  id=27674f36-5175-4683-93b6-f60004474e31\r\nwarning: expected name after CMapName in cmap\r\nINFO[3471] Deleting default/ks175vfn due to missing a1j5m99  logger=/pkg/controller/handlers/cleanup\r\nINFO[3471] Deleting default/wksp1fvqxb due to missing a1j5m99  logger=/pkg/controller/handlers/cleanup\r\nINFO[3471] Handling request: method POST, path /workspaces/delete  id=0e236b62-21ed-4f24-8b36-3aafb19deee3\r\nINFO[3471] Handled request: method POST, path /workspaces/delete  id=0e236b62-21ed-4f24-8b36-3aafb19deee3\r\nINFO[3475] Handled request: method POST, path /run       id=dbc748a3-4860-4e91-8f29-82da6f717fed\r\nERRO[3475] error syncing '_t default/wksp1vw2g9': handler otto-controller otto.gptscript.ai/v1, Kind=Workspace: [routes.go:91] KnowledgeSet.otto.gptscript.ai \"ks175vfn\" not found, requeuing \r\nINFO[3475] Deleting default/wksp1vw2g9 due to missing a1j5m99  logger=/pkg/controller/handlers/cleanup\r\nERRO[3475] error syncing 'default/wksp1vw2g9': handler otto-controller otto.gptscript.ai/v1, Kind=Workspace: [routes.go:91] KnowledgeSet.otto.gptscript.ai \"ks175vfn\" not found, requeuing \r\nINFO[3475] Handling request: method POST, path /workspaces/delete  id=93c5503d-772a-4351-9fc0-f27c8823fbcc\r\nINFO[3475] Handled request: method POST, path /workspaces/delete  id=93c5503d-772a-4351-9fc0-f27c8823fbcc\r\nERRO[3475] [SHOULD NOT HAPPEN] failed to update managedFields  error=\"failed to convert new object (default/wksp1vw2g9; otto.gptscript.ai/v1, Kind=Workspace) to smd typed: .status.currentIngestionRunName: field not declared in schema\" name=wksp1vw2g9 namespace=default versionKind=\"{\\\"Group\\\":\\\"otto.gptscript.ai\\\",\\\"Version\\\":\\\"v1\\\",\\\"Kind\\\":\\\"Workspace\\\"}\"\r\n```\r\n\r\nNote - I dont seen any other issue with ingestions relating to other agents. \r\n"
+    },
+    "satisfaction_conditions": [
+      "Generated code must be in sync with type definitions"
+    ],
+    "created_at": "2024-10-24T22:26:52Z"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "number": 52,
+    "title": "chat commands not working",
+    "created_at": "2025-01-26T23:31:33Z",
+    "closed_at": "2025-01-27T00:42:27Z",
+    "labels": [],
+    "url": "https://github.com/DrMeepso/WebFishingCove/issues/52",
+    "body": "Have an issue where none of the built in commands like spawn, kick, ban, users work at all. it only says the command isnt found even though the command file has them in it. any fix?",
+    "comments_url": "https://api.github.com/repos/DrMeepso/WebFishingCove/issues/52/comments",
+    "author": "JBork1",
+    "comments": [
+      {
+        "user": "Ech0klang",
+        "created_at": "2025-01-26T23:32:00Z",
+        "body": "Enable plugins in the server config"
+      }
+    ]
+  }
+]

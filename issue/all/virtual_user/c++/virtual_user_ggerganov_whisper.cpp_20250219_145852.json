@@ -1,0 +1,66 @@
+[
+  {
+    "id": "https://github.com/ggerganov/whisper.cpp/issues/1919",
+    "source": {
+      "issue_number": 1919
+    },
+    "initial_question": {
+      "title": "Add time frames",
+      "body": "Tell me, in the example it is indicated\r\n./main -m models/ggml-large-v1.bin -l ru --no-timestamps -f ~/output.wav -of output -otxt\r\nThis is to remove the time frames, but how can we make sure they still exist? If I delete --no-timestamps, then they are still not there? How can I make them exist?"
+    },
+    "satisfaction_conditions": [
+      "Special tokens are included in text file output",
+      "Command line options correctly control timestamp visibility"
+    ],
+    "created_at": "2024-03-04T13:30:38Z"
+  },
+  {
+    "id": "https://github.com/ggerganov/whisper.cpp/issues/1531",
+    "source": {
+      "issue_number": 1531
+    },
+    "initial_question": {
+      "title": "Why does whisper.cpp not support Chinese recognition",
+      "body": "Whisper supports Chinese recognition. Whisper is an advanced speech recognition system developed by OpenAI, capable of recognizing and transcribing multiple languages, including Chinese. This means Whisper can recognize Chinese speech and convert it into Chinese text. Thanks to its advanced deep learning model, Whisper excels in handling a variety of languages and dialects. Why does whisper.cpp not support Chinese recognition?"
+    },
+    "satisfaction_conditions": [
+      "Chinese language recognition is properly enabled",
+      "Appropriate model configuration is used",
+      "Proper language-specific prompting is implemented"
+    ],
+    "created_at": "2023-11-21T00:44:06Z"
+  },
+  {
+    "id": "https://github.com/ggerganov/whisper.cpp/issues/1465",
+    "source": {
+      "issue_number": 1465
+    },
+    "initial_question": {
+      "title": "talk-llama: say command not found",
+      "body": "Thanks for this work, highly appreciated. I'm getting quite good results on an orangepi5, using wizardLM-7B.ggmlv3.q4_0.bin that I've converted to gguf.\r\n\r\nWhen I test talk-llama, I get this in the exchanges:\r\n```\r\nGeorgi:./examples/talk-llama/speak: line 13: say: command not found\r\nmain: failed to speak\r\n```\r\nThis isn't a big deal, but a little annoying."
+    },
+    "satisfaction_conditions": [
+      "The 'command not found' error for 'say' must be resolved or prevented",
+      "The text-to-speech functionality must either work or be properly disabled",
+      "The modification must preserve the script's ability to run on the specified hardware (orangepi5)"
+    ],
+    "created_at": "2023-11-09T11:21:18Z"
+  },
+  {
+    "id": "https://github.com/ggerganov/whisper.cpp/issues/578",
+    "source": {
+      "issue_number": 578
+    },
+    "initial_question": {
+      "title": "What is the audio length in the stream?",
+      "body": "```\r\n./stream -m ./models/ggml-base.en.bin -t 8 --step 500 --length 5000\r\n```\r\nin the --help it says\r\n>            --length N      [10000  ] audio length in milliseconds\r\n\r\nI thought is the max length of a segment?  but it is not that\r\nthe length to run the stream? (I know it isn't that)\r\nis it the time allowed to process it?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Clarifies the meaning of the --length parameter in relation to audio processing",
+      "Explains the relationship between --length and segmentation",
+      "Specifies the time unit for the length parameter",
+      "Distinguishes segment length from other timing concepts"
+    ],
+    "created_at": "2023-03-07T00:34:03Z"
+  }
+]

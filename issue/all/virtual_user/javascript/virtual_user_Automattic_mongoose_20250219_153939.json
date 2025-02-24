@@ -1,0 +1,188 @@
+[
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/14627",
+    "source": {
+      "issue_number": 14627
+    },
+    "initial_question": {
+      "title": "Is there a way to preserve documents modifications when a doc is modified and then populated?",
+      "body": "### Prerequisites\n\n- [X] I have written a descriptive issue title\n\n### Mongoose version\n\n6.12.8, 7.6.12\n\n### Node.js version\n\n14.21.3, 16.20.2\n\n### MongoDB version\n\n5.0.26\n\n### Operating system\n\nNone\n\n### Operating system version (i.e. 20.04, 11.3, 10)\n\n_No response_\n\n### Issue\n\nHi all,\r\n\r\nWondering if there's a way to preserve changes when doing the following:\r\n\r\n```JS\r\nconst foo = await Foo.findById('someId').populate('bar')\r\n\r\nfoo.bar.name = 'hi there'\r\n\r\nawait foo.populate('bar')\r\n// At this point the foo.bar.name modification is wiped out, saving the document will result in no changes\r\n```\r\n\r\nI know that this looks like a contrived example and there should be no reason to do it. The problem I'm trying to solve is this:\r\nI have a function, `funky`, that will populate `bar`, it essentially just does `await foo.populate('bar')`, that multiple code paths go to and `funky` requires that all properties of `bar` be available. These code paths contain a mixture of:\r\n  - Instances of a populated `bar` where only certain paths have been selected, such as ` await Foo.findById('someId').populate({path: 'bar', select: 'name'})`\r\n  - Instances like the example above where `select` is not used and modifications to `bar` are made. This includes cases where modifications happen before and after the second `populate` is performed.\r\n\r\nI suppose the answer here is that I should audit all of these code paths and remove any `selects` that are happening, and then I shouldn't need the second populate. Just wanted to ask here if there's a way around this though before I spend the time, and potentially create new bugs. \r\n\r\nThanks for any advice.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Modified values in populated documents must be preserved when needed",
+      "All required properties of populated documents must remain accessible",
+      "Data consistency must be maintained across multiple populate operations"
+    ],
+    "created_at": "2024-05-31T15:11:05Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/13673",
+    "source": {
+      "issue_number": 13673
+    },
+    "initial_question": {
+      "title": "Typescript logic to avoid null as a result for model.findOne",
+      "body": "### Prerequisites\n\n- [X] I have written a descriptive issue title\n\n### Mongoose version\n\n7.4.1\n\n### Node.js version\n\n18.16.1\n\n### MongoDB version\n\nLatest\n\n### Operating system\n\nNone\n\n### Operating system version (i.e. 20.04, 11.3, 10)\n\n_No response_\n\n### Issue\n\nHi, I have been using Mongoose v5 for a long time and now I've started to migrate to Mongoose 7. I'm following the official guide which recommends to migrate to v6 first and then to 7, but I'm having some issues with Typescript that did not happen on v5.\r\n\r\nWhen I call `model.findOne()` now, it can return null, which makes sense, but this did not happen on Mongoose 5. This is fine for most cases when you are not sure if there'll be any document at all. However, it does not make sense if my program does different checks before calling the method (findOne) that Typescript says it can be null.\r\n\r\nFor instance, let's say I have two documents that are created at the same time but in different models with different schemas:\r\n```\r\n// Global\r\ninterface GlobalUser {\r\n\tid: string;\r\n\tname: string;\r\n\tavatar: string;\r\n}\r\n\r\nconst SchemaGlobalUser = new mongoose.Schema<GlobalUser>({\r\n\tid: String,\r\n\tname: String,\r\n\tavatar: String\r\n});\r\n\r\nconst ModelGlobalUser = mongoose.model<GlobalUser>('Global', SchemaGlobalUser);\r\n\r\n// Local (copying the interface and schema for a better explanation)\r\ninterface LocalUser {\r\n\tid: string;\r\n\tname: string;\r\n\tavatar: string;\r\n}\r\n\r\nconst SchemaLocalUser = new mongoose.Schema<LocalUser>({\r\n\tid: String,\r\n\tname: String,\r\n\tavatar: String\r\n});\r\n\r\nconst ModelLocalUser = mongoose.model<LocalUser>('Local', SchemaLocalUser);\r\n```\r\n\r\nAnd I create the documents at the same time (with different data):\r\n```\r\nconst newGlobalModel = new ModelGlobalUser({\r\n\tid: user.id,\r\n\tname: user.username,\r\n\tavatar: user.avatar\r\n});\r\n\r\nconst newLocalModel = new ModelLocalUser({\r\n\tid: user.id,\r\n\tname: user.localName,\r\n\tavatar: user.localAvatar\r\n});\r\n\r\nawait newGlobalModel.save();\r\nawait newLocalModel.save();\r\n```\r\n\r\nThen if I call `ModelGlobalUser.findOne({id: user.id})` and it exists, `ModelLocalUser.findOne({id: user.id})` cannot be null. Same thing should happen if I call them in different files or functions (for example, do something -> first findOne (global) -> call another function where the second findOne (local) is done). Nevertheless, Typescript always says it can be null.\r\n\r\nAs said previously, this did not happen on Mongoose 5, where Typescript never said it could be null. Is there any way to return to that old behaviour by setting an option when creating the model or something? I know it's pretty impossible for Typescript to recognise when it can or cannot be null, but maybe a way to tell Typescript that some models cannot return null documents could solve it (basically a way to ignore that findOne can return no documents). "
+    },
+    "satisfaction_conditions": [
+      "Works with Mongoose 7.x query operations",
+      "Preserves existing query functionality"
+    ],
+    "created_at": "2023-07-30T12:32:20Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/13590",
+    "source": {
+      "issue_number": 13590
+    },
+    "initial_question": {
+      "title": "500 Error when using populate method in mongoose",
+      "body": "### Prerequisites\r\n\r\n- [X] I have written a descriptive issue title\r\n\r\n### Mongoose version\r\n\r\n7.3.1\r\n\r\n### Node.js version\r\n\r\n18.14.2\r\n\r\n### MongoDB version\r\n\r\n6.06\r\n\r\n### Operating system\r\n\r\nWindows\r\n\r\n### Operating system version (i.e. 20.04, 11.3, 10)\r\n\r\n11\r\n\r\n### Issue\r\n\r\nI am trying to fetch data from MongoDB using mongoose and the populate method, but I get a 500 error. Here is the code that causes the error:\r\n```\r\nexport const productGetAllMiddleware = expressAsyncHandler(\r\n  async (req: Request, res: Response, next: NextFunction) => {\r\n    try {\r\n      req.query.page = req.query.page ? req.query.page : \"1\";\r\n      const products = await productModel\r\n        .find({})\r\n        .populate(\"inventory_id\")\r\n        .limit(10)\r\n        .skip(10 * (parseInt(req.query.page as string) - 1))\r\n        .exec();\r\n      res.status(200).json(products);\r\n    } catch (err) {\r\n      console.log(err);\r\n      return next(err);\r\n    }\r\n  }\r\n);\r\n```\r\nIf I remove the populate method, the code works fine. Here are the productModel and inventoryModel schemas that I am using:\r\n\r\n```\r\n// productModel\r\nimport mongoose, { InferSchemaType } from \"mongoose\";\r\nimport BaseSchema from \"./BaseSchema\";\r\n\r\nconst Schema = mongoose.Schema;\r\nconst Product = new Schema({\r\n  name: {\r\n    type: String,\r\n    required: [true, \"Name is required\"],\r\n    validate: {\r\n      validator: function (v: string) {\r\n        return v.trim().length > 0;\r\n      },\r\n      message: \"Name cannot be empty\",\r\n    },\r\n  },\r\n  desc: {\r\n    type: String,\r\n    required: [true, \"Description is required\"],\r\n    validate: {\r\n      validator: function (v: string) {\r\n        return v.trim().length > 10;\r\n      },\r\n      message: \"Description should be at least 10 characters long\",\r\n    },\r\n  },\r\n  SKU: {\r\n    type: String,\r\n    required: [true, \"SKU is required\"],\r\n    validate: {\r\n      validator: function (v: string) {\r\n        return /^[A-Z0-9]+$/.test(v);\r\n      },\r\n      message: \"SKU should only contain uppercase letters and numbers\",\r\n    },\r\n  },\r\n  price: {\r\n    type: Number,\r\n    required: [true, \"Price is required\"],\r\n    validate: {\r\n      validator: function (v: number) {\r\n        return v > 0;\r\n      },\r\n      message: \"Price should be a positive number\",\r\n    },\r\n  },\r\n  category_id: { type: Schema.Types.ObjectId, ref: \"ProductCategory\" },\r\n  discount_id: { type: Schema.Types.ObjectId, ref: \"ProductDiscount\" },\r\n  inventory_id: {\r\n    type: Schema.Types.ObjectId,\r\n    ref: \"ProductInventory\",\r\n    require: true,\r\n  },\r\n  image: [{ type: String, default: \"\" }],\r\n  amountPurchased: { type: Number, default: 0 },\r\n});\r\n\r\ntype ProductType = InferSchemaType<typeof Product>;\r\nProduct.add(BaseSchema);\r\nProduct.virtual(\"id\").get(function () {\r\n  return this._id.toHexString();\r\n});\r\n\r\nexport default mongoose.model<ProductType>(\"Product\", Product);\r\n\r\n// inventoryModel\r\nimport mongoose, { InferSchemaType } from \"mongoose\";\r\nimport BaseSchema from \"./BaseSchema\";\r\nconst Schema = mongoose.Schema;\r\nconst ProductInventory = new Schema({\r\n  quantity: {\r\n    type: Number,\r\n    required: [true, \"Quantity is required\"],\r\n    min: [0, \"Quantity cannot be negative\"],\r\n  },\r\n});\r\ntype ProductInventoryType = InferSchemaType<typeof ProductInventory>;\r\nProductInventory.add(BaseSchema);\r\nexport default mongoose.model<ProductInventoryType>(\r\n  \"ProductInventory\",\r\n  ProductInventory\r\n);\r\n\r\n// baseSchema\r\nimport mongoose from \"mongoose\";\r\nconst { Schema } = mongoose;\r\nconst BaseSchema = new Schema(\r\n  {\r\n    deleted_at: { type: Date, default: null },\r\n  },\r\n  {\r\n    timestamps: true,\r\n  }\r\n);\r\nexport default BaseSchema;\r\n```\r\nCan anyone help me figure out why the populate method is causing an error and how to fix it? Thanks in advance.\r\n"
+    },
+    "satisfaction_conditions": [
+      "The relationship between Product and ProductInventory models remains intact"
+    ],
+    "created_at": "2023-07-09T08:05:52Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/13511",
+    "source": {
+      "issue_number": 13511
+    },
+    "initial_question": {
+      "title": "`match`ing on current date in a virtual populate",
+      "body": "### Prerequisites\r\n\r\n- [X] I have written a descriptive issue title\r\n\r\n### Mongoose version\r\n\r\n6.7.4\r\n\r\n### Node.js version\r\n\r\n16.20\r\n\r\n### MongoDB version\r\n\r\n4.4\r\n\r\n### Operating system\r\n\r\nmacOS\r\n\r\n### Operating system version (i.e. 20.04, 11.3, 10)\r\n\r\n_No response_\r\n\r\n### Issue\r\n\r\nHello,\r\n\r\nI'm trying to use a populate virtual that `match`es on a Date field, filtering for documents which have a value that is in the past. My first instinct was to do something like this:\r\n\r\n```ts\r\n// MySchema: { _id }\r\n// OtherSchema: { _id, myRef, activeAt }\r\n\r\nMySchema.virtual(\"myVirtual\", {\r\n    ref: \"OtherSchema\",\r\n    localField: \"_id\",\r\n    foreignField: \"myRef\",\r\n    justOne: true,\r\n    match: {\r\n        activeAt: {\r\n            $lte: new Date()\r\n        }\r\n    },\r\n    options: {\r\n        sort: { activeAt: -1 }\r\n    }\r\n});\r\n```\r\n\r\nBut `new Date()` just evaluates when the app first starts up, and so the match query is always just for the same date.\r\n\r\nIs there some way to query for the current timestamp when the populate runs?"
+    },
+    "satisfaction_conditions": [
+      "The virtual populate query must evaluate the date comparison at execution time, not schema definition time",
+      "The populate operation must correctly filter documents based on the activeAt field being less than or equal to the current time",
+      "The virtual populate configuration must maintain proper reference relationships between the schemas",
+      "The sorting functionality (by activeAt in descending order) must be preserved"
+    ],
+    "created_at": "2023-06-15T03:51:13Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/13205",
+    "source": {
+      "issue_number": 13205
+    },
+    "initial_question": {
+      "title": "i cant save data from checkbox using js and mongoose",
+      "body": "### Prerequisites\n\n- [X] I have written a descriptive issue title\n\n### Mongoose version\n\n7.0.0\n\n### Node.js version\n\n18.15.0 \n\n### MongoDB version\n\n6.0\n\n### Operating system\n\nWindows\n\n### Operating system version (i.e. 20.04, 11.3, 10)\n\n10\n\n### Issue\n\ni have form for new product and using checkbox for chose many size \r\nwhen i choose more than 1 size this error happen\r\n\r\n this.$__.validationError = new ValidationError(this);\r\n                               ^\r\n\r\nValidationError: Product validation failed: size: Cast to string failed for value \"[ 'S', 'M', 'L' ]\" (type Array) at path \"size\"\r\n\r\n\r\n\r\nand this is the schema \r\n\r\nconst mongoose = require('mongoose');\r\nconst Schema = mongoose.Schema;\r\n\r\nconst ProductSchema = new Schema({\r\n    title: String,\r\n    image: String,\r\n    price: Number,\r\n    size: {\r\n        type: String,\r\n        enum: ['S', 'M', 'L', 'xL', '2xL']\r\n    }\r\n});\r\n\r\nand this is example of the checkbox\r\n\r\n <div class=\"form-check form-check-inline\">\r\n                <input class=\"form-check-input\" type=\"checkbox\" name=\"products[size]\" id=\"M\" value=\"M\">\r\n                <label class=\"form-check-label\" for=\"M\">\r\n                    Medium\r\n                </label>\r\n              </div> \r\n\r\n\r\nmodule.exports = mongoose.model('Product', ProductSchema);"
+    },
+    "satisfaction_conditions": [
+      "Size values must be restricted to predefined options"
+    ],
+    "created_at": "2023-03-23T15:12:51Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/13048",
+    "source": {
+      "issue_number": 13048
+    },
+    "initial_question": {
+      "title": "Connecting to local MongoDb from a Docker container fails in any 6.x.x versions",
+      "body": "### Prerequisites\n\n- [X] I have written a descriptive issue title\n\n### Mongoose version\n\n6.9.1\n\n### Node.js version\n\n16.13.2\n\n### MongoDB version\n\n4.0.5\n\n### Operating system\n\nWindows\n\n### Operating system version (i.e. 20.04, 11.3, 10)\n\nWindows 10 Pro (OS Build: 19044.1645)\n\n### Issue\n\nTeam,\r\n\r\nBy using `host.docker.internal` as the `host` value within a Docker Container; up to version **5.12.7** it works beautifully to connect to my local MongoDb (outside of Container), however, it fails to connect at any versions above that, including 6.x.x.   \r\n\r\nHere is sample code snippet:\r\n\r\n    open(mongoose, callback) {        \r\n        const options = {\r\n            // useMongoClient: true,      // <-- no longer necessary\r\n            // useNewUrlParser: true,     // <-- no longer necessary\r\n            // useUnifiedTopology: true,  // <-- no longer necessary\r\n            promiseLibrary: global.Promise  // <-- not sure if its needed in 6.x.x; works fine in 5.12.7\r\n        };\r\n\r\n        const env = process.env.MICRO_SVC_ENV,\r\n              dockerLocalHost = 'host.docker.internal',\r\n              connStr = `mongodb://${dockerLocalHost}:27017/someDb`;\r\n\r\n        mongoose.connect(connStr, options, (err) => {\r\n            if (err) {\r\n                console.error(`${logPrefix} Open(${env}). Mongoose.Connect() failed:`, err);\r\n                return;\r\n            }\r\n\r\n            console.log(`${logPrefix} Open(${env}). CONNECTED to MongoDB.`);\r\n        });\r\n        /// rest of code....\r\n\r\nDoes anyone know if the new versions of mongoose has disabled this feature, or may be I am missing an extra options setting when connecting?        "
+    },
+    "satisfaction_conditions": [
+      "Docker container must be able to resolve the host machine's MongoDB address",
+      "Connection configuration must account for Docker networking specifics"
+    ],
+    "created_at": "2023-02-17T22:47:03Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/13014",
+    "source": {
+      "issue_number": 13014
+    },
+    "initial_question": {
+      "title": "Filter in pre (find) hook Mongoose",
+      "body": "### Prerequisites\n\n- [X] I have written a descriptive issue title\n\n### Mongoose version\n\n6.3.3\n\n### Node.js version\n\n19.5\n\n### MongoDB version\n\n4.4.18 Community\n\n### Operating system\n\nLinux\n\n### Operating system version (i.e. 20.04, 11.3, 10)\n\nManjaro Linux 5.15.91-1\n\n### Issue\n\nI'm trying to perform a query that filters an array from another document, to mention something about the structure, I try to populate the document based on the specified product and store id, so that it doesn't bring the other data from the array but in this case I understand that I can't access the document fields while in the middleware, I'm reading the documentation but I still learning concepts\r\n```\r\n\r\nbUnitSchema.pre(/^find/, function (next) {\r\n  this.populate({\r\n    path: \"menuItem.product\",\r\n\r\n    select: {\r\n      \"storeId.$\": 1,\r\n    },\r\n    match: {\r\n      \"storeId.store\": \"62a811d1af67f5415770f297\",\r\n      \r\n    }\r\n  });\r\n  next();\r\n});\r\n\r\n```\r\n\r\nany guide would be of excellent help\r\n\r\nI try something like this\r\n```\r\n\r\nbUnitSchema.pre(/^find/, function (next) {\r\n  \r\n  this.populate({\r\n    path: \"menuItem.product\",\r\n\r\n    select: {\r\n      \"storeId.$\": 1,\r\n    },\r\n    match: {\r\n      \r\n       *//here im trying to do something like this*\r\n      *\"storeid.store\": bUnitSchema.menuItem.store*\r\n    },\r\n  });\r\n\r\n  next();\r\n});\r\n```\r\n\r\nbut give me\r\n`\r\nstore not defined`"
+    },
+    "satisfaction_conditions": [
+      "Query results must be available before filtering array data",
+      "Population of related documents must filter based on matching store IDs",
+      "Middleware must execute at the correct point in the document lifecycle",
+      "Array filtering must preserve document structure while removing non-matching elements"
+    ],
+    "created_at": "2023-02-09T18:52:05Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/12998",
+    "source": {
+      "issue_number": 12998
+    },
+    "initial_question": {
+      "title": " \"Schema hasn't been registered for model \"[object Object]\" error in two way referential relationship in mongo ig because of 'populate' function.",
+      "body": "### Prerequisites\n\n- [X] I have written a descriptive issue title\n\n### Mongoose version\n\n6.8.1\n\n### Node.js version\n\n16.13.2\n\n### MongoDB version\n\n6.0.3\n\n### Operating system\n\nWindows\n\n### Operating system version (i.e. 20.04, 11.3, 10)\n\n_No response_\n\n### Issue\n\nHere I have declared a two way referential relationship, If I import 'farm' module before 'products' module I am having access to all farms but linked linked products are throwing \"Schema hasn't been registered for model \"[object Object]\" error. If I import 'products' first I cannot access 'farms' collections.\r\n**farm.js**\r\n```\r\nconst mongoose=require('mongoose');\r\nconst product = require('./products');\r\nconst {Schema}=mongoose;\r\n\r\nconst farmSchema=new Schema({\r\n    name:{\r\n        type:String,\r\n        required:[true,'Farm must have an name!']\r\n    },\r\n    city:{\r\n        type:String\r\n    },\r\n    email:{\r\n        type:String,\r\n        required:true\r\n    },\r\n    products:[\r\n        {\r\n            type:Schema.Types.ObjectId,\r\n            ref:product//ref refers to model \r\n        }\r\n    ]\r\n})\r\n\r\nconst farm=mongoose.model('Farm',farmSchema)\r\n\r\nmodule.exports=farm\r\n```\r\n**product.js**\r\n```\r\nconst mongoose=require('mongoose')\r\nconst farm = require('./farm')\r\n\r\nconst productSchema=new mongoose.Schema({\r\n    Pname:{\r\n        type:String,\r\n        required:true\r\n    },\r\n    Price:{\r\n        type:Number,\r\n        required:true,\r\n        min:0\r\n        \r\n    },\r\n    category:{\r\n        type:String,\r\n        lowercase:true,//item will always be lowercase\r\n        enum:['fruit','vegetable','dairy','drinks','nota']\r\n\r\n    },\r\n    farms:[\r\n       {\r\n        type:mongoose.Schema.Types.ObjectId,\r\n        ref:farm\r\n       }\r\n    ]\r\n})\r\n\r\nconst product=mongoose.model('Product',productSchema)\r\n\r\nmodule.exports=product  \r\n```\r\n**index.js**\r\n### This code renders a new page and set up relationship between them.\r\n```app.get('/farm/:id/product/new',async(req,res)=>{//this is the new route for product in a farm, no need to create product individually.(this is correct becouse why anyone will write a subcomment if there is no comment.)\r\n    const {id}=req.params;\r\n    const f=await farm.findById(id)\r\n    res.render('views/products/new',{categories,f})\r\n})\r\n\r\n//setting relationship between two collections\r\napp.post('/farm/:id/product',async(req,res)=>{\r\n    const {id}=req.params\r\n    const Cfarm=await farm.findById(id)\r\n    const {Pname,Price,category}=req.body;\r\n    const p=new product({Pname,Price,category})\r\n    Cfarm.products.push(p)\r\n    p.farms=Cfarm //not pushing bcz many to one relationship\r\n    await Cfarm.save()\r\n    await p.save()\r\n    res.redirect(`/farm/${id}`)\r\n\r\n})\r\n```\r\n### This is a product route which renders the specific page for the product. Having issue populating in this one.\r\n```app.get('/product/:id',async (req,res)=>{\r\n    const {id}=req.params;\r\n    const p=await product.findById(id).populate('farm','name')\r\n    console.log(p)\r\n    res.render('views/products/detail',{p})\r\n})\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Two-way referential relationship must be maintained"
+    ],
+    "created_at": "2023-02-04T06:33:19Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/12238",
+    "source": {
+      "issue_number": 12238
+    },
+    "initial_question": {
+      "title": "Chaining a Mongoose Query returned by an async function",
+      "body": "### Prerequisites\r\n\r\n- [X] I have written a descriptive issue title\r\n\r\n### Mongoose version\r\n\r\n6.3.3\r\n\r\n### Node.js version\r\n\r\n18.6.0\r\n\r\n### MongoDB version\r\n\r\n5.0.10\r\n\r\n### Operating system\r\n\r\nWindows\r\n\r\n### Operating system version (i.e. 20.04, 11.3, 10)\r\n\r\n_No response_\r\n\r\n### Issue\r\n\r\nLet's say we have the following method defined on a Schema:\r\n```js\r\nasync method() {\r\n  // do async stuff first, then\r\n  return this.constructor.find();\r\n}\r\n```\r\n\r\nChaining on an async method will return an error:\r\n```js\r\nconst model = new Model();\r\nawait model.method().populate('field').exec();\r\n// throws .populate is not a function\r\nawait (await model.method()).populate('field').exec();\r\n// same\r\n```\r\n\r\nI understand that the error is thrown because `model.method()` won't return a Mongoose Query, but instantiated documents.\r\n\r\nI'm not sure why the query has been executed, but I guess it has to do with Mongoose internally calling exec for pending queries when there is a change in the event loop or something like that.\r\n\r\nHow can I properly chain the `populate` call here? Is there an option to delay the execution?\r\n\r\n`method` needs to be async because async stuff actually happens inside, besides the `find` call.\r\n\r\nThanks!\r\n"
+    },
+    "satisfaction_conditions": [
+      "The method must remain asynchronous",
+      "Mongoose query methods (like populate) must be chainable on the result",
+      "The query execution must be properly deferred until explicitly requested",
+      "The final executed query must include both the find operation and any chained operations"
+    ],
+    "created_at": "2022-08-08T16:31:03Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/11938",
+    "source": {
+      "issue_number": 11938
+    },
+    "initial_question": {
+      "title": "Set model for many schemas in the same file",
+      "body": "### Prerequisites\r\n\r\n- [X] I have written a descriptive issue title\r\n\r\n### Mongoose version\r\n\r\n6.3.8\r\n\r\n### Node.js version\r\n\r\n16.13.2\r\n\r\n### MongoDB version\r\n\r\n5.0.6\r\n\r\n### Operating system\r\n\r\n_No response_\r\n\r\n### Operating system version (i.e. 20.04, 11.3, 10)\r\n\r\n_No response_\r\n\r\n### Issue\r\n\r\nWhen I created two different schemas related to the model (via optional param in schema object), I accepted an error that shows a Mongoose did override the name of each model, despite these being two separate collections with unique names. \r\nThe following code is related to the scenario: \r\n```\r\nconst mongoose = require('mongoose');\r\nconst st_schema = new mongoose.Schema({\r\n    name: String,\r\n    degree: String\r\n}, {collection: 'students'});\r\nconst st_model = mongoose.model('',st_schema);\r\nconst dpt_schema = new mongoose.Schema({\r\n    name: String,\r\n    num_students: Number\r\n}, {collection: 'departments'});\r\nconst dpt_model = mongoose.model('',dpt_schema);\r\n```\r\n**The error: OverwriteModelError: Cannot overwrite \"\" model once compiled.**\r\nI assumed that cause uses the same variable (const mongoose.). \r\nWe have other roads to define the model, but I would like to learn more details about a specific scenario. \r\nPay attention to the collection of defined \"Inline\" schema variables and the same file."
+    },
+    "satisfaction_conditions": [
+      "Each model must have a unique identifier in the first argument of mongoose.model()",
+      "Models must correctly map to their intended MongoDB collections",
+      "Multiple schemas and models must be able to coexist in the same file",
+      "Model compilation must succeed without overwrite errors"
+    ],
+    "created_at": "2022-06-15T09:00:44Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/5138",
+    "source": {
+      "issue_number": 5138
+    },
+    "initial_question": {
+      "title": "Mongoose authentication fail when trying to connect to MongoDB Atlas",
+      "body": "#4818 Referencing this issue: it's closed but I am still reproducing the same problem.\r\n\r\nMongoose version: `4.9.2`\r\nNode.js version: `7.7.4`\r\nMongoDB Atlas version: `3.2`\r\n\r\nWhen trying to connect via mongo shell, everything works fine.\r\n\r\n```\r\nmongo 'mongodb://someUser:somePassword@someShard-shard-00-00-fjfvq.mongodb.net:27017,someShard-shard-00-01-fjfvq.mongodb.net:27017,someShard-shard-00-02-fjfvq.mongodb.net:27017/someDb?replicaSet=someShard-shard-0&ssl=true&authSource=admin'\r\n```\r\n\r\nHere, I'm connecting to `someDb`, but I'm authenticating the user against the `admin` database.\r\n\r\nWhen trying to connect with Mongoose I get the following error:\r\n\r\n```\r\n { MongoError: authentication fail\r\nat Function.MongoError.create ...\r\n```\r\n\r\nI'm thinking it's an error with it not handling the `authSource` properly. Mongoose successfully connects if I make `admin` the database I'm trying to connect to, but doesn't connect if I make `admin` the `authSource` I'm trying to authenticate against.\r\n\r\nAny ideas?"
+    },
+    "satisfaction_conditions": [
+      "Mongoose successfully establishes connection to MongoDB Atlas cluster",
+      "Compatible versions of dependencies are used"
+    ],
+    "created_at": "2017-03-31T17:05:48Z"
+  },
+  {
+    "id": "https://github.com/Automattic/mongoose/issues/5100",
+    "source": {
+      "issue_number": 5100
+    },
+    "initial_question": {
+      "title": "Mongoose select,populate and save behaving differently on Mac and Windows",
+      "body": "I have a funciton in which i am selecting only 3 fields to go ahead with i.e billing,current_referral_program and referral. And populating user using the reference stored in billing.user\r\n\r\n`static populateReferralLinks(){\r\n\r\n    return Promise.coroutine(function*(){\r\n        let companies = yield Company.find({},'billing referral current_referral_program')\r\n        .populate('billing.user','emails name');\r\n        for(let i = 0 ; i < length ; i++){  \r\n            companies[i].referral.is_created = true;\r\n            companies[i].referral.referral_email = companies[i].billing.user.emails[0].email;\r\n            companies[i] = yield companies[i].save();\r\n       }\r\n       return companies;\r\n    })\r\n    .apply(this)\r\n    .catch((err) => {\r\n            throw err;\r\n    });\r\n} `\r\n\r\nNow when i call this function then on line\r\n\r\n`companies[i].save();`\r\n\r\nThe following command is shown in the terminal in windows\r\n\r\n`Mongoose: companies.update(\r\n{ _id: ObjectId(\"58d12e1a588a96311075c45c\") }, \r\n{ '$set': \r\n   { billing: \r\n      { configured: false, \r\n        user: ObjectId(\"58d12e16588a96311075c45a\") }, \r\n     referral: \r\n     { is_created: true,  \r\n       referral_email: 'jadon.devesh98@gmail.com', \r\n     }, \r\n     updatedAt: new Date(\"Wed, 22 Mar 2017 12:02:55 GMT\") \r\n   } \r\n}\r\n)`\r\n\r\nBut in Mac's terminal it shows this command\r\n\r\n`Mongoose: companies.update({ _id: ObjectId(\"58d12e1a588a96311075c45c\") }) { '$set': { billing: { configured: false, user: ObjectId(\"58d12e16588a96311075c45a\") }, current_limit: {}, current_usage: {},referral: { is_created: true, referral_email: 'jadon.devesh98@gmail.com'}}, '$unset': { updatedAt: 1 } }`\r\n\r\nNow, I haven't mentioned **current_limit** and **current_usage** to be empty. it's executing fine on windows but on Mac it's setting **current_limit** and **current_usage** empty thus updating my document with empty objects on Mac but not on windows.\r\n\r\nIt should behave same way on both OS but it is not.\r\n\r\nMy Company Schema is like this\r\n\r\n`const companySchema = new mongoose.Schema(\r\n    {\r\n       name: {\r\n            type: String,\r\n            trim: true,\r\n            required: true,\r\n            minlength: 3,\r\n            lowercase: true,\r\n        },\r\n        current_limit: {\r\n            leads: {\r\n                type: Number,\r\n                default: null\r\n            },\r\n            traffic: {\r\n                type: Number,\r\n                default: null\r\n            }\r\n        },\r\n        current_usage: {\r\n            leads: {\r\n                type: Number,\r\n                default: 0\r\n            },\r\n            traffic: {\r\n                type: Number,\r\n                default: 0\r\n            }\r\n        }\r\n        billing: {\r\n            user: {\r\n                type: mongoose.Schema.ObjectId,\r\n                ref: 'User'\r\n            },\r\n            configured: {\r\n                type: Boolean,\r\n                default: false\r\n            },\r\n        },\r\n        current_referral_program: {\r\n            type: String,\r\n            uppercase: true,\r\n            enum: ['FIRST', 'SECOND'],\r\n            default: 'FIRST'\r\n        },\r\n        referral: {\r\n            is_created:{\r\n                type: Boolean,\r\n                default: false\r\n            }\r\n            referral_email:{\r\n                type: String,\r\n                default:null\r\n            }\r\n        }\r\n    },\r\n    {\r\n        timestamps: true,\r\n        autoIndex: true\r\n    }\r\n);`\r\n\r\nand User Schema is like this\r\n\r\n`const userSchema = new mongoose.Schema(\r\n    {\r\n        name: {\r\n            type: String,\r\n            trim: true,\r\n            default: ''\r\n        },\r\n        username: {\r\n            type: String,\r\n            trim: true,\r\n            required: true,\r\n            minlength: 4,\r\n            lowercase: true,\r\n            unique: true\r\n        },\r\n        emails: [emailSchema],\r\n        password: {\r\n            type: String,\r\n            required: true,\r\n            minlength: 8\r\n        },\r\n    },\r\n    {\r\n        timestamps: true,\r\n        autoIndex: true\r\n    }\r\n);`\r\n\r\nNote : this happens only for fields like **current_limit** which store an object but not for fields like **name** which store single value but not whole object.\r\n\r\nMongoDb version is 3.4.0 on both systems\r\nMongoose version is 4.5.8"
+    },
+    "satisfaction_conditions": [
+      "Database update operations must be consistent across different operating systems",
+      "Database operations must produce identical queries regardless of the environment"
+    ],
+    "created_at": "2017-03-22T19:01:56Z"
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "id": "https://github.com/techblitzdev/TechBlitz/issues/425",
+    "source": {
+      "issue_number": 425
+    },
+    "initial_question": {
+      "title": "env variable missing",
+      "body": "when  try to run it there is like a variable missing for Claude i guess can you try to update the env variables "
+    },
+    "satisfaction_conditions": [
+      "Environment configuration template includes all required variables"
+    ],
+    "created_at": "2025-01-17T23:19:20Z"
+  },
+  {
+    "id": "https://github.com/techblitzdev/TechBlitz/issues/333",
+    "source": {
+      "issue_number": 333
+    },
+    "initial_question": {
+      "title": "Contribution",
+      "body": "Hey i wanted to contribute to this project but i found a issue on the env files is there any env variables to setup"
+    },
+    "satisfaction_conditions": [
+      "Environment variable template is available to contributors",
+      "Project maintainer provides setup support"
+    ],
+    "created_at": "2024-12-29T15:56:54Z"
+  }
+]

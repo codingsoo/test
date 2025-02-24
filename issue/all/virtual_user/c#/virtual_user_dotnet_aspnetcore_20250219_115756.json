@@ -1,0 +1,1038 @@
+[
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/60175",
+    "source": {
+      "issue_number": 60175
+    },
+    "initial_question": {
+      "title": "[Blazor] Component named \"Text\" can't be used directly inside a code block",
+      "body": "### Is there an existing issue for this?\n\n- [x] I have searched the existing issues\n\n### Describe the bug\n\nGreetings!\nWe have a component called Text\nIt's simple.\n\n```\n<span class=\"@CssClass\">\n    @ChildContent\n</span>\n```\n\nWhen we use it, for example, in an `if` block.\n\n```\n@if (!string.IsNullOrWhiteSpace(SubTitle))\n{\n    <Text Size=\"@Sizes.L\">\n        @SubTitle\n    </Text>\n    \n}\n```\n\nWe get a compilation error\n`Error RZ1023 : \"<text>\" and \"</text>\" tags cannot contain attributes`\nBut if we wrap this component, for example, in a div, or use the full class name, everything is ok.\n```\n@if (!string.IsNullOrWhiteSpace(SubTitle))\n{\n    <div>\n        <Text  Size=\"@Sizes.L\">\n            @SubTitle\n        </Text>\n    </div>\n}\n```\n\n### Expected Behavior\n\nInside the `if` block, I use a component called `Text` and everything works correctly\n\n### Steps To Reproduce\n\n_No response_\n\n### Exceptions (if any)\n\n`Error RZ1023 : \"<text>\" and \"</text>\" tags cannot contain attributes`\n\n### .NET Version\n\n9.0.102\n\n### Anything else?\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Component maintains its intended functionality"
+    ],
+    "created_at": "2025-02-03T15:24:31Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/56708",
+    "source": {
+      "issue_number": 56708
+    },
+    "initial_question": {
+      "title": "PageTitle component added in BuildRenderTree do not update the \"title\".",
+      "body": "### Is there an existing issue for this?\r\n\r\n- [X] I have searched the existing issues\r\n\r\n### Describe the bug\r\n\r\nThe page title is not updated from a `PageTitle` component, added to a component in `BuildRenderTree`.\r\n\r\n### Expected Behavior\r\n\r\nThe `title` in the `head` should be updated with the text.\r\n\r\n### Steps To Reproduce\r\n\r\n`dotnet new blazor`\r\n\r\nAdd `Render.razor.cs` to the `Pages` directory:\r\n\r\n```\r\nusing System;\r\nusing Microsoft.AspNetCore.Components;\r\nusing Microsoft.AspNetCore.Components.Rendering;\r\nusing Microsoft.AspNetCore.Components.Web;\r\nnamespace Test.Components.Pages;\r\n\r\n[Route(\"/render\")]\r\npublic class Render : ComponentBase {\r\n\r\n    protected override void OnAfterRender(bool firstRender) {\r\n        if (firstRender) {\r\n            StateHasChanged();\r\n        }\r\n    }\r\n\r\n    protected override void BuildRenderTree(RenderTreeBuilder builder) {\r\n        base.BuildRenderTree(builder);\r\n\r\n        // Add PageTitle component\r\n        builder.OpenComponent<PageTitle>(0);\r\n        builder.AddContent(1, \"Test Title Here\");\r\n        builder.CloseComponent();\r\n\r\n        // Add other components or content here\r\n        builder.OpenElement(2, \"div\");\r\n        builder.AddContent(3, \"Content of Component A\");\r\n        builder.CloseElement();\r\n    }\r\n}\r\n```\r\n\r\nAdd the `render` page to the menu in `NavMenu.razor`.\r\n\r\n`dotnet run`\r\n\r\nNotice that the page title is updated on all the other pages, but not the \"/render\" page.\r\nWhen navigating to the `render` page, the `title` is emptied/cleared.\r\n\r\n### Exceptions (if any)\r\n\r\n_No response_\r\n\r\n### .NET Version\r\n\r\n8.0.303\r\n\r\n### Anything else?\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Page title updates correctly when PageTitle component is used in BuildRenderTree",
+      "PageTitle component content is properly rendered through the correct attribute structure"
+    ],
+    "created_at": "2024-07-10T00:04:28Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/55997",
+    "source": {
+      "issue_number": 55997
+    },
+    "initial_question": {
+      "title": "Better UX - show \"loading\" (anything) while app is starting up the .NET WebAssembly runtime (for AutoRender, prerender false) ",
+      "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Is your feature request related to a problem? Please describe the problem.\n\nIs there any way how to show some animation or anything while cached WASM is starting up? I found solution to force downloading resources every time so it can be render by server first but it costs resources of course.\n\n### Describe the solution you'd like\n\nI would like to have option to display loading animation on component level while WASMis starting up.\n\n### Additional context\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Visual feedback must be displayed while WebAssembly runtime is initializing",
+      "Visual feedback must automatically disappear once WebAssembly component renders",
+      "Solution must work at component level",
+      "Must function with non-prerendered Blazor WASM components"
+    ],
+    "created_at": "2024-05-31T13:57:54Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/55273",
+    "source": {
+      "issue_number": 55273
+    },
+    "initial_question": {
+      "title": "Blazor.registerCustomEventType doesn't work with static SSR",
+      "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Describe the bug\n\nBlazor.registerCustomEventType doesn't look working with static SSR\n\n### Expected Behavior\n\nIt is expected that Blazor.addEventListener handler is called after as a custom event was registered with Blazor.registerCustomEventType.\n\n### Steps To Reproduce\n\n```\r\nfunction FireCustomEvent(elem) { \r\n    const event = new CustomEvent(\"customevent\", { bubbles: true, detail: elem });\r\n    elem.dispatchEvent(event);\r\n}\r\n\r\nBlazor.registerCustomEventType('customevent', {\r\n    browserEventName: 'customevent',\r\n    createEventArgs: event => {\r\n        return { 'prop1': 1 };\r\n    }\r\n});\r\n\r\n// it doesn't work\r\nBlazor.addEventListener('customevent', function () {\r\n    console.log('???? customevent event handled with Blazor ????');\r\n});\r\n```\n\n### Exceptions (if any)\n\n_No response_\n\n### .NET Version\n\n8.0.100\n\n### Anything else?\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Custom event handling must work within the constraints of static SSR",
+      "Client-side event handling must remain functional after static rendering completes",
+      "Clear distinction between DOM events and Blazor events must be maintained",
+      "Event handling approach must be compatible with the static nature of SSR output"
+    ],
+    "created_at": "2024-04-22T12:01:42Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/54263",
+    "source": {
+      "issue_number": 54263
+    },
+    "initial_question": {
+      "title": "Blazor Component (using RenderMode Interactive Server) - Incorrect Behavior on Navigating between pages, Component is not re-created",
+      "body": "### Is there an existing issue for this?\r\n\r\n- [X] I have searched the existing issues\r\n\r\n### Describe the bug\r\n\r\nI have 2 pages, Page1, Page2. Both pages use the same Counter component with render mode: interactive server that is specified on the Counter components. \r\n\r\n`<Counter @rendermode=\"InteractiveServer\"></Counter>`\r\n\r\nNOTE: The Counter component inside its mark up does not specify render mode.\r\nEach page also contains a navigation link to the other page.\r\n\r\nWhen a user is on Page1 and increments the counter and then navigates (using anchor link) to Page 2 (that has also a Counter) the count is retained from Page1. Then, incrementing Counter on Page2 continues the count. When user navigates back Page1 (using anchor link) the count is now the sum of counts from Page1 and Page2.\r\n\r\n### Expected Behavior\r\n\r\nI expect the component to be re-created and its state reset once a user navigates to another page from current page.\r\nThat does not happen. The counter component appears to live (and retain its state) across page navigations using an anchor tag.\r\n\r\n_If this is the correct behavior for an interactive server side component using web socket connection in an SSR page then how can we re-use components across pages without retaining component state?_\r\n\r\n### Steps To Reproduce\r\n\r\nCreate a sample SSR blazor app, select interactivity per component. \r\nCreate 2 pages.\r\nPlace Counter component on both pages.\r\nNOTE: Remove from the Counter component the \"@rendermode InteractiveServer\", instead place render modes explicitly where you use the counter on each page as:\r\n\r\n`<Counter @rendermode=\"InteractiveServer\"></Counter>`\r\n\r\nAdd this mark up to navigate between the pages:\r\n\r\n`<a href=\"/Page2\">Go to page 2</a>`\r\n\r\n`<a href=\"/Page1\">Go to page 1</a>`\r\n\r\nGo to page 1, increment counter, use link to go to page 2 (observe the count is from page 1). Increment counter again and go back to page 1 (observe the count continues from page 2).\r\n\r\n### Exceptions (if any)\r\n\r\n_No response_\r\n\r\n### .NET Version\r\n\r\n.net 8 Blazor SSR Interactive Server\r\n\r\n### Anything else?\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Component state must reset when navigating between different pages",
+      "Components with the same type but on different pages must be treated as distinct instances",
+      "Solution must work with standard navigation patterns",
+      "Component state isolation must be controllable by developers",
+      "Solution must be compatible with Blazor SSR and Interactive Server components"
+    ],
+    "created_at": "2024-02-28T20:01:31Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/53040",
+    "source": {
+      "issue_number": 53040
+    },
+    "initial_question": {
+      "title": " NavigationException when attempting to navigate after submitting a form #49143  still continue",
+      "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Describe the bug\n\nNavigationException when attempting to navigate after submitting a form\r\nSame at #49143\n\n### Expected Behavior\n\n_No response_\n\n### Steps To Reproduce\n\n_No response_\n\n### Exceptions (if any)\n\n_No response_\n\n### .NET Version\n\n_No response_\n\n### Anything else?\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Navigation must complete successfully when debugger is not attached"
+    ],
+    "created_at": "2023-12-28T09:02:36Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/52708",
+    "source": {
+      "issue_number": 52708
+    },
+    "initial_question": {
+      "title": "Catch-all route at the root level doesn't work any more in .NET 8",
+      "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Describe the bug\n\nI have an application with very few pages, where one is mainly active and catches all the remaining URLs as a part of its logic. In .NET 7, It was enough to annotate that page with `@page \"/{*pageRoute}\"` and declare the corresponding parameter `[Parameter] public string? PageRoute { get; set; }`. But it stopped working when I upgraded to .NET 8 (Blazor United) and started showing a white screen and an exception in the browser's console.\n\n### Expected Behavior\n\nIt should catch the rest of the URLs that didn't match with other routes .\n\n### Steps To Reproduce\n\n1. Create a net .NET 8 Blazor United app with interactive web assembly with pre-rendering turned OFF.\r\n2. Delete pages but the Index.\r\n3. Annotate the Index page with `@page \"/{*pageRoute}\"` and declare a parameter for it `[Parameter] public string? PageRoute { get; set; }`\r\n4. Run the app; you should see a white screen with an error in the console.\n\n### Exceptions (if any)\n\n```\r\nblazor.web.js:1  Error: One or more errors occurred. ('<' is an invalid start of a value. LineNumber: 0 | BytePositionInLine: 0.)\r\n    at Jn (marshal-to-js.ts:349:18)\r\n    at Ul (marshal-to-js.ts:306:28)\r\n    at 00b1e8b6:0x1faca\r\n    at 00b1e8b6:0x1bf8b\r\n    at 00b1e8b6:0xf172\r\n    at 00b1e8b6:0x1e7e4\r\n    at 00b1e8b6:0x1efda\r\n    at 00b1e8b6:0xcfec\r\n    at 00b1e8b6:0x440ad\r\n    at e.<computed> (cwraps.ts:338:24)\r\ncallEntryPoint @ blazor.web.js:1\r\n```\n\n### .NET Version\n\n8.0.100\n\n### Anything else?\n\nIt works if the catch-all wildcard is not placed at the root level but after a URI segment.\r\nWe need a way to allow routes without explicitly listing them in razor pages."
+    },
+    "satisfaction_conditions": [
+      "The route must successfully handle non-file URLs without showing a white screen or throwing exceptions",
+      "The route must not intercept requests intended for static files",
+      "The catch-all route parameter must successfully capture and make the route value accessible to the page",
+      "The solution must work within the .NET 8 routing system"
+    ],
+    "created_at": "2023-12-10T14:51:53Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/46044",
+    "source": {
+      "issue_number": 46044
+    },
+    "initial_question": {
+      "title": "Unexpected parent component rerendering",
+      "body": "### Is there an existing issue for this?\r\n\r\n- [X] I have searched the existing issues\r\n\r\n### Describe the bug\r\n\r\nWhile playing around with some code I noticed a behaviour I wasn't expecting. Here is the code in question:\r\n\r\n### Parent Component\r\n\r\n```razor\r\n@page \"/\"\r\n\r\n<button @onclick=\"ShowPrompt\">Click me</button>\r\n\r\n@if (_showPrompt)\r\n{\r\n    <SurveyPrompt Title=\"Testing\" OnClose=\"Close\" />\r\n}\r\n\r\n@code {\r\n    private bool _showPrompt;\r\n\r\n    private void ShowPrompt() => _showPrompt = true;\r\n    private void Close() => _showPrompt = false;\r\n}\r\n```\r\n\r\n### Child Component\r\n\r\n```razor\r\n<div class=\"alert alert-secondary mt-4\">\r\n    <strong>@Title</strong>\r\n    <button @onclick=\"OnClose\">Close</button>\r\n</div>\r\n\r\n@code {\r\n    [Parameter] public string? Title { get; set; }\r\n    [Parameter] public Action OnClose { get; set; }\r\n}\r\n```\r\n\r\nWhen clicking the Close button in the child component, the child component causes a re-render in the parent component and is hidden. This is unexpected as that should only occur when either the child components parameter type is `EventCallback` or the handler in the parent calls `StateHasChanged`. \r\n\r\nChanging the child components code to this results in the expected behaviour and the child component isn't hidden.\r\n\r\n```razor\r\n<div class=\"alert alert-secondary mt-4\">\r\n    <strong>@Title</strong>\r\n    <button @onclick=\"() => OnClose()\">Close</button>\r\n</div>\r\n\r\n@code {\r\n    [Parameter] public string? Title { get; set; }\r\n    [Parameter] public Action OnClose { get; set; }\r\n}\r\n```\r\n\r\nI don't know if this is a bug or not but it's not what I was expecting and I can't work it out. \r\n\r\n### Expected Behavior\r\n\r\nChild components shouldn't cause re-renders of parents without defining parameters of type `EventCallback` or parent handlers calling `StateHasChanged`\r\n\r\n### Steps To Reproduce\r\n\r\nUpdate the `Index` component in a new Blazor project to the following code:\r\n\r\n```razor\r\n@page \"/\"\r\n\r\n<button @onclick=\"ShowPrompt\">Click me</button>\r\n\r\n@if (_showPrompt)\r\n{\r\n    <SurveyPrompt Title=\"Testing\" OnClose=\"Close\" />\r\n}\r\n\r\n@code {\r\n    private bool _showPrompt;\r\n\r\n    private void ShowPrompt() => _showPrompt = true;\r\n    private void Close() => _showPrompt = false;\r\n}\r\n```\r\n\r\nUpdate the code for the `SurveyPrompt` component to the following:\r\n\r\n```razor\r\n<div class=\"alert alert-secondary mt-4\">\r\n    <strong>@Title</strong>\r\n    <button @onclick=\"OnClose\">Close</button>\r\n</div>\r\n\r\n@code {\r\n    [Parameter] public string? Title { get; set; }\r\n    [Parameter] public Action OnClose { get; set; }\r\n}\r\n```\r\n\r\nClicking the button in the index component shows the survey prompt. Clicking the Close button in the SurveyPrompt hides the Survey prompt. However, no StateHasChanged call has been issues.\r\n\r\n### Exceptions (if any)\r\n\r\n_No response_\r\n\r\n### .NET Version\r\n\r\n7.0.101\r\n\r\n### Anything else?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Parent component must not automatically rerender when child component's close action is triggered",
+      "Child component's close functionality must remain operational",
+      "Parent component state changes (_showPrompt) must still be respected",
+      "Solution must work within Blazor's event handling system"
+    ],
+    "created_at": "2023-01-11T22:54:01Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/45607",
+    "source": {
+      "issue_number": 45607
+    },
+    "initial_question": {
+      "title": "Blazor Server - Html Source Blazor Info",
+      "body": "I am using Blazor Server. It shows the following information in each html output. Can I turn this display of information on or off?\r\n\r\n`<!--Blazor:{\"sequence\":1,\"type\":\"server\",\"prerenderId\":\"27a768f8d34b40efaa24370d7e4146ad\",\"descriptor\":\"CfDJ8A5VzMEeZxVNtV1i8tox076ysU67NXXehnicXlH5TEeVv0iEJP32/AiNvDJqOgroXtAxzk1Rju1ub0J3ovn68kgyB8rxLXQ\\u002BO4uOqAcLYKRZGC30V7okM9Ty3FYGIcYsX3gXhCCdzSwd6WA8RO7RN/d4\\u002B1rGF9dxJeyLIsn5o8NB46ZXHoD3EQJjUiXW0BdGl9zyTFhqeUaBV12mgOvill72AbP\\u002BJBzMy1GlET/bW4qVYDJT3Xobok/gXlgNP3SsKo/MD2YxtArQJx/dQjab8T6FEaw1Ap2sE6nvgk3nQ24bberWWsDXHRmyHNzKtfa2l0YcYUYdoNRdEZACpEOarPgGJC81cdBE3ioENQhddnf\\u002BseH4XTAcvrdT58gXgigPCISeB9pKqIMBrYvNyV\\u002Bi8qUd82LhhKdjpTyf51fKXAZm\"}-->`"
+    },
+    "satisfaction_conditions": [
+      "Blazor component functionality must remain fully operational",
+      "The solution must acknowledge technical limitations of the platform",
+      "Response must clearly address visibility in HTML source code"
+    ],
+    "created_at": "2022-12-15T12:51:13Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/42892",
+    "source": {
+      "issue_number": 42892
+    },
+    "initial_question": {
+      "title": "[Blazor] Question: can i call .net static methods in afterStarted of JavaScript initializers?",
+      "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Describe the bug\n\nThe input parameter `blazor` of afterStarted does not have the `invokeMethodAsync` method, which I want to call the static method of layout.\r\nFor example, I want to read timezoneOffset from the browser (`return new Date().getTimezoneOffset();`) and then call the. net static method to assign a value to a global static variable (TimezoneOffset). Other components can then read this variable directly.\n\n### Expected Behavior\n\n_No response_\n\n### Steps To Reproduce\n\n_No response_\n\n### Exceptions (if any)\n\n_No response_\n\n### .NET Version\n\n6.0.400-preview.22330.6\n\n### Anything else?\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "JavaScript code must be able to invoke .NET static methods after Blazor startup",
+      "JavaScript-to-.NET communication must work within Blazor's startup sequence"
+    ],
+    "created_at": "2022-07-25T11:21:19Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/42493",
+    "source": {
+      "issue_number": 42493
+    },
+    "initial_question": {
+      "title": "How to set SignInScheme in an application using Microsoft.AspNetCore.Authentication.OpenIdConnect on multiple IDPs",
+      "body": "My application uses Microsoft.AspNetCore.Authentication.OpenIdConnect  (version 6.0.6) to work with multiple Identity providers. It is getting \"System.InvalidOperationException: The SignInScheme for a remote authentication handler cannot be set to itself.\". How should the SignInScheme be properly set in this situation to avoid the error? (not setting SignInScheme in my code gives me the same error)\r\n\r\n```\r\n            foreach (var section in _configuration.GetChildren())\r\n            {\r\n                var options = new MicrosoftIdentityOptions();\r\n                section.Bind(options);\r\n\r\n                if (options.ClientId.IsNullOrEmpty())\r\n                    continue; // Skip sections that are not for OpenID Connect.\r\n\r\n                var scheme = section.Key;\r\n\r\n                services.AddAuthentication(scheme)\r\n                        .AddOpenIdConnect(scheme, openIdConnectOptions =>\r\n                        {\r\n                            openIdConnectOptions.ClientId = options.ClientId;\r\n                            openIdConnectOptions.ClientSecret = options.ClientSecret;\r\n                            openIdConnectOptions.Authority = options.Authority;\r\n                            openIdConnectOptions.ResponseType = OpenIdConnectResponseType.Code;\r\n                            openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;\r\n                            openIdConnectOptions.SignInScheme = scheme;\r\n                        });\r\n            }\r\n```\r\n\r\n```\r\n      An unhandled exception has occurred while executing the request.\r\n      System.InvalidOperationException: The SignInScheme for a remote authentication handler cannot be set to itself.  If it was not explicitly set, the AuthenticationOptions.DefaultSignInScheme or DefaultScheme is used.\r\n         at Microsoft.AspNetCore.Authentication.RemoteAuthenticationOptions.Validate(String scheme)\r\n         at Microsoft.AspNetCore.Authentication.AuthenticationBuilder.<>c__DisplayClass4_0`2.<AddSchemeHelper>b__1(TOptions o)\r\n         at Microsoft.Extensions.Options.ValidateOptions`1.Validate(String name, TOptions options)\r\n         at Microsoft.Extensions.Options.OptionsFactory`1.Create(String name)\r\n         at Microsoft.Extensions.Options.OptionsMonitor`1.<>c__DisplayClass10_0.<Get>b__0()\r\n         at System.Lazy`1.ViaFactory(LazyThreadSafetyMode mode)\r\n         at System.Lazy`1.ExecutionAndPublication(LazyHelper executionAndPublication, Boolean useDefaultConstructor)\r\n         at System.Lazy`1.CreateValue()\r\n         at Microsoft.AspNetCore.Authentication.AuthenticationHandler`1.InitializeAsync(AuthenticationScheme scheme, HttpContext context)\r\n         at Microsoft.AspNetCore.Authentication.AuthenticationHandlerProvider.GetHandlerAsync(HttpContext context, String authenticationScheme)\r\n         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Authentication configuration must use a separate scheme for sign-in persistence",
+      "Each OpenID Connect provider configuration must be associated with a valid sign-in scheme",
+      "Application must successfully process authentication requests without throwing the SignInScheme self-reference exception",
+      "Authentication state must persist across requests",
+      "Multiple identity providers must be supported simultaneously"
+    ],
+    "created_at": "2022-06-29T22:02:55Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/41011",
+    "source": {
+      "issue_number": 41011
+    },
+    "initial_question": {
+      "title": "Nesting AuthorizeView and Authorized components with various roles",
+      "body": "### Is there an existing issue for this?\r\n\r\n- [X] I have searched the existing issues\r\n\r\n### Is your feature request related to a problem? Please describe the problem.\r\n\r\nI would like to have a section of a NavBar component wrapped in an `<AuthorizeView>` tag to limit access to only authorized users, but then use nested `<AuthorizeView Roles=\"admin, user, etc\">` within to show/hide various options within the list, if shown. However, I can't use two `<AuthorizeView>` tags due to context conflicts.\r\n\r\nThis is similar to issue #20294 which was closed.\r\n\r\n### Describe the solution you'd like\r\n\r\nBe able to nest `<AuthorizeView>` tags with more restrictive roles in the inner tags to allow for showing/hiding content and subcontent"
+    },
+    "satisfaction_conditions": [
+      "Nested authorization components must compile and function without context conflicts",
+      "Access to authentication state must be preserved at all nesting levels",
+      "Different authorization policies/roles must be applicable at different nesting levels",
+      "Authorization hierarchy must be respected (inner checks only run if outer checks pass)"
+    ],
+    "created_at": "2022-04-01T17:56:52Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/40021",
+    "source": {
+      "issue_number": 40021
+    },
+    "initial_question": {
+      "title": ".Net 6 pass array in query string",
+      "body": "### Is there an existing issue for this?\r\n\r\n- [X] I have searched the existing issues\r\n\r\n### Describe the bug\r\n\r\nI've asked this question in SO but no answer.\r\nI have an issue with passing string array in query string and I don't know what's happening. here is the request:\r\n```\r\n.../api/customers/todos?customerValue=0&branchId=120&allianceId=1&searchValue=&offset=0&count=14&statuses=one&statuses=two&statuses=three\r\n```\r\nand this is my method:\r\n```\r\npublic async Task<PaginatedResult<TodoVm>> GetTodos(decimal? customerValue, string branchId, \r\n            long? allianceId, string searchValue,\r\n            string[] statuses = null,\r\n            int offset = 0, int count = 20)\r\n        {\r\n            //do some stuff and return response\r\n        }\r\n```\r\nwhen I call the api it gives me this error and cannot bind the statues parameter:\r\n```\r\n{\r\n    \"title\": \"One or more validation errors occurred.\",\r\n    \"status\": 400,\r\n    \"errors\": {\r\n        \"$\": [\r\n            \"The input does not contain any JSON tokens. Expected the input to start with a valid JSON token, when isFinalBlock is true. Path: $ | LineNumber: 0 | BytePositionInLine: 0.\"\r\n        ]\r\n    }\r\n}\r\n```\r\nbut when I use **FromQuery** it works! like this:\r\n```\r\npublic async Task<PaginatedResult<TodoVm>> GetTodos(decimal? customerValue, string branchId, \r\n            long? allianceId, string searchValue,\r\n            [FromQuery(Name = \"statuses\")] string[] statuses = null,\r\n            int offset = 0, int count = 20)\r\n        {\r\n            //do some stuff and return response\r\n        }\r\n```\r\nother parameters will be mapped correctly but for array I have to use FromQuery.\r\nFYI, this is how I add controller in Startup:\r\n```\r\nservices.AddControllers()\r\n            .AddJsonOptions(options =>\r\n            {\r\n                options.JsonSerializerOptions.PropertyNameCaseInsensitive = false;\r\n                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;\r\n                options.JsonSerializerOptions.AllowTrailingCommas = false;\r\n            });\r\n```\r\n\r\n### .NET Version\r\n\r\n6.0.100\r\n"
+    },
+    "satisfaction_conditions": [
+      "Array parameters in query string must be successfully bound to the controller action method",
+      "Request must not trigger JSON deserialization errors",
+      "Multiple values for the same query parameter name must be correctly collected as an array",
+      "Non-array query parameters must continue to bind correctly"
+    ],
+    "created_at": "2022-02-06T16:05:41Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/39884",
+    "source": {
+      "issue_number": 39884
+    },
+    "initial_question": {
+      "title": "Duplicated client assemblies after publish",
+      "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Describe the bug\n\nIf i publish a ASP.NET Core hosted web assembly blazor app (using the provided template), then client  assemblies are duplicated in publish folder. Once in wwwroot/_framework folder (with i assume is the right behavior) and once in the publish root folder next to all server assemblies.\n\n### Expected Behavior\n\nAll client assemblies occuring only once in wwwroot/_framework folder after publish.\n\n### Steps To Reproduce\n\n- Create a new ASP.NET Core hosted web assembly blazor app (using the template)\r\n- dotnet publish ./Server.csproj\r\n- Navigate to publish output\n\n### Exceptions (if any)\n\n_No response_\n\n### .NET Version\n\n6.0.101\n\n### Anything else?\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Published application maintains two separate sets of assemblies with distinct purposes",
+      "Browser-optimized assemblies are located in wwwroot/_framework",
+      "Server-side assemblies are preserved in the publish root folder",
+      "User understands this is expected behavior rather than a bug"
+    ],
+    "created_at": "2022-01-31T07:53:37Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/39157",
+    "source": {
+      "issue_number": 39157
+    },
+    "initial_question": {
+      "title": "FindByIdAsync requires string instead of int even with ApplicationUser: IdentityUser<int>",
+      "body": "### Is there an existing issue for this?\n\n- [X] I have searched the existing issues\n\n### Describe the bug\n\nI might be seeing this wrong but shouldn't FindByIdAsync accept an int instead of string when ApplicationUser: IdentityUser<int>?\r\n\r\nI'm using var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId); as an alternative but just wanted to be sure of this.\r\n\r\nThank you!\r\n\r\n\n\n### Expected Behavior\n\n_No response_\n\n### Steps To Reproduce\n\n_No response_\n\n### Exceptions (if any)\n\n_No response_\n\n### .NET Version\n\n.net 6\n\n### Anything else?\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "The system must handle ID type conversion between the user-defined type (int) and the API's expected type (string)",
+      "The system must successfully retrieve the correct user record using their ID",
+      "The solution must maintain compatibility with the existing Identity framework architecture"
+    ],
+    "created_at": "2021-12-22T17:55:53Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/37926",
+    "source": {
+      "issue_number": 37926
+    },
+    "initial_question": {
+      "title": "IJSInProcessRuntime and IJSUnmarshalledRuntime don't work in Blazor Server",
+      "body": "The following JSInterop code works blazor Web Assembly but exact same code doesn't work on Blazor Server\r\n```cs\r\npublic static async ValueTask InitAsync(IJSRuntime jsRuntime)\r\n{\r\n            Runtime = jsRuntime as IJSInProcessRuntime; //in server this cast is null but in wasm works fine\r\n            _moduleTask = new(() => Runtime.InvokeAsync<IJSUnmarshalledObjectReference>(\r\n               \"import\", \"./_content/BlazorBindGen/blazorbindgen.js\").AsTask()); \r\n            Module = await _moduleTask.Value;\r\n}\r\n```\r\nI am missing something?"
+    },
+    "satisfaction_conditions": [
+      "Asynchronous communication must be supported",
+      "JavaScript interop functionality must remain accessible",
+      "Performance optimization features must be optional"
+    ],
+    "created_at": "2021-10-29T11:33:36Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/28104",
+    "source": {
+      "issue_number": 28104
+    },
+    "initial_question": {
+      "title": "System.Text.Json.JsonException: Unlimited loops",
+      "body": "### Describe the bug\r\nI use Entity Framework Core to orm a object,but it has a error when webapi return this object to frontend.\r\nMy Entity:\r\n```C#\r\npublic class User\r\n{\r\n    public string Id{ get; set; }\r\n    public string Name { get; set; }\r\n    public Account Account{ get; set; }\r\n}\r\n\r\npublic class Account \r\n{\r\n    public string Id{ get; set; }\r\n    public string Identifier { get; set; }\r\n    public string UserId { get; set; }\r\n    public User User{ get; set; }\r\n}\r\n```\r\n```\r\nSystem.Text.Json.JsonException: A possible object cycle was detected which is not supported. This can either be due to a cycle or if the object depth is larger than the maximum allowed depth of 64.\r\n   at System.Text.Json.ThrowHelper.ThrowInvalidOperationException_SerializerCycleDetected(Int32 maxDepth)\r\n   at System.Text.Json.JsonSerializer.Write(Utf8JsonWriter writer, Int32 originalWriterDepth, Int32 flushThreshold, JsonSerializerOptions options, WriteStack& state)\r\n   at System.Text.Json.JsonSerializer.WriteAsyncCore(Stream utf8Json, Object value, Type inputType, JsonSerializerOptions options, CancellationToken cancellationToken)\r\n   at Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)\r\n   at Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.\r\n<InvokeNextResultFilterAsync>g__Awaited|29_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()\r\n--- End of stack trace from previous location where exception was thrown ---\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.\r\n    <InvokeNextResourceFilter>g__Awaited|24_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.\r\n        <InvokeFilterPipelineAsync>g__Awaited|19_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)\r\n   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.\r\n            <InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)\r\n   at Microsoft.AspNetCore.Routing.EndpointMiddleware.\r\n                <Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)\r\n   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)\r\n   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)\r\n   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Original entity model integrity must be preserved"
+    ],
+    "created_at": "2020-11-24T07:29:44Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/27692",
+    "source": {
+      "issue_number": 27692
+    },
+    "initial_question": {
+      "title": "Blazor Server: don't bind event listener for non-rendered element",
+      "body": "I'm interested in keeping authorization simple by using the `AuthorizeView` component.  This request is an elaboration of the documentation issue: dotnet/AspNetCore.Docs/issues/20462.\r\n\r\nIn short, say I have Blazor pages, each of which requires authentication and role-based authorization:\r\n```\r\n@page \"/page1\"\r\n@attribute [Authorize]\r\n\r\n<AuthorizeView Role=\"page1\">\r\n    <!-- SECURE CONTENT -->\r\n    <button @onclick=\"SecureAction\">Secure Action</button>\r\n</AuthorizeView>\r\n\r\n@code {\r\n    private void SecureAction()\r\n    {\r\n        // Unauthorized users should not be able to execute this code path\r\n    }\r\n}\r\n```\r\n\r\nIt would be nice if it was impossible for clients to manually trigger the `SecureAction` method.  In this case, because the only element to which it binds is not rendered, no SignalR event listener should be bound.\r\n\r\nI would prefer not to inject the `AuthenticationStateProvider` in every page and guard every protected task/method with it.\r\n\r\nre: @guardrex "
+    },
+    "satisfaction_conditions": [
+      "Event handlers for non-rendered elements must be non-invocable by default",
+      "Authorization state changes must eventually prevent event handler invocation",
+      "Protected actions must respect current authorization state",
+      "Solution must work with AuthorizeView component"
+    ],
+    "created_at": "2020-11-10T20:46:15Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/23687",
+    "source": {
+      "issue_number": 23687
+    },
+    "initial_question": {
+      "title": "Blazor doesn't detect state-change when state is changed in between async calls, requiring manual StateHasChanged()",
+      "body": "### Describe the bug\r\nI have a simple div element inside a component, which has a class set conditionally based on a boolean property on the component:\r\n```\r\n<div class='spinner-container @(!IsLoading ? \"d-none\" : \"\")'>\r\n    <div class=\"spinner-border text-info\" role=\"status\">\r\n        <span class=\"sr-only\">Loading...</span>\r\n    </div>\r\n</div>\r\n```\r\n\r\nThe code looks like this:\r\n\r\n```\r\nbool IsLoading { get; set; }\r\n\r\nasync Task HandleFormSubmit()\r\n{\r\n    try\r\n    {\r\n        await Task.Delay(10);\r\n        IsLoading = true;\r\n        await Task.Delay(5000);\r\n    }\r\n    finally\r\n    {\r\n        IsLoading = false;\r\n    }\r\n}\r\n```\r\n\r\nWhen HandleFormSubmit() is called (which is via an `@onsubmit=\"HandleFormSubmit\"` on a `form` element), the div's class doesn't update to reflect the `IsLoading` state change. If I put an explicit `StateHasChanged()` after `IsLoading = true`, then it does update (but that's a bit... crap).\r\n\r\nThe more interesting bit is, if I move `IsLoading = true;` to before the first `Task.Delay`, Blazor somehow detects the state change and the div's class is updated.\r\n\r\n### To Reproduce\r\nThe above should help reproduce this, but if you can't, then I'll make some time to create a repo for this (sorry, middle of work and a bit busy currently, but didn't want to just ignore/not report this as it seems quite important).\r\n\r\n### Further technical details\r\n- Blazor (Web Assembly) version 3.2\r\n- Include the output of `dotnet --info`\r\n\r\n```\r\n.NET Core SDK (reflecting any global.json):\r\n Version:   3.1.301\r\n Commit:    7feb845744\r\n\r\nRuntime Environment:\r\n OS Name:     Windows\r\n OS Version:  10.0.18363\r\n OS Platform: Windows\r\n RID:         win10-x64\r\n Base Path:   C:\\Program Files\\dotnet\\sdk\\3.1.301\\\r\n\r\nHost (useful for support):\r\n  Version: 3.1.5\r\n  Commit:  65cd789777\r\n\r\n.NET Core SDKs installed:\r\n  2.1.400 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.401 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.502 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.504 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.505 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.507 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.701 [C:\\Program Files\\dotnet\\sdk]\r\n  2.2.101 [C:\\Program Files\\dotnet\\sdk]\r\n  3.1.301 [C:\\Program Files\\dotnet\\sdk]\r\n\r\n.NET Core runtimes installed:\r\n  Microsoft.AspNetCore.All 2.1.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.3 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.9 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.19 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.2.0 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.App 2.1.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.3 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.9 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.19 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.2.0 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 3.1.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.NETCore.App 2.1.2 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.3 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.9 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.19 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.2.0 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 3.1.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.WindowsDesktop.App 3.1.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Component must re-render at appropriate lifecycle points",
+      "State management must work within event handler context"
+    ],
+    "created_at": "2020-07-06T03:13:20Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/22044",
+    "source": {
+      "issue_number": 22044
+    },
+    "initial_question": {
+      "title": "How to override default RoleValidator",
+      "body": "I trying to override the name validation duplication for the roles, here what I have\r\n\r\nStartup file\r\n\r\n```\r\n services.AddScoped<IRoleValidator<ApplicationRole>, \r\n                                                    WebIdp.Services.RoleValidator<ApplicationRole>>();\r\n\r\n services.AddIdentity<AplicationUser, ApplicationRole>(config =>\r\n                {\r\n                    config.SignIn.RequireConfirmedEmail = false;\r\n                    config.Password.RequiredUniqueChars = 0;\r\n\r\n                })\r\n                .AddRoles<ApplicationRole>()\r\n                .AddDefaultUI(UIFramework.Bootstrap4)\r\n                .AddEntityFrameworkStores<ApplicationDbContext>()\r\n                .AddDefaultTokenProviders()\r\n                .AddErrorDescriber<MultilanguageIdentityErrorDescriber>()\r\n                .AddRoleManager<ApplicationRoleManager>();\r\n```\r\nWhen I debug my code my validator works but when I start creating a new role then I have two validators the default and mine in the rolManager Validators property, then it does my validation but after mine it goes to the next validator and fail, since the manager is tryng to check all the validations that it has.\r\n\r\nI'm using Asp.net core 2.2\r\n\r\nDo I am missing some configuration?\r\n\r\nThanks!!\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Only one role validator is active in the application",
+      "Custom role validator successfully overrides default validation behavior",
+      "Role validation executes without throwing unexpected errors",
+      "Custom validation rules are applied during role creation",
+      "Dependency injection system correctly resolves the role validator"
+    ],
+    "created_at": "2020-05-20T18:28:56Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/21354",
+    "source": {
+      "issue_number": 21354
+    },
+    "initial_question": {
+      "title": "AddOpenIdConnect in ASP.NET Core WebAPI in context auf Angular-SPA ->WebAPI (single domain)",
+      "body": "All samples regarding AddOpenIdConnect-middleware seem to target ASP.NET Core MVC. In contrast we have an SPA that accesses a WebAPI. Both are hosted on the same domain. Is it OK to use AddOpenIdConnect-backed cookie authentication on the WebAPI-level in this scenario or what (negative) implications does this have?\r\n\r\nThanks!\r\n"
+    },
+    "satisfaction_conditions": [
+      "Authentication mechanism must securely handle requests between SPA and WebAPI on same domain",
+      "Solution must prevent cross-site request forgery (CSRF) attacks",
+      "Authentication method must be compatible with browser-based SPA architecture",
+      "Communication must be secured with HTTPS",
+      "Authentication tokens/cookies must not be accessible via client-side scripts"
+    ],
+    "created_at": "2020-04-30T07:57:34Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/20585",
+    "source": {
+      "issue_number": 20585
+    },
+    "initial_question": {
+      "title": "What's up with blazor.server.js",
+      "body": "### Describe the bug\r\nI'm trying to develop with netcore3.1. In a fresh boilerplate blazor server app, there is a reference in ```_Host.cshtml``` to ```_framework/blazor.server.js```. Visual Studio highlights this reference and says that it cannot find it. Sure enough, ```_framework``` is not present under ```wwwroot``` in the project.\r\nI did some digging on my system and found that under ```C:\\Users\\michael\\.nuget\\packages\\microsoft.aspnetcore.blazor.build\\3.1.0-preview4.19579.2\\tools\\blazor``` there is a ```blazor.webassembly.js``` but no ```blazor.server.js```.\r\nThe reason that I remark on this is that on another system that I work on, in a similar folder (3.0.0 preview 9) this file is present.\r\nI am having significant difficulties with a project that I am trying to develop where I cannot get components to update properly, and I am wondering if this might be the culprit.\r\n\r\n### Further technical details\r\n- ASP.NET Core version\r\n- Include the output of `dotnet --info`\r\n\r\n.NET Core SDK (reflecting any global.json):\r\n Version:   3.1.201\r\n Commit:    b1768b4ae7\r\n\r\nRuntime Environment:\r\n OS Name:     Windows\r\n OS Version:  10.0.18363\r\n OS Platform: Windows\r\n RID:         win10-x64\r\n Base Path:   C:\\Program Files\\dotnet\\sdk\\3.1.201\\\r\n\r\nHost (useful for support):\r\n  Version: 3.1.3\r\n  Commit:  4a9f85e9f8\r\n\r\n.NET Core SDKs installed:\r\n  2.1.801 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.802 [C:\\Program Files\\dotnet\\sdk]\r\n  2.2.401 [C:\\Program Files\\dotnet\\sdk]\r\n  3.1.101 [C:\\Program Files\\dotnet\\sdk]\r\n  3.1.201 [C:\\Program Files\\dotnet\\sdk]\r\n\r\n.NET Core runtimes installed:\r\n  Microsoft.AspNetCore.All 2.1.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.17 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.2.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.App 2.1.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.17 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.2.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 3.1.3 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.NETCore.App 2.1.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.17 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.2.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 3.1.3 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.WindowsDesktop.App 3.1.3 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]\r\n\r\n- The IDE (VS / VS Code/ VS4Mac) you're running on, and it's version\r\n\r\nVS 16.5.2\r\nVS Code 1.43.2\r\n"
+    },
+    "satisfaction_conditions": [
+      "The application successfully loads and executes blazor.server.js at runtime",
+      "IDE validation errors do not block application execution"
+    ],
+    "created_at": "2020-04-06T21:21:20Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/20455",
+    "source": {
+      "issue_number": 20455
+    },
+    "initial_question": {
+      "title": "In Blazor Server 3.1, is it possible to move _Host.cshtml?",
+      "body": "### Is your feature request related to a problem? Please describe.\r\nWe would like to organize code by Feature / Page.  Is it possible to move \"\\Pages\\\\_Host.cshtml\" to \"\\Features\\Host\\\\_Host.cshtml\" ?\r\n\r\n### Describe the solution you'd like\r\nWe would like to move \"\\Pages\\\\_Host.cshtml\" to \"\\Features\\Host\\\\_Host.cshtml\"\r\n\r\n### Additional context\r\nBecause we host our Blazor Server apps a sub sites in IIS onpremise, we already have the href of the base tag set:  `<base` href=\"/PickListWeb/\" `/>`\r\n"
+    },
+    "satisfaction_conditions": [
+      "_Host.cshtml file is accessible from a different directory path than /Pages",
+      "Application routing system recognizes the new location of _Host.cshtml"
+    ],
+    "created_at": "2020-04-02T16:03:52Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/20409",
+    "source": {
+      "issue_number": 20409
+    },
+    "initial_question": {
+      "title": "Razor Class Library static files inaccessible in any ASPNETCORE_ENVIRONMENT other than Development",
+      "body": "Hi,\r\n\r\nI have a Razor Class Library in .NET Core 3.1.0. The RCL has static assets located in wwwroot folder such as js frameworks, css, etc. \r\n\r\nI have a .NET Core 3.1 Web application that references the RCL. When i run the web application the static files within the RCL can be accessed using the path /_content/AreaName/js/...\r\n\r\nThis works fine when then  ASPNETCORE_ENVIRONMENT is Development. If i change it to anything else, e.g. Local, Staging, the web application returns a 404 (Not found) when trying to access the static files.\r\n\r\nIs this an issue/feature?\r\nIs there a workaround?\r\n\r\nAny advice is appreciated."
+    },
+    "satisfaction_conditions": [
+      "Static files from Razor Class Library must be accessible in non-Development environments",
+      "The /_content/AreaName path pattern must work consistently across environments",
+      "Solution must be compatible with published/production deployments",
+      "Static web assets functionality must be explicitly enabled for target environments"
+    ],
+    "created_at": "2020-04-01T12:27:29Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/19479",
+    "source": {
+      "issue_number": 19479
+    },
+    "initial_question": {
+      "title": "RAZORSDK1006 warning",
+      "body": "### Describe the bug\r\nI have an asp.net project that uses Microsoft.AspNetCore.Mvc package. This generates a compiler warning RAZORSDK1006 warning about Razor language version downgrade. According to the description, this is caused by a reference to Microsoft.AspNetCore.Razor.Design package.\r\n\r\nThis package is referenced by Microsoft.AspNetCore.Mvc package - can it be removed?\r\n\r\n### Further technical details\r\n- Targeting .net core 3.1\r\n- Referenced version of Microsoft.AspnetCore.Mvc is 2.2.0\r\n- IDE is Visual Studio 2019 v16.4.5\r\n"
+    },
+    "satisfaction_conditions": [
+      "The RAZORSDK1006 warning must be resolved",
+      "The project must maintain ASP.NET Core MVC functionality",
+      "The package references must be compatible with .NET Core 3.1",
+      "No version conflicts exist between Razor SDK and other components"
+    ],
+    "created_at": "2020-03-01T20:16:34Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/19463",
+    "source": {
+      "issue_number": 19463
+    },
+    "initial_question": {
+      "title": "BuildRenderTree not being called",
+      "body": "I have a Person.razor component which I wanted to separate the code behind from. After doing so, `BuildRenderTree` method is never called. See below for more information.\r\n\r\n### Customer.razor\r\nThere is no markup intentionally.\r\n\r\n``` C# \r\n@page \"/customer\"\r\n@inherits CustomerBase\r\n```\r\n\r\n### Customer.razor.cs\r\n``` C# \r\n    public class CustomerBase: ComponentBase\r\n    {\r\n        protected override void BuildRenderTree(RenderTreeBuilder builder)\r\n        {\r\n            base.BuildRenderTree(builder);\r\n            builder.AddMarkupContent(0, \"<h1>Person</h1>\");\r\n        }\r\n    }\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Component remains routable via the specified URL",
+      "Code-behind logic remains separated from markup"
+    ],
+    "created_at": "2020-02-29T05:15:56Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/19321",
+    "source": {
+      "issue_number": 19321
+    },
+    "initial_question": {
+      "title": "How Can I pass Parent Tag Ref to Child Tag in taghelper",
+      "body": "How Can I pass Parent Tag Ref to Child Tag in taghelper??"
+    },
+    "satisfaction_conditions": [
+      "Child TagHelper must be able to access its parent TagHelper instance",
+      "Data sharing mechanism must work within ASP.NET Core TagHelper lifecycle",
+      "Parent TagHelper instance must remain accessible during child TagHelper processing",
+      "Solution must maintain TagHelper hierarchy relationship"
+    ],
+    "created_at": "2020-02-25T04:59:37Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/19114",
+    "source": {
+      "issue_number": 19114
+    },
+    "initial_question": {
+      "title": "Client-SignalR on WebAPI without Hub-SignalR in the same solution - how to configure for work? ",
+      "body": "# Issue Title\r\n\r\nClient-SignalR on WebAPI without Hub-SignalR in the same solution - how to configure for work? \r\n\r\n# General\r\nWindows 10\r\ndotnet Core 3.1.1\r\nWebAPI\r\nSignalR \r\n----------\r\nThese are 2 applications Server and WebAPI :\r\nMy architecture has 1) remote WebAPI application and 2) Server that calls WebAPI. They are located at different addresses and perform different tasks. Hub SignalR is located on Server. I need to configure Client on WebAPI so that it informs everyone about the intermediate steps performed so that the server knows.\r\nThe whole day I was looking for how to register Client SignslR as Service (in WebAPI) so that Client SignslR would send messages from Controller on WebAPI to Server (Hub SignalR ).\r\nI would like it to be convenient as with IHubContext, but at least correctly, even if it is not convenient.\r\n\r\nHelp me, plz. Cann't find any sample how use SignalR client on WebAPI\\in controller without Hub in the same project.\r\n"
+    },
+    "satisfaction_conditions": [
+      "SignalR client must successfully connect to remote Hub server",
+      "WebAPI controllers must be able to send messages to the Hub",
+      "Connection management must be handled at application scope",
+      "SignalR client must be accessible as a service in the WebAPI application",
+      "Connection must persist across multiple controller actions"
+    ],
+    "created_at": "2020-02-18T07:43:54Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/17764",
+    "source": {
+      "issue_number": 17764
+    },
+    "initial_question": {
+      "title": "How can I access from AuthorizeRouteView.NotAuthorized the url or name of a component .",
+      "body": "How can I access from AuthorizeRouteView.NotAuthorized the url or name of a page component from which I'm being redirected to a Login component. In other words, when an unauthenticated user tries to access a page component with the Authorize attribute, he should be redirected to a Login component. The code to navigate to the  Login component resides within the AuthorizeRouteView.NotAuthorized property thus:\r\n\r\n        <AuthorizeRouteView RouteData=\"@routeData\" \r\n                                    DefaultLayout=\"@typeof(MainLayout)\">\r\n                <NotAuthorized>\r\n                       NavigationManager.NavigateTo(\"Login\");\r\n                 </NotAuthorized>\r\n                <Authorizing>\r\n                    Wait...\r\n                </Authorizing>\r\n          </AuthorizeRouteView>\r\n\r\nNow, what I want to pass with the login route is the return url; that is the url from which the user is redirected, so that if the login succeed, I can redirect the user to the the page he wanted to access. I could do it, but as shown below, but it smells as a workaround, and I want to know if Blazor has a dedicated feature for this purpose, which I believe many users will need without resorting to workarounds.  This is the code that is supposed to do the job:\r\n    \r\n     @{\r\n          var returnUrl = routeData.PageType.Name.Equals(\"Index\") ? null : routeData.PageType.Name;\r\n                           \r\n          var str = returnUrl == null ? $\"Login/Index\" : $\"Login/{returnUrl}\";\r\n\r\n           NavigationManager.NavigateTo(str);\r\n     }\r\n \r\nNote: routeData.PageType.Name returns values such as Counter and FetchData, which is fine and I can use it as the return url. But it also returns Index, which is not so fine, because I can't use Index as a url...\r\nThis \"Login/Counter\" works, and this \"Login/FetchData\" aslo works, but this \"Login/Index\" does not exist.\r\n\r\nNote also that in the Login component, I define a parameter Property which will accept the return url value passed to the Login component. \r\n\r\nThis should be a common scenario, and that feature is much needed unless I've missed something. Thanks.   "
+    },
+    "satisfaction_conditions": [
+      "Must capture the original requested URL when redirecting to login",
+      "Must work within Blazor's authorization flow",
+      "Must handle special cases like index/home pages appropriately",
+      "Must maintain valid routing syntax"
+    ],
+    "created_at": "2019-12-11T08:31:14Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/17739",
+    "source": {
+      "issue_number": 17739
+    },
+    "initial_question": {
+      "title": "Blazor Select binding doesn't bind initial value",
+      "body": "### Describe the bug\r\nIn s/s Blazor, a bound variable which is itself initialised to null does not reflect the initial state of a select box.\r\nThis bug is #10481 and possibly #9716 but these have been closed as dups or fixed, without it actually being fixed.\r\nI'm going to describe it again: I'm seeing it in 3.1, so it's definitely still around.\r\n\r\n### To Reproduce\r\n\r\n* Create a default server-side Blazor project in VS (ASP.Net Core 3.1, VS 16.4)\r\n* On some page of the demo app (I use the counter page) add the following markup:\r\n```\r\n<select @bind=\"SelectionValue\">\r\n    <option>Option A</option>\r\n    <option>Option B</option>\r\n</select>\r\n<button @onclick=\"TestClick\">Test Click</button>\r\n```\r\nand the following code\r\n```\r\n    string SelectionValue {get;set;}\r\n\r\n    void TestClick()\r\n    {\r\n        Console.WriteLine($\"Selection: '{SelectionValue}'\");\r\n    }\r\n```\r\n\r\n* Start the application in such a way as to be able to see the console\r\n* Navigate to the page but don't touch the select box (it will be showing \"Option A\")\r\n* Click on the \"Test Click\" button\r\n* Observe that the bound variable is null (i.e. you get `Selection: ''` printed to the console)\r\n* The only way to actually get \"Option A\" is to change the selection to Option B and then change it back.\r\n\r\nI don't need a work around (it's easy), but this behaviour doesn't feel like the 'principle of least surprise' - it's counter-intuitive that you wouldn't get the displayed value of the selection box in the bound variable.\r\nThe fact that the bug's been closed as fixed/dup previously makes me think this wasn't the original intention that it should work like this.\r\n\r\n### Further technical details\r\n- ASP.NET Core version 3.1.100\r\n- The IDE  VS16.4 on Win10\r\n"
+    },
+    "satisfaction_conditions": [
+      "Changes to the selection must be properly reflected in the bound variable"
+    ],
+    "created_at": "2019-12-10T17:28:54Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/17661",
+    "source": {
+      "issue_number": 17661
+    },
+    "initial_question": {
+      "title": "OnAfterRenderAsync still called twice on 3.0.0-preview9.19465.2",
+      "body": "### Describe the bug\r\nUsing server-side prerendering, if you have the following `OnAfterRenderAsync`:\r\n\r\n```\r\nprotected override async Task OnAfterRenderAsync(bool firstRender)\r\n{\r\n\tif (firstRender)\r\n\t{\r\n\t\tawait MyTask();\r\n\t\tConsole.WriteLine(\"FirstRender\");\r\n\t}\r\n\r\n\tConsole.WriteLine(\"OnAfterRenderAsync\");\r\n}\r\n```\r\n\r\nThen \"OnAfterRenderAsync\" is still written to the console _twice_ even though previously it was stated that starting in preview 9 `OnAfterRenderAsync` would _not_ be called during the prerendering lifecycle at all.\r\n\r\n### To Reproduce\r\n\r\n\r\nCreate a new blazor project with server-side prerendering enabled.\r\n\r\nCreate a component that overrides `OnAfterRenderAsync`\r\n\r\nThat override will be called twice during rendering.\r\n\r\n### Further technical details\r\n- ASP.NET Core version : 3.0.0-preview9.19465.2\r\n- IDE: VS2019 Version 16.3.8\r\n"
+    },
+    "satisfaction_conditions": [
+      "OnAfterRenderAsync executes only once per render cycle",
+      "Component state updates from parent and child components trigger only one render cycle"
+    ],
+    "created_at": "2019-12-06T16:28:30Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/17551",
+    "source": {
+      "issue_number": 17551
+    },
+    "initial_question": {
+      "title": "How to Log Controller/Handler Name From Middleware",
+      "body": "I want to log (along with other things) the name of the controller that is ultimately invoked.  That seems to require that controllers make an explicit call or use an ActionFilter.  I don't want to encumber controller writers with that.   How can I do this in middleware?   Essentially I want to insert middleware between the endpoints and the controllers.\r\n\r\nAny recommendations?"
+    },
+    "satisfaction_conditions": [
+      "Middleware successfully retrieves controller information without modifying controller code",
+      "Logging occurs before controller execution",
+      "Controller name information is accessible from the middleware context",
+      "Middleware integration preserves the request pipeline flow"
+    ],
+    "created_at": "2019-12-03T17:44:19Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/17416",
+    "source": {
+      "issue_number": 17416
+    },
+    "initial_question": {
+      "title": "Hosting bundle IIS reset / application pool recycle question",
+      "body": "Hi,\r\nI'm currently working on expanding a setup application that downloads applications and puts them in a IIS folder. Some of the applications are asp. net core which require the hosting bundle to be installed. The setup module will install the bundle if it not found on the found on the target machine(which runs the setup application). When i was testing the bundle installer i saw in the eventlog all the application pools where recycled. \r\n\r\n- Why is this recycle started? \r\n    - Is this due to a IIS reset?  \r\n\r\nThe only thing i could think of was for the environment path that is added for the dotnet.exe location but we install everything in the default folders(C:\\Program Files\\dotnet).  \r\n\r\nThe web.configs for our asp.net core application all have a full path to the dotnet exe path. \r\n\r\n- Is the recycle necessary? \r\n    - Is there a way to turn this recycle off if it not necessary?\r\n\r\nI'm asking this because the customers where the applications are being installed can also have other application running on IIS and we don't want to disturb there process. \r\n\r\nKind regards,\r\n\r\nWalter\r\n"
+    },
+    "satisfaction_conditions": [
+      "Users must be informed about IIS application pool recycling during installation",
+      "Installation timing must be configurable by system administrators",
+      "IIS module changes must be properly loaded"
+    ],
+    "created_at": "2019-11-26T14:04:04Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/17259",
+    "source": {
+      "issue_number": 17259
+    },
+    "initial_question": {
+      "title": "In Blazor creating the Same Element Multiple times in DOM.",
+      "body": "Is there any possibility of appending the same element multiple times in the DOM. I have tried this below case.\r\n\r\n```\r\n<button @onclick=\"clicked\">Update DOM</button>\r\n\r\n@if(rendered) { \r\n       <div id=\"Random_id\">Showed in DOM</div> \r\n }\r\n\r\n@code{` \r\n\r\n     private bool rendered { get; set; } = false\r\n     \r\n     private void clicked() {\r\n        this.rendered = true;\r\n        this.StateHasChanged();\r\n     }\r\n}\r\n```\r\n\r\nIn this case the same element is not appended in the DOM for multiple times. Any solution for this ?"
+    },
+    "satisfaction_conditions": [
+      "Multiple identical DOM elements must be created dynamically",
+      "Each element must have a unique identifier",
+      "UI updates must reflect the current state accurately",
+      "Elements must persist until explicitly removed"
+    ],
+    "created_at": "2019-11-20T13:27:51Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/17178",
+    "source": {
+      "issue_number": 17178
+    },
+    "initial_question": {
+      "title": "Question: Blazor NavigationManager.LocationChanged Async",
+      "body": "In general what would be the best method (if any) to call awaitable methods from NavigationManager.LocationChanged, since NavigationManager.LocationChanged is not async? \r\n\r\nIs wrapping the awaitable Task call into Task.Run/Task.WaitAll acceptable? For example something like:\r\n\r\n```\r\nvar task = Task<bool>.Run(async () =>\r\n{\r\n   //Call await method here \r\n    return false;\r\n});\r\n\r\nTask.WaitAll(task);\r\nvar retVal = task.Result;\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Asynchronous operations must be properly handled within the LocationChanged event",
+      "Previous in-progress navigation operations must be cancellable",
+      "Async operation state must be trackable"
+    ],
+    "created_at": "2019-11-17T12:04:43Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/16945",
+    "source": {
+      "issue_number": 16945
+    },
+    "initial_question": {
+      "title": "[blazor]how to resolve prerender twice call ?",
+      "body": "My component is instantiated twice, so ,if i write a lib ,i must avoid/careful use all before onafterrender things? what i can do\uff1f\r\n "
+    },
+    "satisfaction_conditions": [
+      "Component initialization code executes only once during the full component lifecycle",
+      "Component renders correctly after initialization",
+      "Solution works within Blazor's prerendering lifecycle",
+      "State consistency is maintained between renders"
+    ],
+    "created_at": "2019-11-09T16:30:01Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/16583",
+    "source": {
+      "issue_number": 16583
+    },
+    "initial_question": {
+      "title": "Blazor. OnParametersSet fires not as expected",
+      "body": "Hi. It's simply component.\r\n**Index.razor:**\r\n```\r\n@page \"/\"\r\n\r\n<MyCoolComponent>\r\n    <Template>\r\n        <div style=\"background-color:red;height:100px;width:100px;\"></div>\r\n    </Template>\r\n</MyCoolComponent>\r\n\r\n<button @onclick=\"DoNothing\">Do Nothing</button>\r\n\r\n@code {\r\n    private void DoNothing(MouseEventArgs e)\r\n    {\r\n\r\n    }\r\n}\r\n```\r\n\r\n**MyCoolComponent.razor:**\r\n```\r\n@msg\r\n@Template\r\n\r\n@code {\r\n    [Parameter]\r\n    public RenderFragment Template { get; set; }\r\n    string msg;\r\n\r\n    protected override void OnParametersSet()\r\n    {\r\n        msg =$\"OnParametersSet of MyCoolComponent fires every time on click button on Parent Page, \" +\r\n                $\"last time in {DateTime.Now.ToString()}. Why?\";\r\n    }\r\n}\r\n```\r\n\r\nOnParametersSet event of MyCoolComponent fires every time on click button on Parent Page, why?"
+    },
+    "satisfaction_conditions": [
+      "Component re-rendering behavior is controlled or optimized",
+      "OnParametersSet triggering frequency is reduced",
+      "Parent component button clicks don't trigger unnecessary child updates"
+    ],
+    "created_at": "2019-10-28T11:10:57Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/15216",
+    "source": {
+      "issue_number": 15216
+    },
+    "initial_question": {
+      "title": "Several migration issues",
+      "body": "Hi,\r\n\r\nafter upgrading from 2.2 to 3.0, my Web API has several issues seemingly regarded to conventions changed in version 3.0 which I couldn't find a reference to in the migration docs.\r\n\r\nGeneral info:\r\nAll my controllers are based on a custom `ApiControllerBase` with this code:\r\n```\r\n    [ApiController]\r\n    public abstract class ApiControllerBase : ControllerBase\r\n    {\r\n    }\r\n```\r\nMy expectation is that all controllers which descend from this base controller have standard API controller behavior.\r\n\r\nThese are my issues:\r\n\r\n### GET request routing returns status 400 `A non empty request body is required`\r\n\r\nSource: \r\n```\r\n        [HttpGet]\r\n        [Route(\"{id}\")]\r\n        public async Task<TaskModel> GetByIdAsync(int id, IList<string> extend = null)\r\n        {\r\n            return await _service.GetByIdAsync(id, extend);\r\n        }\r\n```\r\nThis happens because the controller interprets the `extend` parameter to be contained in the request body. In version 2.2, this was correctly interpreted as a query parameter.\r\nMy question: This is a GET request. A GET request shouldn't have a body. Why does this error occur?\r\n\r\n### Unauthorized users get redirected to the login page\r\nOn API controllers, unauthorized users get redirected to the login page when unauthorized, HTML markup is returned with a 200 code. Why aren't 401 responses sent instead?\r\n\r\nThanks for your help!\r\n"
+    },
+    "satisfaction_conditions": [
+      "API controller behavior must be consistent across inherited controllers",
+      "Parameter binding behavior must be explicitly defined when differing from defaults"
+    ],
+    "created_at": "2019-10-21T11:48:34Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/15209",
+    "source": {
+      "issue_number": 15209
+    },
+    "initial_question": {
+      "title": "Parsing Request Accept header: why is Mvc not using Microsoft.Net.Http.Headers.MediaTypeHeaderValue?",
+      "body": "There seems to be a redundancy in the framework to parse accept headers request. \r\nOn the one hand there's the type `AcceptHeaderParser `in `Microsoft.AspNetCore.Mvc.Formatters `which we used to handle content negotiation, but it has recently been made internal so we had to find another solution.\r\nOn the other hand, there's `Microsoft.Net.Http.Headers.MediaTypeHeaderValue` , which also parses headers, but the results are a bit different, regarding the Quality property parsing. \r\nWhich one are we supposed to use? We switched to `MediaTypeHeaderValue `because it's still public, but they seem to be redundant and do the same work, with some small differences... \r\nI notice that the `DefaultOutputFormatterSelector` is using the internal `Microsoft.AspNetCore.Mvc.Formatters.AcceptHeaderParser` and I was wondering why there's not just one implementation to parse headers."
+    },
+    "satisfaction_conditions": [
+      "Header parsing must handle both spec-compliant and non-compliant Accept headers",
+      "The chosen parsing method must be accessible through public APIs",
+      "The parsing implementation must be compatible with ASP.NET Core MVC content negotiation"
+    ],
+    "created_at": "2019-10-20T17:37:41Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/14974",
+    "source": {
+      "issue_number": 14974
+    },
+    "initial_question": {
+      "title": "`dotnet publish` produces executable specific to OS it's executed on",
+      "body": "I noticed that Windows hosting the `dotnet publish` gets an EXE file, while Linux (Ubuntu) gets an extensionless executable file named by the assembly. Under assumption that produced DLL and json-config files are actually exactly the same (regardless of where this process executes), shouldn't the process produce entrypoint binaries for all supported operating systems [at the same time]? Maybe I'm not noticing that the behavior that I'm after is actually present? The behavior that I'm noticing might complicate the build-process in certain scenarios. I just wanted to bring it to your attention. Thanks."
+    },
+    "satisfaction_conditions": [
+      "Build process produces platform-appropriate executable format",
+      "Cross-platform compatibility maintained through DLL files",
+      "Platform-specific executables function as launchers",
+      "Build process allows specification of target platforms",
+      "Configuration files remain consistent across platforms"
+    ],
+    "created_at": "2019-10-14T05:12:59Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/14800",
+    "source": {
+      "issue_number": 14800
+    },
+    "initial_question": {
+      "title": "ElementReference causes \"Invalid JSON\" exception when returned to JavaScript",
+      "body": "### Describe the bug\r\nCalling C# from JavaScript, then JavaScript from C# to obtain ElementReferences, then returning those ElementReferences to C#, Blazor throws an exception:\r\n```\r\nblazor.webassembly.js:1 Uncaught (in promise) Error: System.Text.Json.JsonException: Invalid JSON\r\n  at Microsoft.JSInterop.Infrastructure.DotNetDispatcher.EndInvokeJS (/Microsoft.JSInterop.JSRuntime jsRuntime, System.String arguments) <0x20ed888 + 0x000fc> in <4e424253df194e1299a1044d93a79164>:0 \r\n  at Mono.WebAssembly.Interop.MonoWebAssemblyJSRuntime.EndInvokeJS (/System.String argsJson) <0x20e4a58 + 0x0000a> in <d0b620549c284928acbf6b89d371ca02>:0 \r\n    at Object.callMethod (blazor.webassembly.js:1)\r\n    at Object.endInvokeJSFromDotNet (blazor.webassembly.js:1)\r\n    at blazor.webassembly.js:1\r\n```\r\n\r\n### To Reproduce\r\nSteps to reproduce the behavior:\r\n- .Net Core 3.0.0-100\r\n- dotnet new blazorwasm\r\n\r\nCreate a JavaScript method that creates an element:\r\n```javascript\r\nwindow.CreateElement = (text) => {\r\n  var element = document.createElement(\"span\");\r\n  element.innerText = text;\r\n  return element;\r\n}\r\n```\r\nCreate a [JSInvokable] C# method:\r\n```csharp\r\n[JSInvokable]\r\npublic static async Task<List<ElementReference>> GetElements(){\r\n  List<ElementReference> refs = new List<ElementReference>();\r\n  refs.Add(await JSInterop.InvokeAsync<ElementReference>(\"CreateElement\",\"first\"));\r\n  refs.Add(await JSInterop.InvokeAsync<ElementReference>(\"CreateElement\",\"second\"));\r\n  return refs;\r\n}\r\n```\r\nCreate another JavaScript function that calls the C# method:\r\n```javascript\r\nwindow.Test = async () => {\r\n  var refs = await DotNet.InvokeAsync(\"TestProject\",\"GetElements\");\r\n}\r\n```\r\nInvoke window.Test.\r\n\r\n### Expected behavior\r\nExpect no exception to be thrown, and for the elements created by the CreateElement method to be returned to the Test method.\r\n"
+    },
+    "satisfaction_conditions": [
+      "System maintains proper identification of externally created elements"
+    ],
+    "created_at": "2019-10-07T21:51:24Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/14702",
+    "source": {
+      "issue_number": 14702
+    },
+    "initial_question": {
+      "title": "How to add multiple styles using the IDictionary<string, object> in Blazor attributes ?",
+      "body": "### Below is the code blow which throws an exception as this key value already exists.\r\n\r\n\"<div @attributes=\"@_Attributes\"></div>\"\r\n\r\n@code {\r\nprivate IDictionary<string, object> _Attributes = new Dictionary<string, object>();\r\n\r\n// This adds to the element\r\n_Attributes.Add(\"style\", \"width:\" + this.width);\r\n\r\n// This throws an exception that the key value already exists\r\n_Attributes.Add(\"style\", \"height:\" + this.height);\r\n}\r\n\r\nCan anyone suggest a solution for this  to achieve in any other way.?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple style properties must be successfully applied to a single element",
+      "No duplicate key exceptions are thrown when applying styles",
+      "All style values must be correctly rendered in the final HTML output",
+      "Style values must be dynamically updatable from component properties"
+    ],
+    "created_at": "2019-10-03T13:24:15Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/14246",
+    "source": {
+      "issue_number": 14246
+    },
+    "initial_question": {
+      "title": "Blazor Server should use absolute paths for blazor.server.js and for connecting to the Blazor hub",
+      "body": "It looks like Blazor Server is using relative paths in a couple of places that limit when it can be used. This caused some issues when I tried to use Blazor components in an MVC app on any view other than the home page.\r\n\r\nRepro steps:\r\n\r\n- Create an MVC app\r\n- Add `services.AddServerSideBlazor()` to `Startup.ConfigureServices` and `endpoints.MapBlazorHub()` in `Startup.Configure`.\r\n- Add the *blazor.server.js* script to the layout using the script tag we use in the Blazor Server template: `<script src=\"_framework/blazor.server.js\"></script>`\r\n- Add a Razor component to the project with some sort of user interactivity support.\r\n- Add the component to the *Privacy.cshtml* page: `@(await Html.RenderComponentAsync<MyComponent>(RenderMode.ServerPrerendered))`\r\n- Run the app and browser to the Privacy page\r\n\r\nActual result:\r\n- The component is not interactive, because the request for *blazor.server.js* goes to */Home/_framework/blazor.server.js*. \r\n- To work around this issue, update the script tag to use `~/`: `<script src=\"~/_framework/blazor.server.js\"></script>`. **Should we do this everywhere?**\r\n- The component is still not interactive because the SignalR client tries to connect to `/Home/_blazor/`. This seems like a bug we need to fix in *blazor.server.js*?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Blazor components must be interactive when accessed from any valid route/page in the application",
+      "JavaScript resources must load successfully from any page location",
+      "SignalR connection must establish successfully from any page location",
+      "Base path configuration must be consistent across the application"
+    ],
+    "created_at": "2019-09-23T06:09:17Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/14144",
+    "source": {
+      "issue_number": 14144
+    },
+    "initial_question": {
+      "title": "Blazor String Parameters in event handlers in the new Preview 9, rc.",
+      "body": "### Is your feature request related to a problem? Please describe.\r\n\r\nHi I just updated from AspNetCore 3.0 Preview 7 to AspNetCore 3.0 RC1 and there the event handler syntax changed significantly.\r\n\r\nThe old version was this:\r\nonclick=@(async ()=> SetPagerSize(\"forward\"))\r\n\r\nI havent found something yet, but is there a way to pass strings as parameters.\r\n\r\nThere passing string parameters was possible \r\n\r\nHow can I pass strings to functions in RC1?\r\n\r\n<button class=\"btn pagebutton btn-secondary\" @onclick=\"(async ()=> NavigateToPage(\"next\"))\">Next</button>\r\n\r\n\r\nsince the content of @onclick= needs to be inside \"\", the string \"next\" will end this string. Is there already a syntax to fix this? When I use '' like in javascript \r\n\r\n### Describe the solution you'd like\r\nNot shure what would be the best soltion, now I extract all my strings to constants. In javascript you can always use '' inside the \"\", but that would violate the C# syntax.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "String parameters must be successfully passed to event handler functions",
+      "Syntax must be valid within Blazor's event binding syntax",
+      "String delimiters must not prematurely terminate the attribute value",
+      "Solution must be compatible with async lambda expressions"
+    ],
+    "created_at": "2019-09-19T12:07:15Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/13895",
+    "source": {
+      "issue_number": 13895
+    },
+    "initial_question": {
+      "title": "context.Features.Get<IHttpMaxRequestBodySizeFeature>() is null during test",
+      "body": "### Describe the bug\r\nWhen writing a XUNIT test for testing for max body sizes, the line\r\n\r\n```C#\r\ncontext.Features.Get<IHttpMaxRequestBodySizeFeature>()\r\n```\r\nthrows a error of \r\n\r\n```\r\nSystem.NullReferenceException: 'Object reference not set to an instance of an object.'\r\n```\r\n\r\n```C#\r\nprivate readonly WebApplicationFactory<XXXX.Startup> _webAppFactory;\r\n\r\n var webAppClient = _webAppFactory\r\n                .WithWebHostBuilder(\r\n                builder =>\r\n                {\r\n                    builder.UseSolutionRelativeContentRoot(@\"..\\..\\\", \"XXXX.sln\");              \r\n                    builder.Configure(app =>\r\n                    {\r\n                        app.Run(async context =>\r\n                        {\r\n                            context.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize = 100_000_000;\r\n                        });\r\n\r\n                    });\r\n                }\r\n            )\r\n            .CreateClient(clientOptions);\r\n````\r\n\r\n### To Reproduce\r\nSteps to reproduce the behavior:\r\n1. Using this version of ASP.NET Core '...'\r\n2. Run this code '....'\r\n3. With these arguments '....'\r\n4. See error\r\n\r\n### Expected behavior\r\n`context.Features.Get<IHttpMaxRequestBodySizeFeature>()` not to be and be able to set the value of MaxRequestBodySize to a given value\r\n\r\n\r\n### Additional context\r\nAdd any other context about the problem here.\r\nInclude the output of `dotnet --info`\r\n dotnet --info\r\n.NET Core SDK (reflecting any global.json):\r\n Version:   2.2.100\r\n Commit:    b9f2fa0ca8\r\n\r\nRuntime Environment:\r\n OS Name:     Windows\r\n OS Version:  10.0.15063\r\n OS Platform: Windows\r\n RID:         win10-x64\r\n Base Path:   C:\\Program Files\\dotnet\\sdk\\2.2.100\\\r\n\r\nHost (useful for support):\r\n  Version: 2.2.0\r\n  Commit:  1249f08fed\r\n\r\n.NET Core SDKs installed:\r\n  2.1.403 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.502 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.505 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.602 [C:\\Program Files\\dotnet\\sdk]\r\n  2.2.100 [C:\\Program Files\\dotnet\\sdk]\r\n\r\n.NET Core runtimes installed:\r\n  Microsoft.AspNetCore.All 2.1.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.1.9 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.All 2.2.0 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.All]\r\n  Microsoft.AspNetCore.App 2.1.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.1.9 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.AspNetCore.App 2.2.0 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]\r\n  Microsoft.NETCore.App 2.1.5 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.1.9 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]\r\n  Microsoft.NETCore.App 2.2.0 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]"
+    },
+    "satisfaction_conditions": [
+      "Test environment allows feature registration when needed"
+    ],
+    "created_at": "2019-09-11T15:54:52Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/13713",
+    "source": {
+      "issue_number": 13713
+    },
+    "initial_question": {
+      "title": "Question: How to update EditContext.FieldClass from preview8 to preview9?",
+      "body": "How can we update `EditContext?.FieldClass(FieldIdentifier)` from preview8 to preview9? Is `EditContext?.FieldCssClass(FieldIdentifier)` the equivalent?"
+    },
+    "satisfaction_conditions": [
+      "Code using EditContext field class functionality continues to work after upgrading from preview8 to preview9",
+      "Code references the correct method name for the new preview version",
+      "Existing field class styling behavior is preserved"
+    ],
+    "created_at": "2019-09-05T13:07:33Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/13195",
+    "source": {
+      "issue_number": 13195
+    },
+    "initial_question": {
+      "title": " JsonSerializerOptions has no setter",
+      "body": "When I want to set new options with `AddJsonOptions` the `JsonSerializerOptions` is read-only.\r\n```C#\r\npublic static void ConfigureServices(this IServiceCollection services)\r\n{\r\n    services.AddControllers().AddJsonOptions(options =>\r\n    {\r\n        options.JsonSerializerOptions = new JsonSerializerOptions(); // compile error\r\n    });\r\n}\r\n```\r\nSo here I think `AddJsonOptions` is useless and I have to use `Configure` method:\r\n```C#\r\nservices.Configure<JsonSerializerOptions>(options =>\r\n{\r\n    options.IgnoreNullValues = true;\r\n\r\n});\r\n```\r\n\r\n```\r\nASP.NET Core Version: 3.0 Preview 8 \r\n\r\n.NET Core SDK (reflecting any global.json):\r\n Version:   3.0.100-preview8-013656\r\n Commit:    8bf06ffc8d\r\n\r\nRuntime Environment:\r\n OS Name:     Windows\r\n OS Version:  10.0.18362\r\n OS Platform: Windows\r\n RID:         win10-x64\r\n Base Path:   C:\\Program Files\\dotnet\\sdk\\3.0.100-preview8-013656\\\r\n\r\nHost (useful for support):\r\n  Version: 3.0.0-preview8-28405-07\r\n  Commit:  d01b2fb7bc\r\n\r\n.NET Core SDKs installed:\r\n  2.1.800-preview-009696 [C:\\Program Files\\dotnet\\sdk]\r\n  2.1.800 [C:\\Program Files\\dotnet\\sdk]\r\n  2.2.300 [C:\\Program Files\\dotnet\\sdk]\r\n  3.0.100-preview6-012264 [C:\\Program Files\\dotnet\\sdk]\r\n  3.0.100-preview8-013656 [C:\\Program Files\\dotnet\\sdk]\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "JSON serialization options are successfully modified",
+      "Code compiles without errors",
+      "Changes are applied within the service configuration phase",
+      "Null value handling behavior is configurable"
+    ],
+    "created_at": "2019-08-16T18:54:22Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/13151",
+    "source": {
+      "issue_number": 13151
+    },
+    "initial_question": {
+      "title": "AddAttribute onclick no longer accepts lambda expressions",
+      "body": "I've been working on a project without updating for a while, but it seems like no one else can contribute with my current setup so I decided to try setting it up with the latest version of Blazor. It's almost working, but I make extensive use of \r\n\r\n`builder.AddAttribute()`\r\n\r\nespecially with buttons. It seems that now the AddAttribute function no longer accepts actions, and when I try to do something like \r\n\r\n`builder.AddAttribute(2, \"onclick\", () => ToggleNavMenu());`\r\n\r\nI get a an error:\r\n\r\n>Error\tCS1660\tCannot convert lambda expression to type bool because it is not a delegate type\t\r\n\r\nIt seems like there is a different way to do it now, but in my searching I couldn't find any examples. \r\n"
+    },
+    "satisfaction_conditions": [
+      "Button click events must successfully trigger the intended method call",
+      "Code must compile without delegate type conversion errors",
+      "RenderTreeBuilder must be able to attach event handlers to elements",
+      "Event handler must support passing parameters to the target method"
+    ],
+    "created_at": "2019-08-15T00:31:27Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/12167",
+    "source": {
+      "issue_number": 12167
+    },
+    "initial_question": {
+      "title": "What is the CheckAccess pattern in Blazor ?",
+      "body": "Could you please describe this concept !\r\n\r\nThanks..."
+    },
+    "satisfaction_conditions": [
+      "Explains thread context requirements for UI operations",
+      "Describes a mechanism to check current thread context",
+      "Explains context switching behavior",
+      "Distinguishes between different Blazor scenarios",
+      "Identifies common use cases"
+    ],
+    "created_at": "2019-07-14T17:46:29Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/11099",
+    "source": {
+      "issue_number": 11099
+    },
+    "initial_question": {
+      "title": "UriHelper cannot be used to navigate to non-Blazor URIs in server-side",
+      "body": "# Repro\r\n\r\nCreate a new server-side Blazor app (with auth).\r\n\r\nTry to use `IUriHelper.NavigateTo(\"Identity/Account/Login\")` (make a button).\r\n\r\nIt will go to the Not Found page instead of doing an actual navigation. However, making an `<a href>` with the same URL will navigate to the login page.\r\n\r\nUsing preview 6"
+    },
+    "satisfaction_conditions": [
+      "Navigation to non-Blazor routes must complete successfully",
+      "Navigation behavior must be consistent with standard browser navigation",
+      "Programmatic navigation must bypass Blazor router when needed",
+      "Authentication-related routes must remain accessible"
+    ],
+    "created_at": "2019-06-11T16:59:52Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/10980",
+    "source": {
+      "issue_number": 10980
+    },
+    "initial_question": {
+      "title": "[SignalR] Access HubContext in Ctor of strongly typed Hub",
+      "body": "Is it/should it be possible to access the `HubContext `in the constructor of a strongly typed hub?\r\nI\u00b4m trying to initialize some members of my hub in the ctor with values from `context.items` but the context is null at that time. Is this intended by design?"
+    },
+    "satisfaction_conditions": [
+      "Hub context access must be deferred until after hub instantiation",
+      "Any initialization requiring HubContext must occur after constructor execution"
+    ],
+    "created_at": "2019-06-07T07:27:31Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/10796",
+    "source": {
+      "issue_number": 10796
+    },
+    "initial_question": {
+      "title": "Blazor: Calling Javasscript Interop on Program.cs ",
+      "body": "Hello,\r\n\r\nI need to make a Javascript Interop call on the Program.cs. Please, check my code below:\r\n\r\n    public class Program\r\n    {\r\n        public static void Main(string[] args)\r\n        {\r\n            var host = CreateHostBuilder(args).Build();\r\n            using (var scope = host.Services.CreateScope())\r\n            {\r\n                var js = scope.ServiceProvider.GetRequiredService<IJSRuntime>();\r\n                var lang = js.InvokeAsync<string>(\"myJsFunctions.browserLanguage\").Result;\r\n                CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(lang);                \r\n            }\r\n            host.Run();\r\n        }\r\n\r\n        public static IWebAssemblyHostBuilder CreateHostBuilder(string[] args) =>\r\n            BlazorWebAssemblyHost.CreateDefaultBuilder()\r\n                .UseBlazorStartup<Startup>();\r\n    }\r\n\r\nI've tried all the possible ways to make that async call, but in all the cases the application is not started on the browser, and it freezes on the loading... page.\r\n\r\nAm I doing something wrong? As you can see, I need to catch the browser language before the application is loaded.\r\n\r\nThanks!\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "JavaScript interop call successfully retrieves browser language",
+      "Application successfully loads and renders without freezing",
+      "Browser language is obtained before culture-dependent components are rendered",
+      "JavaScript runtime is fully initialized before interop calls"
+    ],
+    "created_at": "2019-06-03T20:16:26Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/10404",
+    "source": {
+      "issue_number": 10404
+    },
+    "initial_question": {
+      "title": "[Question] How to add Custom JsonConverter to Blazor Client application",
+      "body": "I have created my own custom JsonConverter for custom data structure ... But I can use it only with JsonConvert.DeserializeObject directly\r\nIt would be nice somehow to register in Blazor Client Application Custom JsonConverter\r\nBut using services.AddMvc() it is not possible because is not found anywhere in assembly as extension method\r\n\r\nHow to add custom JsonConverter ?"
+    },
+    "satisfaction_conditions": [
+      "Custom JSON deserialization must work with HTTP responses in Blazor client",
+      "Solution must work within Blazor client's architecture limitations",
+      "Raw HTTP response data must be accessible for custom processing",
+      "Custom deserialization logic must be applicable to the response data"
+    ],
+    "created_at": "2019-05-20T20:00:02Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/10254",
+    "source": {
+      "issue_number": 10254
+    },
+    "initial_question": {
+      "title": "Anti forgery token of razor page forms within folders not available automatically. ",
+      "body": ""
+    },
+    "satisfaction_conditions": [
+      "Anti-forgery token is successfully generated and included in form submissions"
+    ],
+    "created_at": "2019-05-15T07:22:48Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/8386",
+    "source": {
+      "issue_number": 8386
+    },
+    "initial_question": {
+      "title": "How to create a component of InputText to use in EditForm",
+      "body": "### Cenario\r\nI'm trying to make a component that uses InputText, but when I edit the textbox, it doesn't update the EditForm Model. This is how i'm trying to do this:\r\n\r\n#### RazorInputTest.razor\r\n    <div class=\"form-group\">\r\n        <label class=\"col-form-label\">@Label</label>\r\n        <InputText Class=\"form-control\" bind-Value=\"@Value\"></InputText>\r\n    </div>\r\n\r\n    @functions{\r\n        [Parameter] string Label { get; set; }\r\n        [Parameter] string Value { get; set; }\r\n        [Parameter] EventCallback<string> ValueChanged { get; set; }\r\n    }\r\n\r\n#### Index.razor\r\n    <span>Name of the category: @category.Name</span>\r\n    <EditForm Model=\"@category\">\r\n        <RazorInputTest bind-Value=\"@category.Name\"/>\r\n    </EditForm>\r\nWhen I edit the input, the span with the \"Name of the category\" doesn't update, but I don't know what I am doing wrong.\r\n\r\n### Objective\r\nI'm doing a set of bootstrap formated components and this is an important part of this project: preformated input-boxes. I want to create components that binds viewmodels, like InputText does inside the EditForm, but InputText inside a component, inside a EditForm inside another component.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Component must maintain Bootstrap formatting",
+      "Component must support nested usage within other components"
+    ],
+    "created_at": "2019-03-10T13:45:42Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/6926",
+    "source": {
+      "issue_number": 6926
+    },
+    "initial_question": {
+      "title": "Microsoft.AspNetCore.Mvc, .NetStandard and .NetCore versions",
+      "body": "I understand how .Net Standard and .Net Core relate. However, can you please clarify the relationships between versions of packages like Microsoft.AspNetCore.Mvc and .Net Standard and .Net Core. It would appear that the version numbers for Microsoft.AspNetCore.Mvc seems to track against .Net Core but does that mean there are any dependencies between them or not because Microsoft.AspNetCore.Mvc lists .Net Standard 2.0 as a dependency not .Net Core?\r\n\r\nFor example, if I've got a .Net Core 2.1 application with a project that is using .Net Standard 2.0 and that references Microsoft.AspNetCore.Mvc 2.1.3, what are the implications of updating Microsoft.AspNetCore.Mvc to 2.2.0?"
+    },
+    "satisfaction_conditions": [
+      "Version compatibility must be maintained between the web application and its ASP.NET Core packages",
+      "Package references must be appropriately handled for .NET Core applications",
+      "Class libraries targeting .NET Standard must use compatible package versions",
+      "Framework upgrade requirements must be clearly identified"
+    ],
+    "created_at": "2019-01-22T17:14:49Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/5839",
+    "source": {
+      "issue_number": 5839
+    },
+    "initial_question": {
+      "title": "Bug: doesn't check duplicated email while changing user's email address",
+      "body": "When I call UserManager.SetEmailAsync(), it doesn't validate whether there's duplicated email address in database which could cause more than one users having the same email address.\r\n\r\nIf there're any duplicated email addresses in database, the UserManager.FindByEmailAsync() will not working properly -- it only return one result but not all matching results.\r\n\r\nTherefore, it's necessary to validate duplicated email address while creating user and changing user's email address."
+    },
+    "satisfaction_conditions": [
+      "Email uniqueness validation must be configurable"
+    ],
+    "created_at": "2018-11-27T12:28:13Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/3159",
+    "source": {
+      "issue_number": 3159
+    },
+    "initial_question": {
+      "title": "Generalization of the ModelState error messages",
+      "body": "Hey everyone,\r\nI am making a school project where I want to use localization in the SPA project, not in API.\r\nFor this project I am using dotnet core 2.0.\r\n\r\nThe problem what I actually have is, how to generalize error messages like:\r\n - for invalid input returns 'invalid_input'\r\n - for missing data returns 'required'\r\n\r\nExample JSON:\r\n```\r\n{\r\n  'login': 'required',\r\n  'password': 'too_short'\r\n}\r\n```\r\n\r\nRegards,\r\nTheAifam5"
+    },
+    "satisfaction_conditions": [
+      "Error messages must be customizable to return standardized keys/codes",
+      "Error message format must be compatible with client-side localization",
+      "Solution must work within ASP.NET Core 2.0 validation framework"
+    ],
+    "created_at": "2018-05-20T19:33:27Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/2782",
+    "source": {
+      "issue_number": 2782
+    },
+    "initial_question": {
+      "title": "Is there any way to read and rewrite the request body in a middleware?",
+      "body": "If i do it like this,:\r\n```\r\nusing System;\r\nusing System.IO;\r\nusing System.Threading.Tasks;\r\nusing Microsoft.AspNetCore.Http;\r\nusing Microsoft.AspNetCore.Http.Internal;\r\nusing Newtonsoft.Json;\r\n\r\nnamespace WebApplication5.Middleware\r\n{\r\n    public class CryptoMiddleware\r\n    {\r\n        private readonly RequestDelegate _next;\r\n\r\n        public CryptoMiddleware(RequestDelegate next)\r\n        {\r\n            _next = next;\r\n        }\r\n\r\n        public async Task Invoke(HttpContext context)\r\n        {\r\n            var req = context.Request;\r\n            var resp = context.Response;\r\n            var orignalResponseBody = resp.Body;\r\n\r\n            using (var responseStream = new MemoryStream())\r\n            {\r\n                try\r\n                {\r\n                    resp.Body = responseStream;\r\n\r\n                    req.EnableRewind();\r\n                    using (var reader = new StreamReader(req.Body))\r\n                    {\r\n                        var reqData = reader.ReadToEnd();\r\n                    }\r\n\r\n                    var reqPlainObj = new\r\n                    {\r\n                        data = \"plain text\"\r\n                    };\r\n                    var reqPlainString = JsonConvert.SerializeObject(reqPlainObj);\r\n\r\n                    using (var writer = new StreamWriter(req.Body))\r\n                    {\r\n                        writer.Write(reqPlainString);\r\n                    }\r\n\r\n                    await _next(context);\r\n\r\n                    using (var reader = new StreamReader(resp.Body))\r\n                    {\r\n                        var str = reader.ReadToEnd();\r\n                        Console.WriteLine($\"response plain:{str}\");\r\n                    }\r\n\r\n                    var respDataObj = new\r\n                    {\r\n                        data = \"response data\"\r\n                    };\r\n                    var respDataStr = JsonConvert.SerializeObject(respDataObj);\r\n                    \r\n                    using (var writer = new StreamWriter(orignalResponseBody))\r\n                    {\r\n                        writer.Write(respDataStr);\r\n                    }\r\n                }\r\n                finally\r\n                {\r\n                    resp.Body = orignalResponseBody;\r\n                }\r\n            }\r\n           \r\n        }\r\n    }\r\n}\r\n\r\n```\r\nthe paramater in my action is always null."
+    },
+    "satisfaction_conditions": [
+      "Original response body stream must be restored after processing"
+    ],
+    "created_at": "2018-01-16T08:25:40Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/1821",
+    "source": {
+      "issue_number": 1821
+    },
+    "initial_question": {
+      "title": "Error at DefaultAntiforgeryTokenSerializer.Deserialize(String serializedToken)",
+      "body": "I'm getting an error with a very short stack trace. It occurs when I try to login to my .net core web application. Also, I can't seem to reproduce the error on my development environment. It only occurs on my staging environment. I'm having a hard time finding out where this error is coming from or why it's happening. Does anyone have an idea?\r\n\r\n```\r\nat Microsoft.AspNetCore.Antiforgery.Internal.DefaultAntiforgeryTokenSerializer.Deserialize(String serializedToken)\r\nat Microsoft.AspNetCore.Antiforgery.Internal.DefaultAntiforgery.GetCookieTokenDoesNotThrow(HttpContext httpContext)\r\n```\r\n\r\nNot doing anything special in my Login post.\r\n\r\n        [AllowAnonymous]\r\n        [HttpPost(\"/Login\")]\r\n        public async Task<IActionResult> Login(LoginModel lm, string returnUrl)\r\n        {\r\n            ViewBag.ReturnUrl = returnUrl;\r\n\r\n            var loginResult = await _authManager.SignInAsync(lm.Username, lm.Password);\r\n            if (loginResult.Result == LoginValidationResultType.Ok)\r\n            {\r\n                if (string.IsNullOrWhiteSpace(returnUrl))\r\n                {\r\n                    return Redirect(\"/ew/default.asp?GroupID=23\");\r\n                }\r\n                else\r\n                {\r\n                    return Redirect(returnUrl);\r\n                }\r\n            }\r\n            return View(lm);\r\n        }\r\n\r\nHere's my project.json:\r\n\r\n```\r\n  \"buildOptions\": {\r\n    \"emitEntryPoint\": true,\r\n    \"preserveCompilationContext\": true,\r\n    \"warningsAsErrors\": true\r\n  },\r\n    \"dependencies\": {\r\n      \"MyApp.Services\": \"1.0.0-*\",\r\n      \"Microsoft.AspNetCore.Diagnostics.Elm\": \"0.1.0\",\r\n      \"Microsoft.AspNetCore.Authentication.Cookies\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Authorization\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Diagnostics\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Hosting\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Hosting.Abstractions\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Http.Extensions\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Localization\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Mvc\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Routing\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Server.IISIntegration\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Server.Kestrel\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.Session\": \"1.0.0\",\r\n      \"Microsoft.AspNetCore.StaticFiles\": \"1.0.0\",\r\n      \"Microsoft.Extensions.Caching.SqlServer\": \"1.0.0\",\r\n      \"Microsoft.Extensions.Logging.Console\": \"1.0.0\",\r\n      \"Microsoft.Extensions.Logging.Debug\": \"1.0.0\",\r\n      \"Microsoft.VisualStudio.Web.BrowserLink.Loader\": \"14.0.0\",\r\n      \"Microsoft.AspNetCore.Razor.Tools\": {\r\n        \"version\": \"1.0.0-preview2-final\",\r\n        \"type\": \"build\"\r\n      },\r\n      \"Microsoft.Extensions.Configuration.EnvironmentVariables\": \"1.0.0\",\r\n      \"Microsoft.Extensions.Configuration.Json\": \"1.0.0\",\r\n      \"Microsoft.Extensions.Logging\": \"1.0.0\",\r\n      \"Microsoft.Extensions.Options.ConfigurationExtensions\": \"1.0.0\",\r\n      \"Microsoft.DotNet.ProjectModel\": \"1.0.0-rc4-003206\"\r\n    },\r\n\r\n  \"frameworks\": {\r\n    \"net461\": {}\r\n  },\r\n\r\n  \"runtimeOptions\": {\r\n    \"configProperties\": {\r\n      \"System.GC.Server\": true\r\n    }\r\n  },\r\n\r\n  \"tools\": {\r\n    \"BundlerMinifier.Core\": \"2.0.238\",\r\n    \"Microsoft.AspNetCore.Razor.Tools\": \"1.0.0-preview2-final\",\r\n    \"Microsoft.AspNetCore.Server.IISIntegration.Tools\": \"1.0.0-preview2-final\"\r\n  },\r\n\r\n  \"scripts\": {\r\n    \"postpublish\": \"dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%\"\r\n  }\r\n```\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Application continues to function normally despite antiforgery token decryption errors",
+      "Login page loads successfully after authentication cookie expiration",
+      "Error logging captures antiforgery token issues without application failure",
+      "Form submission security remains intact"
+    ],
+    "created_at": "2016-11-16T16:26:51Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/1308",
+    "source": {
+      "issue_number": 1308
+    },
+    "initial_question": {
+      "title": "Is there a way to create a class library for .NET Core and the normal .NET",
+      "body": "Hi everyone,\n\nI need a way to build a library that I can use in a WPF-Application and in a .NET Core Web-API. Is there any way to do this?\n\nPaule\n"
+    },
+    "satisfaction_conditions": [
+      "Library must be compatible with both WPF and .NET Core Web-API environments",
+      "Library must support multi-targeting of different .NET frameworks",
+      "Library can be referenced and used from both application types",
+      "Build process produces appropriate outputs for each target framework"
+    ],
+    "created_at": "2016-02-17T09:46:31Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/861",
+    "source": {
+      "issue_number": 861
+    },
+    "initial_question": {
+      "title": "ErrorPageOptions in beta6",
+      "body": "After updating the ASP.Net5 WebApp project template to beta6 I have the following issue in Startup.cs:\n\n```\napp.UseErrorPage(ErrorPageOptions.ShowAll);\n```\n\nThis line throws _'ErrorPageOptions' does not contain a definition for 'ShowAll'._ Any idea, how this is handled in beta6?\n"
+    },
+    "satisfaction_conditions": [
+      "Error page functionality is successfully enabled in development environment",
+      "Code compiles without ErrorPageOptions.ShowAll reference",
+      "Detailed error information is visible when running in development mode",
+      "Error handling behaves appropriately for different environments"
+    ],
+    "created_at": "2015-08-24T21:47:28Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/645",
+    "source": {
+      "issue_number": 645
+    },
+    "initial_question": {
+      "title": "Implicit references",
+      "body": "If an app makes an explicit reference to some assembly in some package, you would expect it to have that package listed in the _project.json_ file. \n\nHowever what happens if there is an implicit reference? The one use-case we have is that the **Hosting:Application** environment variable _may_ be set and this allows an alternative Startup class to be executed when the app starts up. This has nothing to do with the app itself (the environment variable applies to _all_ apps) so the app would not have an entry in the _project.json_ file. However when you try to run the app, it fails because the runtime is trying to find the global Startup class and since there is no entry in the _project.json_ file for the appropriate package the load fails even if the package is available in the _packages_ folder. \n\nThis begs the question on how such corner cases for implicit references should be handled. Ideally there should be a way (env variable etc.) to specify which package contains the assembly containing the global startup. Or am I doing something wrong with my setup?\n"
+    },
+    "satisfaction_conditions": [
+      "Dependencies must be resolved before runtime execution begins",
+      "Solution must work within CoreCLR constraints"
+    ],
+    "created_at": "2015-05-29T16:49:36Z"
+  },
+  {
+    "id": "https://github.com/dotnet/aspnetcore/issues/19530",
+    "source": {
+      "issue_number": 19530
+    },
+    "initial_question": {
+      "title": "httpContext.Response.OnStarting lambdas executing in reverse order ",
+      "body": "I have a setup where the same cookie might get deleted, set or changed in the same request based on various business logic. As per Microsoft suggestion, I have these cookie updates wrapped up inside OnStarting. In doing so, I have noticed that the lamdas run in the REVERSE order of their registration.\r\n\r\nEg: \r\n```\r\n\r\n            this.HttpContext.Response.OnStarting(\r\n                () =>\r\n                {\r\n                    Console.WriteLine(1);\r\n                    return Task.CompletedTask;\r\n                });\r\n\r\n            this.HttpContext.Response.OnStarting(\r\n               () =>\r\n               {\r\n                   Console.WriteLine(2);\r\n                   return Task.CompletedTask;\r\n               });\r\n\r\n            this.HttpContext.Response.OnStarting(\r\n               () =>\r\n               {\r\n                   Console.WriteLine(3);\r\n                   return Task.CompletedTask;\r\n               });\r\n\r\n            this.HttpContext.Response.OnStarting(\r\n               () =>\r\n               {\r\n                   Console.WriteLine(4);\r\n                   return Task.CompletedTask;\r\n               });\r\n\r\n            this.HttpContext.Response.OnStarting(\r\n               () =>\r\n               {\r\n                   Console.WriteLine(5);\r\n                   return Task.CompletedTask;\r\n               });\r\n\r\n            this.HttpContext.Response.OnStarting(\r\n               () =>\r\n               {\r\n                   Console.WriteLine(6);\r\n                   return Task.CompletedTask;\r\n               });\r\n\r\n            this.HttpContext.Response.OnStarting(\r\n               () =>\r\n               {\r\n                   Console.WriteLine(7);\r\n                   return Task.CompletedTask;\r\n               });\r\n\r\n```\r\n\r\nOutputs:\r\n7\r\n6\r\n5\r\n4\r\n3\r\n2\r\n1\r\n\r\nASP.NET Core version: 3.1"
+    },
+    "satisfaction_conditions": [
+      "Cookie modifications must be completed before response starts",
+      "Multiple registered OnStarting callbacks must execute in last-in-first-out (LIFO) order",
+      "Response state validation must be performed before cookie operations"
+    ],
+    "created_at": "2020-03-03T17:05:17Z"
+  }
+]

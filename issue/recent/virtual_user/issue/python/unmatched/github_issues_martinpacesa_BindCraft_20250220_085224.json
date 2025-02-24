@@ -1,0 +1,74 @@
+[
+  {
+    "number": 170,
+    "title": "Ranking function",
+    "created_at": "2025-02-12T15:25:22Z",
+    "closed_at": "2025-02-12T16:35:44Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/170",
+    "body": "Hi, thank you for your great package! It has been incredibly useful and has made my research/task much more efficient!\n\nI'm using BindCraft and have generated 300 binders. However, they are all running at different times, which forces me to stop the pipeline before it reaches 100. Is there a way to run the ranking function individually?\n\nAny guidance or suggestions would be greatly appreciated!\n\n",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/170/comments",
+    "author": "JH-42",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2025-02-12T15:31:14Z",
+        "body": "Yeah, I just set the number of designs to 1 and run it again"
+      }
+    ]
+  },
+  {
+    "number": 169,
+    "title": "Missing subunit in output model",
+    "created_at": "2025-02-11T13:10:52Z",
+    "closed_at": "2025-02-13T15:24:43Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/169",
+    "body": "Hello,\n\nIm currently trying to design binders for a complex composed of 3 subunits. To accelerate processing I delete one subunit and trim away parts of the structure of the remaining 2 subunits that are far away from the hotspot and do not interfere with binding of the binder. I successfully managed to design binders for one complex (4ic0) but for a homologous complex (6qgt) I can't get it to work. For some reason one subunit gets skipped during the process. So the output structure only contains subunit G (where the hotspot is on) but subunit B is missing, which probably causes binder design to the interface where subunit B should sit.\nSo far I tried using different trimmed structures as input and also the not trimmed structure (apart from deleting the 3rd subunit) and renaming the chains (don't now if the name of the chain even effects anything).\u00a0\n\nI am using these settings:\u00a0\nadvanved filters =default_4stage_multimer_hardtarget.json\nfilters = slightly adjusted version of the peptide_filters.json\nHowever all these settings worked fine on the first complex.\n\nDo you have an idea what causes this issue?\nKind regards",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/169/comments",
+    "author": "da-schaefer",
+    "comments": [
+      {
+        "user": "martinpacesa",
+        "created_at": "2025-02-13T11:24:13Z",
+        "body": "So if a subunit is missing, it probably was not specified in the 'chains = \"A,B,C\"' of the target_settings file. The chain names there correspond to what chains are taken into account during design so it does matter. Can you double check that it matches to what is in your pdb file?"
+      }
+    ]
+  },
+  {
+    "number": 4,
+    "title": "ValueError: RGBA values should be within 0-1 range",
+    "created_at": "2024-10-02T22:13:42Z",
+    "closed_at": "2024-10-03T06:36:50Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/4",
+    "body": "Hey, \r\nsorry, but I ran into another issue when running the provided example. Stage 4 finishes, but then I get the following: \r\n\r\nTrajectory successful, final pLDDT: 0.74\r\nTraceback (most recent call last):\r\n  File \"/home/joe/Software/BindCraft/bindcraft.py\", line 108, in <module>\r\n    trajectory = binder_hallucination(design_name, target_settings[\"starting_pdb\"], target_settings[\"chains\"],\r\n  File \"/home/joe/Software/BindCraft/functions/colabdesign_utils.py\", line 227, in binder_hallucination\r\n    plots = af_model.animate(dpi=150)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/colabdesign/af/utils.py\", line 118, in animate\r\n    return make_animation(**sub_traj, pos_ref=pos_ref, length=self._lengths,\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/colabdesign/shared/plot.py\", line 303, in make_animation\r\n    ims[-1].append(plot_pseudo_3D(pos[k], c=plddt[k], Ls=Ls, cmin=0.5, cmax=0.9, **flags))\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/colabdesign/shared/plot.py\", line 177, in plot_pseudo_3D\r\n    lines = mcoll.LineCollection(seg_xy[order], colors=colors[order], linewidths=linewidths,\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 1393, in __init__\r\n    super().__init__(\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 206, in __init__\r\n    self._internal_update(kwargs)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/artist.py\", line 1216, in _internal_update\r\n    return self._update_props(\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/artist.py\", line 1192, in _update_props\r\n    ret.append(func(v))\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 1463, in set_color\r\n    self.set_edgecolor(c)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 834, in set_edgecolor\r\n    self._set_edgecolor(c)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/collections.py\", line 813, in _set_edgecolor\r\n    self._edgecolors = mcolors.to_rgba_array(c, self._alpha)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/matplotlib/colors.py\", line 476, in to_rgba_array\r\n    raise ValueError(\"RGBA values should be within 0-1 range\")\r\nValueError: RGBA values should be within 0-1 range\r\n\r\nDid anyone else encounter this?",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/4/comments",
+    "author": "joerloeffler",
+    "comments": [
+      {
+        "user": "sokrypton",
+        "created_at": "2024-10-03T04:30:42Z",
+        "body": "Can you try downgrade matplotlib?\r\n```pip install matplotlib==3.7.1```"
+      }
+    ]
+  },
+  {
+    "number": 3,
+    "title": "TypeError: Cannot convert numpy.ndarray to numpy.ndarray",
+    "created_at": "2024-10-02T19:47:29Z",
+    "closed_at": "2024-10-03T06:37:12Z",
+    "labels": [],
+    "url": "https://github.com/martinpacesa/BindCraft/issues/3",
+    "body": "hey, \r\nafter following the steps of reinstalling pyrosetta, I ended up with the following error message when trying to rerun the example locally.\r\n\r\nTraceback (most recent call last):\r\n  File \"/home/joe/Software/BindCraft/./bindcraft.py\", line 52, in <module>\r\n    create_dataframe(trajectory_csv, trajectory_labels)\r\n  File \"/home/joe/Software/BindCraft/functions/generic_utils.py\", line 262, in create_dataframe\r\n    df = pd.DataFrame(columns=columns)\r\n  File \"/home/mojoe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/frame.py\", line 876, in __init__\r\n    mgr = dict_to_mgr(\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/internals/construction.py\", line 443, in dict_to_mgr\r\n    arrays = Series(data, index=columns, dtype=object)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/series.py\", line 490, in __init__\r\n    index = ensure_index(index)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/indexes/base.py\", line 7647, in ensure_index\r\n    return Index(index_like, copy=copy, tupleize_cols=False)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/indexes/base.py\", line 565, in __new__\r\n    arr = sanitize_array(data, None, dtype=dtype, copy=copy)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/construction.py\", line 654, in sanitize_array\r\n    subarr = maybe_convert_platform(data)\r\n  File \"/home/joe/miniforge3/envs/BindCraft/lib/python3.9/site-packages/pandas/core/dtypes/cast.py\", line 138, in maybe_convert_platform\r\n    arr = lib.maybe_convert_objects(arr)\r\n  File \"lib.pyx\", line 2538, in pandas._libs.lib.maybe_convert_objects\r\nTypeError: Cannot convert numpy.ndarray to numpy.ndarray\r\n\r\nThank you for your support! ",
+    "comments_url": "https://api.github.com/repos/martinpacesa/BindCraft/issues/3/comments",
+    "author": "joerloeffler",
+    "comments": [
+      {
+        "user": "LandonGetz",
+        "created_at": "2024-10-02T21:29:54Z",
+        "body": "I also hit this error after following the solutions in #2, but I managed to get around this by reinstalling jax (guided by some suggestions also in #2). \r\n`pip install --force-reinstall jax`"
+      }
+    ]
+  }
+]

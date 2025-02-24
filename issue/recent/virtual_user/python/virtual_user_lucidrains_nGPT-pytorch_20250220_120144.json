@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/lucidrains/nGPT-pytorch/issues/11",
+    "source": {
+      "issue_number": 11
+    },
+    "initial_question": {
+      "title": "Boolean mask doe snot work",
+      "body": "on A100, using nvidia/pytroch 24.09.py3 container, pasisng a Bollean mask does not work with sdpa. It yields NaN gradients.\r\n\r\nI made it work by multiplying the mask by -10. (-20. works too).\r\n\r\nI tested the fix: \r\n\r\n`mask = mask.float() * -torch.finfo(q.dtype).max`\r\n\r\nAnd this also yields NaN gradients.\r\n\r\nWhat works for me is simply:\r\n\r\n`mask = mask * -10.0`\r\n"
+    },
+    "satisfaction_conditions": [
+      "Attention mask must prevent NaN gradients during backpropagation",
+      "Mask values must effectively suppress attention for masked positions",
+      "Solution must handle fully masked rows/columns without breaking",
+      "Mask implementation must work with both FP16 and FP32 datatypes"
+    ],
+    "created_at": "2024-11-02T16:48:37Z"
+  }
+]

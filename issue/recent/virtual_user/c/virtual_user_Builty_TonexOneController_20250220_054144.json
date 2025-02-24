@@ -1,0 +1,47 @@
+[
+  {
+    "id": "https://github.com/Builty/TonexOneController/issues/50",
+    "source": {
+      "issue_number": 50
+    },
+    "initial_question": {
+      "title": "No sound from the pedal",
+      "body": "I have the 1.69\" LCD board V1 and flashed the 1.0.5.2 release.\nWhen connecting the development board to the pedal, there is some sound when booting (for one second) just like when connecting to a PC and after there is no sound from the pedal."
+    },
+    "satisfaction_conditions": [
+      "Boot sound remains functional"
+    ],
+    "created_at": "2025-01-18T21:00:21Z"
+  },
+  {
+    "id": "https://github.com/Builty/TonexOneController/issues/47",
+    "source": {
+      "issue_number": 47
+    },
+    "initial_question": {
+      "title": "No sound output for firmeware V1.0.4.2",
+      "body": "I am using s3-zero with the firmware V1.0.4.2. I can change the preset with my M-wave footcontroller, but there is no sound coming out from ToneX. Is there any settings on my Tonex OneI have to choose? I already set my toneX as Stomp mode, tried toggling on/off as well, but no help. \r\n\r\nThe sounds can come out if I use it without any PCB. Please advise. Thanks. "
+    },
+    "satisfaction_conditions": [
+      "Audio output is restored while device is connected via USB",
+      "Solution maintains preset switching functionality",
+      "Software configuration change resolves the issue",
+      "Solution is achievable through ToneX software settings"
+    ],
+    "created_at": "2025-01-07T19:42:54Z"
+  },
+  {
+    "id": "https://github.com/Builty/TonexOneController/issues/22",
+    "source": {
+      "issue_number": 22
+    },
+    "initial_question": {
+      "title": "Waveshare Zero + MVave Chocolate latest Version not working",
+      "body": "Hello. Great project by the way. I could flash the latest client firmware on the ESP32 Zero, but the BT is not connecting. Tried the new beta in the Special folder. So now the Chocolate is connecting, but Preset changes are not possible. It is only possible to switch from A to B on Tonex One Pedal and with a step on Chocolate it changes back to A. But after that nothing else works. And I noticed that every time when I reset the Waveshare via the button the A/B of the presets on the Tonex Pedal are changed to another preset. Maybe you can help me."
+    },
+    "satisfaction_conditions": [
+      "Bluetooth connection must be stable"
+    ],
+    "created_at": "2024-11-26T20:07:29Z"
+  }
+]

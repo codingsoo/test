@@ -1,0 +1,269 @@
+[
+  {
+    "number": 5532,
+    "title": "Import syntax error with express.Router() import",
+    "created_at": "2024-03-13T04:40:44Z",
+    "closed_at": "2024-03-13T15:23:32Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/5532",
+    "body": "### Need help figuring out why this would error.\r\nI am using bun and not node for the runtime. I don't think that affects anything here. I am using express JS 5.0 BETA 1\r\nI just feel there is a better way than actually doing (despite Node/Bun caching modules I still feel like this is redundant):\r\n```\r\nimport express from 'express';\r\nconst viewRouter = express.Router();\r\n```\r\n* The Code\r\n```\r\nimport { Router as viewRouter } from 'express';\r\nviewRouter.get('/', (req, res) => {\r\n    res.render('index.ejs');\r\n});\r\nmodule.exports = viewRouter;\r\n```\r\n* The Error\r\n```\r\nSyntaxError: Unexpected token '{'. import call expects one or two arguments.\r\n      at <parse> (/mnt/z/sic-web/src/server/routes/viewRouter.js:1:1)\r\n1 | import {Router as viewRouter} from 'express';\r\n    ^\r\n```",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/5532/comments",
+    "author": "cainba",
+    "comments": [
+      {
+        "user": "cainba",
+        "created_at": "2024-03-13T05:07:47Z",
+        "body": "One thing I made an oopsie here with is the `module.exports= viewRouter` line which is commonJS . \r\nChange it to default export viewRouter and I get the following error:\r\n```\r\nTypeError: argument handler must be a function\r\n      at /mnt/z/sic-web/src/node_modules/router/lib/route.js:211:15\r\n      at /mnt/z/sic-web/src/node_modules/express/lib/application.js:474:5\r\n      at /mnt/z/sic-web/src/sicapp.js:11:1\r\n206 | \r\n207 |     for (var i = 0; i < callbacks.length; i++) {\r\n208 |       var fn = callbacks[i]\r\n209 | \r\n210 |       if (typeof fn !== 'function') {\r\n211 |         throw new TypeError('argument handler must be a function')\r\n                    ^\r\nTypeError: argument handler must be a function\r\n      at /mnt/z/sic-web/src/node_modules/router/lib/route.js:211:15\r\n      at /mnt/z/sic-web/src/node_modules/express/lib/application.js:474:5\r\n      at /mnt/z/sic-web/src/sicapp.js:11:1\r\n^C\r\ncain@cain-pc:/mnt/z/sic-web/src$ bun run dev\r\n$ bun --hot sicapp.js\r\n206 | \r\n207 |     for (var i = 0; i < callbacks.length; i++) {\r\n208 |       var fn = callbacks[i]\r\n209 | \r\n210 |       if (typeof fn !== 'function') {\r\n211 |         throw new TypeError('argument handler must be a function')\r\n                    ^\r\nTypeError: argument handler must be a function\r\n      at /mnt/z/sic-web/src/node_modules/router/lib/route.js:211:15\r\n      at /mnt/z/sic-web/src/node_modules/express/lib/application.js:474:5\r\n      at /mnt/z/sic-web/src/sicapp.js:12:1\r\n206 | \r\n207 |     for (var i = 0; i < callbacks.length; i++) {\r\n208 |       var fn = callbacks[i]\r\n209 | \r\n210 |       if (typeof fn !== 'function') {\r\n211 |         throw new TypeError('argument handler must be a function')\r\n                    ^\r\nTypeError: argument handler must be a function\r\n      at /mnt/z/sic-web/src/node_modules/router/lib/route.js:211:15\r\n      at /mnt/z/sic-web/src/node_modules/express/lib/application.js:474:5\r\n      at /mnt/z/sic-web/src/sicapp.js:12:1\r\n```"
+      },
+      {
+        "user": "wesleytodd",
+        "created_at": "2024-03-13T15:23:32Z",
+        "body": "I am nearly positive even if you get this issue worked out you will just hit other issues. Express couples deeply to Node.js api's which are likely different enough to matter. Just don't want to provide an answer on the errors without pointing out you are likely in for a world of pain \ud83e\udd23. Additionally I don't think it has been discussed yet, but we likely do not have any plans to support Bun, so YMMV on this effort even in the longer term.\r\n\r\nThat said, it looks to me like something else is up with your code as I am not sure how the runtime difference could cause a typeof check to fail. And since that is the case, I am going to close this since we do not do technical support in here. If you can prove this is a bug of some sort in express please re-open this, but otherwise I would ask on Reddit or StackOverflow."
+      },
+      {
+        "user": "joeyguerra",
+        "created_at": "2024-03-13T16:45:27Z",
+        "body": "I agree with Wes.\r\n\r\nI'll add this to give you some suggestion though.\r\n\r\n```javascript\r\nimport { Router as viewRouter } from 'express'\r\nviewRouter().get('/', (req, res) => {\r\n  res.render('index')\r\n})\r\nexport default viewRouter\r\n```\r\n\r\n`Router` is a function.\r\n\r\nI would suggest the following instead for `viewRouter.js`\r\n\r\n```javascript\r\nexport default app => {\r\n  app.get('/', (req, res) => {\r\n    res.render('index')\r\n  })\r\n}\r\n```\r\n\r\nand in `sicapp.js`, \r\n\r\n\r\n```javascript\r\nimport express from 'express'\r\nimport viewRouter from './routes/viewRouter.js'\r\n// other code\r\n...\r\n\r\nconst app = express()\r\n....\r\nviewRouter(app)\r\n\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 5331,
+    "title": "Cannot route to a specific route",
+    "created_at": "2023-11-23T18:11:28Z",
+    "closed_at": "2023-11-25T14:26:00Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/5331",
+    "body": "> This is the route that I want the express to route\r\n```\r\napp.use('/griev', require('./routes/api/grievance'));\r\n\r\napp.all('*', (req, res) => {\r\n    res.status(404);\r\n    if (req.accepts('html')) {\r\n        res.sendFile(path.join(__dirname, 'views', '404.html'));\r\n    } else if (req.accepts('json')) {\r\n        res.json({ \"error\": \"404 Not Found\" });\r\n    } else {\r\n        res.type('txt').send(\"404 Not Found\");\r\n    }\r\n});\r\n```\r\n> This is my grievance api route\r\n\r\n```\r\nconst express = require('express');\r\nconst router = express.Router();\r\nconst grievController = require('../../controllers/grievController');\r\nconst ROLES_LIST = require('../../config/roles_list');\r\nconst verifyRoles = require('../../middleware/verifyRoles');\r\n\r\nconsole.log(\"griev route\")\r\n\r\nif (verifyRoles(ROLES_LIST.User)) {\r\n    router.post(grievController.createIssue);\r\n}\r\nelse\r\n    console.log(\"could not verify\");\r\n\r\n\r\nmodule.exports = router;\r\n```\r\n**All I get is 404 error whenever I make a post request to ```/griev``` route** ",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/5331/comments",
+    "author": "premsai-konduru",
+    "comments": [
+      {
+        "user": "AverageY",
+        "created_at": "2023-11-23T20:03:32Z",
+        "body": "Does adding a route to the post fix it?\n\n```\nrouter.post('/' , controller);\n```"
+      }
+    ]
+  },
+  {
+    "number": 4879,
+    "title": "The router restore function can incorrectly set variables to undefined",
+    "created_at": "2022-04-03T14:26:13Z",
+    "closed_at": "2022-04-03T16:13:04Z",
+    "labels": [
+      "question",
+      "module:router"
+    ],
+    "url": "https://github.com/expressjs/express/issues/4879",
+    "body": "I found a case where `request.params` becomes undefined. Here is a concrete test case to reproduce the case:\r\n\r\n```javascript\r\n// test/app.router.js\r\n\r\nit('should have req.params in finish event after handler2 calls next', function(done){\r\n  var app = express();\r\n\r\n  function handler1(req, res, next) {\r\n    res.once('finish', function() {\r\n      setTimeout(function() {\r\n        assert(req.params.id);\r\n      })\r\n    })\r\n\r\n    next()\r\n  }\r\n\r\n  function handler2(req, res, next){\r\n    res.end(req.params.id);\r\n    next()\r\n  }\r\n\r\n  app.get('/user/:id', handler1, handler2);\r\n\r\n  request(app)\r\n  .get('/user/1')\r\n  .expect(200, '1', done);\r\n})\r\n```\r\n\r\nThe test runs fine if there is no `next` call in `handler2`. The `setTimeout` in `handler1` ensures that the test fails.\r\n\r\nAs I understand it, the last `next` will cause the function `done` to be called in the router:\r\n\r\n```javascript\r\n// lib/router/index.js\r\n\r\n// no more matching layers\r\nif (idx >= stack.length) {\r\n    setImmediate(done, layerError);\r\n    return;\r\n}\r\n```\r\n\r\nThe problem is that `done` is not working correctly in this case. If there are middlewares and no router the `done` function will replace `baseUrl`, `next`, and `params` with the value `undefined`.\r\n\r\n```javascript\r\n// lib/router/index.js\r\n\r\n// restore vals\r\nfor (var i = 0; i < props.length; i++) {\r\n    obj[props[i]] = vals[i];\r\n}\r\n```\r\n\r\nHence the `setTimeout` in the `handler1`. Without a timeout, the `handler1` function mostly finishes successfully before `done` is called in the next iteration of the event loop.\r\n\r\nMy proposal to fix the problem would be to check for `undefined`:\r\n\r\n```javascript\r\n// lib/router/index.js\r\n\r\n// restore vals\r\nfor (var i = 0; i < props.length; i++) {\r\n  if (vals[i] !== undefined) {\r\n    obj[props[i]] = vals[i];\r\n  }\r\n}\r\n```\r\n\r\nBefore creating a pull request I would like to hear if I missed some details or a better solution.\r\n\r\nI think better would if the `done` function would not try to restore anything if there is no router at all. But I could not figure out a good way to do that.",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/4879/comments",
+    "author": "floftar",
+    "comments": [
+      {
+        "user": "dougwilson",
+        "created_at": "2022-04-03T16:13:04Z",
+        "body": "This is working as designed. When the code path exits the router, all the values are cleared."
+      },
+      {
+        "user": "dougwilson",
+        "created_at": "2022-04-06T16:53:25Z",
+        "body": "Hi @floftar because inside the `handle` function, those are the only properties that are manipulated, so it is being responsible for restoring those properties back to the values they were when the `req` first entered into that `handle` function."
+      }
+    ]
+  },
+  {
+    "number": 4569,
+    "title": "Answering before routes are registered",
+    "created_at": "2021-04-19T17:43:54Z",
+    "closed_at": "2021-04-19T17:59:18Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/4569",
+    "body": "**My environment:**\r\n-Node app with Express\r\n-Nginx with nginx-mod-passenger (Phusion Passenger open source)\r\n-Ubuntu 18.04 on an virtual private server\r\n\r\n**My problem is:**\r\nPhusion Passenger seems to have a sleep mode that pauses the Node.JS app after a bit time without requests. When I now make a request and the app is woken up, express immediatly returns 404. To access the routes I have set, I must make a second request as soon as the routes are loaded.\r\n\r\n**My proposal:**\r\nAs long as not all routes are loaded, express should wait instead of responding.  ",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/4569/comments",
+    "author": "MatsG23",
+    "comments": [
+      {
+        "user": "dougwilson",
+        "created_at": "2021-04-19T17:45:35Z",
+        "body": "Hi @MatsG23 can you show an example? Express.js cannot answer requests until you call `app.listen`. Are you invoking that method too early in your code?"
+      },
+      {
+        "user": "dougwilson",
+        "created_at": "2021-04-19T17:52:07Z",
+        "body": "That is still fine, as that is essentially what `app.listen` does. So by the time you make your `server.listen` call there, have you finished registering your routes? If not, you probably want to add some kind of mechanism that is aware of when your code completes the route registration and then call `server.listen` at that point."
+      },
+      {
+        "user": "MatsG23",
+        "created_at": "2021-04-19T17:57:28Z",
+        "body": "Oh in my router I'm postponing direct registration by wrapping the router.post/router.get/... in an async parenthesis. I think this is the error!"
+      },
+      {
+        "user": "dougwilson",
+        "created_at": "2021-04-19T17:59:18Z",
+        "body": "No problem @MatsG23 ! Express.js does not know when you are finished adding routes, of course. The only way it would know is just whenever you call the `.listen` to start the server. If you start it before you finish, you'll get the behavior."
+      }
+    ]
+  },
+  {
+    "number": 4357,
+    "title": "localhost cannot read property 'name' of undefined nodejs",
+    "created_at": "2020-07-23T08:04:09Z",
+    "closed_at": "2020-07-23T10:16:16Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/4357",
+    "body": "`TypeError: Cannot read property 'fName' of undefined\r\n    at C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\Newsletter-Signup\\app.js:20:28\r\n    at Layer.handle [as handle_request] (C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\express\\lib\\router\\layer.js:95:5)\r\n    at next (C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\express\\lib\\router\\route.js:137:13)\r\n    at Route.dispatch (C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\express\\lib\\router\\route.js:112:3)\r\n    at Layer.handle [as handle_request] (C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\express\\lib\\router\\layer.js:95:5)\r\n    at C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\express\\lib\\router\\index.js:281:22\r\n    at Function.process_params (C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\express\\lib\\router\\index.js:335:12)\r\n    at next (C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\express\\lib\\router\\index.js:275:10)\r\n    at C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\body-parser\\lib\\read.js:130:5\r\n    at invokeCallback (C:\\Users\\Aishwarya Gupta\\Desktop\\WebDevProject\\node_modules\\raw-body\\index.js:224:16)`\r\n\r\nHere's my code in app.js\r\n`const express = require('express');\r\nconst bodyParser = require('body-parser');\r\nconst request = require('request');\r\nconst app = express();\r\napp.use(express.static('public'));\r\napp.use(bodyParser.urlencoded({ extended: true }));`\r\n\r\nPost request code:\r\n`app.post('/', function (req, res) {\r\n  var firstName = res.body.fName;\r\n  var lastName = res.body.lName;\r\n  var emailID = res.body.fEmail;\r\n  console.log(firstName, lastName, emailID);\r\n});`",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/4357/comments",
+    "author": "aishwarya07g",
+    "comments": [
+      {
+        "user": "rodion-arr",
+        "created_at": "2020-07-23T08:31:09Z",
+        "body": "Hi, `body` is property of request `req`. You are using `res` instead."
+      }
+    ]
+  },
+  {
+    "number": 4279,
+    "title": "Wrong render path",
+    "created_at": "2020-05-15T23:18:45Z",
+    "closed_at": "2020-05-17T02:52:44Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/4279",
+    "body": "Hi, I am taking post id parameter to show blog content, everything is fine on here but there is a problem, it is on code or express rendering I don't know exactly.\r\nExpress trying to send my js/css/img files in 'public/post/', but I want to it send from only 'public' path.\r\n\r\nI tried these;\r\n- I tried to change 'path.join'(express.static) but it is also didn't work.\r\n-> `path.join(__dirname + '../', 'public')` or etc...\r\n- I tried to specify path to router but it didn't.\r\n-> (In app.js) app.use('/', mainRouter, here express.path)\r\n- I searched on google, express docs but I couldn't find any solution to this.\r\n\r\n**Routers:**\r\nOnly one router: _main.js_\r\n\r\n**Public Folder:**  classic express generator\r\n\r\n**Codes:**\r\n```\r\n// Show Post By ID\r\n// 5ebabf454b74f711141a5aa4 -> Test Database ID, It exists.\r\nrouter.get('/post/:postid', (req, res, next) => {\r\n    Post.findById(req.params.postid).then((doc) => {\r\n        res.render('post', { title: devblog.name, post: doc });\r\n    }).catch((err) => {\r\n        next(createError(404, err));\r\n    });\r\n});\r\n```\r\n**Console:**\r\n```\r\nGET /post/5ebabf454b74f711141a5aa4 304 3191.975 ms - -\r\nGET /post/stylesheets/bootstrap.min.css 404 500.526 ms - 2295\r\nGET /post/stylesheets/style.css 404 562.285 ms - 2295\r\nGET /post/javascripts/jquery-3.4.1.slim.min.js 404 1438.587 ms - 2295\r\nGET /post/javascripts/bootstrap.bundle.min.js 404 2100.498 ms - 2295\r\n```\r\nHere is the problem: \r\n> /post/stylesheets/\r\n\r\nHow i can change this to normal? **What should I do?**\r\n> /post/stylesheets/ => /stylesheets/\r\n\r\nSorry for syntax, bad English sentences, If there are many flaws, please forgive me.",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/4279/comments",
+    "author": "ipatavatsizz",
+    "comments": [
+      {
+        "user": "jonchurch",
+        "created_at": "2020-05-16T19:49:01Z",
+        "body": "This is probably an issue with how you're linking to these files from your template.\r\n\r\nUsually it's forgetting to add a forward slash `/` to the resource's path:\r\n\r\nIf the URL of your page is `/post/1234` and you use a stylesheet link like the following:\r\n\r\n```html\r\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css/mystyle.css\">\r\n```\r\nIt will try to load `/post/1234/css/mystle.css`\r\n\r\nBut if you use a forward slash in the html tag, it will try to load from the root of the website:\r\n\r\n```html\r\n<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/mystyle.css\">\r\n```\r\n\r\nFrom the same page, that tag will try to load `/css/mystle.css`"
+      }
+    ]
+  },
+  {
+    "number": 3980,
+    "title": "Client Cannot GET /xxx.html before accessing main ",
+    "created_at": "2019-06-11T02:37:33Z",
+    "closed_at": "2019-06-11T11:29:30Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/3980",
+    "body": "I have the following server side code:\r\n\r\n```\r\nvar app = express();\r\napp.get('/', function (req, res) {\r\n\tres.redirect('/main');\r\n});\r\napp.get('/main', function (req, res) {\r\n\tvar d = new Date();\r\n\tres.sendFile(path.join(__dirname + '/main.html'));\r\n\tInfo(req.ip + ' - Session to main.html built successfully! ');\r\n\tapp.use(express.static(__dirname));\r\n});\r\n```\r\n\r\nAlso there are some other html files in the same directory, e.g. xxx.html.  \r\nI found the following behavior that confuses, if I build a new session, try to access localhost:7778/xxx.html, the client cannot get: Cannot GET /xxx.html:\r\n\r\n```\r\nFailed to load resource: the server responded with a status of 404 (Not Found)\r\n```\r\n\r\nOn the other hand, after accessed localhost:7778/, and then try to access localhost:7778/xxx.html, will succeed.\r\n\r\nCan anyone explain the behavior? Can I set the localhost/xxx.html be able to directly accessed?\r\n\r\nThanks a lot!",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/3980/comments",
+    "author": "ctlkkc",
+    "comments": [
+      {
+        "user": "r0mflip",
+        "created_at": "2019-06-11T03:24:40Z",
+        "body": "Your `app.use(express.static(__dirname));` shouldn't be in the route handler."
+      }
+    ]
+  },
+  {
+    "number": 3744,
+    "title": "npm ERR! code EJSONPARSE",
+    "created_at": "2018-09-13T18:06:36Z",
+    "closed_at": "2018-09-13T18:08:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/3744",
+    "body": "Help I am getting this error\r\n> C:\\Users\\Admin\\Desktop\\bot>npm install discord.io winston -save.\r\n> npm ERR! file C:\\Users\\Admin\\Desktop\\bot\\package.json\r\n> npm ERR! code EJSONPARSE\r\n> npm ERR! JSON.parse Failed to parse json\r\n>  pm ERR! JSON.parse Unexpected token \ufffd in JSON at position 0 while parsing near '\ufffd\ufffd{\r\n> npm ERR! JSON.parse  \u001c n a m e \u001d ...'\r\n> npm ERR! JSON.parse Failed to parse package.json data.\r\n> npm ERR! JSON.parse package.json must be actual JSON, not just JavaScript.\r\n> \r\n> npm ERR! A complete log of this run can be found in:\r\n> npm ERR!     C:\\Users\\Admin\\AppData\\Roaming\\npm-cache\\_logs\\2018-09-13T17_55_13_036Z-debug.log\r\n> \r\n\r\n\r\nHere is the log:\r\n\r\n> 0 info it worked if it ends with ok\r\n> 1 verbose cli [ 'C:\\\\Program Files\\\\nodejs\\\\node.exe',\r\n> 1 verbose cli   'C:\\\\Program Files\\\\nodejs\\\\node_modules\\\\npm\\\\bin\\\\npm-cli.js',\r\n> 1 verbose cli   'install',\r\n> 1 verbose cli   'discord.io',\r\n> 1 verbose cli   'winston',\r\n> 1 verbose cli   '-save.' ]\r\n> 2 info using npm@6.4.1\r\n> 3 info using node@v10.10.0\r\n> 4 verbose npm-session c92302b61857a70f\r\n> 5 silly install loadCurrentTree\r\n> 6 silly install readLocalPackageData\r\n> 7 timing stage:rollbackFailedOptional Completed in 15ms\r\n> 8 timing stage:runTopLevelLifecycles Completed in 89ms\r\n> 9 verbose stack Error: Failed to parse json\r\n> 9 verbose stack Unexpected token \ufffd in JSON at position 0 while parsing near '\ufffd\ufffd{ \r\n>  \r\n> 9 verbose stack  \u001c n a m e \u001d ...'\r\n> 9 verbose stack     at parseError (C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\read-package-json\\read-json.js:452:11)\r\n> 9 verbose stack     at parseJson (C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\read-package-json\\read-json.js:104:26)\r\n> 9 verbose stack     at C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\read-package-json\\read-json.js:51:5\r\n> 9 verbose stack     at C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\graceful-fs\\graceful-fs.js:78:16\r\n> 9 verbose stack     at FSReqWrap.readFileAfterClose [as oncomplete] (internal/fs/read_file_context.js:53:3)\r\n> 10 verbose cwd C:\\Users\\Admin\\Desktop\\bot\r\n> 11 verbose Windows_NT 10.0.17134\r\n> 12 verbose argv \"C:\\\\Program Files\\\\nodejs\\\\node.exe\" \"C:\\\\Program Files\\\\nodejs\\\\node_modules\\\\npm\\\\bin\\\\npm-cli.js\" \"install\" \"discord.io\" \"winston\" \"-save.\"\r\n> 13 verbose node v10.10.0\r\n> 14 verbose npm  v6.4.1\r\n> 15 error file C:\\Users\\Admin\\Desktop\\bot\\package.json\r\n> 16 error code EJSONPARSE\r\n> 17 error JSON.parse Failed to parse json\r\n> 17 error JSON.parse Unexpected token \ufffd in JSON at position 0 while parsing near '\ufffd\ufffd{ \r\n>  \r\n> 17 error JSON.parse  \u001c n a m e \u001d ...'\r\n> 18 error JSON.parse Failed to parse package.json data.\r\n> 18 error JSON.parse package.json must be actual JSON, not just JavaScript.\r\n> 19 verbose exit [ 1, true ]\r\n> \r\n\r\nWhat should I do?\r\n",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/3744/comments",
+    "author": "CubecCubehead",
+    "comments": [
+      {
+        "user": "dougwilson",
+        "created_at": "2018-09-13T18:08:13Z",
+        "body": "The error is from the command `npm install discord.io winston -save`, which is `npm`. It states that the file `C:\\Users\\Admin\\Desktop\\bot\\package.json` is not valid JSON."
+      }
+    ]
+  },
+  {
+    "number": 3565,
+    "title": "Post request flood?",
+    "created_at": "2018-02-14T08:47:11Z",
+    "closed_at": "2018-02-15T11:22:27Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/3565",
+    "body": "Introduction\r\n================\r\nI\u00b4ve a nodejs application with express that have some post and get request. The whole website works just fine without problems.\r\n\r\nProblem\r\n============\r\nIf I call the post request to much in time the site will crash. It will not respond to other requests. Doesn\u00b4t matter if it\u00b4s get or post request. I just can close the tab and open the site in a new one. Then it work again.\r\n\r\nMy Code\r\n===========\r\n\r\n## Client side ##\r\nIt\u00b4s a easy post request to set a client permission. There is no callback defined.\r\n\r\n    $.post(\r\n       '/clients/set/client/permission',\r\n       {\r\n          permName: globPermissionTable[permName],\r\n          value: checked,\r\n          id: '<%= data[0].id %>'\r\n       }\r\n    );\r\n\r\n----------\r\n\r\n## Server side ##\r\nJust a easy post segment. Even if I will uncomment all in the request it will be not response.\r\n\r\n    app.post('/clients/set/client/permission', function(req, res) {\r\n\t   // Permissioncheck\r\n\t   /*var permName = req.body.permName, val = req.body.value, id = req.body.id;\r\n\t   if(helper.checkParams([permName, val, id])) {\r\n\t\t     database.SetClientPermissions(parseInt(id), permName, (val === 'true') ? true : false);\r\n\t   };*/\r\n    });",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/3565/comments",
+    "author": "lgund",
+    "comments": [
+      {
+        "user": "lgund",
+        "created_at": "2018-02-14T08:58:33Z",
+        "body": "I found out now that if a write _res.send('finished');_ this problem doesn\u00b4t happen. If it\u00b4s that important to always send something back?\r\n\r\n-----------\r\nFull Code:\r\n`app.post('/clients/set/client/permission', function(req, res) {\r\n   res.send('finished');\r\n});`"
+      },
+      {
+        "user": "wesleytodd",
+        "created_at": "2018-02-14T21:50:51Z",
+        "body": "Yes, you always need to send a response.  Otherwise the connection will remain open waiting for that response.  If you are not going to handle a request in a middleware, you can also just call `next` and allow express to respond for you with a 404:\r\n\r\n```\r\napp.post('/foo', function (req, res, next) {\r\n  if (something) {\r\n    return res.send('response');\r\n  }\r\n  next();\r\n});\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 3433,
+    "title": "error handled at unknown error handler",
+    "created_at": "2017-09-27T18:28:29Z",
+    "closed_at": "2017-09-27T19:00:58Z",
+    "labels": [
+      "4.x",
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/3433",
+    "body": "express version : 4.15,\r\nnode version: 8.1.4\r\n\r\nim currently experiencing an odd behavior within my application, I have nested routes and im defining my routes like this\r\n\r\n```js\r\nconst router = require('express').Router();\r\nconst m = require('../modules/index').v1;\r\n\r\nrouter.route('/')\r\n  .post(m.create)\r\n  .get(m.list)\r\n  .all(m.transformer);\r\n\r\nrouter.route('/:id')\r\n  .all(m.middlewareById)\r\n  .put(m.editById)\r\n  .delete(m.deleteById)\r\n  .get(m.getById)\r\n  .all(m.transformer);\r\nmodule.exports = router;\r\n```\r\nIm currently developing m.create API controller, and when and error occurs that is not handled sends me a response of HTML page with error object. \r\n```html\r\n<!DOCTYPE html>\r\n<html lang=\"en\">\r\n    <head>\r\n        <meta charset=\"utf-8\">\r\n        <title>Error</title>\r\n    </head>\r\n    <body>\r\n        <pre>[object Object]</pre>\r\n    </body>\r\n</html>\r\n```\r\nI want to eliminate this behavior and response with JSON only, but somehow its by passing my defined request handlers, and instead of getting handled at a middle ware that I specify, or the one at `app.js` \r\nits is being handled somewhere else mysteriously, i've been express user for 3 or more years and this is the first time im facing such behavior.\r\nhas something changed in new Express version? \r\n\r\n_app.js_\r\n```js\r\nconst express = require('express');\r\nconst path = require('path');\r\n// const favicon = require('serve-favicon');\r\nconst logger = require('morgan');\r\nconst cookieParser = require('cookie-parser');\r\n...\r\n\r\napp.use('/', index);\r\napp.use('/systemadmin', systemAdminRoutes);\r\n\r\n// catch 404 and forward to error handler\r\napp.use((req, res, next) => {\r\n  const err = new Error('Not Found');\r\n  err.status = 404;\r\n  next(err);\r\n});\r\n\r\n// error handler\r\napp.use((err, req, res) => {\r\n  // next is the last argument in above function\r\n  // set locals, only providing error in development\r\n  // res.locals.message = err.message;\r\n  // res.locals.error = req.app.get('env') === 'development' ? err : {};\r\n  debug(err); // nothing logs here \r\n  debug(err.message);\r\n  debug(err.name);\r\n  debug(err.errorCode);\r\n  debug(err.stack);\r\n  // render the error page\r\n  res.status(err.status || 500);\r\n  res.send({error: err.message}); //this never gets called\r\n});\r\n\r\nmodule.exports = app;\r\n```",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/3433/comments",
+    "author": "muhammadfaizan",
+    "comments": [
+      {
+        "user": "dougwilson",
+        "created_at": "2017-09-27T18:31:28Z",
+        "body": "Maybe you ran a linter on your code recently? Your code above you have\r\n```js\r\napp.use((err, req, res) => {\r\n```\r\n\r\nBut (which has always been in the case), it MUST have 4 arguments in order to work:\r\n```js\r\napp.use((err, req, res, next) => {\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 3219,
+    "title": "parser.incoming._addHeaderLines is not a function",
+    "created_at": "2017-02-21T17:36:49Z",
+    "closed_at": "2017-02-21T17:41:15Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/expressjs/express/issues/3219",
+    "body": "I tried running express with uws and I get this error : \r\n\r\n> _http_common.js:138\r\n>       parser.incoming._addHeaderLines(headers, headers.length);\r\n>                       ^\r\n> \r\n> TypeError: parser.incoming._addHeaderLines is not a function\r\n>     at HTTPParser.parserOnMessageComplete (_http_common.js:138:23)\r\n> \r\n> npm ERR! Darwin 16.1.0\r\n> npm ERR! argv \"/usr/local/bin/node\" \"/usr/local/bin/npm\" \"run\" \"start:dev\"\r\n> npm ERR! node v7.5.0\r\n> npm ERR! npm  v4.1.2\r\n> npm ERR! code ELIFECYCLE\r\n> npm ERR! AdminMeepV2@0.1.0 start:dev: `npm run resetdb && node server.js`\r\n> npm ERR! Exit status 1\r\n> npm ERR! \r\n> npm ERR! Failed at the AdminMeepV2@0.1.0 start:dev script 'npm run resetdb && node server.js'.\r\n> npm ERR! Make sure you have the latest version of node.js and npm installed.\r\n> npm ERR! If you do, this is most likely a problem with the AdminMeepV2 package,\r\n> npm ERR! not with npm itself.\r\n> npm ERR! Tell the author that this fails on your system:\r\n> npm ERR!     npm run resetdb && node server.js\r\n> npm ERR! You can get information on how to open an issue for this project with:\r\n> npm ERR!     npm bugs AdminMeepV2\r\n> npm ERR! Or if that isn't available, you can get their info via:\r\n> npm ERR!     npm owner ls AdminMeepV2\r\n> npm ERR! There is likely additional logging output above.\r\n> \r\n> npm ERR! Please include the following file with any support request:\r\n> npm ERR!     /Users/gatsbill/Desktop/meepV2/server/npm-debug.log\r\n> Aureliens-MBP:server gatsbill$ \r\n\r\nHere is my code : \r\n\r\n```js\r\n'use strict';\r\n\r\nconst express = require('express');\r\n\r\nObject.setPrototypeOf(express.request, require('uws').http.getRequestPrototype());\r\nObject.setPrototypeOf(express.response, require('uws').http.getResponsePrototype());\r\n\r\nconst app = express();\r\nconst server = require('http').createServer(app);\r\n\r\nconst config = require('./config');\r\nconst setGlobalMiddlewares = require('./middlewares/middlewares');\r\nconst routes = require('./routes');\r\n\r\n// set global middlewares\r\nsetGlobalMiddlewares(app);\r\n\r\n// route controller\r\napp.use(routes);\r\n\r\n// start http server\r\nserver.listen(config.server.port, () => {\r\n   console.log('server listen on port ' + config.server.port);\r\n});\r\n```\r\n\r\nDunno if you need all the middleware ",
+    "comments_url": "https://api.github.com/repos/expressjs/express/issues/3219/comments",
+    "author": "billouboq",
+    "comments": [
+      {
+        "user": "dougwilson",
+        "created_at": "2017-02-21T17:39:29Z",
+        "body": "I'm not sure. That error is coming from Node.js core (`_http_common.js:138`), not from this module. Can you share the code you used? Do you have a full stack trace? Perhaps there is a bug somewhere in `uws`? Not sure."
+      },
+      {
+        "user": "dougwilson",
+        "created_at": "2017-02-21T17:41:15Z",
+        "body": "Ah, you edited the original post. Looks like the issue is your line\r\n```js\r\nconst server = require('http').createServer(app);\r\n```\r\n\r\nYou need to use the `uws` module to create the server, not Node.js core. I believe that line should be:\r\n```js\r\nconst server = require('uws').http.createServer(app);\r\n```"
+      },
+      {
+        "user": "wesleytodd",
+        "created_at": "2017-02-21T17:41:24Z",
+        "body": "Looks like the server you are using is core `http` with the req/res from uws.  That is probably never going to work.  You MIGHT be able to do it with the uws server.\r\n\r\nEDIT: looks like Doug beat me to it :)"
+      }
+    ]
+  }
+]

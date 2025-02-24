@@ -1,0 +1,20 @@
+[
+  {
+    "id": "https://github.com/Thavarshan/comet/issues/49",
+    "source": {
+      "issue_number": 49
+    },
+    "initial_question": {
+      "title": "File is damaged and cant be opened M3 Pro Macos Sonoma",
+      "body": "tried the last 3 versions, none of them worked and show as damaged"
+    },
+    "satisfaction_conditions": [
+      "Application becomes launchable on macOS Sonoma",
+      "MacOS security restrictions are properly addressed",
+      "Application file integrity is maintained",
+      "Solution works with multiple versions of the application",
+      "Changes persist after implementation"
+    ],
+    "created_at": "2024-11-02T11:51:06Z"
+  }
+]

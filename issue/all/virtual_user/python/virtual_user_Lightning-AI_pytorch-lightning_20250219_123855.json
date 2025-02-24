@@ -1,0 +1,1248 @@
+[
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/20086",
+    "source": {
+      "issue_number": 20086
+    },
+    "initial_question": {
+      "title": "module statistics has no attribute mean",
+      "body": "### Bug description\r\n\r\nWhen updating to the new PyTorch-lightning version 2.3.3 and using the MlFlowLogger as logger arg in the trainer I\u2018m getting the error trace (see error section)\r\n\r\n\r\n### What version are you seeing the problem on?\r\n\r\nmaster\r\n\r\n### How to reproduce the bug\r\n\r\n_No response_\r\n\r\n### Error messages and logs\r\n\r\n```\r\ntrain.py 9 <module>\r\nimport mlflow.pytorch\r\n \r\n__init__.py 1190 <module>\r\nfrom mlflow.pytorch._lightning_autolog import MlflowModelCheckpointCallback  # noqa: F401\r\n \r\n_lightning_autolog.py 24 <module>\r\nimport pytorch_lightning as pl\r\n \r\n__init__.py 27 <module>\r\nfrom pytorch_lightning.callbacks import Callback  # noqa: E402\r\n \r\n__init__.py 29 <module>\r\nfrom pytorch_lightning.callbacks.pruning import ModelPruning\r\n \r\npruning.py 32 <module>\r\nfrom pytorch_lightning.core.module import LightningModule\r\n \r\n__init__.py 16 <module>\r\nfrom pytorch_lightning.core.module import LightningModule\r\n \r\nmodule.py 62 <module>\r\nfrom pytorch_lightning.loggers import Logger\r\n \r\n__init__.py 14 <module>\r\nfrom pytorch_lightning.loggers.comet import CometLogger\r\n \r\ncomet.py 30 <module>\r\nfrom pytorch_lightning.loggers.logger import Logger, rank_zero_experiment\r\n \r\nlogger.py 103 <module>\r\ndefault_func: Callable[[Sequence[float]], float] = statistics.mean,\r\n \r\nAttributeError:\r\nmodule 'statistics' has no attribute 'mean'\r\n\r\n```\r\n\r\n\r\n### Environment\r\n\r\n<details>\r\n  <summary>Current environment</summary>\r\n\r\n```\r\n#- PyTorch Lightning Version (e.g., 1.5.0): 2.3.3\r\n#- PyTorch Version (e.g., 2.0): 2.3.1\r\n#- Python version (e.g., 3.9): 3.11\r\n#- OS (e.g., Linux): MacOS Sonoma 14.5\r\n#- CUDA/cuDNN version:\r\n#- GPU models and configuration:\r\n#- How you installed Lightning(`conda`, `pip`, source): pip\r\n```\r\n\r\n</details>\r\n\r\n\r\n### More info\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "The statistics.mean function is accessible to PyTorch Lightning",
+      "PyTorch Lightning successfully initializes without AttributeError"
+    ],
+    "created_at": "2024-07-15T07:18:01Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/20020",
+    "source": {
+      "issue_number": 20020
+    },
+    "initial_question": {
+      "title": "Teardown trying to copy \"meta\" tensors",
+      "body": "### Bug description\n\nI've got a model template that I'm using with torch.vmap, and to use it I need to store a meta model in my lightning module. However lightning keeps trying to copy the meta model to devices / during teardown etc... This results in an error for the meta tensor, since it does not have a copy method. Any good way to work around this?\r\n\r\nThis code generates my MLP's template, and during any lightning method that copies things, it dies when ```self.base_model.copy()``` or ```self.base_model.to(\"device\")``` is called.\r\n\r\n```python\r\nself.base_model = copy.deepcopy(self.mlp)\r\nself.base_model.to('meta')\r\n```\n\n### What version are you seeing the problem on?\n\nv2.2\n\n### How to reproduce the bug\n\n```python\nRun any lightning model with a meta model as a lightning property\r\n\r\n\r\nself.base_model = copy.deepcopy(self.mlp)\r\nself.base_model.to('meta')\n```\n\n\n### Error messages and logs\n\n```\r\nNotImplementedError: Cannot copy out of meta tensor; no data!\r\n```\r\n\n\n### Environment\n\n<details>\r\n  <summary>Current environment</summary>\r\n\r\n```\r\n#- Lightning Component (e.g. Trainer, LightningModule, LightningApp, LightningWork, LightningFlow):\r\n#- PyTorch Lightning Version (e.g., 1.5.0): 2.2\r\n#- Lightning App Version (e.g., 0.5.2): \r\n#- PyTorch Version (e.g., 2.0): 2.2\r\n#- Python version (e.g., 3.9): 3.10\r\n#- OS (e.g., Linux): Windows\r\n#- CUDA/cuDNN version: 12.1\r\n#- GPU models and configuration: 3090\r\n#- How you installed Lightning(`conda`, `pip`, source): conda\r\n#- Running environment of LightningApp (e.g. local, cloud): local\r\n```\r\n\r\n</details>\r\n\n\n### More info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Meta model must not trigger PyTorch Lightning's device movement/copying operations",
+      "Meta model must remain accessible for use with torch.vmap",
+      "Solution must maintain compatibility with Lightning's model lifecycle",
+      "Meta model state must be preserved"
+    ],
+    "created_at": "2024-06-27T08:19:33Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/18975",
+    "source": {
+      "issue_number": 18975
+    },
+    "initial_question": {
+      "title": "Training a simple XOR network yields incorrect, undeterministic behaviour",
+      "body": "### Bug description\n\nHi, I am trying to train a simple DNN to solve the XOR problem. This can be trivially solved with a pure torch implementation. I cannot replicate the same simple model in lightning. Instead the trained model oscillates between different states, never managing to correctly produce XOR.\n\n### What version are you seeing the problem on?\n\nv2.1\n\n### How to reproduce the bug\n\n```python\n# import libraries\r\nimport torch\r\nimport torch.nn as nn\r\nfrom torch.autograd import Variable\r\n\r\n\r\nclass XOR(nn.Module):\r\n    def __init__(self):\r\n        super(XOR, self).__init__()\r\n        self.linear_sigmoid_stack = nn.Sequential(\r\n            nn.Linear(2, 2),\r\n            nn.Sigmoid(),\r\n            nn.Linear(2, 1)\r\n        )\r\n\r\n    def forward(self, x):\r\n        return self.linear_sigmoid_stack(x)\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    # create data\r\n    Xs = torch.Tensor([[0., 0.],\r\n                       [0., 1.],\r\n                       [1., 0.],\r\n                       [1., 1.]])\r\n\r\n    y = torch.Tensor([0., 1., 1., 0.]).reshape(Xs.shape[0], 1)\r\n\r\n    xor_network = XOR()\r\n\r\n    epochs = 1000\r\n    mseloss = nn.MSELoss()\r\n    optimizer = torch.optim.Adam(xor_network.parameters(), lr=0.03)\r\n    all_losses = []\r\n    current_loss = 0\r\n    plot_every = 50\r\n\r\n    for epoch in range(epochs):\r\n\r\n        # input training example and return the prediction\r\n        yhat = xor_network.forward(Xs)\r\n\r\n        # calculate MSE loss\r\n        loss = mseloss(yhat, y)\r\n\r\n        # backpropogate through the loss gradiants\r\n        loss.backward()\r\n\r\n        # update model weights\r\n        optimizer.step()\r\n\r\n        # remove current gradients for next iteration\r\n        optimizer.zero_grad()\r\n\r\n        # append to loss\r\n        current_loss += loss\r\n        if epoch % plot_every == 0:\r\n            all_losses.append(current_loss / plot_every)\r\n            current_loss = 0\r\n\r\n        # print progress\r\n        if epoch % 500 == 0:\r\n            print(f'Epoch: {epoch} completed')\r\n```\r\n\r\nI tried to use Lightning to simplify away the boilerplate code like so:\r\n```\r\nimport torch\r\nfrom torch import nn\r\nimport torch.nn.functional as F\r\nimport lightning as L\r\nfrom torch.utils.data import TensorDataset, DataLoader\r\n\r\n\r\nclass XORNetwork(L.LightningModule):\r\n    def __init__(self):\r\n        super(XORNetwork, self).__init__()\r\n        self.linear_sigmoid_stack = nn.Sequential(\r\n            nn.Linear(2, 2),\r\n            nn.Sigmoid(),\r\n            nn.Linear(2, 1)\r\n        )\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        # training_step defines the train loop.\r\n        x, y = batch\r\n        yhat = self.forward(x)\r\n        loss = F.mse_loss(yhat, y)\r\n        return loss\r\n\r\n    def forward(self, x):\r\n        return self.linear_sigmoid_stack(x)\r\n\r\n    def configure_optimizers(self):\r\n        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)\r\n        return optimizer\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    X = torch.Tensor([[0., 0.], [0., 1.], [1., 0], [1., 1]])\r\n    labels = torch.Tensor([0., 1., 1., 0])\r\n    dataset = TensorDataset(X, labels)\r\n    dataloader = DataLoader(dataset, batch_size=1, shuffle=True)\r\n\r\n    xor_network = XORNetwork()\r\n\r\n    # train model\r\n    trainer = L.Trainer(max_epochs=500, accelerator=\"cpu\")\r\n    trainer.fit(model=xor_network, train_dataloaders=dataloader)\r\n\r\n    xor_network.eval()\r\n    with torch.no_grad():\r\n        test_output = xor_network(X)\r\n        print(test_output.round())\r\n```\n```\n\n\n### Error messages and logs\n\n_No response_\n\n### Environment\n\n<details>\r\n  <summary>Current environment</summary>\r\n\r\n* CUDA:\r\n\t- GPU:               None\r\n\t- available:         False\r\n\t- version:           None\r\n* Lightning:\r\n\t- lightning:         2.1.1\r\n\t- lightning-utilities: 0.9.0\r\n\t- pytorch-lightning: 2.1.1\r\n\t- torch:             2.1.0\r\n\t- torchmetrics:      1.2.0\r\n* Packages:\r\n\t- aiohttp:           3.8.6\r\n\t- aiosignal:         1.3.1\r\n\t- async-timeout:     4.0.3\r\n\t- attrs:             23.1.0\r\n\t- certifi:           2023.7.22\r\n\t- charset-normalizer: 3.3.2\r\n\t- filelock:          3.13.1\r\n\t- frozenlist:        1.4.0\r\n\t- fsspec:            2023.10.0\r\n\t- idna:              3.4\r\n\t- jinja2:            3.1.2\r\n\t- lightning:         2.1.1\r\n\t- lightning-utilities: 0.9.0\r\n\t- markupsafe:        2.1.3\r\n\t- mpmath:            1.3.0\r\n\t- multidict:         6.0.4\r\n\t- networkx:          3.2.1\r\n\t- numpy:             1.26.1\r\n\t- packaging:         23.2\r\n\t- pip:               22.3.1\r\n\t- pytorch-lightning: 2.1.1\r\n\t- pyyaml:            6.0.1\r\n\t- requests:          2.31.0\r\n\t- setuptools:        65.5.1\r\n\t- sympy:             1.12\r\n\t- torch:             2.1.0\r\n\t- torchmetrics:      1.2.0\r\n\t- tqdm:              4.66.1\r\n\t- typing-extensions: 4.8.0\r\n\t- urllib3:           2.0.7\r\n\t- wheel:             0.38.4\r\n\t- yarl:              1.9.2\r\n* System:\r\n\t- OS:                Darwin\r\n\t- architecture:\r\n\t\t- 64bit\r\n\t\t- \r\n\t- processor:         arm\r\n\t- python:            3.10.13\r\n\t- release:           23.0.0\r\n\t- version:           Darwin Kernel Version 23.0.0: Fri Sep 15 14:41:34 PDT 2023; root:xnu-10002.1.13~1/RELEASE_ARM64_T8103\r\n\r\n</details>\r\n\n\n### More info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Model produces correct XOR output (0,1,1,0) after training",
+      "Model evaluation code present to verify results"
+    ],
+    "created_at": "2023-11-09T10:17:57Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/18890",
+    "source": {
+      "issue_number": 18890
+    },
+    "initial_question": {
+      "title": "ModuleNotFoundError: No module named 'lightning' in lightning container image",
+      "body": "### Bug description\n\n`lightning.pytorch` module is installed in lightning container images as pytorch_lightning, thus it is not compatible with the documentation. \r\n\r\nIn order for import to work in a container image, the import should be of the following form:\r\n\r\n```python\r\nfrom lightning.pytorch.loggers import CSVLogger\r\n```\r\n\r\nWhile the documentation states:\r\n\r\n```python\r\nfrom pytorch_lightning.loggers import CSVLogger\r\n```\n\n### What version are you seeing the problem on?\n\nv2.1\n\n### How to reproduce the bug\n\n```python\ndocker run -it --rm pytorchlightning/pytorch_lightning:latest-py3.10-torch2.0-cuda12.0.1\r\npython -c \"from lightning.pytorch.loggers import CSVLogger\"\n```\n\n\n### Error messages and logs\n\n```\r\nTraceback (most recent call last):\r\n  File \"<string>\", line 1, in <module>\r\nModuleNotFoundError: No module named 'lightning'\r\n```\r\n\n\n### Environment\n\n<details>\r\n  <summary>Current environment</summary>\r\n\r\n* CUDA:\r\n        - GPU:               None\r\n        - available:         False\r\n        - version:           11.7\r\n* Lightning:\r\n        - lightning-utilities: 0.9.0\r\n        - pytorch-lightning: 2.1.0rc0\r\n        - torch:             2.0.1\r\n        - torchmetrics:      1.0.3\r\n* Packages:\r\n        - absl-py:           2.0.0\r\n        - aiohttp:           3.8.5\r\n        - aiosignal:         1.3.1\r\n        - antlr4-python3-runtime: 4.9.3\r\n        - anyio:             3.7.1\r\n        - async-timeout:     4.0.3\r\n        - attrs:             23.1.0\r\n        - cachetools:        5.3.1\r\n        - certifi:           2019.11.28\r\n        - chardet:           3.0.4\r\n        - charset-normalizer: 3.3.0\r\n        - click:             8.1.7\r\n        - cloudpickle:       2.2.1\r\n        - cmake:             3.27.6\r\n        - coloredlogs:       15.0.1\r\n        - contourpy:         1.1.1\r\n        - coverage:          7.3.1\r\n        - cycler:            0.12.0\r\n        - dbus-python:       1.2.16\r\n        - deepspeed:         0.9.3\r\n        - docstring-parser:  0.15\r\n        - exceptiongroup:    1.1.3\r\n        - fastapi:           0.103.2\r\n        - filelock:          3.12.4\r\n        - flatbuffers:       23.5.26\r\n        - fonttools:         4.43.0\r\n        - frozenlist:        1.4.0\r\n        - fsspec:            2023.9.2\r\n        - google-auth:       2.23.2\r\n        - google-auth-oauthlib: 1.0.0\r\n        - grpcio:            1.59.0\r\n        - h11:               0.14.0\r\n        - hjson:             3.1.0\r\n        - humanfriendly:     10.0\r\n        - hydra-core:        1.3.2\r\n        - idna:              2.8\r\n        - importlib-resources: 6.1.0\r\n        - iniconfig:         2.0.0\r\n        - jinja2:            3.1.2\r\n        - joblib:            1.3.2\r\n        - jsonargparse:      4.25.0\r\n        - kiwisolver:        1.4.5\r\n        - lightning-utilities: 0.9.0\r\n        - lit:               17.0.2\r\n        - markdown:          3.4.4\r\n        - markdown-it-py:    3.0.0\r\n        - markupsafe:        2.1.3\r\n        - matplotlib:        3.7.3\r\n        - mdurl:             0.1.2\r\n        - mpmath:            1.3.0\r\n        - multidict:         6.0.4\r\n        - networkx:          3.1\r\n        - ninja:             1.11.1\r\n        - numpy:             1.26.0\r\n        - nvidia-cublas-cu11: 11.10.3.66\r\n        - nvidia-cuda-cupti-cu11: 11.7.101\r\n        - nvidia-cuda-nvrtc-cu11: 11.7.99\r\n        - nvidia-cuda-runtime-cu11: 11.7.99\r\n        - nvidia-cudnn-cu11: 8.5.0.96\r\n        - nvidia-cufft-cu11: 10.9.0.58\r\n        - nvidia-curand-cu11: 10.2.10.91\r\n        - nvidia-cusolver-cu11: 11.4.0.1\r\n        - nvidia-cusparse-cu11: 11.7.4.91\r\n        - nvidia-nccl-cu11:  2.14.3\r\n        - nvidia-nvtx-cu11:  11.7.91\r\n        - oauthlib:          3.2.2\r\n        - omegaconf:         2.3.0\r\n        - onnx:              1.14.1\r\n        - onnxruntime:       1.16.0\r\n        - packaging:         23.1\r\n        - pandas:            2.1.1\r\n        - pillow:            10.0.1\r\n        - pip:               23.2.1\r\n        - pluggy:            1.3.0\r\n        - protobuf:          4.24.3\r\n        - psutil:            5.9.5\r\n        - py-cpuinfo:        9.0.0\r\n        - pyasn1:            0.5.0\r\n        - pyasn1-modules:    0.3.0\r\n        - pydantic:          1.10.13\r\n        - pygments:          2.16.1\r\n        - pygobject:         3.36.0\r\n        - pyparsing:         3.1.1\r\n        - pytest:            7.4.0\r\n        - pytest-cov:        4.1.0\r\n        - pytest-random-order: 1.1.0\r\n        - pytest-rerunfailures: 12.0\r\n        - pytest-timeout:    2.1.0\r\n        - python-apt:        2.0.1+ubuntu0.20.4.1\r\n        - python-dateutil:   2.8.2\r\n        - pytorch-lightning: 2.1.0rc0\r\n        - pytz:              2023.3.post1\r\n        - pyyaml:            6.0.1\r\n        - requests:          2.22.0\r\n        - requests-oauthlib: 1.3.1\r\n        - requests-unixsocket: 0.2.0\r\n        - rich:              13.5.3\r\n        - rsa:               4.9\r\n        - scikit-learn:      1.3.1\r\n        - scipy:             1.11.3\r\n        - setuptools:        59.5.0\r\n        - six:               1.14.0\r\n        - sniffio:           1.3.0\r\n        - starlette:         0.27.0\r\n        - sympy:             1.12\r\n        - tensorboard:       2.14.1\r\n        - tensorboard-data-server: 0.7.1\r\n        - tensorboardx:      2.6.2.2\r\n        - threadpoolctl:     3.2.0\r\n        - tomli:             2.0.1\r\n        - torch:             2.0.1\r\n        - torchmetrics:      1.0.3\r\n        - tqdm:              4.66.1\r\n        - triton:            2.0.0\r\n        - typeshed-client:   2.4.0\r\n        - typing-extensions: 4.7.1\r\n        - tzdata:            2023.3\r\n        - urllib3:           1.25.8\r\n        - uvicorn:           0.23.2\r\n        - werkzeug:          3.0.0\r\n        - wget:              3.2\r\n        - wheel:             0.41.2\r\n        - yarl:              1.9.2\r\n* System:\r\n        - OS:                Linux\r\n        - architecture:\r\n                - 64bit\r\n                - \r\n        - processor:         x86_64\r\n        - python:            3.10.13\r\n        - release:           5.3.0-28-generic\r\n        - version:           #30~18.04.1-Ubuntu SMP Fri Jan 17 06:14:09 UTC 2020\r\n\r\n</details>\n\n### More info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Package installation method must match the intended import style",
+      "Documentation must consistently use one import style"
+    ],
+    "created_at": "2023-10-30T07:58:12Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/18378",
+    "source": {
+      "issue_number": 18378
+    },
+    "initial_question": {
+      "title": "Fabric cannot launch with specified gpu indices",
+      "body": "### Bug description\n\nHi,\r\n\r\nI launch fabric with specified gpu indices, and get RuntineError messges as follows.\r\nHow can I solve this issue? Thanks.\r\n\r\nSoftware version:\r\n```\r\ndeepspeed 0.10.0\r\nlightning 2.0.7\r\npytorch 2.0.1\r\npython 3.10.9\r\n```\r\n\r\nThe code looks like:\r\n```python\r\nimport lightning as L\r\nfabric = L.Fabric(accelerator=\"cuda\", devices=\"0,1,4,5\", strategy='deepspeed')\r\nfabric.launch()\r\n```\r\n\r\nThe error messges and logs is:\r\n```\r\n[2023-08-24 07:56:20,780] [INFO] [real_accelerator.py:133:get_accelerator] Setting ds_accelerator to cuda (auto detect)\r\nTraceback (most recent call last):\r\n  File \"/home/xxx/test_fab.py\", line 45, in <module>\r\n    fabric.launch()\r\n  File \"/home/xxx/miniconda310/envs/ml/lib/python3.10/site-packages/lightning/fabric/fabric.py\", line 687, in launch\r\n    return self._strategy.launcher.launch(function, *args, **kwargs)\r\n  File \"/home/xxx/miniconda310/envs/ml/lib/python3.10/site-packages/lightning/fabric/strategies/launchers/subprocess_script.py\", line 92, in launch\r\n    return function(*args, **kwargs)\r\n  File \"/home/xxx/miniconda310/envs/ml/lib/python3.10/site-packages/lightning/fabric/fabric.py\", line 776, in _run_with_setup\r\n    self._strategy.setup_environment()\r\n  File \"/home/xxx/miniconda310/envs/ml/lib/python3.10/site-packages/lightning/fabric/strategies/ddp.py\", line 113, in setup_environment\r\n    self._setup_distributed()\r\n  File \"/home/xxx/miniconda310/envs/ml/lib/python3.10/site-packages/lightning/fabric/strategies/deepspeed.py\", line 579, in _setup_distributed\r\n    _validate_device_index_selection(self.parallel_devices)\r\n  File \"/home/xxx/miniconda310/envs/ml/lib/python3.10/site-packages/lightning/fabric/strategies/deepspeed.py\", line 821, in _validate_device_index_selection\r\n    raise RuntimeError(\r\nRuntimeError: The selected device indices [0, 1, 4, 5] don't match the local rank values of processes. If you need to select GPUs at a specific index, set the `CUDA_VISIBLE_DEVICES` environment variable instead. For example: `CUDA_VISIBLE_DEVICES=0,1,4,5`.\r\n```\r\n\n\n### What version are you seeing the problem on?\n\nv2.0\n\n### How to reproduce the bug\n\n_No response_\n\n### Error messages and logs\n\n_No response_\n\n### Environment\n\n<details>\r\n  <summary>Current environment</summary>\r\n\r\n```\r\n#- Lightning Component (e.g. Trainer, LightningModule, LightningApp, LightningWork, LightningFlow):\r\n#- PyTorch Lightning Version (e.g., 1.5.0):\r\n#- Lightning App Version (e.g., 0.5.2):\r\n#- PyTorch Version (e.g., 2.0):\r\n#- Python version (e.g., 3.9): \r\n#- OS (e.g., Linux):\r\n#- CUDA/cuDNN version:\r\n#- GPU models and configuration:\r\n#- How you installed Lightning(`conda`, `pip`, source):\r\n#- Running environment of LightningApp (e.g. local, cloud):\r\n```\r\n\r\n</details>\r\n\n\n### More info\n\n_No response_\n\ncc @carmocca @justusschock @awaelchli"
+    },
+    "satisfaction_conditions": [
+      "GPU device selection must be configured in a way that DeepSpeed can recognize and access",
+      "Selected GPU devices must be accessible in sequential order starting from 0",
+      "Training script must be able to access the intended GPU devices",
+      "No runtime errors related to device index selection when launching the training"
+    ],
+    "created_at": "2023-08-24T00:21:36Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/18170",
+    "source": {
+      "issue_number": 18170
+    },
+    "initial_question": {
+      "title": "Basic ProgressBar does not work",
+      "body": "### Bug description\r\n\r\nVersion of `pytorch_lightning==2.0.6`, `tqdm==4.65.0`\r\nI want to display the training progress of my models and the basic ProgressBar from pytorch_lightning.callbacks does not work (nothing shows up).\r\nHowever, when I switched to RichProgressBar, the rich progress bar shows up.\r\n\r\n### What version are you seeing the problem on?\r\n\r\nv2.0\r\n\r\n### How to reproduce the bug\r\n\r\n`python\r\npytorch_lightning.callbacks import ProgressBar` does not show up anything.\r\n\r\n`from pytorch_lightning.callbacks import RichProgressBar` can show the training progress.\r\n\r\n\r\n### Error messages and logs\r\n\r\n\r\nNothing shows up for ```ProgressBar```.\r\n\r\n### Environment\r\n`pytorch_lightning==2.0.6`\r\n`tqdm==4.65.0`\r\n\r\n### More info\r\nRunning things in a Linux environment, with an A40 GPU.\n\ncc @awaelchli"
+    },
+    "satisfaction_conditions": [
+      "Training progress visualization is visible during model training",
+      "Progress bar functionality works without explicit import/configuration",
+      "Correct progress bar class is referenced if manual implementation is needed",
+      "Solution is compatible with PyTorch Lightning 2.0+ architecture"
+    ],
+    "created_at": "2023-07-26T21:40:27Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/18135",
+    "source": {
+      "issue_number": 18135
+    },
+    "initial_question": {
+      "title": "_PrefetchDataFetcher ignores prefetch_factor",
+      "body": "### Bug description\r\n\r\nNo matter what prefetch_factor is set for the `DataLoader` in a `LightningDataModule` wrapper, when the `_PrefetchDataFetcher` is initialized, the value is always reset to 1.\r\n\r\n\r\n\r\n### What version are you seeing the problem on?\r\n\r\nv2.0\r\n\n\ncc @justusschock @awaelchli"
+    },
+    "satisfaction_conditions": [
+      "DataLoader's prefetch_factor setting remains functional and independent",
+      "Trainer's prefetch behavior is clearly distinct from DataLoader prefetching",
+      "Batch exhaustion detection remains functional"
+    ],
+    "created_at": "2023-07-21T21:34:48Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/16102",
+    "source": {
+      "issue_number": 16102
+    },
+    "initial_question": {
+      "title": "Torch sees GPU but does not use it",
+      "body": "### Bug description\n\nWhen I use ``torch.cuda.device_count()``\r\nit returns 1, which is correct\r\nBut then when using Lightning, it shows this in terminal\r\n``LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]\r\n``\n\n### How to reproduce the bug\n\n_No response_\n\n### Error messages and logs\n\n```\r\n# Error messages and logs here please\r\n```\r\n\n\n### Environment\n\n<details>\r\n  <summary>Current environment</summary>\r\n\r\n```\r\n#- Lightning Component (e.g. Trainer, LightningModule, LightningApp, LightningWork, LightningFlow):\r\n#- PyTorch Lightning Version (e.g., 1.5.0):\r\n#- Lightning App Version (e.g., 0.5.2):\r\n#- PyTorch Version (e.g., 1.10):\r\n#- Python version (e.g., 3.9):\r\n#- OS (e.g., Linux):\r\n#- CUDA/cuDNN version:\r\n#- GPU models and configuration:\r\n#- How you installed Lightning(`conda`, `pip`, source):\r\n#- Running environment of LightningApp (e.g. local, cloud):\r\n```\r\n\r\n</details>\r\n\n\n### More info\n\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "System correctly detects available GPU(s)",
+      "Lightning framework displays appropriate GPU visibility status",
+      "Output format matches hardware configuration",
+      "User understands normal system behavior"
+    ],
+    "created_at": "2022-12-17T17:36:44Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/15973",
+    "source": {
+      "issue_number": 15973
+    },
+    "initial_question": {
+      "title": "access to the last training epoch that triggered early stopping",
+      "body": "### Description & Motivation\r\n\r\nI wish there was a method to access when the last training epoch number was. The max_training_epoch differs from the last training epoch resulting from the early stopping.\n\ncc @borda @carmocca @awaelchli"
+    },
+    "satisfaction_conditions": [
+      "Access to the actual final training epoch number is provided",
+      "The returned epoch number reflects early stopping events",
+      "The information is accessible after training completion"
+    ],
+    "created_at": "2022-12-09T01:07:08Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/14199",
+    "source": {
+      "issue_number": 14199
+    },
+    "initial_question": {
+      "title": "on_save_checkpoint runs multiple times on DDP",
+      "body": "## \ud83d\udc1b Bug\r\n\r\non_save_checkpoint handler of the LightningModule runs once per GPU when running on multiple GPUs with `strategy=dpp`. This can have unwanted side effects when saving additional checkpoint information.\r\n\r\nIs there a way to make this run only the master? \r\n\r\nIs this the expected behavior? I would think the former would be the more common use case.\r\n\r\n### To Reproduce\r\n\r\n```py\r\nfrom transformers import AutoModel\r\nfrom pytorch_lightning import LightningModule\r\n\r\nclass BoringModel(LightningModule):\r\n    def __init__(self,  model_name, save_path):\r\n        super().__init__()\r\n        self.save_hyperparameters()\r\n        self.model = AutoModel.from_pretained(self.hparams.model_name)\r\n\r\n    def forward(self, pixel_values):\r\n        outputs = self.model(pixel_values=pixel_values)\r\n        return outputs\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        loss = self(batch).sum()\r\n        self.log(\"train_loss\", loss)\r\n        return {\"loss\": loss}\r\n\r\n    def validation_step(self, batch, batch_idx):\r\n        loss = self(batch).sum()\r\n        self.log(\"valid_loss\", loss)\r\n\r\n    def test_step(self, batch, batch_idx):\r\n        loss = self(batch).sum()\r\n        self.log(\"test_loss\", loss)\r\n\r\n    def configure_optimizers(self):\r\n        return torch.optim.SGD(self.layer.parameters(), lr=0.1)\r\n\r\n    def on_save_checkpoint(self, checkpoint):\r\n        print(\"Saving model latest checkpoint in HF format..\")\r\n        self.model.save_pretrained(self.hparams.save_path)\r\n```\r\n\r\n- Lightning Component (e.g. Trainer, LightningModule):\r\n- PyTorch Lightning Version  1.6.4\r\n- OS (e.g., Linux): Linux\r\n- CUDA/cuDNN version: 11.3\r\n- GPU models and configuration:  8xT4\r\n- Any other relevant information:\r\n"
+    },
+    "satisfaction_conditions": [
+      "Hook execution must be controllable by rank",
+      "Checkpoint data integrity must be maintained",
+      "Rank identification must be accessible",
+      "Must work within DDP strategy context"
+    ],
+    "created_at": "2022-08-14T13:42:46Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/13360",
+    "source": {
+      "issue_number": 13360
+    },
+    "initial_question": {
+      "title": "Using Dataloader in pytorch_lightning when using DDP training?",
+      "body": "My computer has 2 gpus and I have some problems:\r\n1. First, I used Pytorch\r\nI have 10 images, I created distributed dataloader (using sampler) follow Pytorch instruction, batchsize = 4, gpu=2.\r\n=> So with each gpu, length of batch0 is 4 and length of batch1 is 4. Sampler added 2 to batch1 to make batchsize = 4.\r\nI trained with ddp_spawn with pytorch code and everything is ok.\r\n\r\n2. Next, I used Pytorch Lightning\r\nI also use 10 images, I created dataloader (Normal Dataloader) follow Pytorch Instruction, batchsize =4, gpu=2\r\n=> so with each gpu, length of batch0 is 4 and length of batch1 is 1.\r\n\r\nNow, I want to use pytorch lightning but I want batchsize=4 same distributed sampler when working with pytorchlightning. How should I do?\r\n\r\nThanks\n\ncc @awaelchli @rohitgr7 @akihironitta @justusschock @ninginthecloud @otaj"
+    },
+    "satisfaction_conditions": [
+      "All batches must maintain consistent size across GPUs",
+      "Data must be properly distributed across available GPUs",
+      "Batch normalization must function correctly",
+      "Dataset samples must be properly handled when not evenly divisible by (batch_size * num_gpus)"
+    ],
+    "created_at": "2022-06-22T06:51:21Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/12943",
+    "source": {
+      "issue_number": 12943
+    },
+    "initial_question": {
+      "title": "Distribution not moved to correct device",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nI'm attempting to port a variational auto-encoder to use `torch.distributions`. I noticed that when I define a `torch.distributions.Distribution` as a module parameter - for example the `prior` in the example below - it doesn't get moved to the correct device. I'm fairly certain this is because you call `module.apply()` with a lambda in order to recursively move modules to the specific device - unfortunately a Distribution is not a module but it does hold tensors so this strategy fails in this edge case.\r\n\r\n### To Reproduce\r\n\r\n```\r\nimport os\r\n\r\nimport torch\r\nfrom torch.utils.data import DataLoader, Dataset\r\n\r\nfrom pytorch_lightning import LightningModule, Trainer\r\n\r\nfrom torch.distributions import MultivariateNormal\r\n\r\nclass RandomDataset(Dataset):\r\n    def __init__(self, size, length):\r\n        self.len = length\r\n        self.data = torch.randn(length, size)\r\n\r\n    def __getitem__(self, index):\r\n        return self.data[index]\r\n\r\n    def __len__(self):\r\n        return self.len\r\n\r\n\r\nclass BoringModel(LightningModule):\r\n    def __init__(self):\r\n        super().__init__()\r\n        self.layer = torch.nn.Linear(32, 2)\r\n\r\n        latent_dim=2\r\n        self.prior = MultivariateNormal(\r\n\t\t\ttorch.zeros(latent_dim), \r\n\t\t\tscale_tril=torch.diag(torch.ones(latent_dim)))\r\n\r\n    def forward(self, x):\r\n        assert self.prior.loc.device == x.device, \"incorrect device\"\r\n        return self.layer(x)\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        loss = self(batch).sum()\r\n        self.log(\"train_loss\", loss)\r\n        return {\"loss\": loss}\r\n\r\n    def validation_step(self, batch, batch_idx):\r\n        loss = self(batch).sum()\r\n        self.log(\"valid_loss\", loss)\r\n\r\n    def test_step(self, batch, batch_idx):\r\n        loss = self(batch).sum()\r\n        self.log(\"test_loss\", loss)\r\n\r\n    def configure_optimizers(self):\r\n        return torch.optim.SGD(self.layer.parameters(), lr=0.1)\r\n\r\n\r\ndef run():\r\n    train_data = DataLoader(RandomDataset(32, 64), batch_size=2)\r\n    val_data = DataLoader(RandomDataset(32, 64), batch_size=2)\r\n    test_data = DataLoader(RandomDataset(32, 64), batch_size=2)\r\n\r\n    model = BoringModel()\r\n    trainer = Trainer(\r\n        gpus=1,\r\n        default_root_dir=os.getcwd(),\r\n        limit_train_batches=1,\r\n        limit_val_batches=1,\r\n        limit_test_batches=1,\r\n        num_sanity_val_steps=0,\r\n        max_epochs=1,\r\n        enable_model_summary=False,\r\n    )\r\n    trainer.fit(model, train_dataloaders=train_data, val_dataloaders=val_data)\r\n    trainer.test(model, dataloaders=test_data)\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    run()\r\n```\r\n\r\n### Expected behavior\r\n\r\n<!-- FILL IN -->\r\n\r\n### Environment\r\n\r\n* CUDA:\r\n        - GPU:\r\n                - NVIDIA GeForce RTX 3090\r\n                - NVIDIA GeForce RTX 3090\r\n        - available:         True\r\n        - version:           11.1\r\n* Packages:\r\n        - numpy:             1.22.3\r\n        - pyTorch_debug:     False\r\n        - pyTorch_version:   1.9.1+cu111\r\n        - pytorch-lightning: 1.6.1\r\n        - tqdm:              4.64.0\r\n* System:\r\n        - OS:                Linux\r\n        - architecture:\r\n                - 64bit\r\n                - ELF\r\n        - processor:         x86_64\r\n        - python:            3.8.10\r\n        - version:           #121-Ubuntu SMP Thu Mar 24 16:04:27 UTC 2022"
+    },
+    "satisfaction_conditions": [
+      "Distribution objects must persist across model operations"
+    ],
+    "created_at": "2022-05-01T04:06:14Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/8559",
+    "source": {
+      "issue_number": 8559
+    },
+    "initial_question": {
+      "title": "Wandblogger not logging train loss after every step",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nI am using wandb with Pytorch Lightning. I am logging train/loss, val/loss, train/metric, val/metric. Everything is logged properly to wandb dashboard except the **train/loss** (after every step).\r\n\r\nHere's the main lightning module:\r\n\r\n`class ImageClassification(pl.LightningModule):\r\n    def __init__(self, model):\r\n        super().__init__()\r\n        self.model = model\r\n        self.criterion = nn.BCEWithLogitsLoss()\r\n        self.lr = CFG['lr']\r\n    \r\n    def forward(self, x):\r\n        output = self.model(x)\r\n        return output\r\n    \r\n    def configure_optimizers(self):\r\n        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=CFG['lr'])\r\n        return self.optimizer\r\n    \r\n    def training_step(self, batch, batch_idx):\r\n        images, targets = batch['image'], batch['target']\r\n        output = self.model(images)\r\n        loss = self.criterion(output.view(-1), targets)\r\n        \r\n        self.log('train/loss', loss, logger=True)  # the thing that is not being logged\r\n\r\n        try:\r\n            auc = roc_auc_score(targets.detach().cpu(), output.sigmoid().detach().cpu())\r\n            self.log(\"train/auc\", auc, prog_bar=True, logger=True)\r\n        except:\r\n            pass\r\n        \r\n        return {\r\n            \"loss\": loss,\r\n            \"predictions\": output,\r\n            \"targets\" : targets\r\n        }\r\n    \r\n    def training_epoch_end(self, outputs):\r\n\r\n        preds = []\r\n        targets = []\r\n\r\n        for output in outputs:\r\n            preds += output['predictions']\r\n            targets += output['targets']\r\n        \r\n        targets = torch.stack(targets)\r\n        preds = torch.stack(preds)\r\n\r\n        train_auc = roc_auc_score(targets.detach().cpu(), preds.sigmoid().detach().cpu())\r\n        self.log(\"train/auc_epoch\", train_auc,logger=True)\r\n    \r\n    def validation_step(self, batch, batch_idx):\r\n        images, targets = batch['image'], batch['target']\r\n        output = self.model(images)\r\n        loss = self.criterion(output.view(-1), targets)\r\n\r\n        self.log('val/loss', loss,prog_bar=True, logger=True)\r\n\r\n        return {\r\n            \"predictions\": output,\r\n            \"targets\": targets\r\n        }\r\n    \r\n    def validation_epoch_end(self, outputs):\r\n\r\n        preds = []\r\n        targets = []\r\n\r\n        for output in outputs:\r\n            preds += output['predictions']\r\n            targets += output['targets']\r\n        \r\n        targets = torch.stack(targets)\r\n        preds = torch.stack(preds)\r\n    \r\n        val_auc = roc_auc_score(targets.detach().cpu(), preds.sigmoid().detach().cpu())\r\n        self.log(\"val/auc_epoch\", val_auc,prog_bar=True,logger=True)\r\n    \r\n    def test_step(self, batch, batch_idx):\r\n        images = batch['image']\r\n        output = self.model(images)\r\n        return output`"
+    },
+    "satisfaction_conditions": [
+      "Logger configuration is properly initialized and enabled"
+    ],
+    "created_at": "2021-07-26T13:30:21Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/6104",
+    "source": {
+      "issue_number": 6104
+    },
+    "initial_question": {
+      "title": "Early stopping on custom metric without validation_step",
+      "body": "#### What is your question?\r\n\r\nI have a metric that I can only define using every predictions on the validation split, so I cannot use `validation_step` since it only operates on batches of data.\r\nI have a callback that computes and log this metric in `on_train_epoch_end`. \r\nI am not executing the validation loop because it's useless in my case.\r\nMy question is: How can I properly use the EarlyStopping callback ? (Same question for ModelCheckpoint)\r\n\r\n#### What have you tried?\r\nI have tried manually calling `pl_module.on_validation_epoch_end()` in my callback but it doesn't seem to work because EarlyStopping never stops the model even though the patience should have dropped to 0.\r\n\r\n#### What's your environment?\r\n\r\n - OS: Kubuntu 20.04\r\n - Packaging: pip\r\n - Version: 1.1.4\r\n"
+    },
+    "satisfaction_conditions": [
+      "Custom metric is successfully monitored for early stopping",
+      "Metric value is properly logged and accessible to callbacks",
+      "Early stopping functionality works without full validation loop",
+      "Minimal computational overhead"
+    ],
+    "created_at": "2021-02-20T16:19:44Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5705",
+    "source": {
+      "issue_number": 5705
+    },
+    "initial_question": {
+      "title": "Why do some metrics require `num_classes=1` for binary classification?",
+      "body": "## \u2753 Why do some metrics require `num_classes=1` for binary classification?\r\n\r\n#### What is your question?\r\n\r\nWhy do some metrics require the argument `num_classes=1` for binary classification (and some don't) to give the correct results?\r\n\r\nI find it rather unintuitively to calculate Recall/Precision/F1 with the argument `num_classes=1` for a binary classification, whereas e.g. ConfusionMatrix requires `num_classes=2` in the same situation.\r\n\r\nFurthermore, using Recall/Precision/F1 with `num_classes=2` for a binary classification gives wrong results - so this also might be considered a bug-report.\r\n\r\nIt took me quite some time to figure out, why calculated metrics are different from what I calculated by hand from the confusion matrix.\r\n\r\n#### Code\r\n\r\n```python\r\nimport torch\r\nfrom pytorch_lightning import metrics\r\n\r\n# example data\r\npreds = [0] * 200 + [1] * 30 + [0] * 10 + [1] * 20\r\ntargets = [0] * 200 + [1] * 30 + [1] * 10 + [0] * 20\r\n\r\npreds = torch.tensor(preds)\r\ntargets = torch.tensor(targets)\r\n\r\n# define method for printing metrics\r\n\r\n\r\ndef _print_some_metrics(preds, targets, num_classes):\r\n    precision = metrics.classification.Precision(num_classes=num_classes)\r\n    recall = metrics.classification.Recall(num_classes=num_classes)\r\n    f1 = metrics.classification.F1(num_classes=num_classes)\r\n\r\n    accuracy = metrics.classification.Accuracy()\r\n    avg_precision = metrics.classification.AveragePrecision(\r\n        num_classes=1)\r\n    confusion_matrix = metrics.ConfusionMatrix(num_classes=2)\r\n\r\n    # print results\r\n    print(\"Precision:\\n{}\\n\".format(precision(preds, targets)))\r\n    print(\"Recall:\\n{}\\n\".format(recall(preds, targets)))\r\n    print(\"F1:\\n{}\\n\".format(f1(preds, targets)))\r\n\r\n    print(\"AVG Precision:\\n{}\\n\".format(avg_precision(preds, targets)))\r\n    print(\"Accuracy:\\n{}\\n\".format(accuracy(preds, targets)))\r\n    print(\"ConfMat:\\n{}\\n\".format(confusion_matrix(preds, targets)))\r\n\r\n\r\n_print_some_metrics(preds, targets, num_classes=1)\r\n_print_some_metrics(preds, targets, num_classes=2)\r\n```\r\n\r\nResults in\r\n\r\n> $ _print_some_metrics(preds, targets, num_classes=1)\r\n> Precision:\r\n> 0.6000000238418579\r\n> \r\n> Recall:\r\n> 0.75\r\n> \r\n> F1:\r\n> 0.6666666865348816\r\n> \r\n> AVG Precision:\r\n> 0.48846155405044556\r\n> \r\n> Accuracy:\r\n> 0.8846153616905212\r\n> \r\n> ConfMat:\r\n> tensor([[200.,  20.],\r\n>         [ 10.,  30.]])\r\n> \r\n> \r\n> $ _print_some_metrics(preds, targets, num_classes=2)\r\n> Precision:\r\n> 0.8846153616905212\r\n> \r\n> Recall:\r\n> 0.8846153616905212\r\n> \r\n> F1:\r\n> 0.8846153616905212\r\n> \r\n> AVG Precision:\r\n> 0.48846155405044556\r\n> \r\n> Accuracy:\r\n> 0.8846153616905212\r\n> \r\n> ConfMat:\r\n> tensor([[200.,  20.],\r\n>         [ 10.,  30.]])\r\n\r\nAs one can see, Precision/Recall/F1 give different (wrong) results when setting `num_classes=2` in a binary classification.\r\nAveragePrecision doesn't even work with the binary usecase when setting `num_classes=2` whereas ConfusionMatrix doesn't work when setting `num_classes=1`.\r\n\r\nI wonder if there is a specific reason why one would set `num_classes=1` in a binary classification (where actually 2 classes exist).\r\n\r\nWouldn't it be more straightforward to set `num_classes=2` for binary classification for all metrics?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Clear distinction between single-class and two-class metric calculations",
+      "Consistent tensor allocation across metrics",
+      "Proper error handling for mismatched parameters"
+    ],
+    "created_at": "2021-01-29T13:16:35Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5636",
+    "source": {
+      "issue_number": 5636
+    },
+    "initial_question": {
+      "title": "Understanding accumulate_grad_batches  parameter? ",
+      "body": "I am very new to PL. As far as I understand **accumulate_grad_batches** works similar to  **'gradient_accumulation_steps'** , where the main task is to increase the effective batch size.  But I do not see any change in training epoch step count when increasing the  **accumulate_grad_batches** parameters.\r\n\r\nLet's say, I have a dataset of 1000 examples and my batch_size is one and I only use a single GPU. So in this case, if I use the value 2  for the **accumulate_grad_batches**,  the number of steps for an epoch should be shown as 500 (logger). But I still see 1000.\r\n\r\nIs it a bug or PL doesn't divide the number of steps when showing in the log?"
+    },
+    "satisfaction_conditions": [
+      "Total step count display remains consistent regardless of gradient accumulation setting",
+      "Optimizer updates occur at the correct reduced frequency",
+      "Training progress tracking remains accurate"
+    ],
+    "created_at": "2021-01-24T10:10:44Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5552",
+    "source": {
+      "issue_number": 5552
+    },
+    "initial_question": {
+      "title": "How to iterate over training set AGAIN on training epoch end?",
+      "body": "## \u2753 Questions and Help\r\n\r\n<!-- If you still can't find what you need: -->\r\n\r\n#### What is your question?\r\n\r\nHow to iterate over training set AGAIN on training epoch end or on validation epoch start?\r\nI have a model that works as expected on MNIST, but for my unique data, val_loss<train_loss for all samples.\r\nI have no idea what causes this, and it is too suspicious to allow me to go on.\r\n\r\n*I want to do a validation step on training data, in eval mode*\r\n\r\nI hope it will ease my mind.\r\n\r\n#### Code\r\nWell, if I had code for how to correctly do this I wouldn't ask :)\r\n\r\n#### What have you tried?\r\nThis doesn't sound like a standard use case, not even sure that's supported.\r\n\r\n#### What's your environment?\r\n\r\n - OS: [e.g. iOS, Linux, Win] Win\r\n - Packaging [e.g. pip, conda] Pip\r\n - Version [e.g. 0.5.2.1] 1.1.4\r\n"
+    },
+    "satisfaction_conditions": [
+      "Model must be able to evaluate training data in evaluation mode",
+      "Access to complete training dataset must be maintained after training epoch",
+      "Model state must be properly switched between training and evaluation modes"
+    ],
+    "created_at": "2021-01-18T07:57:20Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5550",
+    "source": {
+      "issue_number": 5550
+    },
+    "initial_question": {
+      "title": "on_train_epoch_end vs training_epoch_end",
+      "body": "## \u2753 Questions and Help\r\n\r\nWhat is the difference between on_train_epoch_end and training_epoch_end? For what applications should we use each?\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "training_epoch_end must process aggregated training step outputs",
+      "on_train_epoch_end must be identified as a hook for custom logic",
+      "Clear functional distinction between the two methods must be provided"
+    ],
+    "created_at": "2021-01-17T21:37:32Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5454",
+    "source": {
+      "issue_number": 5454
+    },
+    "initial_question": {
+      "title": "Validation step is ignored when using DataModule",
+      "body": "#### What is your question?\r\nHi, guys!\r\nI created my own DataModule and loading it to the trainer. However, it appears that the \"fit\" is skipping the validation step.\r\nHow can I ensure that the code runs through the validation step too?\r\n\r\n#### Code\r\n```\r\nclass DataModule(pl.LightningDataModule):\r\n    def __init__(self, batch_size=25, seed=0):\r\n    # def __init__(self, dataset, batch_size=25, seed=0):\r\n        super().__init__()\r\n        self.dataset = dataset\r\n        self.batch_size = batch_size\r\n        self.seed = seed\r\n        self.split = [801, 100, 100]\r\n        # self.transform = torchvision.transforms.ToTensor()\r\n\r\n    def setup(self, stage=None):\r\n        # train/valid/test split\r\n        # and assign to use in dataloaders via self\r\n        train_set, valid_set, test_set = torch.utils.data.random_split(self.dataset, self.split, generator=torch.Generator().manual_seed(self.seed))\r\n\r\n        if stage == 'fit' or stage is None:\r\n\r\n            self.train_set = train_set\r\n            self.valid_set = valid_set\r\n\r\n        if stage == 'test' or stage is None:\r\n            self.test_set = test_set\r\n\r\n    def train_dataloader(self):\r\n        return torch.utils.data.DataLoader(self.train_set, batch_size=self.batch_size, shuffle=True)\r\n\r\n    def valid_dataloader(self):\r\n        return torch.utils.data.DataLoader(self.valid_set, batch_size=self.batch_size, shuffle=False)\r\n\r\n    def test_dataloader(self):\r\n        return torch.utils.data.DataLoader(self.test_set, batch_size=self.batch_size, shuffle=False)\r\n\r\nclass LitReg(pl.LightningModule):\r\n    def __init__(self, in_dims, out_dims, lr=2e-4, max_dict={}):\r\n        super().__init__()\r\n        self.in_size = in_dims\r\n        self.out_size = out_dims\r\n        self.lr = lr\r\n        self.max_dict = max_dict\r\n\r\n        # model\r\n        self.model = nn.Sequential(\r\n            nn.Linear(self.in_size, self.in_size),\r\n\r\n            nn.LeakyReLU(0.02),\r\n\r\n            nn.Linear(self.in_size, self.out_size)\r\n        )\r\n\r\n        self.model.apply(self.weights_init)\r\n\r\n    def forward(self, data):\r\n        out = self.model(data)\r\n        return out\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        x, y, l_rate = batch\r\n        pred_y = self.model(x)\r\n        train_loss = F.mse_loss(pred_y, y) \r\n\r\n        self.log('train_loss', train_loss, prog_bar=True)\r\n        return train_loss\r\n\r\n    def validation_step(self, batch, batch_idx):\r\n        self._shared_eval(batch, batch_idx, 'val')\r\n\r\n    def test_step(self, batch, batch_idx):\r\n        self._shared_eval(batch, batch_idx, 'test')\r\n\r\n    def _shared_eval(self, batch, batch_idx, prefix):\r\n        x, y, l_rate = batch\r\n        pred_y = self.model(x)\r\n\r\n        loss = F.mse_loss(pred_y, y) \r\n        self.log(f'{prefix}_loss', loss, prog_bar=True)\r\n        return loss\r\n\r\n    def configure_optimizers(self):\r\n        optimizer = torch.optim.Adam(self.parameters(), self.lr)\r\n        return optimizer\r\n\r\n    def weights_init(self, m):\r\n        if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):\r\n            torch.nn.init.normal_(m.weight, 0.0, 0.02)\r\n        if isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):\r\n            torch.nn.init.normal_(m.weight, 0.0, 0.02)\r\n            torch.nn.init.constant_(m.bias, 0)\r\n        if isinstance(m, nn.Linear):\r\n            torch.nn.init.normal_(m.weight, 0.0, 0.02)\r\n            torch.nn.init.constant_(m.bias, 0)\r\n```\r\n#### What have you tried?\r\nPlacing breakpoints to debug in VSCode, but all in vain.\r\nAlso accessed both valid and test datasets and loaders. All looks set.\r\nWhat is working? If I load the data the following way.\r\n```\r\n    **train_loader = DataLoader(X_train, batch_size=args.batch_size)\r\n    val_loader = DataLoader(X_val, batch_size=args.batch_size)\r\n    test_loader = DataLoader(X_test, batch_size=args.batch_size)\r\n\r\n    trainer.fit(model, train_loader, val_loader)**\r\n```\r\n\r\n#### What's your environment?\r\n\r\n - OS: Win\r\n - Packaging pip\r\n - Version 1.1.3\r\n\r\nThank you for your attention!"
+    },
+    "satisfaction_conditions": [
+      "Validation loop must be executed during model training",
+      "Validation metrics must appear in training progress bar",
+      "DataModule's validation dataloader must be properly recognized by the trainer",
+      "No validation-related warnings should be generated during training"
+    ],
+    "created_at": "2021-01-11T00:49:13Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5129",
+    "source": {
+      "issue_number": 5129
+    },
+    "initial_question": {
+      "title": "How to forbid save optimizer's state \uff1f",
+      "body": "Sometime's it's time-consuming."
+    },
+    "satisfaction_conditions": [
+      "Model checkpointing excludes optimizer state",
+      "Model weight saving functionality remains intact"
+    ],
+    "created_at": "2020-12-14T15:12:33Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4947",
+    "source": {
+      "issue_number": 4947
+    },
+    "initial_question": {
+      "title": "How to log more than one metrics in logger?",
+      "body": "I want to log two metircs.What should i do?\r\nself.log('my_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True) \r\nThis can only log one metrics."
+    },
+    "satisfaction_conditions": [
+      "Multiple distinct metrics are successfully logged simultaneously",
+      "Each logged metric maintains its individual tracking parameters (step/epoch/progress bar visibility)",
+      "Logged metrics are accessible through the logger system"
+    ],
+    "created_at": "2020-12-02T15:31:25Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4874",
+    "source": {
+      "issue_number": 4874
+    },
+    "initial_question": {
+      "title": "Metric Reset",
+      "body": "How can I manually reset a metric? \r\nOr metric states are reset to default values after calling the `compute()` method?"
+    },
+    "satisfaction_conditions": [
+      "Metric state is successfully reset to initial/default values",
+      "Reset functionality is available when needed"
+    ],
+    "created_at": "2020-11-26T17:37:30Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4711",
+    "source": {
+      "issue_number": 4711
+    },
+    "initial_question": {
+      "title": "How to monitor more than one quantity?",
+      "body": "What i do if i want to monitor more than one quantity?"
+    },
+    "satisfaction_conditions": [
+      "Multiple distinct quantities can be monitored simultaneously",
+      "System accepts configuration for multiple monitoring targets"
+    ],
+    "created_at": "2020-11-17T12:41:15Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4646",
+    "source": {
+      "issue_number": 4646
+    },
+    "initial_question": {
+      "title": "Loading samples to RAM with DDP.",
+      "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\n\r\nI'm facing an IO bottleneck that can be fixed with a custom `torch.utils.data.Dataset` that loads each sample to RAM. Then training goes fast as I don't need to read my samples (images) from disk (slow). Everything works well with when I'm using 1 GPU, but I'm a bit lost when I switch to multiple GPUs with DDP.\r\n\r\nDDP divides the samples to each GPU and I'm wondering when/where I should load my samples to RAM so that each process only loads its own partition of the samples?\r\n\r\n#### Code\r\n\r\n```\r\nclass RAMDataset(data.Dataset):\r\n    def __init__(self, paths,labels,transform):\r\n        \"\"\"Dataset that loads all samples to RAM.\"\"\"\r\n        self.paths = paths\r\n        self.labels = labels\r\n        self.transform = transform\r\n\r\n    def __len__(self):\r\n        return len(self.samples)\r\n\r\n    def load_to_RAM(self):\r\n        self.images = []\r\n        for path in self.paths:\r\n            with open(path, \"rb\") as f:\r\n                str_encode = f.read()\r\n                nparr = np.frombuffer(str_encode, np.uint8)\r\n                self.images.append(cv2.imdecode(nparr, cv2.IMREAD_COLOR))\r\n\r\n    def __getitem__(self, index):\r\n        # Run self.load_to_RAM() first!\r\n        image = self.transform(self.images[index])\r\n        label = self.labels[index]\r\n        return image, label\r\n```\r\n\r\n#### What have you tried?\r\n\r\nWith 1 GPU `self.load_to_RAM()` can be excecuted as soon as the Dataset has been created.\r\n\r\n```\r\ndataset = RAMDataset(paths,labels)\r\ndataset.load_to_RAM()\r\nloader = DataLoader(dataset,...)\r\ntrainer.fit(model,loader)\r\n```\r\n\r\nBut obviously this would load the samples `num_gpus` times to the RAM of the node.\r\n\r\nI quickly tried to call `self.train_dataloader.dataset.load_to_RAM()`on the hook `setup()` but got the following error...\r\n```\r\nAttributeError: '_PatchDataLoader' object has no attribute 'dataset'\r\n```\r\n..and I'm 99% this solution would also load all of the samples to RAM.\r\n\r\n#### Possible solution?\r\n\r\n1. Find out which process (which GPU and which node) is currently running.\r\n2. Get the allocated slice of the samples for this process.\r\n3. Load only that slice of the `self.paths` to RAM.\r\n\r\nTried to go through the source code but couldn't find out how I could implement this.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Dataset access must remain performant across multiple epochs",
+      "Dataset consistency must be maintained across training epochs"
+    ],
+    "created_at": "2020-11-12T21:06:02Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4607",
+    "source": {
+      "issue_number": 4607
+    },
+    "initial_question": {
+      "title": "How to change the Datamodule during training with a callback?",
+      "body": "#### What is your question?\r\nHow to change the Datamodule during training with a callback?\r\nMore details:\r\nI am looking for a way to reinitialized my Datamodule with different parameter, I am currently sending the height of my images as argument to my datamodule and I want to change this height at some point during training, the simple way is to call trainer.fit multiple times with different datamodules, but I am wondering is there a way to do this on callback, in the same way as you do when you change the optimizer or lr_scheduler?\r\n\r\n\r\nSomething similar to this:\r\n```\r\ndef on_train_epoch_start(self, trainer, pl_module):\r\n            sch = optim.lr_scheduler.StepLR(optimizer, 1, 0.96)\r\n            scheduler = {\r\n                'scheduler': sch,\r\n                'interval': interval,  # or 'step'\r\n                'monitor': 'train_loss',\r\n                'reduce_on_plateau': False,\r\n                'frequency': 1,\r\n            }\r\n            trainer.lr_schedulers = trainer.configure_schedulers([scheduler])\r\n```"
+    },
+    "satisfaction_conditions": [
+      "DataModule parameters can be modified during training execution",
+      "Changes to DataModule are synchronized with training epochs",
+      "DataLoader is reinitialized with updated parameters",
+      "Training continues uninterrupted after DataModule changes",
+      "DataModule changes are controllable programmatically"
+    ],
+    "created_at": "2020-11-10T15:59:21Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4604",
+    "source": {
+      "issue_number": 4604
+    },
+    "initial_question": {
+      "title": "How to load to from a checkpoint to same device when pretrained encoder was used",
+      "body": "## \u2753 Questions and Help \r\n\r\nI implemented a `ClassificationNet` (see below) that's using a pretrained encoder. After training, I'm trying to load it to CPU using `ClassificationNet.load_from_checkpoint(pth, map_location=torch.device(\"cpu\")`, but since `map_location` in `get_encoder` is `None`, the encoder tries to load to GPU. How can I inform `get_encoder` to load to the same `map_location`? \r\nSince I just started using Lightning, I guess there's a much smarter way to circumvent this situation altogether -- I look forward to your suggestions :) Thanks!\r\n\r\n#### Code\r\n``` python\r\nclass ClassificationNet(LightningModule):\r\n    ...\r\n    self.encoder = get_encoder(pretrained=True)\r\n\r\nget_encoder(pretrained=False, map_location=None):\r\n    model = FancyModel()\r\n    if pretrained:\r\n        ckpt_data = torch.utils.model_zoo.load_url(url, map_location=map_location)\r\n    ....\r\n```\r\n\r\n - OS: Manjaro Linux\r\n - Version 1.0.5"
+    },
+    "satisfaction_conditions": [
+      "Model loads to the specified target device",
+      "Device specification propagates to all model components",
+      "Compatible with PyTorch Lightning's checkpoint loading system"
+    ],
+    "created_at": "2020-11-10T14:35:57Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4465",
+    "source": {
+      "issue_number": 4465
+    },
+    "initial_question": {
+      "title": "How to save the latest and best checkpoint?",
+      "body": "I can set a checkpoing callback to save best model, but I also want it save the latest model, so that i can `resume_from_checkpoint` from latest checkpoint. how to do this?"
+    },
+    "satisfaction_conditions": [
+      "Both latest and best model checkpoints are successfully saved",
+      "Checkpoint saving occurs automatically during training"
+    ],
+    "created_at": "2020-11-01T10:25:10Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4135",
+    "source": {
+      "issue_number": 4135
+    },
+    "initial_question": {
+      "title": "Accuracy metric number of classes warning question",
+      "body": "For context, I'm running a heavy multi-label classification model with small batches (~10 elements) and a large number of classes (~50 classes). While training I'm getting this warning on **accuracy** metric calculation:\r\n\r\n> You have set 32 number of classes which is different from predicted (6) and target (28) number of classes\r\n\r\nShould I be worried? I'm not sure why this should be a warning. \r\nI keep wondering why is it bad having fewer classes in predicted output compared with the expected number of classes."
+    },
+    "satisfaction_conditions": [
+      "Warning message behavior is understood and explained",
+      "Impact on model performance is clarified",
+      "Version compatibility is identified",
+      "Class prediction coverage is assessed"
+    ],
+    "created_at": "2020-10-14T04:26:41Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/3803",
+    "source": {
+      "issue_number": 3803
+    },
+    "initial_question": {
+      "title": "Access metrics in custom callbacks",
+      "body": "## \u2753 Questions and Help\r\n\r\nI have found it useful/helpful to sometimes access metrics in custom callbacks. In v0.9.0 this works using something like this:\r\n\r\n```\r\ndef training_step(self, batch, batch_idx):\r\n    return {\"loss\": self._step(batch)}\r\n\r\ndef validation_step(self, batch, batch_idx):\r\n    return {\"val_loss\": self._step(batch)}\r\n\r\ndef training_epoch_end(self, outputs):\r\n    # ...\r\n    return {\"interesting_key_train\": interesting_value}\r\n\r\ndef validation_epoch_end(self, outputs):\r\n    # ...\r\n    return {\"interesting_key_val\": interesting_value}\r\n```\r\n\r\nThe setup allows for the values returned in the `_epoch_end` methods to be accessed via `trainer.callback_metrics`. As such, a callback could use these values, e.g.\r\n\r\n```\r\nclass CustomCallback(Callback):\r\n\r\n    def on_validation_end(self, trainer, pl_module):\r\n        metrics = trainer.callback_metrics\r\n        interesting_value = metrics[\"interesting_key_train\"]\r\n```\r\n\r\nWhen using the current master branch, the above approach is possible for values returned in `validation_epoch_end` but no longer possible for `training_epoch_end` as setting a return value in `training_epoch_end` raises the exception,\r\n\r\n```\r\nMisconfigurationException: training_epoch_end expects a return of None. HINT: remove the return statement in training_epoch_end\r\n```\r\n\r\nAdditionally the values stored in `trainer.callback_metrics` have changed. Using the example above, in v0.9.0, it is `{\"loss\": ..., \"interesting_key_train\": ..., \"interesting_key_val\": ...}` and on master it is simply `{\"interesting_key_val\": ...}`.\r\n\r\nWhat is the intended way to access metrics (in particular from the training loop) in callbacks?"
+    },
+    "satisfaction_conditions": [
+      "Metrics from training must be accessible within custom callbacks",
+      "Solution must be compatible with the framework's current version"
+    ],
+    "created_at": "2020-10-02T19:05:49Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/3698",
+    "source": {
+      "issue_number": 3698
+    },
+    "initial_question": {
+      "title": "How to keep some LightningModule's parameters on cpu when using CUDA devices for training",
+      "body": "## \u2753 Questions and Help\r\n\r\n\r\n#### What is your question?\r\nI tried to transform my code into Lightning yesterday, but the CUDA OOM error occurred. My model has a very large parameter ```nn.Embedding(24000000, 128)``` (more than 22GB), which obviously exceeds the memory of my CUDA device. I implemented two classes to sovle this problem in my torch_version code, the pseudo code is as follows:\r\n\r\n#### PyTorch Code\r\n```python\r\nclass Emb(nn.Module):\r\n        def __init__(self):\r\n                xxxxxx # some init operations\r\n                self.emb = nn.Emebdding(24000000, 128)\r\n        def forward(self, idx):\r\n                return self.emb(idx)\r\n\r\nclass MyModule(nn.Module):\r\n        def __init__(self):\r\n                xxxxxx # some init operations\r\n                self.calculation = some_calculation()\r\n        def forward(self, input):\r\n                out = self.calculation(input)\r\n                return out\r\n\r\n# train part:\r\nget_emb = Emb()\r\nmodel = MyModule()\r\nmodel = model.cuda()\r\noptimizer = some_optimizer([{\"params\": e.parameters}, {\"params\": model.parametersba}], lr=1e-3)\r\nloss_metric = some_loss()\r\nfor epo in epoch:\r\n        for x, y in dataloader:\r\n                embs = get_emb(x.cpu()).cuda()\r\n                out = model(embs)\r\n                loss = loss_metric(out, y)\r\n                optimizer.zero_grad()\r\n                loss.backward()\r\n                optimizer.step()\r\n```\r\nThe torch_version code above keeps the nn.Embedding on cpu and ensures that the optimization of training is completed on CUDA devices. But I don't know how to achieve this via pytorch_lightning, because the entire 'training' part is encapsulated in training_step. The PL code  is as follows:\r\n\r\n#### PL Code\r\n```python\r\nclass MyModule(pl.LightningModule):\r\n        def __init__(self):\r\n                xxxxxx # some init operations\r\n                self.calculation = some_calculation()\r\n                self.emb = nn.Embedding(24000000, 128)\r\n                self.loss_metric = some_loss()\r\n        def training_step(self, batch, batch_idx):\r\n                x, y = batch\r\n                embs = self.emb(x)\r\n                out = self.calculation(embs)\r\n                return {\"loss\": self.loss_metric(out, y)}\r\n\r\n# train part\r\nmodel = MyModule()\r\ntrainer = pl.Trainer(gpus=-1)\r\ntrainer.fit(model, dataloader)\r\n```\r\nSo, is there any recommended way to keep a part of the LightningModule's parameters on cpu when using CUDA devices for training? \r\n\r\n#### What's your environment?\r\n\r\n - OS: Ubuntu 16.04.6 LTS\r\n - CUDA: version 10.2, 2080Ti\r\n - Version 0.9.0\r\n"
+    },
+    "satisfaction_conditions": [
+      "Large embedding layer remains on CPU while other model components run on GPU",
+      "Model training proceeds successfully with GPU acceleration",
+      "Embedding parameters persist across model checkpoints",
+      "Data transfer between CPU embedding and GPU components functions correctly",
+      "Compatible with PyTorch Lightning's training framework"
+    ],
+    "created_at": "2020-09-28T11:46:05Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/3696",
+    "source": {
+      "issue_number": 3696
+    },
+    "initial_question": {
+      "title": "How to set default EarlyStopping patience?",
+      "body": "Is it possible to set the default EarlyStopping patience without creating a custom early stopping callback? \r\n\r\nInstead of writing:\r\n```\r\ntrainer = pl.Trainer(early_stop_callback=EarlyStopping(patience=XXX))\r\n```\r\n\r\nI'd like to overwrite the default patience directly and then use EvalResult(early_stop_on=...). "
+    },
+    "satisfaction_conditions": [
+      "Early stopping patience parameter must be configurable",
+      "Solution must function within PyTorch Lightning's training framework"
+    ],
+    "created_at": "2020-09-28T06:21:06Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/3473",
+    "source": {
+      "issue_number": 3473
+    },
+    "initial_question": {
+      "title": "Correct way of implementing early stopping",
+      "body": "I am trying to implement early stopping on my LSTM classifier.Running the script on colab GPU environment. Here's the code\r\n\r\n```python\r\n!pip install pytorch-lightning torchtext \r\nimport os\r\nimport torch\r\nimport torch.nn as nn\r\nimport torch.nn.functional as F\r\nfrom torch.utils.data import DataLoader\r\nimport pytorch_lightning as pl\r\nfrom torch.utils.data import random_split\r\nfrom torchtext import data, datasets\r\nfrom torch.nn.utils.rnn import pack_padded_sequence\r\nfrom pytorch_lightning.metrics import functional as FM\r\nfrom pytorch_lightning.callbacks import EarlyStopping\r\n\r\n#### set up fields\r\nTEXT = data.Field(lower=True, include_lengths=True, batch_first=True)\r\nLABEL = data.Field(sequential=False)\r\n\r\n##### make splits for data\r\ntrain, test = datasets.IMDB.splits(TEXT, LABEL)\r\n\r\n##### build the vocabulary\r\nTEXT.build_vocab(train)\r\nLABEL.build_vocab(train)\r\n\r\n#### make iterator for splits\r\ntrain_iter, test_iter = data.BucketIterator.splits(\r\n    (train, test), batch_size=100, device=0)\r\n\r\nclass LightningLSTM(pl.LightningModule):\r\n  def __init__(self, embedd_dim, hidden_size, output_dim, vocab_size, **kwargs):\r\n    super().__init__()\r\n    self.embedd_dim = embedd_dim\r\n    self.hidden_size = hidden_size\r\n    self.output_dim = output_dim\r\n    self.vocab_size = vocab_size\r\n    self.embedding = nn.Embedding(self.vocab_size, self.embedd_dim)\r\n    self.lstm = nn.LSTM(self.embedd_dim, self.hidden_size, batch_first=True, **kwargs)\r\n    self.linear = nn.Linear(self.hidden_size, self.output_dim)\r\n    self.softmax = nn.Softmax(1)\r\n\r\n  def forward(self, x, lengths):\r\n    output = self.embedding(x)\r\n    packed_output = pack_padded_sequence(output, lengths.cpu().numpy(), batch_first=True, enforce_sorted=False)\r\n    output, (ht, ct) = self.lstm(packed_output)\r\n    output = self.linear(ht).squeeze(0)\r\n    return output\r\n\r\n  def configure_optimizers(self):\r\n    optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)\r\n    return optimizer\r\n\r\n  def validation_step(self, batch, batch_idx):\r\n    x, l, y = *batch.text, batch.label\r\n    y-=1\r\n    y_hat = self(x, l)\r\n    loss = F.cross_entropy(y_hat, y)\r\n    y_pred = torch.argmax(self.softmax(y_hat),1)\r\n    result = pl.EvalResult(checkpoint_on=loss, early_stop_on=loss)\r\n    acc = FM.accuracy(y_pred, y, num_classes=self.output_dim)\r\n    result.log('val_loss', loss, prog_bar=True, on_step=True)\r\n    result.log('val_acc', acc, prog_bar=True, on_step=True)\r\n    return result\r\n\r\n  def training_step(self, batch, batch_idx):\r\n    x, l, y = *batch.text, batch.label\r\n    y-=1\r\n    y_hat = self(x, l)\r\n    loss = F.cross_entropy(y_hat, y)\r\n    y_pred = torch.argmax(self.softmax(y_hat),1)\r\n    result = pl.EvalResult(checkpoint_on=loss)\r\n    acc = FM.accuracy(y_pred, y, num_classes=self.output_dim)\r\n    result = pl.TrainResult(minimize=loss)\r\n    result.log('loss', loss)\r\n    result.log('train_acc', acc)\r\n    return result\r\n\r\nEMBEDDING_DIM = 200\r\nVOCAB_SIZE = len(TEXT.vocab)\r\nOUTPUT_DIM = 2 #two labels - positive and negative\r\nHIDDEN_SIZE = 1024\r\nmodel = LightningLSTM(EMBEDDING_DIM, HIDDEN_SIZE, OUTPUT_DIM, VOCAB_SIZE)\r\n\r\nearly_stopping = EarlyStopping('val_loss', patience=3, mode='min')\r\ntrainer = pl.Trainer(gpus=1, max_epochs=10, early_stop_callback=early_stopping)\r\ntrainer.fit(model, train_iter, test_iter) `\r\n```\r\nThis is the output + warning I get when I start the training - \r\n\r\n\r\n``` \r\nGPU available: True, used: True\r\nTPU available: False, using: 0 TPU cores\r\nCUDA_VISIBLE_DEVICES: [0]\r\n/usr/local/lib/python3.6/dist-packages/pytorch_lightning/utilities/distributed.py:37: UserWarning: Could not log computational graph since the `model.example_input_array` attribute is not set or `input_array` was not given\r\n  warnings.warn(*args, **kwargs)\r\n\r\n  | Name      | Type      | Params\r\n----------------------------------------\r\n0 | embedding | Embedding | 50 M  \r\n1 | lstm      | LSTM      | 5 M   \r\n2 | linear    | Linear    | 2 K   \r\n3 | softmax   | Softmax   | 0     \r\nEpoch 5: 100%\r\n500/500 [02:07<00:00, 3.91it/s, loss=0.105, v_num=3, step_val_loss=1.06, step_val_acc=0.71, epoch_val_loss=0.748, epoch_val_acc=0.763]\r\n/usr/local/lib/python3.6/dist-packages/pytorch_lightning/utilities/distributed.py:37: UserWarning: \r\n                    When using EvalResult(early_stop_on=X) or TrainResult(early_stop_on=X) the\r\n                    'monitor' key of EarlyStopping has no effect.\r\n                    Remove EarlyStopping(monitor='val_early_stop_on) to fix')\r\n                \r\n  warnings.warn(*args, **kwargs)\r\nSaving latest checkpoint..\r\n\r\n1\r\n ```\r\n\r\nIf I don't specifically mention `early_stop_on = loss` in the EvalResult initialization (in the validation_step method), the trainer keeps training it for the max number of epochs specified. Also, I do not get the warning when I remove the `early_stop_on` parameter. Early stopping works fine when I include the parameter.\r\n\r\nI am confused about what is the right way to implement early stopping.  `early_stopping = EarlyStopping('val_loss', patience=3, mode='min')` this line seems to implement early stopping as well. But doesn't work unless I explicitly mention in the EvalResult object.\r\n\r\nCan anyone point out if I am missing something?\r\n\r\nThanks!\r\n\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Early stopping functionality successfully interrupts training before maximum epochs",
+      "Early stopping monitors the correct validation metric",
+      "Early stopping configuration is properly recognized by the training system"
+    ],
+    "created_at": "2020-09-12T10:24:28Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/3009",
+    "source": {
+      "issue_number": 3009
+    },
+    "initial_question": {
+      "title": "how to show estimated total training time in progress bar?",
+      "body": "how to show estimated total training time in progress bar?"
+    },
+    "satisfaction_conditions": [
+      "Progress bar displays estimated total remaining training time",
+      "Progress indicator integrates with PyTorch Lightning's training framework",
+      "Time estimation updates dynamically during training",
+      "Progress visualization remains visible throughout the training process",
+      "Time estimation accounts for total epochs and current progress"
+    ],
+    "created_at": "2020-08-16T17:57:11Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2984",
+    "source": {
+      "issue_number": 2984
+    },
+    "initial_question": {
+      "title": "CrossEntropyLoss with weights",
+      "body": "I need weights in CrossEntropyLoss (actually multiple, but the same issue).  The documentation talks about tensors copied from other tensors, but there is no tensor to copy from in the init.  So I'm stuck.\r\nTo make the weights unquestionably simple, I use ones.\r\n\r\n```\r\nclass JJG_Transformer(pl.LightningModule):\r\n\r\n    def __init__(self, alphanet_plus_2, letter_weights_per_position):\r\n        super(JJG_Transformer, self).__init__()\r\n        self.criterions = []\r\n        for weight in self.letter_weights_per_position:\r\n            weight = torch.ones((94))\r\n            self.criterions.append( torch.nn.CrossEntropyLoss(weight=weight) )\r\n    def validation_step(self, batch, batch_idx):\r\n        batch_im, batch_true_value_NT, batch_letter_transformer_input = batch\r\n        out_NTA = self(batch_im, batch_letter_transformer_input)\r\n        loss0 = self.criterions[0](out_NTA[:,0,:], batch_true_value_NT[:,0])\r\n        loss1 = self.criterions[1](out_NTA[:,1,:], batch_true_value_NT[:,1])\r\n        loss = loss0 + loss1\r\n        tensorboard_logs = {'val_loss': loss, 'val_loss0': loss0, 'val_loss1':loss1}\r\n        return {'val_loss': loss, 'log': tensorboard_logs}\r\n\r\n```\r\n\r\n  ```\r\nFile \"/home/john/Documents/GitHub/Offline_Handwriting_Recognition/Solutions/Aug2020_simple_transformer/src/kiss_transformer.py\", line 254, in <module>\r\n    trainer.fit(model, train_dataloader=train_loader, val_dataloaders=val_loader)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/states.py\", line 34, in wrapped_fn\r\n    result = fn(self, *args, **kwargs)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1017, in fit\r\n    self.accelerator_backend.train(model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/accelerators/ddp_backend.py\", line 56, in train\r\n    self.ddp_train(process_idx=self.task_idx, mp_queue=None, model=model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/accelerators/ddp_backend.py\", line 219, in ddp_train\r\n    results = self.trainer.run_pretrain_routine(model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1196, in run_pretrain_routine\r\n    self._run_sanity_check(ref_model, model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1229, in _run_sanity_check\r\n    eval_results = self._evaluate(model, self.val_dataloaders, max_batches, False)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/evaluation_loop.py\", line 325, in _evaluate\r\n    output = self.evaluation_forward(model, batch, batch_idx, dataloader_idx, test_mode)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/evaluation_loop.py\", line 609, in evaluation_forward\r\n    output = model(*args)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 722, in _call_impl\r\n    result = self.forward(*input, **kwargs)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/overrides/data_parallel.py\", line 160, in forward\r\n    output = self.module.validation_step(*inputs[0], **kwargs[0])\r\n  File \"/home/john/Documents/GitHub/Offline_Handwriting_Recognition/Solutions/Aug2020_simple_transformer/src/kiss_transformer.py\", line 128, in validation_step\r\n    loss0 = self.criterions[0](out_NTA[:,0,:], batch_true_value_NT[:,0])\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 722, in _call_impl\r\n    result = self.forward(*input, **kwargs)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/modules/loss.py\", line 948, in forward\r\n    ignore_index=self.ignore_index, reduction=self.reduction)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/functional.py\", line 2422, in cross_entropy\r\n    return nll_loss(log_softmax(input, 1), target, weight, None, ignore_index, None, reduction)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/functional.py\", line 2218, in nll_loss\r\n    ret = torch._C._nn.nll_loss(input, target, weight, _Reduction.get_enum(reduction), ignore_index)\r\nRuntimeError: Expected object of device type cuda but got device type cpu for argument #3 'weight' in call to _thnn_nll_loss_forward\r\nTraceback (most recent call last):\r\n  File \"kiss_transformer.py\", line 254, in <module>\r\n    trainer.fit(model, train_dataloader=train_loader, val_dataloaders=val_loader)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/states.py\", line 34, in wrapped_fn\r\n    result = fn(self, *args, **kwargs)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1030, in fit\r\n    results = self.accelerator_backend.spawn_ddp_children(model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/accelerators/ddp_backend.py\", line 118, in spawn_ddp_children\r\n    results = self.ddp_train(local_rank, mp_queue=None, model=model, is_master=True)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/accelerators/ddp_backend.py\", line 219, in ddp_train\r\n    results = self.trainer.run_pretrain_routine(model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1196, in run_pretrain_routine\r\n    self._run_sanity_check(ref_model, model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1229, in _run_sanity_check\r\n    eval_results = self._evaluate(model, self.val_dataloaders, max_batches, False)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/evaluation_loop.py\", line 325, in _evaluate\r\n    output = self.evaluation_forward(model, batch, batch_idx, dataloader_idx, test_mode)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/evaluation_loop.py\", line 609, in evaluation_forward\r\n    output = model(*args)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 722, in _call_impl\r\n    result = self.forward(*input, **kwargs)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/overrides/data_parallel.py\", line 160, in forward\r\n    output = self.module.validation_step(*inputs[0], **kwargs[0])\r\n  File \"kiss_transformer.py\", line 128, in validation_step\r\n    loss0 = self.criterions[0](out_NTA[:,0,:], batch_true_value_NT[:,0])\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 722, in _call_impl\r\n    result = self.forward(*input, **kwargs)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/modules/loss.py\", line 948, in forward\r\n    ignore_index=self.ignore_index, reduction=self.reduction)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/functional.py\", line 2422, in cross_entropy\r\n    return nll_loss(log_softmax(input, 1), target, weight, None, ignore_index, None, reduction)\r\n  File \"/opt/conda/lib/python3.7/site-packages/torch/nn/functional.py\", line 2218, in nll_loss\r\n    ret = torch._C._nn.nll_loss(input, target, weight, _Reduction.get_enum(reduction), ignore_index)\r\nRuntimeError: Expected object of device type cuda but got device type cpu for argument #3 'weight' in call to _thnn_nll_loss_forward\r\n```\r\n\r\n```\r\ntrainer = pl.Trainer( gpus=[0, 1],  \r\n                accumulate_grad_batches=16, \r\n                max_epochs=500, \r\n                check_val_every_n_epoch=1, \r\n                distributed_backend='ddp', \r\n```\r\n\r\npl__version__ 0.9.0rc12\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple loss functions must remain accessible and functional during model operation",
+      "Solution must be compatible with distributed training setup"
+    ],
+    "created_at": "2020-08-15T02:46:24Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2928",
+    "source": {
+      "issue_number": 2928
+    },
+    "initial_question": {
+      "title": "is limit_train_batches shuffle or random",
+      "body": "hi, I am using limit_train_batches . If it is set, is it means a subdataset of whole train dataset ? similar with torch.utils.data.random_split"
+    },
+    "satisfaction_conditions": [
+      "The limit_train_batches parameter must consistently select a subset of the full training dataset",
+      "The batches selection must respect the dataloader's configuration settings",
+      "The subset selection must be sequential from the start of the dataset when no shuffling is enabled"
+    ],
+    "created_at": "2020-08-12T08:13:07Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2888",
+    "source": {
+      "issue_number": 2888
+    },
+    "initial_question": {
+      "title": "Understanding the Progress Bar",
+      "body": "I train on MNIST with data loaders defined below (full train / test sets with `batch_size=128`).  \r\n`'val_check_interval': 0.1`, so per training epoch, I have 10 validation runs.  \r\n\r\nNow:\r\n- 10000 (test) images / 128 (batch_size) = 78.125, so steps such as 54/79 do make sense.  \r\n- 60000 (train) images / 128 (batch_size) = 468.75, so I'd expect something like 120/469.  \r\n\r\nWhat is the \"1259\" representing in the progress bar? I can observe in tensorboard, that the epoch number goes up at exactly 459.\r\n```\r\nValidating:  68%|\u2588\u2588\u2588\u2588\u2588\u2588\u258a   | 54/79 [00:08<00:03,  6.57it/s]\r\nEpoch 4:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 976/1259 [04:01<01:09,  4.05it/s, loss=19279.273, v_num=0]\r\n```\r\n\r\n#### Code\r\n##### Data Loaders\r\n```python\r\n    def train_dataloader(self) -> DataLoader:\r\n        \"\"\"Pytorch-lightning function.\"\"\"\r\n        transform = torchvision.transforms.Compose([torchvision.transforms.Resize((32, 32)),\r\n                                                    torchvision.transforms.ToTensor()])\r\n        train_set = torchvision.datasets.MNIST(root=DATA_DIR_PATH / 'mnist_data',\r\n                                               train=True,\r\n                                               download=True,\r\n                                               transform=transform)\r\n        return DataLoader(train_set,\r\n                          batch_size=128,\r\n                          shuffle=True,\r\n                          num_workers=0)\r\n\r\n    def val_dataloader(self) -> DataLoader:\r\n        \"\"\"Pytorch-lightning function.\"\"\"\r\n        transform = torchvision.transforms.Compose([torchvision.transforms.Resize((32, 32)),\r\n                                                    torchvision.transforms.ToTensor()])\r\n        val_set = torchvision.datasets.MNIST(root=DATA_DIR_PATH / 'mnist_data',\r\n                                             train=False,\r\n                                             download=True,\r\n                                             transform=transform)\r\n        return DataLoader(val_set,\r\n                          batch_size=128,\r\n                          shuffle=False,\r\n                          num_workers=0)\r\n```\r\n#### What's your environment?\r\n - OS: Ubuntu 20.04\r\n - Packaging: pipenv\r\n - Lightning Version: 0.8.5\r\n"
+    },
+    "satisfaction_conditions": [
+      "Progress bar total steps must accurately reflect both training and validation iterations",
+      "Progress bar must align with actual execution milestones",
+      "Total steps calculation must account for validation frequency",
+      "Progress bar must reflect correct batch calculations for both training and validation datasets"
+    ],
+    "created_at": "2020-08-08T14:01:20Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2666",
+    "source": {
+      "issue_number": 2666
+    },
+    "initial_question": {
+      "title": "Plotting learning rate from a lr_scheduler via a Callback",
+      "body": "I think the title explains a lot. But let me elaborate, I have a LightningModule which has a configure_optimizers method returns an optimizer and a scheduler. Later in a Callback I have a `on_batch_end` function in which I try to log the learning rate.\r\n\r\nOf course if the scheduler was accessible as a class member, we could `self.scheduler.get_lr()` on it and use the value to plot. Since this is not how it has been implemented, I am wondering how to do this?\r\n\r\nWould appreciate any pointers.\r\nPytorchLightning - 0.8.5\r\n"
+    },
+    "satisfaction_conditions": [
+      "Learning rate values must be accessible during training",
+      "Learning rate values must be obtainable for all parameter groups",
+      "Learning rate values must be available within callback context",
+      "Learning rate values must be loggable/plottable"
+    ],
+    "created_at": "2020-07-21T23:00:50Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2404",
+    "source": {
+      "issue_number": 2404
+    },
+    "initial_question": {
+      "title": "Will load_from_checkpoint load Huggingface models as well? ",
+      "body": "#### What is your question?\r\n\r\nJust wanted to know will using the `load_from_checkpoint` for a `LightningModule` load the state_dict for the **HuggingFace** models as well?\r\n\r\nEg: for the given example in the docs, will state_dict be loaded for `BertModel.from_pretrained` thing as well? \r\nIdeally, `load_from_checkpoint` should load state_dict for Bert as well like `BertModel.from_pretrained(same_checkpoint)` would do.\r\n\r\n#### Code\r\n```\r\nclass BertMNLIFinetuner(LightningModule):\r\n\r\n    def __init__(self):\r\n        super().__init__()\r\n\r\n        self.bert = BertModel.from_pretrained('bert-base-cased', output_attentions=True)\r\n        self.W = nn.Linear(bert.config.hidden_size, 3)\r\n        self.num_classes = 3\r\n\r\n\r\n    def forward(self, input_ids, attention_mask, token_type_ids):\r\n\r\n        h, _, attn = self.bert(input_ids=input_ids,\r\n                         attention_mask=attention_mask,\r\n                         token_type_ids=token_type_ids)\r\n\r\n        h_cls = h[:, 0]\r\n        logits = self.W(h_cls)\r\n        return logits, attn\r\n``` "
+    },
+    "satisfaction_conditions": [
+      "The trained weights from the checkpoint must be successfully loaded into all model components, including the HuggingFace model",
+      "The loading process must handle the initialization sequence correctly (pretrained weights followed by checkpoint weights)",
+      "The final model state must reflect the checkpoint weights rather than the pretrained weights",
+      "The loading process must preserve the entire model architecture and parameters"
+    ],
+    "created_at": "2020-06-28T20:12:31Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2370",
+    "source": {
+      "issue_number": 2370
+    },
+    "initial_question": {
+      "title": "Access the logging directory through LightningModule or Trainer",
+      "body": "Is there a way to access the current logging directory (e.g., lightning_logs/version_x)? I've searched the documentation and the source code but haven't found a solution yet.\r\n\r\nI want to save some intermediate raw tensors to that directory.\r\n\r\nThanks,\r\nDavid"
+    },
+    "satisfaction_conditions": [
+      "Access to logging directory path is obtained programmatically",
+      "Directory path is accessible from within the training context"
+    ],
+    "created_at": "2020-06-26T09:25:06Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2310",
+    "source": {
+      "issue_number": 2310
+    },
+    "initial_question": {
+      "title": "how to train a network that doesn't require any training data",
+      "body": "The Wake-Sleep algorithm doesn't require any data during the sleep phase (effectively it generates it's own data). pytorch-lightning, however, appears to require a `train_dataloader()` method.\r\n\r\nThe only way I have to make pytorch-lightning run at all (for this admitted unusual case) is to specify some dummy dataset in `train_dataloader`, and then to ignore the data that gets passed to `training_step`. But I don't like that cycles are spent iterating through irrelevant data then. Is there a more elegant way?\r\n\r\nI considered defining my own custom `DataLoader` that returns the simulated data that the sleep phase uses, but this started seeming like even more of a hack than the previous solution. After all, my \"dataloader\" doesn't load any data; it effectively generates new data every \"epoch\". It's seems unnatural to split the sleep phase updates in this way.\r\n\r\nIs there a more straightforward way in lightning to train a network that doesn't require any data? Thanks!"
+    },
+    "satisfaction_conditions": [
+      "Training process must function without pre-existing training data",
+      "Training framework must execute efficiently without unnecessary operations",
+      "Integration with PyTorch Lightning's training workflow must be maintained",
+      "Data generation must occur during the training process",
+      "Implementation must align with standard PyTorch/Lightning patterns"
+    ],
+    "created_at": "2020-06-21T22:46:58Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2308",
+    "source": {
+      "issue_number": 2308
+    },
+    "initial_question": {
+      "title": "How to make inference right",
+      "body": "Hello everyone. I'm new to pytorch-lightning, but already excited with this framework. It's very convenient to train my models using lightning. Now my usecase is: I have trained my model and want to do inference on my test data and get results (for example, in csv format). I'd like to do my inference pytorch-lightning-way. What is the best practice to do it?   \r\n\r\n### Before asking:   \r\n1. search the issues.   \r\n2. search the docs.    \r\n\r\n#### What's your environment?\r\n\r\n - OS: [Linux]\r\n - Packaging [pip]\r\n - Version [0.8.1]\r\n"
+    },
+    "satisfaction_conditions": [
+      "Model inference produces expected outputs for test data",
+      "Results can be saved in a structured format",
+      "Inference can be performed without requiring a training phase",
+      "Gradient computation is disabled during inference"
+    ],
+    "created_at": "2020-06-21T19:30:23Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2263",
+    "source": {
+      "issue_number": 2263
+    },
+    "initial_question": {
+      "title": "Full batch training",
+      "body": "## \u2753 Questions and Help\r\n\r\nFor smaller datasets, it makes sense to do full batch training, not minibatch. How do you implement fullbatch training in pytorch lightning, given that train and validation might be different sizes?\r\n"
+    },
+    "satisfaction_conditions": [
+      "DataLoader configuration allows processing entire training dataset in a single batch",
+      "DataLoader configurations support different batch sizes for training and validation"
+    ],
+    "created_at": "2020-06-19T06:19:52Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2179",
+    "source": {
+      "issue_number": 2179
+    },
+    "initial_question": {
+      "title": "train_percent_check as a method for reducing train data size.",
+      "body": "## \u2753 Question\r\n\r\n<!-- If you still can't find what you need: -->\r\n\r\n#### What is your question?\r\nWhen we use `train_percent_check=x` while training does it uses the same x per cent of data in every epoch?\r\nCan it be used as a method for making total data size short during training? \r\n\r\n#### Code\r\n\r\n`Trainer(gpus=4,max_epochs=20,train_percent_check=.2,log_gpu_memory=True,weights_summary=None)`\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Training data size is consistently reduced to the specified percentage across all epochs",
+      "Data sampling behavior is predictable based on shuffle settings",
+      "Percentage parameter effectively controls total training data volume"
+    ],
+    "created_at": "2020-06-14T09:54:51Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2102",
+    "source": {
+      "issue_number": 2102
+    },
+    "initial_question": {
+      "title": "Validation step metrics not logged",
+      "body": "## \u2753 Questions and Help\r\n\r\nIt seems like data output in the `validation_step` does not get logged to tensorboard, it needs to be aggregated first in the `validation_epoch_end`, which is not the case for `training_step`.\r\n\r\nThe below would only show `val_loss` and only aggregated but all of `mae`, `mape` etc from every iteration.\r\n\r\nAs a workaround I could explicitly log, but how do I get the current iteration in the callbacks I only see how to get the current epoch.\r\n\r\n```\r\n    def step(self, y_hat, y, mode='train'):\r\n        loss = F.mse_loss(y_hat, y)\r\n        mae = F.l1_loss(y_hat, y)\r\n        mape = median_absolute_percentage_error(y_hat, y)\r\n        r2 = r2_score(y_hat, y)\r\n        out = {'loss': loss, 'mae': mae, 'mape': mape, 'R2': r2}\r\n        if mode=='train':\r\n            out['log'] = out.copy()\r\n            return out\r\n        elif mode =='val':\r\n            out = {f'{mode}_{k}': v for k,v in out.items()}\r\n            out['log'] = out.copy()\r\n            return out\r\n        else:\r\n            raise Exception('Unsupported mode')\r\n    def validation_step(self, batch, batch_idx):\r\n        x, y = batch\r\n        y_hat = self(x)\r\n        return self.step(y_hat, y, 'val')\r\n\r\n    def validation_epoch_end(self, outputs):\r\n        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()\r\n        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()\r\n        tensorboard_logs = {'val_loss': avg_loss}\r\n        return {'val_loss': avg_loss, 'log': tensorboard_logs}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Validation metrics must be distinguishable from training metrics"
+    ],
+    "created_at": "2020-06-07T05:28:55Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2045",
+    "source": {
+      "issue_number": 2045
+    },
+    "initial_question": {
+      "title": "2 optimizers : skip updates for the second optim",
+      "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\nI have a model with 2 optimizers : one for the backbone weight and second for \"backbone support\" weights. However, 2nd optimizer should only accumulate grads through the whole epoch and perform one update at the epoch end. \r\n\r\nLightning keeps asking for an output for the 2nd optimizer, but there is nothing to output in addition to the first optimizer results. How can I bypass this ?\r\n\r\n#### Code\r\nHere are defined the training_step and optimizer_step functions to illustrate my issue.\r\n```\r\ndef training_step(self, batch, batch_idx, optimizer_idx):\r\n        if optimizer_idx == 0:\r\n            images, target = batch\r\n            output = self(images)\r\n            loss_val = F.cross_entropy(output, target)\r\n            acc1, acc5 = self.__accuracy(output, target, topk=(1, 5))\r\n            weight_cons, act_cons, weight_p_c_cons = self.normalized_consumption()\r\n\r\n            tqdm_dict = {'Loss/train_loss': loss_val, \r\n                        'Acc/acc1': acc1,\r\n                        'Acc/acc5': acc5,}\r\n            output = OrderedDict({\r\n                'loss': loss_val,\r\n                'Loss/loss': loss_val,\r\n                'Acc/acc1': acc1,\r\n                'Acc/acc5': acc5,\r\n                'progress_bar': tqdm_dict,\r\n                'log': tqdm_dict\r\n            })\r\n            return output\r\n     if optimizer_idx == 1:\r\n         # Do nothing ?\r\n\r\ndef optimizer_step(self, current_epoch, batch_nb, optimizer, optimizer_i, second_order_closure=None):\r\n        if optimizer_i == 0:\r\n            optimizer.step()\r\n            optimizer.zero_grad()\r\n\r\n        # update 2nd optimizer at the end of the epoch\r\n        if optimizer_i == 1 and self.__nbbatch -1 <= batch_nb:\r\n            optimizer.step()\r\n            optimizer.zero_grad()\r\n```\r\n<!-- Please paste a code snippet if your question requires it! -->   \r\n\r\n#### What have you tried?\r\nI tried to pass an empty output dict in training_step if the optimizer_idx == 1. However, Lightning complains that the dict is empty (`trainer/logging.py:106` -> `Nonetype has no attribute 'items'`)\r\n#### What's your environment?\r\n\r\n - OS: Linux\r\n - Packaging pip\r\n - Version 0.7.5\r\n"
+    },
+    "satisfaction_conditions": [
+      "Second optimizer must accumulate gradients throughout the epoch",
+      "Second optimizer must only update weights once per epoch",
+      "Training loop must return valid outputs for both optimizers",
+      "Gradient accumulation must not interfere with first optimizer's normal operation"
+    ],
+    "created_at": "2020-06-01T22:16:04Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/1988",
+    "source": {
+      "issue_number": 1988
+    },
+    "initial_question": {
+      "title": "Stopping the code along with a graceful shutdown.",
+      "body": "##\r\nIs there a way to stop the training in the model when some criteria are satisfied. Something along the lines:\r\n```\r\nclass myCallback(Callback):\r\n    def __init__(self):\r\n        ...\r\n    def on_epoch_end(self, trainer, pl_module):\r\n        if criteria:\r\n            model.stop_training = True # stops the training; need help here\r\n```\r\nNote that I also want to have the early stopping feature where the 'val_loss' is monitored but want to stop running the code if some other criteria is satisfied. Also, is my method of having this feature in the callback module correct or should I inherit the early stopping criteria?"
+    },
+    "satisfaction_conditions": [
+      "Training process terminates when custom criteria are met",
+      "Shutdown process executes gracefully without data loss",
+      "Stopping mechanism is implementable within callback framework"
+    ],
+    "created_at": "2020-05-28T16:12:51Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/1982",
+    "source": {
+      "issue_number": 1982
+    },
+    "initial_question": {
+      "title": "Is there a way to make the Trainer skip loading optimizer from a checkpoint?",
+      "body": "Use case is if I want to load a model's weights but reset the the optimizer state. Is there a flag I can pass that skips loading the optimizer?"
+    },
+    "satisfaction_conditions": [
+      "Model weights are successfully loaded from checkpoint while optimizer state is reset",
+      "Training can continue with the reset optimizer state",
+      "Behavior differs appropriately between Trainer.resume_from_checkpoint and LightningModule.load_from_checkpoint"
+    ],
+    "created_at": "2020-05-28T12:01:42Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/1980",
+    "source": {
+      "issue_number": 1980
+    },
+    "initial_question": {
+      "title": "Collect all  losses into a list?",
+      "body": "What's the easiest way to return a list with all my losses in it? Note: I don't want to log it, but I want to have a list that I can plot in altair after training is done.\r\n\r\nCurrently, I'm maintaining a list outside the lightning module:\r\n\r\n```\r\nlosses = [] # <-- this one\r\n...\r\n\r\nclass MyModule(LightningModule):\r\n    def validation_epoch_end(self, outputs):\r\n            avg_loss = torch.stack([ x['val_loss'] for x in outputs ]).mean()\r\n            correct = sum([ x['correct'] for x in outputs])\r\n            accuracy = float(correct) / len(outputs)\r\n            losses.append(avg_loss)   # <--- append to outside var here\r\n            \r\n            return {'avg_loss' : avg_loss, 'accuracy': accuracy, 'log' : {'val_loss': avg_loss, 'accuracy': accuracy}}\r\n```\r\n\r\nIs there a \"lightning\" way of doing this?"
+    },
+    "satisfaction_conditions": [
+      "Loss values must be persistently stored across training epochs",
+      "Loss data must be accessible after training completion",
+      "Loss data must be stored in a format compatible with plotting libraries",
+      "Solution must maintain PyTorch Lightning's training workflow"
+    ],
+    "created_at": "2020-05-28T10:09:45Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/1979",
+    "source": {
+      "issue_number": 1979
+    },
+    "initial_question": {
+      "title": "Dynamically change optimizer frequency",
+      "body": "## \u2753 Questions and Help\r\n\r\n#### What is your question?\r\nI have a WGAN and the ratio between iterations on the discriminator and on the generator is fixed at 5:1. I accomplished this by passing the frequency parameter in the `configure_optimizers` method\r\n```\r\nres_1 = {\r\n            'optimizer': optimizer_d,\r\n            'frequency': 5,\r\n            'lr_scheduler': scheduler_d\r\n        }\r\n```\r\nsame for generator\r\n```\r\nres_2 = {\r\n            'optimizer': optimizer_g,\r\n            'frequency': 1, \r\n            'lr_scheduler': scheduler_g\r\n        }\r\n```\r\n\r\nHow can I dynamically change the `frequency` parameter, such that for the first `n` iterations I have a frequency `x` and after I have a frequency `y`.\r\n\r\n#### Code\r\n\r\nDon't know how to do it.\r\n\r\n#### What have you tried?\r\n\r\n#### What's your environment?\r\n\r\n - OS: OS independent\r\n - Packaging: pip\r\n - Version: 0.7.6\r\n"
+    },
+    "satisfaction_conditions": [
+      "Optimizer frequency ratio must be modifiable during training",
+      "Changes must occur at specific training milestones",
+      "Original training process must continue uninterrupted"
+    ],
+    "created_at": "2020-05-28T08:42:13Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/1930",
+    "source": {
+      "issue_number": 1930
+    },
+    "initial_question": {
+      "title": "How to access training and validation losses from callbacks? ",
+      "body": "For example, if my validation_epoch_end in the trainer returns {'avg_loss':loss, 'log':logs}, how to get the loss value from a callback method like:def on_validation_end(trainer, pl_module)?"
+    },
+    "satisfaction_conditions": [
+      "Access to loss metrics must be available within callback methods",
+      "Retrieved metrics must match those returned by validation_epoch_end",
+      "Metric access method must work within the callback's execution context",
+      "Access method must handle tensor data on the appropriate device"
+    ],
+    "created_at": "2020-05-23T08:45:53Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/877",
+    "source": {
+      "issue_number": 877
+    },
+    "initial_question": {
+      "title": "How do I test before any training?",
+      "body": "## \u2753 Questions and Help\r\n\r\nI am now migrating some of my previous works into lightning. I wish to see if it is able to reproduce my previous results or not. But the doc implies that all the testing has to be performed after training or after loading the previous lightning training state, which I do not have either.\r\n\r\nSo How can I test before training?\r\n\r\n#### Code\r\n\r\n```python\r\n\r\n    trainer = Trainer(logger=logger, max_epochs=5, gpus=[3], distributed_backend=None)\r\n    hparams = HParams(fold=fold, model=model_name, batch_size=8, num_workers=16)\r\n    system = MySYS(hparams, trainer)\r\n\r\n    system.model.load_state_dict(torch.load(state_dict))\r\n    trainer.test()\r\n```\r\nIt cannot work since the trainer does not initialize at all.\r\n\r\n#### What have you tried?\r\nI found inside the code for testing:\r\n```python\r\n\r\n    def test(self, model=None):\r\n        r\"\"\"\r\n\r\n        Separates from fit to make sure you never run on your test set until you want to.\r\n\r\n        Args:\r\n            model (LightningModule): The model to test.\r\n\r\n        Example::\r\n\r\n            # Option 1\r\n            # run test after fitting\r\n            trainer = Trainer()\r\n            model = LightningModule()\r\n\r\n            trainer.fit()\r\n            trainer.test()\r\n\r\n            # Option 2\r\n            # run test from a loaded model\r\n            model = LightningModule.load_from_checkpoint('path/to/checkpoint.ckpt')\r\n            trainer = Trainer()\r\n            trainer.test(model)\r\n        \"\"\"\r\n        self.testing = True\r\n        if model is not None:\r\n            self.fit(model)\r\n        else:\r\n            self.run_evaluation(test=True)\r\n```\r\nWhich requires to fit the model that I do not understand at all. Why a fitting is required inside training code? If for the purpose of initialization, can't we just put some init code here?"
+    },
+    "satisfaction_conditions": [
+      "Testing functionality must work without requiring prior model training",
+      "Pre-loaded model weights must be properly evaluated",
+      "Testing interface must be compatible with PyTorch Lightning's architecture"
+    ],
+    "created_at": "2020-02-17T06:34:46Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/690",
+    "source": {
+      "issue_number": 690
+    },
+    "initial_question": {
+      "title": "How to make test_end() return metrics ",
+      "body": "I have searched through the docs / Google as well as looked through the source code.\r\n\r\nIt seems like test_end() returns nothing (it has no `return` in the function). I was wondering if I was missing something really obvious. \r\n\r\nI would simply like to return the metrics of the test end."
+    },
+    "satisfaction_conditions": [
+      "Test metrics must be accessible after test execution",
+      "Test metrics must persist beyond the test_end() function scope",
+      "Solution must work within PyTorch Lightning's execution flow",
+      "Original test functionality must be preserved"
+    ],
+    "created_at": "2020-01-15T17:47:23Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/477",
+    "source": {
+      "issue_number": 477
+    },
+    "initial_question": {
+      "title": "About the Weight Initialization in PL",
+      "body": "Hi,\r\n\r\nI am tring to use BERT for a project. The pretrained BERT model is part of my model. I am wondering how will PL initialize the model weights. Will it overwrite the pretrained BERT weights?\r\n\r\nThanks."
+    },
+    "satisfaction_conditions": [
+      "Pretrained BERT weights remain intact unless explicitly modified by user code",
+      "Weight initialization control remains with the user",
+      "Weight initialization follows standard PyTorch practices",
+      "Initialization logic is properly placed within the model's lifecycle"
+    ],
+    "created_at": "2019-11-08T02:28:25Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/10285",
+    "source": {
+      "issue_number": 10285
+    },
+    "initial_question": {
+      "title": "UserWarning: you defined a validation_step but have no val_dataloader. Skipping val loop",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nUsing pytorch-lightning 1.5.0rc1, I will get UserWarning:\r\n```\r\npytorch_lightning/trainer/configuration_validator.py:156: UserWarning: you defined a validation_step but have no val_dataloader. Skipping val loop\r\n  rank_zero_warn(f\"you defined a {step_name} but have no {loader_name}. Skipping {stage} loop\")\r\n```\r\nBut with pytorch-lightning 1.4.9, there is no such warning.\r\n\r\n<!-- A clear and concise description of what the bug is. -->\r\n\r\n### To Reproduce\r\n```\r\nimport torch\r\nfrom torch import nn\r\nfrom collections import OrderedDict\r\nimport pytorch_lightning as pl\r\n\r\nfrom torch.utils.data import DataLoader, TensorDataset\r\n\r\n\r\nclass TestLrModule(pl.LightningModule):\r\n    def __init__(self, input_size, hidden_size):\r\n        super(TestLrModule, self).__init__()\r\n        self._fc = OrderedDict([\r\n            ('fc0', nn.Linear(input_size, hidden_size)),\r\n            ('tan0', nn.ReLU()),\r\n            ('fc1', nn.Linear(hidden_size, 1)),\r\n        ])\r\n        self.fc = nn.Sequential(self._fc)\r\n        self._loss_fn = nn.MSELoss()\r\n\r\n    def forward(self, x):\r\n        y = self.fc(x)\r\n        return y.squeeze(dim=1)\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        x, y = batch\r\n        y_hat = self.forward(x)\r\n        return self._loss_fn(y_hat, y)\r\n\r\n    def training_epoch_end(self, outputs):\r\n        loss = torch.mean(torch.stack([x['loss'] for x in outputs]))\r\n        self.log('train_loss', loss, on_epoch=True)\r\n\r\n    def validation_step(self, batch, batch_idx):\r\n        x, y = batch\r\n        y_hat = self.forward(x)\r\n        return self._loss_fn(y_hat, y)\r\n\r\n    def validation_epoch_end(self, outputs):\r\n        loss = torch.mean(torch.stack(outputs))\r\n        self.log('val_loss', loss, on_epoch=True)\r\n\r\n    def configure_optimizers(self):\r\n        return torch.optim.Adam(self.parameters(), lr=2e-3, weight_decay=1e-4)\r\n\r\n\r\nsample, feature = 4000, 10\r\nrx, ry = torch.rand(sample, feature), torch.rand(sample)\r\ntest_sample = int(sample * 0.2)\r\ntest_rx, test_ry = torch.rand(test_sample, feature), torch.rand(test_sample)\r\n\r\ntrain_data = DataLoader(TensorDataset(rx, ry), batch_size=32, num_workers=2)\r\nvalid_data = DataLoader(TensorDataset(test_rx, test_ry), batch_size=32, num_workers=2)\r\n\r\nm = TestLrModule(rx.shape[1], 16)\r\ntrainer = pl.Trainer(max_epochs=20)\r\ntrainer.fit(m, train_data, valid_data)\r\n```\r\n\r\n### Environment\r\n\r\n- PyTorch Version  1.8.0\r\n- Python version: 3.8.5\r\n- OS (e.g., Linux): linux\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "No validation warning appears when validation_step is defined with a valid data loader",
+      "Accumulate grad batches warning provides clear information about optimizer hook timing",
+      "Version compatibility resolves the validation warning issue"
+    ],
+    "created_at": "2021-11-01T05:06:39Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/9697",
+    "source": {
+      "issue_number": 9697
+    },
+    "initial_question": {
+      "title": "IsADirectoryError: [Errno 21] Is a directory: '/home/pc/SR/dC/1-Data_Preparation'",
+      "body": "I am using **Jupyter Lab Server**. It has pre-installed tf2.3_py3.6 kernel installed in it. It has 2 GPUS in it.\r\n\r\nPyTorch Lightning Version (e.g., 1.3.0): '1.4.6'\r\nPyTorch Version (e.g., 1.8): '1.6.0+cu101'\r\nPython version: 3.6\r\nOS (e.g., Linux): system='Linux'\r\nCUDA/cuDNN version: 11.2\r\nGPU models and configuration: Mentioned below\r\nHow you installed PyTorch (conda, pip, source): pip\r\n\r\n\r\nNVIDIA-SMI 460.91.03    Driver Version: 460.91.03    CUDA Version: 11.2     |\r\n|-------------------------------+----------------------+----------------------+\r\n| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |\r\n| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |\r\n|                               |                      |               MIG M. |\r\n|===============================+======================+======================|\r\n|   0  Tesla V100-SXM2...  Off  | 00000000:62:00.0 Off |                    0 |\r\n| N/A   36C    P0    57W / 300W |   2842MiB / 32510MiB |      0%      Default |\r\n|                               |                      |                  N/A |\r\n+-------------------------------+----------------------+----------------------+\r\n|   1  Tesla V100-SXM2...  Off  | 00000000:89:00.0 Off |                    0 |\r\n| N/A   32C    P0    43W / 300W |      3MiB / 32510MiB |      0%      Default |\r\n|                               |                      |                  N/A |\r\n+-------------------------------+----------------------+----------------------+\r\n                                                                              \r\n+-----------------------------------------------------------------------------+\r\n| Processes:                                                                  |\r\n|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |\r\n|        ID   ID                                                   Usage      |\r\n|=============================================================================|\r\n+-----------------------------------------------------------------------------+\r\n\r\nI have trained a model, and saved the best model.\r\n\r\n```\r\nclass SRTagger(pl.LightningModule):\r\n\r\n  def __init__(self, n_classes: int, n_training_steps=None, n_warmup_steps=None):\r\n    super().__init__()\r\n    self.bert = BertModel.from_pretrained(BERT_MODEL_NAME, return_dict=True)\r\n    self.classifier = nn.Linear(self.bert.config.hidden_size, n_classes)\r\n    self.n_training_steps = n_training_steps\r\n    self.n_warmup_steps = n_warmup_steps\r\n    self.criterion = nn.BCELoss()\r\n\r\n  def forward(self, input_ids, attention_mask, labels=None):\r\n    output = self.bert(input_ids, attention_mask=attention_mask)\r\n    output = self.classifier(output.pooler_output)\r\n    output = torch.sigmoid(output)    \r\n    loss = 0\r\n    if labels is not None:\r\n        loss = self.criterion(output, labels)\r\n    return loss, output\r\n\r\n  def training_step(self, batch, batch_idx):\r\n    input_ids = batch[\"input_ids\"]\r\n    attention_mask = batch[\"attention_mask\"]\r\n    labels = batch[\"labels\"]\r\n    loss, outputs = self(input_ids, attention_mask, labels)\r\n    self.log(\"train_loss\", loss, prog_bar=True, logger=True)\r\n    return {\"loss\": loss, \"predictions\": outputs, \"labels\": labels}\r\n\r\n  def validation_step(self, batch, batch_idx):\r\n    input_ids = batch[\"input_ids\"]\r\n    attention_mask = batch[\"attention_mask\"]\r\n    labels = batch[\"labels\"]\r\n    loss, outputs = self(input_ids, attention_mask, labels)\r\n    self.log(\"val_loss\", loss, prog_bar=True, logger=True)\r\n    return loss\r\n\r\n  def test_step(self, batch, batch_idx):\r\n    input_ids = batch[\"input_ids\"]\r\n    attention_mask = batch[\"attention_mask\"]\r\n    labels = batch[\"labels\"]\r\n    loss, outputs = self(input_ids, attention_mask, labels)\r\n    self.log(\"test_loss\", loss, prog_bar=True, logger=True)\r\n    return loss\r\n\r\n  def training_epoch_end(self, outputs):\r\n    \r\n    labels = []\r\n    predictions = []\r\n    for output in outputs:\r\n      for out_labels in output[\"labels\"].detach().cpu():\r\n        labels.append(out_labels)\r\n      for out_predictions in output[\"predictions\"].detach().cpu():\r\n        predictions.append(out_predictions)\r\n\r\n    labels = torch.stack(labels).int()\r\n    predictions = torch.stack(predictions)\r\n\r\n    for i, name in enumerate(LABEL_COLUMNS):\r\n      class_roc_auc = auroc(predictions[:, i], labels[:, i])\r\n      self.logger.experiment.add_scalar(f\"{name}_roc_auc/Train\", class_roc_auc, self.current_epoch)\r\n\r\n\r\n  def configure_optimizers(self):\r\n\r\n    optimizer = optim.RAdam(self.parameters(), lr=2e-5)\r\n\r\n    scheduler = get_linear_schedule_with_warmup(\r\n      optimizer,\r\n      num_warmup_steps=self.n_warmup_steps,\r\n      num_training_steps=self.n_training_steps\r\n    )\r\n\r\n    return dict(\r\n      optimizer=optimizer,\r\n      lr_scheduler=dict(\r\n        scheduler=scheduler,\r\n        interval='step'\r\n      )\r\n    )\r\n\r\n```\r\n**After training, I want to load my best model without training it again**\r\n\r\n\r\n```\r\ncheckpoint_callback = ModelCheckpoint(\r\n  dirpath=\"checkpoints\",\r\n  filename=\"best-checkpoint\",\r\n  save_top_k=1,\r\n  verbose=True,\r\n  monitor=\"val_loss\",\r\n  mode=\"min\"\r\n)\r\n\r\nlogger = TensorBoardLogger(\"lightning_logs\", name=\"SReply\")\r\n\r\n# And early stopping triggers when the loss hasn't improved for the last \r\n# 2 epochs (you might want to remove/reconsider this when training on real-world projects):\r\n\r\n\r\nearly_stopping_callback = EarlyStopping(monitor='val_loss', patience=2)\r\n# We can start the training process:\r\n# checkpoint_callback supports only a bool value. If set to True, it will create a model checkpoint\r\n# instance internally, but if you want to assign your own custom instance then pass it within callbacks:\r\n\r\ntrainer = pl.Trainer(\r\n  logger=logger,\r\n  callbacks=[early_stopping_callback,checkpoint_callback],\r\n  max_epochs=N_EPOCHS,\r\n  gpus=1,\r\n  progress_bar_refresh_rate=50,\r\n  amp_level='O3'\r\n  )\r\n\r\ntrained_model = SRTagger.load_from_checkpoint(trainer.checkpoint_callback.best_model_path,n_classes=len(LABEL_COLUMNS))\r\ntrained_model.eval()\r\ntrained_model.freeze()\r\n```\r\n\r\n\r\n**Error**\r\n\r\n\r\n```\r\n---------------------------------------------------------------------------\r\nIsADirectoryError                         Traceback (most recent call last)\r\n/usr/local/bin/kernel-launchers/python/scripts/launch_ipykernel.py in <module>\r\n----> 1 trained_model = SRTagger.load_from_checkpoint(trainer.checkpoint_callback.best_model_path,n_classes=len(LABEL_COLUMNS))\r\n      2 trained_model.eval()\r\n      3 trained_model.freeze()\r\n\r\n~/.local/lib/python3.6/site-packages/pytorch_lightning/core/saving.py in load_from_checkpoint(cls, checkpoint_path, map_location, hparams_file, strict, **kwargs)\r\n    129             checkpoint = pl_load(checkpoint_path, map_location=map_location)\r\n    130         else:\r\n--> 131             checkpoint = pl_load(checkpoint_path, map_location=lambda storage, loc: storage)\r\n    132 \r\n    133         if hparams_file is not None:\r\n\r\n~/.local/lib/python3.6/site-packages/pytorch_lightning/utilities/cloud_io.py in load(path_or_url, map_location)\r\n     30         return torch.hub.load_state_dict_from_url(str(path_or_url), map_location=map_location)\r\n     31     fs = get_filesystem(path_or_url)\r\n---> 32     with fs.open(path_or_url, \"rb\") as f:\r\n     33         return torch.load(f, map_location=map_location)\r\n     34 \r\n\r\n~/.local/lib/python3.6/site-packages/fsspec/spec.py in open(self, path, mode, block_size, cache_options, **kwargs)\r\n    980                 autocommit=ac,\r\n    981                 cache_options=cache_options,\r\n--> 982                 **kwargs,\r\n    983             )\r\n    984             if not ac and \"r\" not in mode:\r\n\r\n~/.local/lib/python3.6/site-packages/fsspec/implementations/local.py in _open(self, path, mode, block_size, **kwargs)\r\n    143         if self.auto_mkdir and \"w\" in mode:\r\n    144             self.makedirs(self._parent(path), exist_ok=True)\r\n--> 145         return LocalFileOpener(path, mode, fs=self, **kwargs)\r\n    146 \r\n    147     def touch(self, path, **kwargs):\r\n\r\n~/.local/lib/python3.6/site-packages/fsspec/implementations/local.py in __init__(self, path, mode, autocommit, fs, compression, **kwargs)\r\n    234         self.compression = get_compression(path, compression)\r\n    235         self.blocksize = io.DEFAULT_BUFFER_SIZE\r\n--> 236         self._open()\r\n    237 \r\n    238     def _open(self):\r\n\r\n~/.local/lib/python3.6/site-packages/fsspec/implementations/local.py in _open(self)\r\n    239         if self.f is None or self.f.closed:\r\n    240             if self.autocommit or \"w\" not in self.mode:\r\n--> 241                 self.f = open(self.path, mode=self.mode)\r\n    242                 if self.compression:\r\n    243                     compress = compr[self.compression]\r\n\r\nIsADirectoryError: [Errno 21] Is a directory: '/home/pc/SR/dC/1-Data_Preparation'\r\n```\r\n\r\n**This error. comes when I try to load my model second time after closing and reopening the jupyter notebook. I run the code except training it.**\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Model initialization parameters must match training configuration",
+      "Model must be loaded without requiring retraining",
+      "Model must be set to evaluation mode after loading"
+    ],
+    "created_at": "2021-09-25T04:04:35Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/9488",
+    "source": {
+      "issue_number": 9488
+    },
+    "initial_question": {
+      "title": "Getting error with Pytorch lightning when passing model checkpoint",
+      "body": "I am training a multi-label classification problem using Hugging face models.\r\n\r\nI am using `Pytorch lightning` to train the model.\r\n \r\n\r\nHere is the code:\r\n\r\nAnd early stopping triggers when the loss hasn't improved for the last \r\n\r\n    early_stopping_callback = EarlyStopping(monitor='val_loss', patience=2)\r\n\r\nWe can start the training process:\r\n\r\n\r\n    checkpoint_callback = ModelCheckpoint(\r\n      dirpath=\"checkpoints\",\r\n      filename=\"best-checkpoint\",\r\n      save_top_k=1,\r\n      verbose=True,\r\n      monitor=\"val_loss\",\r\n      mode=\"min\"\r\n    )\r\n\r\n\r\n    trainer = pl.Trainer(\r\n      logger=logger,\r\n      callbacks=[early_stopping_callback],\r\n      max_epochs=N_EPOCHS,\r\n     checkpoint_callback=checkpoint_callback,\r\n      gpus=1,\r\n      progress_bar_refresh_rate=30\r\n    )\r\n    # checkpoint_callback=checkpoint_callback,\r\n\r\nAs soon as I run this, I get error:\r\n\r\n\r\n    ~/.local/lib/python3.6/site-packages/pytorch_lightning/trainer/connectors/callback_connector.py in _configure_checkpoint_callbacks(self, checkpoint_callback)\r\n         75             if isinstance(checkpoint_callback, Callback):\r\n         76                 error_msg += \" Pass callback instances to the `callbacks` argument in the Trainer constructor instead.\"\r\n    ---> 77             raise MisconfigurationException(error_msg)\r\n         78         if self._trainer_has_checkpoint_callbacks() and checkpoint_callback is False:\r\n         79             raise MisconfigurationException(\r\n    \r\n    MisconfigurationException: Invalid type provided for checkpoint_callback: Expected bool but received <class 'pytorch_lightning.callbacks.model_checkpoint.ModelCheckpoint'>. Pass callback instances to the `callbacks` argument in the Trainer constructor instead.\r\n\r\n\r\n**How can I fix this issue?**"
+    },
+    "satisfaction_conditions": [
+      "Model checkpoint callback must be passed through the correct parameter in Trainer initialization",
+      "Trainer configuration must accept the ModelCheckpoint instance in a way that matches the API requirements",
+      "Both early stopping and checkpoint callbacks must remain functional in the training setup",
+      "Training process must be able to execute without raising MisconfigurationException"
+    ],
+    "created_at": "2021-09-13T14:43:28Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/9176",
+    "source": {
+      "issue_number": 9176
+    },
+    "initial_question": {
+      "title": "on_save_checkoint never called",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nI wrote a `Callback` class and found `on_save_checkpoint` had never been called\r\n\r\n### To Reproduce\r\n\r\nMy callback class:\r\n```\r\nfrom pytorch_lightning.callbacks import Callback\r\nfrom os.path import join\r\nimport torch\r\nimport os\r\nimport pytorch_lightning as pl\r\nfrom typing import Dict, Any, Optional\r\n\r\n\r\nclass JitSave(Callback):\r\n\r\n    def __init__(self):\r\n        self.outputs = None\r\n        self.n_dataloaders = None\r\n\r\n    def on_save_checkpoint(\r\n        self, trainer: 'pl.Trainer', pl_module: 'pl.LightningModule', checkpoint: Dict[\r\n                str, Any]\r\n    ) -> dict:\r\n        # Torch.jit.save\r\n        jit_model_dir = join(\r\n            join(os.getcwd(), \"checkpoints\"), f\"jit_{self.logger[0].version}\" + \"{}.pt\"\r\n        )\r\n        torch.jit.save(self.model.cpu().to_torchscript(), jit_model_dir.format(\"cpu\"))\r\n        torch.jit.save(self.model.to_torchscript(), jit_model_dir.format(\"gpu\"))\r\n        print(f\"torch.jit.save path :\\n{jit_model_dir}\")\r\n        # return {\"jitsave_path\": jit_model_dir}\r\n        return checkpoint\r\n\r\n    def setup(self, trainer: 'pl.Trainer', pl_module: 'pl.LightningModule', stage: Optional[str] = None) -> None:\r\n        self.n_dataloaders = len(pl_module.val_dataloader())\r\n\r\n    def _reset(self):\r\n        self.outputs = [[] for _ in range(self.n_dataloaders)]\r\n\r\n    def on_epoch_start(self, trainer: 'pl.Trainer', pl_module: 'pl.LightningModule') -> None:\r\n        self._reset()\r\n\r\n    def on_validation_epoch_end(self, trainer: 'pl.Trainer', pl_module: 'pl.LightningModule') -> None:\r\n        for dataloader_idx, output in enumerate(self.outputs):\r\n            pass\r\n```\r\n`on_validation_epoch_end` works but on_save_checkpoint not.\r\n\r\nThis is my `ModelCheckpoint`:\r\n\r\n```\r\nmodel_checkpoint:\r\n  _target_: pytorch_lightning.callbacks.ModelCheckpoint\r\n  monitor: \"val/f1\" # name of the logged metric which determines when model isimproving\r\n  mode: \"max\" # can be \"max\" or \"min\"\r\n  save_top_k: 1 # save k best models (determined by above metric)\r\n  save_last: False # additionaly always save model from last epoch\r\n  verbose: False\r\n  dirpath: \"checkpoints/\"\r\n  filename: \"epoch_{epoch:03d}\"\r\n  auto_insert_metric_name: False\r\n  save_weights_only: True\r\n```\r\n\r\nCallbacks are passed to the trainer:\r\n\r\n```\r\ncallbacks: List[Callback] = []\r\n    if \"callbacks\" in config:\r\n        for _, cb_conf in config.callbacks.items():\r\n            if \"_target_\" in cb_conf:\r\n                log.info(f\"Instantiating callback <{cb_conf._target_}>\")\r\n                callbacks.append(hydra.utils.instantiate(cb_conf))\r\n```\r\n\r\n```\r\ntrainer: Trainer = hydra.utils.instantiate(\r\n        config.trainer, callbacks=callbacks, logger=logger, _convert_=\"partial\"\r\n    )\r\n```\r\n\r\n\r\n### Expected behavior\r\n\r\n`on_save_checkpoint` should be called.\r\n\r\n### Environment\r\n\r\n* CUDA:\r\n        - GPU:\r\n                - GeForce RTX 2080 Ti\r\n        - available:         True\r\n        - version:           10.2\r\n* Packages:\r\n        - numpy:             1.19.5\r\n        - pyTorch_debug:     False\r\n        - pyTorch_version:   1.9.0+cu102\r\n        - pytorch-lightning: 1.4.2\r\n        - tqdm:              4.62.1\r\n* System:\r\n        - OS:                Linux\r\n        - architecture:\r\n                - 64bit\r\n                - ELF\r\n        - processor:         x86_64\r\n        - python:            3.8.10\r\n        - version:           #60~20.04.1-Ubuntu SMP Thu May 6 09:52:46 UTC 2021"
+    },
+    "satisfaction_conditions": [
+      "Callback must be properly registered with the PyTorch Lightning Trainer",
+      "Checkpoint saving must be triggered during training",
+      "Callback class must properly inherit from PyTorch Lightning's Callback base class"
+    ],
+    "created_at": "2021-08-28T15:11:45Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/9155",
+    "source": {
+      "issue_number": 9155
+    },
+    "initial_question": {
+      "title": "AttributeError: Can't pickle local object when attempting multi-GPU training",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nRunning the provided script with multiple GPUs causes the following error:\r\n```\r\n$ python pickle_test.py\r\n.../lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py:746: UserWarning: You requested multiple GPUs but did not specify a backend, e.g. `Trainer(accelerator=\"dp\"|\"ddp\"|\"ddp2\")`. Setting `accelerator=\"ddp_spawn\"` for you.\r\n  rank_zero_warn(\r\nGPU available: True, used: True\r\nTPU available: False, using: 0 TPU cores\r\nIPU available: False, using: 0 IPUs\r\n.../lib/python3.8/site-packages/pytorch_lightning/trainer/configuration_validator.py:99: UserWarning: you passed in a val_dataloader but have no validation_step. Skipping val loop\r\n  rank_zero_warn(f\"you passed in a {loader_name} but have no {step_name}. Skipping {stage} loop\")\r\nLOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]\r\nTraceback (most recent call last):\r\n  File \"pickle_test.py\", line 81, in <module>\r\n    test_x(tmpdir)\r\n  File \"pickle_test.py\", line 77, in test_x\r\n    trainer.fit(model=model, datamodule=dm)\r\n  File \".../lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py\", line 553, in fit\r\n    self._run(model)\r\n  File \".../lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py\", line 918, in _run\r\n    self._dispatch()\r\n  File \".../lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py\", line 986, in _dispatch\r\n    self.accelerator.start_training(self)\r\n  File \".../lib/python3.8/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 92, in start_training\r\n    self.training_type_plugin.start_training(trainer)\r\n  File \".../lib/python3.8/site-packages/pytorch_lightning/plugins/training_type/ddp_spawn.py\", line 158, in start_training\r\n    mp.spawn(self.new_process, **self.mp_spawn_kwargs)\r\n  File \".../lib/python3.8/site-packages/torch/multiprocessing/spawn.py\", line 230, in spawn\r\n    return start_processes(fn, args, nprocs, join, daemon, start_method='spawn')\r\n  File \".../lib/python3.8/site-packages/torch/multiprocessing/spawn.py\", line 179, in start_processes\r\n    process.start()\r\n  File \".../lib/python3.8/multiprocessing/process.py\", line 121, in start\r\n    self._popen = self._Popen(self)\r\n  File \".../lib/python3.8/multiprocessing/context.py\", line 283, in _Popen\r\n    return Popen(process_obj)\r\n  File \".../lib/python3.8/multiprocessing/popen_spawn_posix.py\", line 32, in __init__\r\n    super().__init__(process_obj)\r\n  File \".../lib/python3.8/multiprocessing/popen_fork.py\", line 19, in __init__\r\n    self._launch(process_obj)\r\n  File \".../lib/python3.8/multiprocessing/popen_spawn_posix.py\", line 47, in _launch\r\n    reduction.dump(process_obj, fp)\r\n  File \".../lib/python3.8/multiprocessing/reduction.py\", line 60, in dump\r\n    ForkingPickler(file, protocol).dump(obj)\r\nAttributeError: Can't pickle local object 'LightningDataModule.from_datasets.<locals>.train_dataloader'\r\n```\r\n\r\n### To Reproduce\r\n\r\nThe following script causes the bug:\r\n```python\r\nimport pytorch_lightning as pl\r\nfrom pytorch_lightning import LightningDataModule\r\nfrom torch.nn import functional as F\r\nfrom torchvision import transforms\r\nfrom torchvision.datasets import MNIST\r\n\r\ntmpdir = '../../data'\r\n\r\n\r\ndef mnist(root: str, normalize: bool = False):\r\n    tlist = [transforms.ToTensor()]\r\n\r\n    if normalize:\r\n        tlist.append(transforms.Normalize((0.5,), (0.5,)))\r\n\r\n    transform = transforms.Compose(tlist)\r\n\r\n    trainset = MNIST(root=root, train=True, download=True, transform=transform)\r\n    testset = MNIST(root=root, train=False, download=True, transform=transform)\r\n    return trainset, testset\r\n\r\n\r\ndef mnist_datamodule(data_path: str, batch_size: int, num_workers: int):\r\n    train, val = mnist(data_path, normalize=True)\r\n    return LightningDataModule.from_datasets(train, val, None, batch_size=batch_size, num_workers=num_workers)\r\n\r\n\r\nimport torch\r\nfrom pytorch_lightning import LightningModule\r\n\r\n\r\nclass BoringModel(LightningModule):\r\n\r\n    def __init__(self):\r\n        super().__init__()\r\n        self.fc1 = torch.nn.Linear(28 * 28, 32)\r\n        self.fc2 = torch.nn.Linear(32, 10)\r\n\r\n    def forward(self, x):\r\n        x = torch.flatten(x, 1)\r\n        x = F.sigmoid(self.fc1(x))\r\n        x = F.softmax(self.fc2(x))\r\n        return x\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        x, y = batch\r\n        y_hat = self(x)\r\n        loss = F.cross_entropy(y_hat, y)\r\n        return loss\r\n\r\n    def training_step_end(self, training_step_outputs):\r\n        return training_step_outputs\r\n\r\n    def training_epoch_end(self, outputs) -> None:\r\n        torch.stack([x[\"loss\"] for x in outputs]).mean()\r\n\r\n    def configure_optimizers(self):\r\n        optimizer = torch.optim.SGD(self.parameters(), lr=0.01)\r\n        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1)\r\n        return [optimizer], [lr_scheduler]\r\n\r\n\r\ndef test_x(tmpdir):\r\n    # init model\r\n    model = BoringModel()\r\n\r\n    # Initialize a trainer\r\n    trainer = pl.Trainer(\r\n        max_epochs=1,\r\n        progress_bar_refresh_rate=20,\r\n        gpus=2\r\n    )\r\n\r\n    dm = mnist_datamodule(tmpdir, 16, 1)\r\n\r\n    # Train the model \u26a1\r\n    trainer.fit(model=model, datamodule=dm)\r\n\r\n\r\nif __name__ == '__main__':\r\n    test_x(tmpdir)\r\n```\r\n\r\n### Expected behavior\r\n\r\n<!-- FILL IN -->\r\n\r\n### Environment\r\n\r\nRunning on a SLURM cluster\r\n- PyTorch Lightning Version (e.g., 1.3.0): 1.4.1\r\n- PyTorch Version (e.g., 1.8): 1.9.0\r\n- Python version: 3.8.0\r\n- OS (e.g., Linux): Linux HPCC\r\n- CUDA/cuDNN version: 10.1\r\n- GPU models and configuration: 2x 2080\r\n- How you installed PyTorch (`conda`, `pip`, source): conda\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multi-GPU training executes without pickle-related errors"
+    ],
+    "created_at": "2021-08-27T00:24:54Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/8823",
+    "source": {
+      "issue_number": 8823
+    },
+    "initial_question": {
+      "title": "Allow `--gpus=None` to be specified on the CLI.",
+      "body": "Currently specifying `--gpus=None` breaks the utils.argparse logic. I want to allow the string None to be a valid option. In other words, I want the user to be able to explicitly specify the default value for this argument, which is currently not possible.\r\n\r\nWhy? In my workflow I customized my argparser. This caused the `--gpus` argument to default to something non-None. Then, for whatever reason, my nvidia drivers stopped working (as they sometimes do), so I wanted to fallback on the CPU. When I tried to set `--gpus=None` argparse balked at me because it was not a valid gpu option. But removing the `--gpus` option no longer defaulted to None. Therefore, there was no way for the user to overwrite my short-sighted defaults and simply get the CPU.\r\n\r\nIf the only way to set the value of an argument is by removing the specification, then that can cause issues like the one I had. Regardless, I think it is good design such that you can always _change_ the value of an argument to achieve a particular funtionality. \r\n\r\nAs an example say I have a script:\r\n\r\n```bash\r\npython fit.py \\\r\n    --gpus=1 \\\r\n    --num_workers=2 \r\n```\r\n\r\nthe diff from the above to the CPU version where it removes the line:\r\n\r\n```bash\r\npython fit.py \\\r\n    --num_workers=2 \r\n```\r\n\r\nno longer gives a reader any indication that a --gpus option was ever there, or is something that could be specified and changed, whereas \r\n\r\n```bash\r\npython fit.py \\\r\n    --gpus=None \\\r\n    --num_workers=2 \r\n```\r\n\r\nPreserves the original `--gpus` arg as something important that this script might vary. (It also makes it much eaiser to futher parametarize that argument in bash itself). I believe that having the option to simply change the value rather than being forced to remove the entire line is desirable. "
+    },
+    "satisfaction_conditions": [
+      "Users must have a way to disable GPU usage through command line arguments",
+      "Command line argument structure must remain visible in scripts",
+      "Command line arguments must be easily modifiable for script parameterization",
+      "Default processing mode must be accessible through explicit command line specification"
+    ],
+    "created_at": "2021-08-10T03:30:58Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/8678",
+    "source": {
+      "issue_number": 8678
+    },
+    "initial_question": {
+      "title": "multigpu ddp: Code after fit executed many times",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nAfter training model with the Trainer.fit on 4-gpu machine with the accelerator=\"ddp\", my code which goes after that executed 3 (?) times. \r\nI receive 2 exceptions \"FileNotFoundError\" and then printing of successful weights saving.\r\n\r\n\r\n\r\n### To Reproduce\r\n\r\n```py\r\n....\r\ntrainer = pl.Trainer(\r\n    gpus=-1,\r\n    precision=16 if train_opt.get(\"fp16\", False) else 32,\r\n    accelerator=\"ddp\",\r\n    accumulate_grad_batches=train_opt.get(\"grad_accum\", 1),\r\n    max_epochs=train_opt.get(\"epochs\", 20),\r\n    default_root_dir=train_opt.get(\"root_dir\", None),\r\n    callbacks=callbacks,\r\n    logger=logger,\r\n    log_every_n_steps=1,\r\n)\r\n....\r\ntrainer.fit(model, dataloaders[0], dataloaders[1])\r\nif trainer.state.status != TrainerStatus.FINISHED:\r\n    raise InterruptedError()\r\n\r\npath = checkpoint_callback.best_model_path\r\n\r\nos.makedirs(os.path.dirname(target_path), exist_ok=True)\r\nmodel.load_state_dict(torch.load(str(path))[\"state_dict\"])\r\ntorch.save(model.model.state_dict(), target_path)\r\n```\r\n\r\n### Expected behavior\r\n\r\nA single execution of the code after trainer.fit\r\n\r\n### Environment\r\n\r\n* CUDA:\r\n\t- GPU:\r\n\t\t- Tesla V100-SXM2-16GB\r\n\t\t- Tesla V100-SXM2-16GB\r\n\t\t- Tesla V100-SXM2-16GB\r\n\t\t- Tesla V100-SXM2-16GB\r\n\t- available:         True\r\n\t- version:           10.1\r\n* Packages:\r\n\t- numpy:             1.18.5\r\n\t- pyTorch_debug:     False\r\n\t- pyTorch_version:   1.6.0\r\n\t- pytorch-lightning: 1.4.0rc0\r\n\t- tqdm:              4.61.2\r\n* System:\r\n\t- OS:                Linux\r\n\t- architecture:\r\n\t\t- 64bit\r\n\t\t- \r\n\t- processor:         x86_64\r\n\t- python:            3.7.7\r\n\t- version:           #1 SMP Tue May 11 20:50:07 UTC 2021\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Post-training code executes exactly once per training run",
+      "File operations succeed without FileNotFoundError exceptions",
+      "Model checkpoint operations are coordinated across multiple GPUs",
+      "Solution maintains distributed training performance",
+      "Post-training operations complete successfully on the correct process"
+    ],
+    "created_at": "2021-08-02T13:28:33Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/8351",
+    "source": {
+      "issue_number": 8351
+    },
+    "initial_question": {
+      "title": "_pickle.PicklingError: Can't pickle <class 'TypeError'>: it's not the same object as builtins.TypeError",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nEncountering the following issue:\r\n```\r\nTraceback (most recent call last):\r\n  File \"/import/linux/python/3.8.2/lib/python3.8/multiprocessing/queues.py\", line 239, in _feed\r\n    obj = _ForkingPickler.dumps(obj)\r\n  File \"/import/linux/python/3.8.2/lib/python3.8/multiprocessing/reduction.py\", line 51, in dumps\r\n    cls(buf, protocol).dump(obj)\r\n_pickle.PicklingError: Can't pickle <class 'TypeError'>: it's not the same object as builtins.TypeError\r\nTraceback (most recent call last):\r\n  File \"/import/linux/python/3.8.2/lib/python3.8/multiprocessing/queues.py\", line 239, in _feed\r\n    obj = _ForkingPickler.dumps(obj)\r\n  File \"/import/linux/python/3.8.2/lib/python3.8/multiprocessing/reduction.py\", line 51, in dumps\r\n    cls(buf, protocol).dump(obj)\r\n_pickle.PicklingError: Can't pickle <class 'TypeError'>: it's not the same object as builtins.TypeError\r\n```\r\n\r\n* This happens when using just 1 GPU without multi-gpu\r\n* I have manually pickled my model, data loader and all modules and have fixed any issues\r\n\r\n - PyTorch Lightning Version 1.3.8\r\n - PyTorch Version 1.9\r\n - Python version: 3.8.2\r\n - OS: Linux\r\n - CUDA/cuDNN version: cuda/10.2-cudnn7.5.1\r\n - GPU models and configuration:\r\n - How you installed PyTorch: pip\r\n"
+    },
+    "satisfaction_conditions": [
+      "Solution must work with GPU acceleration enabled"
+    ],
+    "created_at": "2021-07-09T11:40:19Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/7544",
+    "source": {
+      "issue_number": 7544
+    },
+    "initial_question": {
+      "title": "Training fails at the end of the epoch when returning None in the training step",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nSometimes my training loss in a batch is nan. Hence, I return None as loss so that the model will not backpropagate through it as suggested here: #4956. It works fine during the epoch; however, the code fails at the end of the epoch in the function reduce_across_time (line 532).\r\n\r\n```python\r\n           if isinstance(value, list):\r\n                value = torch.tensor(value)\r\n```\r\n\r\nIn case of None, value will be equal to [None] and torch cannot create a proper tensor out of it (*** RuntimeError: Could not infer dtype of NoneType)\r\n\r\nIs it me doing something wrong, or is it a bug in Lightning? Is there any workaround?\r\n\r\nPytorch Version \r\npytorch-lightning-1.3.1\r\ntorch 1.8.1+cu11\r\npython 3.7.9"
+    },
+    "satisfaction_conditions": [
+      "Logged metrics must only include non-None values",
+      "Average loss calculations must account for skipped batches"
+    ],
+    "created_at": "2021-05-14T09:17:48Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/6778",
+    "source": {
+      "issue_number": 6778
+    },
+    "initial_question": {
+      "title": "No TPU devices were found.",
+      "body": "Thanks for great framework.  \r\nI tried to train with tpu (Google Cloud Platform Environment). I encounter error like this:\r\n```\r\nkaki_ai@kaki-ins:~/kopite-bot$ python3 train_blender.py\r\n16:14:31 | Overriding opt[\"no_cuda\"] to True (previously: False)\r\n16:14:31 | Loading model with `--beam-block-full-context false`\r\n16:14:31 | loading dictionary from /home/kaki_ai/ParlAI/data/models/blender/blender_90M/model.dict\r\n16:14:31 | num words = 54944\r\n16:14:32 | DEPRECATED: XLM should only be used for backwards compatibility, as it involves a less-stable layernorm operation.\r\n16:14:33 | Total parameters: 87,508,992 (87,508,992 trainable)\r\n16:14:33 | Loading existing model params from /home/kaki_ai/ParlAI/data/models/blender/blender_90M/model\r\nTraceback (most recent call last):\r\n  File \"train_blender.py\", line 47, in <module>\r\n    val_dataloader=test_loader,\r\n  File \"/home/kaki_ai/kopite-bot/training/lightning_base.py\", line 135, in fit\r\n    accumulate_grad_batches=self.accumulate_grad_batches,\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/connectors/env_vars_connector.py\", line 39, in insert_env_defaults\r\n    return fn(self, **kwargs)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 321, in __init__\r\n    replace_sampler_ddp, deterministic, precision, amp_backend, amp_level, plugins\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py\", line 91, in __init__\r\n    self.tpu_cores = device_parser.parse_tpu_cores(tpu_cores)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/utilities/device_parser.py\", line 113, in parse_tpu_cores\r\n    raise MisconfigurationException('No TPU devices were found.')\r\npytorch_lightning.utilities.exceptions.MisconfigurationException: No TPU devices were found.\r\n```\r\n\r\nIf you have any doubts, please help me. Thank you!"
+    },
+    "satisfaction_conditions": [
+      "TPU environment variables are properly configured",
+      "System successfully establishes connection with TPU hardware",
+      "Error 'No TPU devices were found' is resolved"
+    ],
+    "created_at": "2021-04-01T05:38:18Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/6421",
+    "source": {
+      "issue_number": 6421
+    },
+    "initial_question": {
+      "title": "trainer.test is breaking when a model is not passed",
+      "body": "From the docs:\r\n\r\n```\r\n# (1) load the best checkpoint automatically (lightning tracks this for you)\r\ntrainer.test()\r\n```\r\n\r\nTrainer.test should use the best checkpoint when a model isn't provided, and currently, that doesn't work."
+    },
+    "satisfaction_conditions": [
+      "Best checkpoint weights are automatically loaded when trainer.test() is called without a model argument",
+      "Model weights after test() match those from the best checkpoint",
+      "Test execution proceeds successfully after checkpoint restoration",
+      "Checkpoint loading occurs even when model state has been modified"
+    ],
+    "created_at": "2021-03-08T21:56:10Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5897",
+    "source": {
+      "issue_number": 5897
+    },
+    "initial_question": {
+      "title": "Auto_scale_batch_size fails for to bigger batch sizes, cuDNN failure",
+      "body": "## \ud83d\udc1b Bug\r\n\r\n<!-- A clear and concise description of what the bug is. -->\r\nI'm using a pre-trained ResNet50 on 224x224 images with 16-bit precision, I wanted to test the auto_scale_batch_size functionality.\r\n\r\nThe output in the terminal is the following:\r\nGPU available: True, used: True\r\nTPU available: None, using: 0 TPU cores\r\nLOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]\r\nUsing native 16bit precision.\r\nBatch size 2 succeeded, trying batch size 4\r\nBatch size 4 succeeded, trying batch size 8\r\nBatch size 8 succeeded, trying batch size 16\r\nBatch size 16 succeeded, trying batch size 32\r\nBatch size 32 succeeded, trying batch size 64\r\nBatch size 64 succeeded, trying batch size 128\r\nBatch size 128 succeeded, trying batch size 256\r\n\r\nAll good till then. On batch size 256 the GPU's memory certainly is not sufficient and it fails on a 2d convolution.\r\nThe auto_scaling should be aborted at this point and the batch_size fixed to 128.\r\nInstead the script fails with the message \"RuntimeError: Unable to find a valid cuDNN algorithm to run convolution\".\r\n\r\n### To Reproduce\r\nI'm not doing anything exceptional:\r\n1. Parsing arguments with \"--auto_scale_batch_size\", \"true\"\r\n2. Initiating model, datamodule and trainer using the parsed arguments\r\n3. trainer.tune(model, dm)\r\n\r\n### Question\r\nIs this a problem on the Pytorch Lightning side not capturing the exception or is this anyhow linked to Cuda and installing a different version could be enough?\r\n\r\n\r\n### Environment\r\n1x GeForce RTX 2080Ti\r\nUbuntu 20.10\r\nPython 3.8.5\r\nPytorch Lightning 1.1.8\r\nPytorch 1.7.1\r\nCuda 11.2\r\nEnv created with miniconda, packages installed with pip\r\n"
+    },
+    "satisfaction_conditions": [
+      "System must correctly identify the maximum viable batch size"
+    ],
+    "created_at": "2021-02-10T08:51:55Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5572",
+    "source": {
+      "issue_number": 5572
+    },
+    "initial_question": {
+      "title": "When overwriting the setup() function in the LightningDataModule, it is forced to add an unnecessary parameter.",
+      "body": "## \ud83d\udc1b Bug\r\n\r\n<!-- A clear and concise description of what the bug is. -->\r\n\r\n## When overwriting the setup() function in the LightningDataModule, it is forced to add an unnecessary parameter.\r\n\r\n<!-- FILL IN -->\r\n\r\n### Environment\r\n\r\n - PyTorch Version (e.g., 1.0):1.7\r\n - OS (e.g., Linux):Windows\r\n - How you installed PyTorch (`conda`, `pip`, source):pip\r\n - Python version:3.6.12\r\n - CUDA/cuDNN version:11.0\r\n - GPU models and configuration: \r\n - Any other relevant information: def setup(self)\r\n\r\n### Additional context\r\n\r\nI have to add another argument to setup(self) for it to work, such as setup(self,a), which I won't actually use at all.\r\n"
+    },
+    "satisfaction_conditions": [
+      "The setup() method must accept a stage parameter",
+      "The method must be compatible with both training and testing workflows",
+      "The method signature must conform to the LightningDataModule interface",
+      "The solution must resolve the perceived 'unnecessary parameter' concern"
+    ],
+    "created_at": "2021-01-19T14:10:32Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/5027",
+    "source": {
+      "issue_number": 5027
+    },
+    "initial_question": {
+      "title": "On \"import pytorch-lightning\": AttributeError: python: undefined symbol: THCudaHalfTensor_normall",
+      "body": "## \ud83d\udc1b Bug\r\n\r\n<!-- A clear and concise description of what the bug is. -->\r\nSimply by importing pytorch-lightning, I receive the following error: `AttributeError: python: undefined symbol: THCudaHalfTensor_normall`\r\n\r\nTraceback:\r\n```\r\nTraceback (most recent call last):\r\n  File \"test.py\", line 1, in <module>\r\n    import pytorch_lightning\r\n  File \"/data/nv419/anaconda3/lib/python3.7/site-packages/pytorch_lightning/__init__.py\", line 56, in <module>\r\n    from pytorch_lightning import metrics\r\n  File \"/data/nv419/anaconda3/lib/python3.7/site-packages/pytorch_lightning/metrics/__init__.py\", line 14, in <module>\r\n    from pytorch_lightning.metrics.metric import Metric\r\n  File \"/data/nv419/anaconda3/lib/python3.7/site-packages/pytorch_lightning/metrics/metric.py\", line 26, in <module>\r\n    from pytorch_lightning.utilities.apply_func import apply_to_collection\r\n  File \"/data/nv419/anaconda3/lib/python3.7/site-packages/pytorch_lightning/utilities/__init__.py\", line 25, in <module>\r\n    from apex import amp\r\n  File \"/data/nv419/anaconda3/lib/python3.7/site-packages/apex-0.1-py3.7-linux-x86_64.egg/apex/__init__.py\", line 12, in <module>\r\n    from . import optimizers\r\n  File \"/data/nv419/anaconda3/lib/python3.7/site-packages/apex-0.1-py3.7-linux-x86_64.egg/apex/optimizers/__init__.py\", line 2, in <module>\r\n    from .fp16_optimizer import FP16_Optimizer\r\n  File \"/data/nv419/anaconda3/lib/python3.7/site-packages/apex-0.1-py3.7-linux-x86_64.egg/apex/optimizers/fp16_optimizer.py\", line 8, in <module>\r\n    lib.THCudaHalfTensor_normall.argtypes=[ctypes.c_void_p, ctypes.c_void_p]\r\n  File \"/data/nv419/anaconda3/lib/python3.7/ctypes/__init__.py\", line 377, in __getattr__\r\n    func = self.__getitem__(name)\r\n  File \"/data/nv419/anaconda3/lib/python3.7/ctypes/__init__.py\", line 382, in __getitem__\r\n    func = self._FuncPtr((name_or_ordinal, self))\r\nAttributeError: python: undefined symbol: THCudaHalfTensor_normall\r\n```\r\n\r\n### To Reproduce\r\n`import pytorch-lightning`\r\n\r\n### Expected behavior\r\nFor pytorch-lightning to import and be used correctly\r\n\r\n### Environment\r\n* CUDA:\r\n        - GPU:\r\n                - Tesla V100-PCIE-32GB\r\n                - Tesla V100-PCIE-32GB\r\n                - GeForce RTX 2080 Ti\r\n                - GeForce RTX 2080 Ti\r\n                - GeForce RTX 2080 Ti\r\n                - GeForce RTX 2080 Ti\r\n                - GeForce RTX 2080 Ti\r\n                - GeForce RTX 2080 Ti\r\n                - GeForce RTX 2080 Ti\r\n                - GeForce RTX 2080 Ti\r\n        - available:         True\r\n        - version:           10.1\r\n* Packages:\r\n        - numpy:             1.17.2\r\n        - pyTorch_debug:     False\r\n        - pyTorch_version:   1.6.0+cu101\r\n        - tqdm:              4.54.1\r\n* System:\r\n        - OS:                Linux\r\n        - architecture:\r\n                - 64bit\r\n                -\r\n        - processor:         x86_64\r\n        - python:            3.7.4\r\n        - version:           #59~18.04.1-Ubuntu SMP Wed Oct 21 12:14:56 UTC 2020\r\n\r\n### Additional context\r\npytorch-lightning version is 1.0.8 (couldn't import it in obviously...)\r\n"
+    },
+    "satisfaction_conditions": [
+      "PyTorch Lightning successfully imports without symbol errors",
+      "No conflicting CUDA/GPU library dependencies exist"
+    ],
+    "created_at": "2020-12-08T19:40:09Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/4653",
+    "source": {
+      "issue_number": 4653
+    },
+    "initial_question": {
+      "title": "accumulate_grad_batches ignores last batches in epoch if number of steps is not divisible by accumulate_grad_batches?",
+      "body": "Suppose I have accumulate_grad_batches=256 and number of steps in my epoch is 260. Loss is updated only on step number 256 every epoch. I suppose it means that the last 4 batches grads are ignored. Is that correct?"
+    },
+    "satisfaction_conditions": [
+      "All batches must be processed for gradient computation, including remainder batches",
+      "Gradient accumulation must occur in correct-sized groups",
+      "Optimizer steps must be taken after each complete accumulation group",
+      "Gradient buffers must be properly cleared between accumulation groups"
+    ],
+    "created_at": "2020-11-13T09:39:10Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/3752",
+    "source": {
+      "issue_number": 3752
+    },
+    "initial_question": {
+      "title": "Default reduction always applied by `Metric`, even when requesting `'none'` reduction",
+      "body": "## \ud83d\udc1b Bug\r\n\r\n<!-- A clear and concise description of what the bug is. -->\r\nMetric reduction doesn't behave the same between the functional and class API when using `reduction='none'`. The functional API applies no reduction as expected, but the class API seems to apply the default reduction regardless.\r\n\r\nI haven't investigated the code yet to find the specific cause of the bug, so I'm not sure how widespread this bug is, but I've encountered it using both the `DiceCoefficient` and my own implementation of the differentiable dice, inheriting from `TensorMetric`.\r\n\r\n### To Reproduce\r\n\r\nGiven a pair of `pred` and `target`, I get the following behavior with 3 class + background segmentation data:\r\n```python\r\n>>> from pytorch_lightning.metrics import DiceCoefficient\r\n>>> from pytorch_lightning.metrics.functional import dice_score\r\n>>> DiceCoefficient(reduction=\"none\")(pred, target)\r\ntensor(0.0800)\r\n>>> dice_score(pred, target, reduction=\"none\")\r\ntensor([0.0876, 0.0937, 0.0586], device='cuda:0')\r\n```\r\nwhere I would have expected both version to give the same result.\r\n\r\nThe class API seems to apply the default reduction of `'elementwise_mean'` even though I requested `'none'`, since:\r\n```python\r\n>>> dice_score(x_hat, x, reduction=\"none\").mean()\r\ntensor(0.0800, device='cuda:0')\r\n```\r\n\r\n### Expected behavior\r\nReduction behavior should be consistent between class and functional API, and to behave like the current functional API.\r\n\r\n### Environment\r\nI just now installed Lightning from Git to ensure that it's not a bug that's already been solved since the last release.\r\n\r\n* CUDA:\r\n        - GPU: TITAN Xp\r\n        - available:         True\r\n        - version:           10.2\r\n* Packages:\r\n        - numpy:             1.19.2\r\n        - pyTorch_debug:     False\r\n        - pyTorch_version:   1.6.0\r\n        - pytorch-lightning: 0.9.1rc4\r\n        - tqdm:              4.49.0\r\n* System:\r\n        - OS:                Linux\r\n        - architecture: 64bit, ELF\r\n        - processor:         x86_64\r\n        - python:            3.8.5\r\n        - version:           #51~18.04.1-Ubuntu SMP Sat Sep 5 14:35:50 UTC 2020\r\n"
+    },
+    "satisfaction_conditions": [
+      "Results must be numerically consistent when comparing no reduction to manually reduced results"
+    ],
+    "created_at": "2020-09-30T19:46:37Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/3738",
+    "source": {
+      "issue_number": 3738
+    },
+    "initial_question": {
+      "title": "RuntimeError: Input and hidden tensors are not at the same device, found",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nI train LSTM for character level  text generation. At first I initialize hidden and cell with zeros using `torch.zeros`. Unfortunately this tensors are defaultly assigned to the cpu so I get the following error while training\r\n\r\n```python\r\nRuntimeError: Input and hidden tensors are not at the same device, found input tensor at cuda:0 and hidden tensor at cpu\r\n```\r\n\r\n### To Reproduce\r\n\r\n#### Model\r\n\r\n```python\r\nclass RNN(pl.LightningModule):\r\n    lr = 0.0005\r\n\r\n    def __init__(self, input_size, hidden_size, embeding_size, n_categories, n_layers, output_size, p):\r\n        super().__init__()\r\n\r\n        self.criterion = nn.CrossEntropyLoss()\r\n        \r\n        self.n_layers = n_layers\r\n        self.hidden_size = hidden_size\r\n        \r\n        \r\n        self.embeding = nn.Embedding(input_size+n_categories, embeding_size)\r\n        self.lstm = nn.LSTM(embeding_size+n_categories, hidden_size, n_layers, dropout=p)\r\n        self.out_fc = nn.Linear(hidden_size, output_size)\r\n        \r\n        self.dropout = nn.Dropout(p)\r\n        \r\n\r\n    def forward(self, batch_of_category, batch_of_letter, hidden, cell):\r\n        ## letter level operations\r\n        \r\n        embeding = self.dropout(self.embeding(batch_of_letter))\r\n        category_plus_letter = torch.cat((batch_of_category, embeding), 1)\r\n\r\n        #sequence_length = 1\r\n        category_plus_letter = category_plus_letter.unsqueeze(1)\r\n        \r\n        out, (hidden, cell) = self.lstm(category_plus_letter, (hidden, cell))\r\n        out = self.out_fc(out)\r\n        out = out.squeeze(1)\r\n        \r\n        return out, (hidden, cell)\r\n        \r\n\r\n    def configure_optimizers(self):\r\n        optimizer = Adam(self.parameters(), self.lr)\r\n        scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)\r\n\r\n        return [optimizer], [scheduler]\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        item_dict = batch\r\n        loss = 0\r\n        batch_of_category = item_dict[\"category_tensors\"]\r\n\r\n        #we loop over letters, single batch at the time \r\n        \r\n        hidden = torch.zeros(self.n_layers, 1, self.hidden_size).cuda()\r\n        cell = torcAh.zeros(self.n_layers, 1, self.hidden_size).cuda()\r\n        \r\n        for t in range(item_dict[\"input_tensors\"].size(1)):\r\n            batch_of_letter = item_dict[\"input_tensors\"][:, t]\r\n            \r\n            output, (hidden, cell) = self(batch_of_category, batch_of_letter, hidden, cell)\r\n            \r\n            loss += criterion(output, item_dict[\"target_tensors\"][:, t])\r\n\r\n        loss = loss/(t+1)\r\n\r\n\r\n        tensorboard_logs = {'train_loss': loss}\r\n\r\n        return {'loss': loss, 'log': tensorboard_logs}\r\n    \r\n    \r\n    def init_hidden(self, batch_size):\r\n        hidden = torch.zeros(self.n_layers, batch_size, self.hidden_size)\r\n        cell = torch.zeros(self.n_layers, batch_size, self.hidden_size)\r\n        \r\n        return hidden, cell\r\n```\r\n\r\n#### Batch\r\n\r\n```\r\n(['Russian', 'English', 'Russian', 'English'],\r\n ['Piskarenkov', 'Clarkson', 'Pochkaev', 'Woods'],\r\n tensor([[0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],\r\n         [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.],\r\n         [0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],\r\n         [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.]]),\r\n tensor([[42,  9, 19, 11,  1, 18,  5, 14, 11, 15, 22],\r\n         [29, 12,  1, 18, 11, 19, 15, 14,  0,  0,  0],\r\n         [42, 15,  3,  8, 11,  1,  5, 22,  0,  0,  0],\r\n         [49, 15, 15,  4, 19,  0,  0,  0,  0,  0,  0]]),\r\n tensor([[ 9, 19, 11,  1, 18,  5, 14, 11, 15, 22, 59],\r\n         [12,  1, 18, 11, 19, 15, 14, 59,  0,  0,  0],\r\n         [15,  3,  8, 11,  1,  5, 22, 59,  0,  0,  0],\r\n         [15, 15,  4, 19, 59,  0,  0,  0,  0,  0,  0]]))\r\n```\r\n\r\n#### Trainer \r\n\r\n```python\r\ndm = NamesDatamodule(1)\r\n\r\nrnn_model = RNN(input_size=ds.n_tokens,\r\n            hidden_size=256,\r\n            embeding_size = 128, \r\n            n_layers=2,    \r\n            n_categories=ds.n_categories,\r\n            output_size=ds.n_tokens,\r\n            p=0.3)\r\n\r\n\r\ntrainer = Trainer(max_epochs=3, \r\n                  logger=None,\r\n                  gpus=1,\r\n                  early_stop_callback=False,\r\n                  checkpoint_callback=False,\r\n                  )\r\n\r\ntrainer.fit(rnn_model, dm)\r\n```\r\n\r\n### Expected behavior\r\n\r\nHidden values should automatically be assigned to the `device`\r\n\r\n### Environment\r\n\r\nGoogle Colab\r\n\r\n - Pytroch 1.6.0+cu101\r\n - Lightning 0.9.1rc3\r\n - Python version:\r\n - GPU models and configuration: single colab GPU\r\n\r\n### Additional context\r\n\r\nProblem can be solved by adding `.cuda()` to the variables but it is not a solution that I think should be necessary \r\n"
+    },
+    "satisfaction_conditions": [
+      "Device assignment must work in both single and multi-GPU environments"
+    ],
+    "created_at": "2020-09-30T08:05:07Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2939",
+    "source": {
+      "issue_number": 2939
+    },
+    "initial_question": {
+      "title": "mlflow checkpoints in the wrong location ",
+      "body": "I'm not sure if I'm doing something wrong, I'm using mlflow instead of tensorboard as a logger. I've used the defaults i.e.\r\n\r\n```\r\nmlflow = loggers.MLFlowLogger()\r\ntrainer = pl.Trainer.from_argparse_args(args, logger=mlflow)\r\n```\r\n\r\nI'm ending up with the following folder structure\r\n\r\n\\mlflow\r\n\\mlflow\\1\r\n\\mlflow\\1\\\\{guid}\\artifacts\r\n\\mlflow\\1\\\\{guid}\\metrics\r\n\\mlflow\\1\\\\{guid}\\params\r\n\\mlflow\\1\\\\{guid}\\meta.yaml\r\n**\\1\\\\{guid}\\checkpoints**\r\n\r\ni.e. the checkpoints are in the wrong location, they should be in the `\\mlflow` folder. \r\n\r\nPerhaps this is an mlflow rather than pytorch-lightning issue? \r\n\r\nI'm using pytorch-lightning 0.8.5 on macos running in python 3.7.6\r\n"
+    },
+    "satisfaction_conditions": [
+      "Checkpoint files are stored in the correct MLflow directory structure"
+    ],
+    "created_at": "2020-08-12T22:58:48Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2679",
+    "source": {
+      "issue_number": 2679
+    },
+    "initial_question": {
+      "title": "Default checkpoint location problematic when using docker ",
+      "body": "The default behavior of `ModelCheckpoint` is to use `os.getcwd()`. Outside my docker container, this ended up being the same directory where my tensorboard logs were saved (e.g. `/my/dir/tb_logs/default/version_0/checkpoints/`).  But inside the docker container, it saved to the internal working directory (e.g. `/home/default/version_0/checkpoints/`). Since this location disappeared along with the container, the checkpoint was gone, and there was no warning raised to explain why.\r\n\r\nRequiring a checkpoint directory isn't desirable, but I'd like to help others avoid this grief in the future. Is there a better way to infer a default location than `os.getcwd()`? Something as simple as a print statement with the checkpoint location would have saved me a lot of time troubleshooting.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Checkpoint files persist after container termination",
+      "Checkpoint save location is clearly communicated to user",
+      "Checkpoint directory is configurable without requiring explicit directory creation",
+      "Checkpoint location aligns with other output locations"
+    ],
+    "created_at": "2020-07-23T17:53:41Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2670",
+    "source": {
+      "issue_number": 2670
+    },
+    "initial_question": {
+      "title": "bug in pytorch_lightning.metrics.functional.auroc",
+      "body": "the code:\r\n```\r\ndef validation_epoch_end(self, outputs):\r\n        .........\r\n        print(total_y_hat.device)\r\n        print(total_y_true.device)\r\n        print(total_y_hat)\r\n        print(total_y_true)\r\n        print(total_y_hat.shape)\r\n        print(total_y_true.shape)\r\n        auc_score = auroc(total_y_hat, total_y_true)\r\n```\r\nthe output is:\r\n```\r\nGet data done!\r\nValidation sanity check:  50%|\u2588\u2588\u2588\u2588\u2588     | 1/2 [00:00<00:00,  1.06it/s]\r\n\r\ncuda:0\r\ncuda:0\r\ntensor([0.5084, 0.5084, 0.5084,  ..., 0.5084, 0.5084, 0.5084], device='cuda:0')\r\ntensor([0., 0., 0.,  ..., 0., 0., 0.], device='cuda:0')\r\ntorch.Size([16384])\r\ntorch.Size([16384])\r\nTraceback (most recent call last):\r\n  File \"lighting_sales.py\", line 443, in <module>\r\n    main(hparams)\r\n  File \"lighting_sales.py\", line 392, in main\r\n    trainer.fit(model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 918, in fit\r\n    self.single_gpu_train(model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/distrib_parts.py\", line 176, in single_gpu_train\r\n    self.run_pretrain_routine(model)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1076, in run_pretrain_routine\r\n    False)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/trainer/evaluation_loop.py\", line 330, in _evaluate\r\n    eval_results = model.validation_epoch_end(outputs)\r\n  File \"lighting_sales.py\", line 252, in validation_epoch_end\r\n    auc_score = auroc(total_y_hat, total_y_true)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/metrics/functional/classification.py\", line 817, in auroc\r\n    return _auroc(pred=pred, target=target, sample_weight=sample_weight, pos_label=pos_label)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/metrics/functional/classification.py\", line 766, in new_func\r\n    x, y = func_to_decorate(*args, **kwargs)[:2]\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/metrics/functional/classification.py\", line 815, in _auroc\r\n    return roc(pred, target, sample_weight, pos_label)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/metrics/functional/classification.py\", line 553, in roc\r\n    pos_label=pos_label)\r\n  File \"/opt/conda/lib/python3.7/site-packages/pytorch_lightning/metrics/functional/classification.py\", line 504, in _binary_clf_curve\r\n    torch.tensor([target.size(0) - 1])])\r\nRuntimeError: All input tensors must be on the same device. Received cuda:0 and cpu\r\n```\r\n          \r\n           "
+    },
+    "satisfaction_conditions": [
+      "Code works with the latest version of PyTorch Lightning",
+      "Validation epoch end function processes tensors of matching shapes"
+    ],
+    "created_at": "2020-07-22T09:40:31Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2538",
+    "source": {
+      "issue_number": 2538
+    },
+    "initial_question": {
+      "title": "tensor_metric decorator does not let you return Tuple or List ouputs",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nWhen creating a metric function that returns multiple outputs in the form of a Tuple or List the metric class complains that it can't convert a Tuple or List to a tensor, even though the contents of the Tuple/List are tensors.\r\n\r\n### To Reproduce\r\n\r\nAn example of this would be a function  to return the topk accuracy \r\n\r\n```\r\n\r\n    @tensor_metric()\r\n    def accuracy(output, target, topk=(1,)):\r\n        \"\"\"Computes the precision@k for the specified values of k\"\"\"\r\n\r\n        maxk = max(topk)\r\n        batch_size = target.size(0)\r\n    \r\n        _, pred = output.topk(maxk, 1, True, True)\r\n        pred = pred.t()\r\n        correct = pred.eq(target.view(1, -1).expand_as(pred))\r\n    \r\n        res = []\r\n        for k in topk:\r\n            correct_k = correct[:k].view(-1).float().sum(0)\r\n            res.append(correct_k.mul_(100.0 / batch_size))\r\n        return res\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        x, y = batch\r\n        y_hat = self(x)\r\n        loss = F.cross_entropy(y_hat, y)\r\n        acc = self.accuracy(y_hat, y, topk=(1, 5))\r\n\r\n```\r\n\r\n### Error Output\r\n\r\n```\r\n\r\nEpoch 1:   0%|          | 0/1876 [00:00<?, ?it/s] Traceback (most recent call last):\r\n  File \"/home/local/CORP/dbyrne/Documents/Projects/RL/pytorch-lightning-bolts/pl_bolts/models/mnist_module.py\", line 138, in <module>\r\n    trainer.fit(model)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 912, in fit\r\n    self.dp_train(model)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/distrib_parts.py\", line 258, in dp_train\r\n    self.run_pretrain_routine(model)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1093, in run_pretrain_routine\r\n    self.train()\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/training_loop.py\", line 375, in train\r\n    self.run_training_epoch()\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/training_loop.py\", line 458, in run_training_epoch\r\n    _outputs = self.run_training_batch(batch, batch_idx)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/training_loop.py\", line 634, in run_training_batch\r\n    loss, batch_output = optimizer_closure()\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/training_loop.py\", line 598, in optimizer_closure\r\n    output_dict = self.training_forward(split_batch, batch_idx, opt_idx, self.hiddens)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/trainer/training_loop.py\", line 754, in training_forward\r\n    output = self.model(*args)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 550, in __call__\r\n    result = self.forward(*input, **kwargs)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/overrides/data_parallel.py\", line 65, in forward\r\n    outputs = self.parallel_apply(replicas, inputs, kwargs)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/overrides/data_parallel.py\", line 69, in parallel_apply\r\n    return parallel_apply(replicas, inputs, kwargs, self.device_ids[:len(replicas)])\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/overrides/data_parallel.py\", line 209, in parallel_apply\r\n    raise output\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/overrides/data_parallel.py\", line 166, in _worker\r\n    output = module.training_step(*input, **kwargs)\r\n  File \"/home/local/CORP/dbyrne/Documents/Projects/RL/pytorch-lightning-bolts/pl_bolts/models/mnist_module.py\", line 52, in training_step\r\n    acc = self.accuracy(y_hat, y, topk=(1, 5))\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/metrics/converters.py\", line 58, in new_func\r\n    result = function_to_decorate(*args, **kwargs)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/metrics/converters.py\", line 59, in new_func\r\n    return func_to_apply(result, *dec_args, **dec_kwargs)\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/pytorch_lightning/metrics/converters.py\", line 84, in _convert_to_tensor\r\n    raise TypeError(f\"The given type ('{type(data).__name__}') cannot be converted to a tensor!\")\r\nTypeError: The given type ('list') cannot be converted to a tensor!\r\nException ignored in: <function tqdm.__del__ at 0x7f8c82724ae8>\r\nTraceback (most recent call last):\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/tqdm/std.py\", line 1086, in __del__\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/tqdm/std.py\", line 1293, in close\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/tqdm/std.py\", line 1471, in display\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/tqdm/std.py\", line 1089, in __repr__\r\n  File \"/home/local/CORP/dbyrne/anaconda3/envs/core_rl/lib/python3.7/site-packages/tqdm/std.py\", line 1433, in format_dict\r\nTypeError: cannot unpack non-iterable NoneType object\r\n\r\nProcess finished with exit code 1\r\n\r\n```\r\n\r\n### Environment\r\n\r\n - PyTorch Version: 1.4\r\n - OS: Linux\r\n - How you installed PyTorch: Conda\r\n - Python version: 3.7.7\r\n - CUDA/cuDNN version: 10.1\r\n - GPU models and configuration: RTX 2080"
+    },
+    "satisfaction_conditions": [
+      "Metric calculation must maintain batch processing capability",
+      "Accuracy values must maintain correct numerical precision"
+    ],
+    "created_at": "2020-07-07T10:51:10Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2400",
+    "source": {
+      "issue_number": 2400
+    },
+    "initial_question": {
+      "title": "CrossEntropyLoss fails to run with GPU",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nUsing the following `training_step` method which uses `nn.CrossEntropyLoss()` loss function:\r\n\r\n```python\r\n    def training_step(self, batch, batch_idx):\r\n        x1, x2 = batch[\"x1\"], batch[\"x2\"]\r\n        predict = self(x1, x2)\r\n        target = torch.arange(x1.size()[0])\r\n        loss = self.loss_fn(predict, target)\r\n        return {'loss': loss}\r\n```\r\nfails to run with GPU throwing the following error:\r\n\r\n```python\r\nRuntimeError: Expected object of device type cuda but got device type cpu for argument #2 'target' in call to _thnn_nll_loss_forward\r\n```\r\nThe function `self.loss_fn` is shown below:\r\n\r\n```python\r\nimport torch\r\nfrom pytorch_lightning import LightningModule\r\nfrom torch import nn\r\n\r\n\r\nclass NPairsLoss(LightningModule):\r\n    \"\"\"\r\n    The N-Pairs Loss.\r\n    It measures the loss given predicted tensors x1, x2 both with shape [batch_size, hidden_size],\r\n    and target tensor y which is the identity matrix with shape  [batch_size, batch_size].\r\n    \"\"\"\r\n\r\n    def __init__(self, alpha=100):\r\n        super(NPairsLoss, self).__init__()\r\n        self.ce = nn.CrossEntropyLoss()\r\n        self.alpha = alpha\r\n\r\n    def similarities(self, x1, x2):\r\n        \"\"\"\r\n        Calculates the cosine similarity matrix for every pair (i, j),\r\n        where i is an embedding from x1 and j is another embedding from x2.\r\n\r\n        :param x1: a tensors with shape [batch_size, hidden_size].\r\n        :param x2: a tensors with shape [batch_size, hidden_size].\r\n        :return: the cosine similarity matrix with shape [batch_size, batch_size].\r\n        \"\"\"\r\n        x1 = x1 / torch.norm(x1, dim=1, keepdim=True)\r\n        x2 = x2 / torch.norm(x2, p=2, dim=1, keepdim=True)\r\n        return self.alpha * torch.matmul(x1, x2.t())\r\n\r\n    def forward(self, predict, target):\r\n        \"\"\"\r\n        Computes the N-Pairs Loss between the target and predictions.\r\n        :param predict: the prediction of the model,\r\n        Contains the batches x1 (image embeddings) and x2 (description embeddings).\r\n        :param target: the identity matrix with shape  [batch_size, batch_size].\r\n        :return: N-Pairs Loss value.\r\n        \"\"\"\r\n        x1, x2 = predict\r\n        predict = self.similarities(x1, x2)\r\n        # by construction the probability distribution must be concentrated on the diagonal of the similarities matrix.\r\n        # so, Cross Entropy can be used to measure the loss.\r\n        return self.ce(predict, target)\r\n```\r\nIs `target = torch.arange(x1.size()[0])` not being created in the GPU?\r\n\r\n### Expected behavior\r\n\r\nThat  target tensor (`target = torch.arange(x1.size()[0])`) is created on the GPU. \r\n\r\n\r\n### Environment\r\n\r\n* CUDA:\r\n\t- GPU:\r\n\t\t- GeForce RTX 2080\r\n\t- available:         True\r\n\t- version:           10.2\r\n* Packages:\r\n\t- numpy:             1.19.0\r\n\t- pyTorch_debug:     False\r\n\t- pyTorch_version:   1.5.1\r\n\t- pytorch-lightning: 0.8.1\r\n\t- tensorboard:       2.2.2\r\n\t- tqdm:              4.46.1\r\n* System:\r\n\t- OS:                Linux\r\n\t- architecture:\r\n\t\t- 64bit\r\n\t\t- ELF\r\n\t- processor:         x86_64\r\n\t- python:            3.7.3\r\n\t- version:           #41-Ubuntu SMP Tue Dec 3 00:27:35 UTC 2019\r\n\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The solution must preserve the original tensor's numerical properties while changing only its device location",
+      "The device information must be accessible within the training step"
+    ],
+    "created_at": "2020-06-28T15:04:30Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2238",
+    "source": {
+      "issue_number": 2238
+    },
+    "initial_question": {
+      "title": "when no checkpoints are saved, test fails",
+      "body": "Build a model that doesn't save a checkpoint and this crashes.\r\nIt should use the last model instead.\r\n```\r\nmodel = ...\r\ntrainer = Trainer(fast_dev_run)\r\ntrainer.fit(model)\r\ntrainer.test()\r\n```\r\n\r\n@yukw777 \r\n```\r\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \r\n\r\nself = <torch.serialization._open_file object at 0x7f443d4d88d0>, name = ''\r\nmode = 'rb'\r\n\r\n    def __init__(self, name, mode):\r\n>       super(_open_file, self).__init__(open(name, mode))\r\nE       FileNotFoundError: [Errno 2] No such file or directory: ''\r\n```\r\n\r\n\r\nThe test for this should be:\r\n\r\n```\r\ndef test_no_ckpt_test(tmpdir):\r\n    model = EvaluationModel()\r\n    trainer = Trainer(fast_dev_run)\r\n    trainer.fit(model)\r\n    trainer.test()\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Model testing must succeed when no checkpoints are available",
+      "No file-not-found errors should occur during testing"
+    ],
+    "created_at": "2020-06-18T15:02:14Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/2081",
+    "source": {
+      "issue_number": 2081
+    },
+    "initial_question": {
+      "title": "RuntimeError: Address already in use on 'ddp' mode pl 0.8.0",
+      "body": " Trainer configuration:\r\n```\r\n    trainer = pl.Trainer(\r\n        logger= CometLogger( api_key=\"ID\"),\r\n        auto_select_gpus=True,\r\n        gpus=3,\r\n        distributed_backend=\"ddp\",\r\n   )\r\n```\r\nThe error:\r\n```\r\nGPU available: True, used: True\r\nNo environment variable for node rank defined. Set as 0.\r\nCUDA_VISIBLE_DEVICES: [0,1,2]\r\nCometLogger will be initialized in online mode\r\nCometLogger will be initialized in online mode\r\ninitializing ddp: LOCAL_RANK: 0/2 WORLD_SIZE:3\r\nTraceback (most recent call last):\r\n  File \"train.py\", line 156, in <module>\r\n    main()\r\n  File \"train.py\", line 64, in main\r\n    main_train(model_class_pointer, hyperparams, logger)\r\n  File \"train.py\", line 148, in main_train\r\n    trainer.fit(model)\r\n  File \"/user/anaconda3/envs/docBert/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 884, in fit\r\n    self.spawn_ddp_children(model)\r\n  File \"/user/anaconda3/envs/docBert/lib/python3.7/site-packages/pytorch_lightning/trainer/distrib_data_parallel.py\", line 395, in spawn_ddp_children\r\n    self.ddp_train(local_rank, model, is_master=True)\r\n  File \"/user/anaconda3/envs/docBert/lib/python3.7/site-packages/pytorch_lightning/trainer/distrib_data_parallel.py\", line 425, in ddp_train\r\n    model.init_ddp_connection(self.proc_rank, self.world_size, self.is_slurm_managing_tasks)\r\n  File \"/user/anaconda3/envs/docBert/lib/python3.7/site-packages/pytorch_lightning/core/lightning.py\", line 962, in init_ddp_connection\r\n    torch_distrib.init_process_group(torch_backend, rank=proc_rank, world_size=world_size)\r\n  File \"/user/anaconda3/envs/docBert/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py\", line 393, in init_process_group\r\n    store, rank, world_size = next(rendezvous_iterator)\r\n  File \"/user/anaconda3/envs/docBert/lib/python3.7/site-packages/torch/distributed/rendezvous.py\", line 172, in _env_rendezvous_handler\r\n    store = TCPStore(master_addr, master_port, world_size, start_daemon, timeout)\r\nRuntimeError: Address already in use\r\n```\r\nEnv\r\n```\r\n* CUDA:\r\n        - available:         True\r\n        - version:           10.1\r\n* Packages:\r\n        - numpy:             1.18.4\r\n        - pyTorch_debug:     False\r\n        - pyTorch_version:   1.5.0\r\n        - pytorch-lightning: 0.8.0-dev\r\n        - tensorboard:       2.1.0\r\n        - tqdm:              4.46.0\r\n* System:\r\n        - OS:                Linux\r\n        - architecture:\r\n                - 64bit\r\n                - \r\n        - processor:         x86_64\r\n        - python:            3.7.7\r\n        - version:           #97-Ubuntu SMP Wed Apr 1 03:25:46 UTC 2020\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "No port conflict exists when running DDP training",
+      "Multiple DDP jobs can run simultaneously on the same machine",
+      "No orphaned training processes remain from previous runs"
+    ],
+    "created_at": "2020-06-05T10:58:42Z"
+  },
+  {
+    "id": "https://github.com/Lightning-AI/pytorch-lightning/issues/1155",
+    "source": {
+      "issue_number": 1155
+    },
+    "initial_question": {
+      "title": "No validation checks when overfit_pct is set",
+      "body": "## \ud83d\udc1b Bug\r\n\r\nWhen setting the `overfit_pct` to any value between 0 and 1 (exclusive) in trainer, the validation checks are disabled.\r\n\r\n### To Reproduce\r\n\r\nI have worked on a minimal example to reproduce the bug:\r\n\r\n```python3\r\nimport pytorch_lightning as pl\r\nimport torch\r\n\r\nclass Dataset(torch.utils.data.Dataset):\r\n\r\n    def __init__(self, input_dim, output_dim):\r\n        super(Dataset, self).__init__()\r\n        self.input_dim = input_dim\r\n        self.output_dim = output_dim\r\n\r\n    def __getitem__(self, idx):\r\n        X = torch.rand(1, self.input_dim)\r\n        y = torch.randint(0, self.output_dim, (1,))\r\n        return X, y\r\n\r\n    def __len__(self):\r\n        return 1000\r\n\r\nclass Model(pl.LightningModule):\r\n\r\n    def __init__(self, input_dim, output_dim):\r\n        super(Model, self).__init__()\r\n        self.layer = torch.nn.Linear(input_dim, output_dim)\r\n        self.dataset = Dataset(input_dim, output_dim)\r\n\r\n    def forward(self, x, y):\r\n        yhat = torch.softmax(self.layer(x), -1)\r\n        return F.nll_loss(logits, y)\r\n\r\n    def train_dataloader(self):\r\n        return torch.utils.data.DataLoader(self.dataset, batch_size=64)\r\n\r\n    def configure_optimizers(self):\r\n        return torch.optim.Adam(self.parameters(), lr=1e-3)\r\n\r\n    def training_step(self, batch, batch_idx):\r\n        loss = self.forward(*batch)\r\n        return {'loss': loss, 'log': {'loss': loss}}\r\n\r\n    def validation_step(self, batch, batch_idx):\r\n        loss = self.forward(*batch)\r\n        return {'val_loss': loss, 'log': {'val_loss': loss}}\r\n\r\n\r\nif __name__ == '__main__':\r\n    model = Model(100, 10)\r\n    trainer = pl.Trainer(overfit_pct=.01)\r\n    trainer.fit(model)\r\n```\r\n\r\n### Expected behavior\r\n\r\nValidation checks occur normally\r\n\r\n### Environment\r\n```bash\r\nPyTorch version: 1.4.0\r\nIs debug build: No\r\nCUDA used to build PyTorch: 10.1\r\n\r\nOS: Manjaro Linux\r\nGCC version: (GCC) 8.3.0\r\nCMake version: Could not collect\r\n\r\nPython version: 3.7\r\nIs CUDA available: No\r\nCUDA runtime version: 10.2.89\r\nGPU models and configuration: Could not collect\r\nNvidia driver version: Could not collect\r\ncuDNN version: /usr/lib/libcudnn.so.7.6.5\r\n\r\nVersions of relevant libraries:\r\n[pip] numpy==1.18.1\r\n[pip] pytorch-lightning==0.7.1\r\n[pip] torch==1.4.0\r\n[pip] torchvision==0.5.0\r\n[conda] mkl                       2020.0                      166  \r\n[conda] pytorch                   1.4.0           py3.7_cuda10.1.243_cudnn7.6.3_0    pytorch\r\n[conda] pytorch-lightning         0.7.1                    pypi_0    pypi\r\n[conda] torchvision               0.5.0                py37_cu101    pytorch\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Validation checks must execute when overfit_pct is set to a value that results in at least one full batch",
+      "The system must handle the relationship between batch size, dataset size, and overfit_pct correctly",
+      "The behavior of overfit_pct must be consistent with train_percent_check, val_percent_check, and test_percent_check parameters",
+      "The system must perform both initial sanity validation checks and end-of-epoch validation"
+    ],
+    "created_at": "2020-03-15T13:43:17Z"
+  }
+]

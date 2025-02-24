@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/dewenni/ESP32-Jarolift-Controller/issues/5",
+    "source": {
+      "issue_number": 5
+    },
+    "initial_question": {
+      "title": "[BUG] Beim gleichzeitigen Ansteuern mehrerer Rollos aus HA wird nur der erste Befehl \u00fcber Funk versendet",
+      "body": "### Wurde der Fehler in der neuesten Version getestet?\r\n- [x ] Ich nutze die v1.1.1.\r\n\r\n### Fehlerbeschreibung\r\nIch habe vier Rolladen \u00fcber die Home Assistant Gruppenfunktion zu einer Rolladengruppe verkn\u00fcpft\r\nSobald ich einen Steuerbefehl absende wird dieser zwar von HA \u00fcber MQTT versendet, der Jarolift Controller\r\nSteuert jedoch nur den ersten Rolladen tats\u00e4chlich an. Siehe Log\r\n\r\n```\r\n\r\n[18.12.2024 - 20:04:42] I (APP-JARO): command STOP for channel 11 sent\r\n[18.12.2024 - 20:04:42] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/9 | payload: STOP\r\n[18.12.2024 - 20:04:42] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/10 | payload: STOP\r\n[18.12.2024 - 20:04:42] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/11 | payload: STOP\r\n[18.12.2024 - 20:04:42] D (APP-JARO): created devicekey low: 0x93a0fef1 // high: 0xba54365e\r\n[18.12.2024 - 20:04:42] D (APP-JARO): get serial: 0x0000100b for channel: 11\r\n[18.12.2024 - 20:04:42] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/12 | payload: STOP\r\n[18.12.2024 - 20:04:36] I (APP-WEB): web-client disconnected\r\n[18.12.2024 - 20:04:35] I (APP-JARO): Device Counter: 262\r\n[18.12.2024 - 20:04:35] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/9 | payload: CLOSE\r\n[18.12.2024 - 20:04:35] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/10 | payload: CLOSE\r\n[18.12.2024 - 20:04:35] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/11 | payload: CLOSE\r\n[18.12.2024 - 20:04:35] D (APP-JARO): created devicekey low: 0x93a0fef1 // high: 0xba54365e\r\n[18.12.2024 - 20:04:35] D (APP-JARO): get serial: 0x0000100b for channel: 11\r\n[18.12.2024 - 20:04:35] I (APP-MQTT): msg received | topic: jarolift/cmd/shutter/12 | payload: CLOSE\r\n[18.12.2024 - 20:04:31] D (APP-WEB): Received - Element ID: p10_log_refresh_btn = true\r\n``"
+    },
+    "satisfaction_conditions": [
+      "Multiple shutters must respond to simultaneous group commands",
+      "MQTT commands must be processed reliably without loss",
+      "Command timing must accommodate hardware limitations",
+      "Group functionality must match original remote behavior"
+    ],
+    "created_at": "2024-12-18T19:09:59Z"
+  }
+]

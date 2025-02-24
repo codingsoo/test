@@ -1,0 +1,99 @@
+[
+  {
+    "id": "https://github.com/t0bst4r/home-assistant-matter-hub/issues/514",
+    "source": {
+      "issue_number": 514
+    },
+    "initial_question": {
+      "title": "Shelly RGBW2",
+      "body": "Hello, my Shelly RGBW2 is only recognized as a dimmer, unfortunately you can't select or change colors. Everything is available in Homeassistant"
+    },
+    "satisfaction_conditions": [
+      "Device is recognized as an ExtendedColorLight device type",
+      "Color control functionality is available in the bridge interface",
+      "Device state properly reflects color capabilities during initial discovery"
+    ],
+    "created_at": "2025-02-09T10:38:10Z"
+  },
+  {
+    "id": "https://github.com/t0bst4r/home-assistant-matter-hub/issues/498",
+    "source": {
+      "issue_number": 498
+    },
+    "initial_question": {
+      "title": "One hour difference in the log",
+      "body": "Hello,\n\nI notice that the logs have an hour difference compared to the real time in France.\nFor example, the log indicates 8:00 a.m. when it is 9:00 a.m.\n\n Add-on version: 3.0.0-alpha.66\n You are running the latest version of this add-on.\n System: Home Assistant OS 14.2  (aarch64 / raspberrypi4-64)\n Home Assistant Core: 2025.1.4\n Home Assistant Supervisor: 2024.12.3\n\nThank in advance"
+    },
+    "satisfaction_conditions": [
+      "User understands the time format representation",
+      "Time difference between displayed and expected time is resolved",
+      "Consistent time display across all logs"
+    ],
+    "created_at": "2025-02-02T08:09:55Z"
+  },
+  {
+    "id": "https://github.com/t0bst4r/home-assistant-matter-hub/issues/487",
+    "source": {
+      "issue_number": 487
+    },
+    "initial_question": {
+      "title": "Unable to connect to home assistant with url",
+      "body": "I'm getting stuck after adding a bridge with the message \"Unable to connect to home assistant with url\". I am using https. Is that not supported? I have no problem to access the url with url from the same machine. The matter bridge is running in docker and not on the same host as Home Assistant."
+    },
+    "satisfaction_conditions": [
+      "HTTPS connection must be established successfully between Matter bridge and Home Assistant",
+      "Certificate validation must be properly handled",
+      "TLS/SSL security must be maintained",
+      "Docker container must have access to necessary certificate information"
+    ],
+    "created_at": "2025-01-29T14:52:57Z"
+  },
+  {
+    "id": "https://github.com/t0bst4r/home-assistant-matter-hub/issues/192",
+    "source": {
+      "issue_number": 192
+    },
+    "initial_question": {
+      "title": "When restarting, the Names of devices in the Alexa App will be reset",
+      "body": "Awesome project, i just installed it and i'm pretty happy with it.\r\n\r\nHowever i have the problem that the names of devices will be changed back to the names assigned in home assistant. For example i have a smart plug called \"living room TV\" in home assistant that i want to name just \"TV\" in alexa. However, if i restart the bridge, the name is \"living room TV\" after that and the group i assigned in the alexa app is gone. On Homekit this is no issue, the names and rooms persist after a restart of HAMH. \r\nIs there a way to fix this?"
+    },
+    "satisfaction_conditions": [
+      "Device names in Alexa app persist after bridge restart",
+      "Device group assignments in Alexa app remain intact after bridge restart",
+      "Devices are not rediscovered as new devices on bridge restart",
+      "Latest version compatibility with customization persistence"
+    ],
+    "created_at": "2024-11-23T17:03:08Z"
+  },
+  {
+    "id": "https://github.com/t0bst4r/home-assistant-matter-hub/issues/188",
+    "source": {
+      "issue_number": 188
+    },
+    "initial_question": {
+      "title": "Not getting notification to update the addon to 3.0.0 alpha 37 or 38",
+      "body": "My current version is 3.0.0 alpha 36, why am I not getting notification to update the addon to 3.0.0 alpha 37 or 38?"
+    },
+    "satisfaction_conditions": [
+      "User receives appropriate update notifications based on available valid versions",
+      "Update notifications follow system's regular update check schedule",
+      "System properly handles version availability status"
+    ],
+    "created_at": "2024-11-23T13:10:55Z"
+  },
+  {
+    "id": "https://github.com/t0bst4r/home-assistant-matter-hub/issues/31",
+    "source": {
+      "issue_number": 31
+    },
+    "initial_question": {
+      "title": "[Bug] Brightness is changed to 100% when turning lights on",
+      "body": "I am using docker container and Amazon's Alexa. Every time I turn on one light connected through home-assistant-matter-hub to Alexa, the old brigthness setting is changed to 100%. "
+    },
+    "satisfaction_conditions": [
+      "Manual brightness adjustments function correctly",
+      "Communication between Alexa and Matter hub remains stable"
+    ],
+    "created_at": "2024-10-29T14:02:22Z"
+  }
+]

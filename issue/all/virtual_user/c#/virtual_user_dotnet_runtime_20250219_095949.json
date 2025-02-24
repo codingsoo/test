@@ -1,0 +1,842 @@
+[
+  {
+    "id": "https://github.com/dotnet/runtime/issues/99559",
+    "source": {
+      "issue_number": 99559
+    },
+    "initial_question": {
+      "title": "[System.Reflection.Emit] AssemblyBuilderAccess.RunAndCollect not collecting assemblies",
+      "body": "### Description\r\n\r\nSo I've been playing around with `AssemblyBuilderAccess.RunAndCollect`, but it turns out it's not working and has the same behavior as `Run`.\r\nAccording to the docs:\r\n```\r\nThe dynamic assembly will be automatically unloaded and its memory reclaimed,\r\nwhen it's no longer accessible.\r\n```\r\n\r\nEven after fully unreferencing everything related to my dynamic assembly, it will not unload, even after a forced GC collection.\r\nI have fully tested this, using the code in the section below.\r\n\r\n### Reproduction Steps\r\n\r\nI tested this with the following script:\r\n```cs\r\nint id = 0;\r\nfor (; ; )\r\n{\r\n    GC.Collect();\r\n\r\n    var name = $\"Test{id++}\";\r\n    var asm = AssemblyBuilder.DefineDynamicAssembly(new(name), AssemblyBuilderAccess.RunAndCollect);\r\n    var mod = asm.DefineDynamicModule(name);\r\n\r\n    var type1 = mod.DefineType(\"TestClass\", TypeAttributes.Public);\r\n    var met = type1.DefineMethod(\"Foo\", MethodAttributes.Public | MethodAttributes.Static);\r\n    var il = met.GetILGenerator();\r\n    il.EmitWriteLine(\"Hello World!\");\r\n    il.Emit(OpCodes.Ret);\r\n    var t = type1.CreateType();\r\n\r\n    t.InvokeMember(\"Foo\", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, null, null, null);\r\n\r\n    Console.WriteLine(\"----\");\r\n\r\n    foreach (var ass in AppDomain.CurrentDomain.GetAssemblies())\r\n    {\r\n        if (!ass.GetName().Name?.StartsWith(\"Test\") ?? true)\r\n            continue;\r\n\r\n        Console.WriteLine(ass.FullName);\r\n    }\r\n\r\n    Thread.Sleep(100);\r\n    Console.Clear();\r\n}\r\n```\r\n\r\n### Expected behavior\r\n\r\nAfter a `GC.Collect`, the AppDomain should not contain the previously loaded dynamic assembly, and the console output should only contain the latest dyanmic assembly.\r\n\r\nExpected console output after 6th iteration:\r\n```\r\nHello World!\r\n----\r\nTest5, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\r\n```\r\n\r\n### Actual behavior\r\n\r\nThe AppDomain still contains the old dynamic assemblies, even after a forced collection, as seen in the console output.\r\n\r\nActual console output after 6th iteration:\r\n```\r\nHello World!\r\n----\r\nTest0, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\r\nTest1, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\r\nTest2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\r\nTest3, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\r\nTest4, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\r\nTest5, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null\r\n```\r\n\r\n### Regression?\r\n\r\nI have tested the same code in net48 and net472, but the results are the same.\r\n\r\n### Known Workarounds\r\n\r\n_No response_\r\n\r\n### Configuration\r\n\r\nnet8.0\r\nWindows 11\r\nx64\r\nI don't believe the issue is related to these configs.\r\n\r\n### Other information\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Dynamic assemblies created with AssemblyBuilderAccess.RunAndCollect must be eligible for garbage collection when no longer referenced",
+      "Previously created dynamic assemblies should not appear in AppDomain.GetAssemblies() after garbage collection if they are truly collected",
+      "The solution must prevent unintended assembly lifetime extension through diagnostic/monitoring code",
+      "Dynamic assembly creation and collection must work consistently across multiple iterations"
+    ],
+    "created_at": "2024-03-11T19:45:12Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/90925",
+    "source": {
+      "issue_number": 90925
+    },
+    "initial_question": {
+      "title": "[Question] Ref reassignment",
+      "body": "Below is the simple repro which is quite self-explanatory. The question is - why upon exit from `fn` our char reference `c` is not changed to '**b**' char?\r\n```csharp\r\nusing System;\r\nusing System.Runtime.CompilerServices;\r\nusing System.Runtime.InteropServices;\r\n\r\nstatic void fn(ref char c)\r\n{\r\n    c = ref Unsafe.Add(ref c, 1);\r\n\t// now we have c = 'b'\r\n}\r\n\r\nvar input = \"abc\";\r\nref var c = ref MemoryMarshal.GetReference(input.AsSpan());\r\n\r\nfn(ref c);\r\n// but on exit we still have c = 'a'\r\nConsole.WriteLine(c);\r\n```"
+    },
+    "satisfaction_conditions": [
+      "The behavior of ref reassignment vs value assignment must be correctly explained",
+      "The immutability of string objects must be acknowledged"
+    ],
+    "created_at": "2023-08-22T14:48:16Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/46661",
+    "source": {
+      "issue_number": 46661
+    },
+    "initial_question": {
+      "title": "Question about memory barriers in .NET",
+      "body": "In .NET, there are some APIs that explicitly mention the use of memory barriers in their implementation (`Volatile`, `Interlocked`, `Thread.MemoryBarrier`, etc.). But then there are other APIs (such as `ThreadPool.QueueUserWorkItem`, `Task.Run`, and `Threading.Timer`) where it's generally assumed that there is an implicit memory barrier, but the API doesn't explicitly state this. For example:\r\n\r\n```c#\r\nprivate int _i;\r\n\r\npublic void Method()\r\n{\r\n    _i = 1;\r\n    var timer = new Timer(_ => Console.WriteLine(_i), null, 0, -1); //Guaranteed to print 1?\r\n}\r\n```\r\n\r\nMore generally, is there somehow a way to tell which APIs guarantee a memory barrier and which don't? I have a hard time blindly _trusting_ without strong API guarantees to fall back on, especially knowing that implementations are allowed change over time."
+    },
+    "satisfaction_conditions": [
+      "State changes made before queuing work must be visible to the queued work when it executes",
+      "Concurrent collection operations must preserve visibility of object state across threads",
+      "Cancellation requests must ensure visibility of state changes made before cancellation",
+      "Memory ordering guarantees must be maintained regardless of implementation details"
+    ],
+    "created_at": "2021-01-07T01:06:26Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/41568",
+    "source": {
+      "issue_number": 41568
+    },
+    "initial_question": {
+      "title": "[Question] Static readonly fields and branch optimization",
+      "body": "Does JIT optimize `if` and `switch` statements based on value of **static readonly** field? I understand that value will be available only at runtime, but once the type is loaded and cctor called then the static fields remain unchanged. In this case, constant propagation can be applied and dead branches can be removed.\r\n"
+    },
+    "satisfaction_conditions": [
+      "JIT compiler must correctly optimize code paths based on static readonly field values after class initialization",
+      "Field value must remain accessible via reflection despite optimizations",
+      "Optimization behavior must account for generic type constraints",
+      "Optimizations must preserve field memory layout",
+      "Optimizations must occur after class initialization is complete"
+    ],
+    "created_at": "2020-08-30T17:03:50Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/39689",
+    "source": {
+      "issue_number": 39689
+    },
+    "initial_question": {
+      "title": "[Might be Roslyn] Jit produces different ASM results when working with pointer[index] syntax opposed to star syntax",
+      "body": "Well, this might be a Roslyn issue as such code actually produces different IL\r\nSo a code like this:\r\n```\r\nprivate static int Test(int* ptr, int width)\r\n{\r\n   return ptr[width + 1];\r\n}\r\n\r\nprivate static int Test2(int* ptr, int width)\r\n{\r\n   return *(ptr + width + 1);\r\n}\r\n\r\nGet worse when you add more code like this.\r\n\r\n```\r\nproduces different asm:\r\nI got this ASM using @EgorBo 's Disasmo\r\n\r\nThis is Test:\r\n```\r\nG_M56480_IG01:\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 0.00\r\nG_M56480_IG02:\r\n       inc      edx\r\n       movsxd   rax, edx\r\n       mov      eax, dword ptr [rcx+4*rax]\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 2.50\r\nG_M56480_IG03:\r\n       ret\r\n```\r\n\r\nand this is Test2:\r\n```\r\nG_M8850_IG01:\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 0.00\r\nG_M8850_IG02:\r\n       movsxd   rax, edx\r\n       mov      eax, dword ptr [rcx+4*rax+4]\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 2.25\r\nG_M8850_IG03:\r\n       ret\r\n```\r\n\r\nNote redundant inc and movsxd instructions\r\n\r\nAs I said before, this might be a Roslyn bug as IL code produces is different:\r\n\r\nThis is Test:\r\n```\r\nIL_0000: ldarg.0      // ptr\r\nIL_0001: ldarg.1      // width\r\n\r\n// this part is different\r\nIL_0002: ldc.i4.1 // (width + 1) * 4\r\nIL_0003: add\r\nIL_0004: conv.i\r\nIL_0005: ldc.i4.4\r\nIL_0006: mul\r\n\r\nIL_0007: add\r\nIL_0008: ldind.i4\r\nIL_0009: ret\r\n```\r\n \r\nAnd this is Test2:\r\n```\r\nTest2\r\nIL_0000: ldarg.0      // ptr\r\nIL_0001: ldarg.1      // width\r\n\r\n// this part is different\r\nIL_0002: conv.i // (width * 4 + 4)\r\nIL_0003: ldc.i4.4\r\nIL_0004: mul\r\nIL_0005: add\r\nIL_0006: ldc.i4.4\r\n\r\nIL_0007: add\r\nIL_0008: ldind.i4\r\nIL_0009: ret\r\n```\r\n\r\nSeen on .Net Core 3.1, .Net 5\r\nArch x64\r\n\r\nSlightly bigger case: \r\n```\r\n private static int Test(int* ptr, int width)\r\n{\r\n    return ptr[width + 1] + ptr[width + 2] + ptr[width + 3];\r\n}\r\n\r\n private static int Test2(int* ptr, int width)\r\n{\r\n    return *(ptr + width + 1) + *(ptr + width + 2) + *(ptr + width + 3);\r\n}\r\n```\r\n\r\nTest:\r\n```\r\nG_M56480_IG01:\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 0.00\r\nG_M56480_IG02:\r\n       lea      eax, [rdx+1]\r\n       movsxd   rax, eax\r\n       mov      eax, dword ptr [rcx+4*rax]\r\n       lea      r8d, [rdx+2]\r\n       movsxd   r8, r8d\r\n       add      eax, dword ptr [rcx+4*r8]\r\n       add      edx, 3\r\n       movsxd   rdx, edx\r\n       add      eax, dword ptr [rcx+4*rdx]\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 8.00\r\nG_M56480_IG03:\r\n       ret  \r\n```\r\n\r\nTest2:\r\n```\r\nG_M8850_IG01:\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 0.00\r\nG_M8850_IG02:\r\n       movsxd   rax, edx\r\n       mov      edx, dword ptr [rcx+4*rax+4]\r\n       add      edx, dword ptr [rcx+4*rax+8]\r\n       add      edx, dword ptr [rcx+4*rax+12]\r\n       mov      eax, edx\r\n\t\t\t\t\t\t;; bbWeight=1    PerfScore 6.50\r\nG_M8850_IG03:\r\n       ret\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Results must be consistent with C# language specification"
+    ],
+    "created_at": "2020-07-21T08:11:28Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/39627",
+    "source": {
+      "issue_number": 39627
+    },
+    "initial_question": {
+      "title": "GetFromJsonAsync(HttpClient, String, Type, CancellationToken) Losing Track of its Type",
+      "body": "Using GetFromJsonAsync(HttpClient, String, Type, CancellationToken) via Blazor hosted WebAssembly (Version 16.7.0 Preview 4.0 and WebAssembly v5.0.0-preview.6.20312.15.\r\n\r\nI don't want to use the `GetFromJsonAsync<TValue>(HttpClient, String, CancellationToken)` because I specifically don't want to make any explicit casts. The following only works successfully with the explicit cast, it won't return the result from the Json call without it.\r\n\r\nThis should work, since it knows it's a `List<Means>` type via the DataType parameter but does not:\r\n`Items = ((List<TableEntity>)await Server.GetFromJsonAsync(GetAPIs, DataType));`\r\n\r\nThis does, but the need for explicit casting takes away the power of the non TValue version of the function:\r\n\r\n`Items = ((List<Means>)await Server.GetFromJsonAsync(GetAPIs, DataType)).Cast<TableEntity>().ToList();`\r\n\r\nNote: GetAPIs a string with the correct path to the API on the controller. DataType is set as `typeof(List<Means>)` and Items is `List<TableEntity>`.\r\n\r\nPerhaps I'm missing something, but I expect the source code may have a bug.\r\n\r\nThank you in advance - EP\r\n"
+    },
+    "satisfaction_conditions": [
+      "Type conversion from List<Means> to List<TableEntity> must be handled correctly",
+      "No explicit type parameter required in GetFromJsonAsync call",
+      "Solution must work with runtime type information"
+    ],
+    "created_at": "2020-07-20T12:46:04Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/34097",
+    "source": {
+      "issue_number": 34097
+    },
+    "initial_question": {
+      "title": "System.InvalidOperationException: StandardIn has not been redirected",
+      "body": "I got the following exception from time to time in my application whereas the standard input is  redirected.\r\n\r\n````\r\nException has occurred: CLR/System.InvalidOperationException\r\nAn exception of type 'System.InvalidOperationException' occurred in System.Diagnostics.Process.dll but was not handled in user code: 'StandardIn has not been redirected.'\r\n   at System.Diagnostics.Process.get_StandardInput()\r\n   at repro_process.Program.ExecuteProcessAsync(ProcessStartInfo psi) in /home/meziantou/repro-process/Program.cs:line 72\r\n   at repro_process.Program.<>c.<Main>b__0_0(Int32 i) in /home/meziantou/repro-process/Program.cs:line 27\r\n   at System.Threading.Tasks.Parallel.<>c__DisplayClass19_0`1.<ForWorker>b__1(RangeWorker& currentWorker, Int32 timeout, Boolean& replicationDelegateYieldedBeforeCompletion)\r\n````\r\n\r\nI tried to make a small repro of the code I have in production. Note that it doesn't always throw the exception. You may need to run the code 10 times to get the exception.\r\n\r\nA similar exception sometimes occurs on `process.BeginErrorReadLine()` or `process.BeginOutputReadLine()` with a similar message indicating the the standard output/error is not redirected.\r\n\r\n````c#\r\nusing System;\r\nusing System.Diagnostics;\r\nusing System.Threading.Tasks;\r\n\r\nnamespace repro_process\r\n{\r\n    class Program\r\n    {\r\n        static void Main()\r\n        {\r\n            // In the actual code, multiple unit tests (xUnit) run in parallel so I tried to reproduce this behavior by using Parallel.For\r\n            Parallel.For(0, 10000, i =>\r\n            {\r\n                var psi = new ProcessStartInfo\r\n                {\r\n                    FileName = \"git\",\r\n                    ArgumentList =\r\n                    {\r\n                        \"config\",\r\n                        \"--global\",\r\n                        \"test.a\",\r\n                        \"abc\" + i,\r\n                    },\r\n                    RedirectStandardError = true,\r\n                    RedirectStandardInput = true,\r\n                    RedirectStandardOutput = true,\r\n                };\r\n                ExecuteProcessAsync(psi).Wait(); // In the actual code, there is no wait/Result, only await\r\n                Console.WriteLine(i);\r\n            });\r\n        }\r\n\r\n        private static Task<bool> ExecuteProcessAsync(ProcessStartInfo psi)\r\n        {\r\n            var process = new System.Diagnostics.Process\r\n            {\r\n                StartInfo = psi,\r\n                EnableRaisingEvents = true,\r\n            };\r\n\r\n            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);\r\n            process.Exited += (sender, e) =>\r\n            {\r\n                try\r\n                {\r\n                    process.WaitForExit();\r\n                    process.Dispose();\r\n                    tcs.TrySetResult(true);\r\n                }\r\n                catch (Exception ex)\r\n                {\r\n                    tcs.SetException(ex);\r\n                }\r\n            };\r\n\r\n            process.Start();\r\n\r\n            if (psi.RedirectStandardOutput)\r\n            {\r\n                process.OutputDataReceived += (s, e) => { Console.WriteLine(e.Data); };\r\n                process.BeginOutputReadLine();\r\n            }\r\n\r\n            if (psi.RedirectStandardError)\r\n            {\r\n                process.ErrorDataReceived += (s, e) => { Console.WriteLine(e.Data); };\r\n                process.BeginErrorReadLine();\r\n            }\r\n\r\n            if (psi.RedirectStandardInput)\r\n            {\r\n                process.StandardInput.Close();\r\n            }\r\n\r\n            return tcs.Task;\r\n        }\r\n    }\r\n}\r\n````\r\n\r\n**Environment:**\r\n- .NET Core 3.1.3 but I also get the exception on 3.1.0 and 3.1.2\r\n\r\n````\r\n$> lsb_release -a\r\nNo LSB modules are available.\r\nDistributor ID: Ubuntu\r\nDescription:    Ubuntu 18.04.2 LTS\r\nRelease:        18.04\r\nCodename:       bionic\r\n\r\n$> uname -a\r\nLinux DESKTOP-TV4IPEK 4.4.0-19041-Microsoft #1-Microsoft Fri Dec 06 14:06:00 PST 2019 x86_64 x86_64 x86_64 GNU/Linux\r\n\r\n$> lscpu\r\nArchitecture:        x86_64\r\nCPU op-mode(s):      32-bit, 64-bit\r\nByte Order:          Little Endian\r\nCPU(s):              4\r\nOn-line CPU(s) list: 0-3\r\nThread(s) per core:  1\r\nCore(s) per socket:  4\r\nSocket(s):           1\r\nVendor ID:           GenuineIntel\r\nCPU family:          6\r\nModel:               94\r\nModel name:          Intel(R) Core(TM) i5-6600 CPU @ 3.30GHz\r\nStepping:            3\r\nCPU MHz:             3301.000\r\nCPU max MHz:         3301.0000\r\nBogoMIPS:            6602.00\r\nHypervisor vendor:   Windows Subsystem for Linux\r\nVirtualization type: container\r\nFlags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm pni pclmulqdq dtes64 est tm2 ssse3 fma cx16 xtpr pdcm pcid sse4_1 sse4_2 movbe popcnt aes xsave osxsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap clflushopt ibrs ibpb stibp ssbd\r\n````\r\n\r\nEdit: I've just got the issue on Windows too (.NET Core 3.1.2)."
+    },
+    "satisfaction_conditions": [
+      "Process cleanup must complete without resource leaks"
+    ],
+    "created_at": "2020-03-25T22:51:00Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/2385",
+    "source": {
+      "issue_number": 2385
+    },
+    "initial_question": {
+      "title": " WebRequest.DefaultWebProxy Return null exeption",
+      "body": "Hello,\r\n\r\nI have migrated my project .NET FrameWork to .NET Core, and i have a null exeption when i used \r\nWebRequest.DefaultWebProxy.GetType().GetProperty(\"WebProxy\", BindingFlags.NonPublic | BindingFlags.Instance);\r\n\r\n\r\n\r\nCordially"
+    },
+    "satisfaction_conditions": [
+      "Web proxy credentials are successfully configured without runtime exceptions",
+      "Solution uses public API methods instead of private reflection",
+      "Code remains compatible with .NET Core migration",
+      "Proxy configuration maintains expected functionality"
+    ],
+    "created_at": "2020-01-30T13:40:09Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/1191",
+    "source": {
+      "issue_number": 1191
+    },
+    "initial_question": {
+      "title": "How to disable using HTTP_PROXY as default",
+      "body": "#36553\r\n\r\nHow can we turn off this new default implementation?\r\n\r\nI have environment variables HTTP_PROXY. But I want to use system-level proxy default instead of environment variables. I don't want to delete the environment variables because it used by other applications. How can I set to go for system proxy?"
+    },
+    "satisfaction_conditions": [
+      "Application uses system proxy settings instead of environment variables",
+      "Environment variables remain accessible to other applications",
+      "Proxy settings change applies only to the target application",
+      "Changes take effect before network operations begin"
+    ],
+    "created_at": "2019-12-27T16:05:19Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/31419",
+    "source": {
+      "issue_number": 31419
+    },
+    "initial_question": {
+      "title": "about method Write(byte[] buffer, int offset, int count)   the  class of memoryStream ",
+      "body": "if ((count <= 8) && (buffer != _buffer))\r\n            {\r\n                int byteCount = count;\r\n                while (--byteCount >= 0)\r\n                {\r\n                    _buffer[_position + byteCount] = buffer[offset + byteCount];\r\n                }\r\n            }\r\n            else\r\n            {\r\n                Buffer.BlockCopy(buffer, offset, _buffer, _position, count);\r\n            }\r\n\r\n\r\nwhy does the  count of buffer more than 8 and Less than or equal to 8 use different copy method"
+    },
+    "satisfaction_conditions": [
+      "Data copying must be functionally correct regardless of buffer size",
+      "Performance optimization must be demonstrable for different buffer sizes",
+      "Copy operation must handle non-overlapping memory correctly"
+    ],
+    "created_at": "2019-11-07T08:26:40Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/30894",
+    "source": {
+      "issue_number": 30894
+    },
+    "initial_question": {
+      "title": "Q: TaskStatus.Canceled for non-matching OperationCanceledException",
+      "body": "When I run:\r\n```cs\r\n        static void Main(string[] args)\r\n        {\r\n            Task fooTask = Foo();\r\n            System.Console.WriteLine(fooTask.Status);\r\n            Task tokenTask = Task.Run(() => throw new OperationCanceledException(), new CancellationTokenSource().Token);\r\n            tokenTask.ContinueWith(t => System.Console.WriteLine(t.Status)).Wait();\r\n        }\r\n\r\n        static async Task Foo()\r\n        {\r\n            throw new OperationCanceledException();\r\n        }\r\n```\r\nit outputs:\r\n```\r\nCanceled\r\nCanceled\r\n```\r\nI expected the Tasks to be in the `Faulted` state because the `OperationCanceledException` isn't associated with the Task token.\r\n\r\nWhy are these Tasks `Canceled`?"
+    },
+    "satisfaction_conditions": [
+      "Tasks throwing OperationCanceledException must result in Canceled status regardless of token association",
+      "Behavior must be consistent between synchronous and asynchronous exception throwing",
+      "Task status must be observable as Canceled through standard Task inspection methods"
+    ],
+    "created_at": "2019-09-18T21:10:55Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/30439",
+    "source": {
+      "issue_number": 30439
+    },
+    "initial_question": {
+      "title": "Crypto: Is it safe to pool X509Chain objects without resetting the X509ChainPolicy?",
+      "body": "I\u2019m building a high-throughput message broker in .net core (2.1 today, upgrading to 3.0-preview7 soon), and need to do client certificate based authentication with a custom cert chain (that I set up on the chain.ChainPolicy.ExtraStore).\r\n\r\nTo reduce GC pressure, I tend to pool all the byte arrays / batch message arrays / etc.\r\n\r\nIs it a good idea to also pool X509Chain objects? And not do a chain.Policy.Reset call on every rent/return?\r\n\r\nIt\u2019s the X509ChainPolicy.ExtraStore allocation and 5x X509ChainPolicy.ExtraStore.Add(customCert) calls that lead to array resizing, that I want to avoid.\r\n\r\n-\tWhen the chain is returned to the pool, I dispose off all the chainElement.Certificate objects and do a chain.Reset() to dispose off the _pal object.\r\n-\tI am explicitly resetting chain.ChainPolicy.VerificationTime to DateTime.Now after every pool.Rent().\r\n\r\nIn other words - Does the X509ChainPolicy ever end up holding on to any valid / invalid state from an old call to chain.Build()?\r\n\r\nI couldn\u2019t find anything in the source code that says the Policy leads to any cross-talk between multiple chain.Build() calls using the same Policy object, but still wanted someone from corefx to weigh in and give an all clear.\r\n\r\nThanks!\r\n\r\ncc @bartonjs @stephentoub \r\n"
+    },
+    "satisfaction_conditions": [
+      "X509Chain objects must maintain isolation between different validation operations",
+      "Verification time must be current for each validation operation",
+      "Memory resources must be properly managed to prevent leaks",
+      "Performance optimization must not compromise validation accuracy",
+      "Chain policy configuration must remain stable between validations"
+    ],
+    "created_at": "2019-07-31T19:55:52Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/30409",
+    "source": {
+      "issue_number": 30409
+    },
+    "initial_question": {
+      "title": "Dataflow does not process messages in parallel?",
+      "body": "Hello.\r\nIt seems that specifying MaxDegreeOfParallelism does not actually allows dataflow blocks to process multiple messages in parallel. Or I'm missing something?\r\n\r\n```\r\npublic class DataflowTests\r\n{\r\n    private readonly ITestOutputHelper output;\r\n\r\n\r\n    public DataflowTests(ITestOutputHelper output)\r\n    {\r\n        this.output = output;\r\n    }\r\n\r\n    [Fact]\r\n    public async Task Test()\r\n    {\r\n        // arrange\r\n        var second_item_finished = new SemaphoreSlim(0, 1);\r\n        var completed_items = new ConcurrentBag<string>();\r\n\r\n        var start_block = new BufferBlock<string>(new DataflowBlockOptions { BoundedCapacity = 10 });\r\n\r\n        var process_block = new TransformBlock<string, string>(\r\n            async x =>\r\n            {\r\n                // await Task.Yield();\r\n\r\n                this.output.WriteLine(\"Process block: {0}\", x);\r\n\r\n                if (x == \"1\")\r\n                    await second_item_finished.WaitAsync();\r\n\r\n                return x;\r\n            },\r\n            new ExecutionDataflowBlockOptions\r\n            {\r\n                MaxDegreeOfParallelism = 4,\r\n                BoundedCapacity = 10\r\n            });\r\n\r\n\r\n        var final_block = new ActionBlock<string>(\r\n            x =>\r\n            {\r\n                this.output.WriteLine(\"Final block: {0}\", x);\r\n\r\n                if (x == \"2\")\r\n                    second_item_finished.Release();\r\n\r\n                completed_items.Add(x);\r\n            },\r\n            new ExecutionDataflowBlockOptions\r\n            {\r\n                MaxDegreeOfParallelism = 4,\r\n                BoundedCapacity = 10\r\n            });\r\n\r\n        start_block.LinkTo(process_block, new DataflowLinkOptions { PropagateCompletion = true });\r\n        process_block.LinkTo(final_block, new DataflowLinkOptions { PropagateCompletion = true });\r\n\r\n        // act\r\n        foreach (var item in new[] { \"1\", \"2\" })\r\n            if (!await start_block.SendAsync(item))\r\n                this.output.WriteLine(\"Unable to send: {0}\", item);\r\n\r\n        start_block.Complete();\r\n\r\n        if (!final_block.Completion.Wait(2000))\r\n            throw new TimeoutException();\r\n\r\n\r\n        // assert\r\n        completed_items.Should().BeEquivalentTo(\"1\", \"2\");\r\n    }\r\n}\r\n```\r\n\r\nI've tried changing MaxMessagesPerTask to 1 for both process and final block and got the same result (timeout exception)."
+    },
+    "satisfaction_conditions": [
+      "Message ordering constraints must be appropriately configured",
+      "MaxDegreeOfParallelism setting must have observable effect"
+    ],
+    "created_at": "2019-07-29T13:42:34Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/30288",
+    "source": {
+      "issue_number": 30288
+    },
+    "initial_question": {
+      "title": "Question : ValueTask or warning because of not using await",
+      "body": "Hi\r\n\r\nI have an interface from an external library which i have to adhere by.\r\nIt looks like this :\r\n```\r\npublic Task<RealestateObject> Handle(RealEstatePushRequestModel request, CancellationToken cancellationToken)\r\n{\r\n}\r\n```\r\nI only have synchronous code that is required in this block.\r\nIs it better make the function async and just return the result : \r\n```\r\npublic async Task<RealestateObject> Handle(RealEstatePushRequestModel request, CancellationToken cancellationToken)\r\n{\r\n    //Much synchronous code here...\r\n    return new RealestateObject();\r\n}\r\n```\r\nWhich warns me :\r\n**This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do** \r\n\r\n**OR**\r\n\r\nI await ValueTask and return that : \r\n```\r\npublic async Task<RealestateObject> Handle(RealEstatePushRequestModel request, CancellationToken cancellationToken)\r\n{\r\n    return await GetValue(request);\r\n}\r\n\r\npublic ValueTask<RealestateObject> GetValue(RealEstatePushRequestModel request)\r\n{\r\n    //Much synchronous code here...\r\n    return new ValueTask<RealestateObject>(new RealestateObject() { ObjectKey = \"dummydata\" });\r\n}\r\n```\r\nWhich has no warnings at all.\r\n\r\n**OR** \r\n\r\nuse **Task.FromResult**.\r\n```\r\npublic Task<RealestateObject> Handle(RealEstatePushRequestModel request, CancellationToken cancellationToken)\r\n{\r\n    //Much synchronous code here...\r\n    return Task.FromResult(new RealestateObject() { ObjectKey = \"dummydata\" });\r\n}\r\n```\r\n\r\nWhich one of the scenario's is the best to use ?\r\n\r\nThanks!\r\n"
+    },
+    "satisfaction_conditions": [
+      "Method must return a Task<RealestateObject> to comply with interface contract",
+      "Synchronous operations must complete without unnecessary overhead",
+      "Code must not generate compiler warnings about async/await misuse"
+    ],
+    "created_at": "2019-07-17T12:23:47Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/30188",
+    "source": {
+      "issue_number": 30188
+    },
+    "initial_question": {
+      "title": "Double.TryParse succeeds and returns an incorrect value for strings in scientific notation that exceed the bounds of a double.",
+      "body": ".NET Core Version: Version: 3.0.100-preview6-012264 - I think. VS2019 apparently hides the NetCore packages, now, so I am not 100% sure. \r\nHave you experienced this same bug with .NET Framework?: No\r\n\r\nRun the following code: \r\n            var text = \"123e466\";\r\n            var provider = new CultureInfo(\"en-US\");\r\n            double value;\r\n\r\n            var success = Double.TryParse(\r\n                text,\r\n                NumberStyles.Any & ~NumberStyles.AllowTrailingSign,\r\n                provider,\r\n                out value);\r\n\r\n            MessageBox.Show(this, value.ToString(), success.ToString());\r\n\r\nResults in DotNetFramework: \r\n\tsuccess = false\r\n\tvalue = 0\r\n\r\nResults in NetCore:\r\n\tsuccess = true\r\n\tvalue = double.Infinity\r\n\r\nIt seems to me that the original .Net Framework results were correct. \"123e466\" exceeds the bounds of a double, but it should fail to parse, not return Infinity. \r\n"
+    },
+    "satisfaction_conditions": [
+      "The parsing behavior must comply with IEEE 754 standards for floating-point arithmetic",
+      "Values exceeding double precision bounds must be handled consistently",
+      "The TryParse method must return a success status that matches the IEEE 754 interpretation",
+      "The parsed result must represent the closest representable value according to IEEE 754"
+    ],
+    "created_at": "2019-07-08T18:42:57Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/29988",
+    "source": {
+      "issue_number": 29988
+    },
+    "initial_question": {
+      "title": "Hardware Acceleration for unsupported overloads",
+      "body": "Some methods in System.Runtime.Intrinsics.X86 don't have overloads for certain data types. For example:\r\n\r\n```\r\nlong u1 = 12L,\r\nlong u2 = 14L;\r\nvar vectorOne = Vector128.Create(u1);\r\nvar vectorTwo = Vector128.Create(u2);\r\nvar mask = Sse2.MoveMask(Sse2.CompareEqual(vectorOne, vectorTwo))\r\n...\r\n```\r\n\r\nWhile this is expected as there is no hardware instruction for them. Is there **anything** I can do as a workaround to compare, in this case, two Vector128 of data type long using Sse2? Such as reinterpreting, casting, different APIs?"
+    },
+    "satisfaction_conditions": [
+      "Vector comparison operations must produce correct results for long data type",
+      "Performance must be optimized compared to non-vectorized operations",
+      "Original element positions must be retrievable",
+      "Must handle multiple comparison types (equality, greater than, less than)",
+      "Must preserve original data values for matched elements"
+    ],
+    "created_at": "2019-06-23T21:28:14Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/29909",
+    "source": {
+      "issue_number": 29909
+    },
+    "initial_question": {
+      "title": "[System.Text.Json] merging two json structures",
+      "body": "I ran into this use case recently and I was unable to find a solution. \r\n\r\nOn one hand I read the contents of a file, then I obtained the JSON representaiton of that content with\r\n\r\n```\r\nvar document = JsonDocument.Parse(fileContent);\r\n```\r\n\r\nNow I have access to all that data. The second thing I did was build a custom JSON object with the `Utf8JsonWriter`.\r\n\r\n**Question:** how can I integrate the latter object into the former (`document`)? I want to create a property in `document` (maybe nested quite deeply) and set the value of that property to the object that I build with `Utf8JsonWriter`."
+    },
+    "satisfaction_conditions": [
+      "Two JSON structures must be successfully combined into a single valid JSON document",
+      "Original JSON structure must be preserved in the final output",
+      "New JSON data must be insertable at a specified location in the structure",
+      "Final output must be accessible as a single queryable JSON document"
+    ],
+    "created_at": "2019-06-16T19:52:43Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/29815",
+    "source": {
+      "issue_number": 29815
+    },
+    "initial_question": {
+      "title": ".NET Core 3 and WPF library",
+      "body": "I just tried some existing WPF code using .NET Core 3.0 preview 5 and VS 16.2 Preview 1. I read the porting guide for WPF and it seems to only talk about apps not libraries. The main changes seem to be \r\n```\r\n    <OutputType>WinExe</OutputType>\r\n    <UseWPF>true</UseWPF>\r\n```\r\nWhen I try \r\n```\r\n    <OutputType>Library</OutputType>\r\n    <UseWPF>true</UseWPF>\r\n```\r\nI get unresolved references for all the WPF related stuff. I did try WinLibrary but that is rejected. Does this only work for applications at present?"
+    },
+    "satisfaction_conditions": [
+      "WPF library project successfully compiles with .NET Core 3",
+      "Project configuration correctly identifies as a library",
+      "WPF references are properly resolved",
+      "Project maintains library output type"
+    ],
+    "created_at": "2019-06-07T22:23:21Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/29465",
+    "source": {
+      "issue_number": 29465
+    },
+    "initial_question": {
+      "title": "ProcessInfo Linux/Windows incompatibility",
+      "body": "Hi,\r\n\r\nI'm trying to run same process as a child of current process. Showed below code works just fine under windows, but fails in Linux with  error\r\n\r\nNo executable found matching command \"dotnet-MyDll.dll\"\r\n\r\n```\r\nvar processInfo = new ProcessStartInfo\r\n            {\r\n                FileName = \"dotnet\",\r\n                Arguments = \"MyDll.dll \" + id.ToString()\r\n            };\r\n\r\n            Console.WriteLine(\"Starting child process...\");\r\n            var process = Process.Start(processInfo);\r\n            return process;\r\n\r\n```\r\n\r\nIve also tried\r\n         `       FileName = \"dotnet MyDll.dll\"+ id.ToString(),`\r\nbut it ends up with different error \r\nUnhandled Exception: System.ComponentModel.Win32Exception: No such file or directory\r\n\r\nI've also tried \r\n```\r\n\r\n            var parentP = Process.GetCurrentProcess();\r\n            string fullPath = parentP.MainModule.FileName;\r\n            var command = fullPath+\" \"+Assembly.GetEntryAssembly().Location+\" \"+ id.ToString();\r\n            Console.WriteLine(\"Command = \"+command);\r\n            var processInfo = new ProcessStartInfo\r\n            {\r\n                FileName = command\r\n            };\r\n            var process = Process.Start(processInfo);\r\n```\r\nStill \r\nUnhandled Exception: System.ComponentModel.Win32Exception: No such file or directory\r\n\r\nwhat is proper way of running currently running dll again under Linux with dotnet core"
+    },
+    "satisfaction_conditions": [
+      "Process successfully launches on both Windows and Linux platforms",
+      "Command line arguments are properly passed to and received by the child process",
+      "File paths are properly resolved on both operating systems",
+      "Arguments containing whitespace are handled correctly",
+      "Child process executes the same .NET assembly as the parent"
+    ],
+    "created_at": "2019-05-06T12:40:26Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/29160",
+    "source": {
+      "issue_number": 29160
+    },
+    "initial_question": {
+      "title": "What kind EqualityComparer use to unknown in compile time type?",
+      "body": "Is it possible get `EqualityComparer<>.Default`\r\nby `Type` in runtime?\r\nIn compile time I don't know what type will be.\r\n\r\nIs it correct to use `EqualityComparer<object>.Default`?\r\nCan there be problems with this?\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Must obtain a valid equality comparer for a type that is unknown at compile time",
+      "Must work with runtime-provided type information",
+      "Must return an IEqualityComparer-compatible object"
+    ],
+    "created_at": "2019-04-04T08:23:28Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/29130",
+    "source": {
+      "issue_number": 29130
+    },
+    "initial_question": {
+      "title": "Potential Bug with a pinned GCHandle.Alloc call",
+      "body": "There's a problem with GCHandle.Alloc where if you try to allocate the same object (in my case the same byte array) with the GCHandle.Pinned parameter, it doesn't store the byte array again and instead just uses a reference to the first byte array that was stored.\r\n\r\nHere's an example\r\n\r\n```csharp\r\nvar bytes = new byte[] { 0x00, 0xFF, 0x00, 0xFF };\r\n\r\nvar buffer1 = GCHandle.Alloc(bytes, GCHandleType.Pinned);\r\n\r\nvar buffer1Address = buffer1.AddrOfPinnedObject();\r\n\r\nvar buffer2 = GCHandle.Alloc(bytes, GCHandleType.Pinned);\r\n\r\nvar buffer2Address = buffer2.AddrOfPinnedObject();\r\n```\r\n\r\nIn this case, buffer1Address and buffer2Address will be the exact same.\r\n\r\nI was just wondering if this is intentional or if it is indeed a bug?\r\n\r\nIf this is intentional maybe offering an option to not do this could be useful (at least in my case it is)\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple GCHandle allocations of the same object must return the same memory address when using AddrOfPinnedObject()",
+      "Each GCHandle.Alloc call must create a distinct handle instance",
+      "The behavior must be consistent with .NET memory management principles"
+    ],
+    "created_at": "2019-03-31T20:05:18Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/28099",
+    "source": {
+      "issue_number": 28099
+    },
+    "initial_question": {
+      "title": "name collision with type Index added to System namespace",
+      "body": "tag:discussion\r\n\r\nWe have this very old class that's used all over the place called Index, which is basically a Dictionary that accepts more than one item per key. It's used like a mutable IGrouping and was recently retrofitted to implement IGrouping. It's use is so pervasive that it grew another implementation called SortedIndex which is to Index as SortedDictionary is to Dictionary.\r\n\r\nSo now we've got literally thousands of files importing System and expecting Index to be ours (in a far namespace), and on upgrading to .NET Core 3 we get a completely ridiculous number of errors.\r\n\r\nSo now we've got to figure out how to handle this name collision. Trying to rename Index is going to break back-compatibility of our nuget packages all over the place.\r\n\r\n(Yes, some parts of our .NET Core codebase are literally 11 years old and I've got the source control trees to prove 9 of them and would have more but for a disk crash.)"
+    },
+    "satisfaction_conditions": [
+      "Existing functionality must remain unchanged",
+      "Backward compatibility with existing nuget packages must be maintained",
+      "Solution must be applicable across thousands of affected files",
+      "References to the custom Index class must be unambiguously resolved"
+    ],
+    "created_at": "2018-12-06T22:55:39Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/27797",
+    "source": {
+      "issue_number": 27797
+    },
+    "initial_question": {
+      "title": "ConcurrentDictionary initialized with an existing ConcurrentDictionary will act as pointer instead of new object",
+      "body": "When initializing a new ConcurrentDictionary starting from an existing ConcurrentDictionary, the new object will act as pointer.\r\n\r\n``` csharp\r\n// Summary:\r\n//     Initializes a new instance of the System.Collections.Concurrent.ConcurrentDictionary`2\r\n//     class that contains elements copied from the specified System.Collections.Generic.IEnumerable`1,\r\n//     has the default concurrency level, has the default initial capacity, and uses\r\n//     the default comparer for the key type.\r\npublic ConcurrentDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection);\r\n```\r\nbased on this description I wrote the following code:\r\n``` csharp\r\npublic static ConcurrentDictionary<int, myCustomClass> startDictionary;\r\n[...]\r\nConcurrentDictionary<int, myCustomClass> tempDictionary =\r\n                new ConcurrentDictionary<int, myCustomClass>(startDictionary);\r\n```\r\nbecause i need to modify some data into ```tempDictionary``` without affecting ```startDictionary```.\r\n\r\nWhat happens is that any edit to ```tempDictionary``` is reflected to ```startDictionary``` too. Am I doing something wrong?"
+    },
+    "satisfaction_conditions": [
+      "The new dictionary must initially contain all key-value pairs from the original dictionary",
+      "The solution must work with custom class objects as values"
+    ],
+    "created_at": "2018-11-01T21:38:10Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/11367",
+    "source": {
+      "issue_number": 11367
+    },
+    "initial_question": {
+      "title": "ECMA 335 II.15.2 Static, instance, and virtual methods",
+      "body": "Hello all\r\n\r\nWe have two notices in this article\r\n\r\n-  Instance methods on classes (including boxed value types), have a this pointer that is\r\nby default an object reference to the class on which the method is defined.\r\n\r\n-  Instance methods on (unboxed) value types, have a this pointer that is by default a\r\nmanaged pointer to an instance of the type on which the method is defined.\r\n\r\nWhat is a difference between a **object reference** and **managed pointer** in this case?"
+    },
+    "satisfaction_conditions": [
+      "Clear distinction between object reference and managed pointer must be explained",
+      "Explanation must align with ECMA 335 specification",
+      "Explanation must cover the relationship between pointer types and their targets"
+    ],
+    "created_at": "2018-10-30T22:18:06Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/11072",
+    "source": {
+      "issue_number": 11072
+    },
+    "initial_question": {
+      "title": "Linked cancellation token source where all tokens must be cancelled",
+      "body": "This is more of an question of whether such functionality exists within the coreclr already.\r\n\r\nI've used `CancellationTokenSource.CreateLinkedTokenSource` to get a `CancellationToken` which will be cancelled when any of the subject tokens are cancelled.\r\n\r\nMy current scenario is I invoke an HTTP API and I would like to record in Entity Framework the result of that call.  Currently the EF call uses the same token I used for the HTTP API.  This works fine so long the token does not become cancelled.\r\n\r\nThe obvious solution to use a separate `CancellationToken` for the database call, which resulted in me making a small one that expires after 3 seconds, works fine for most scenarios but sometimes it operation takes longer than 3 seconds, so despite the first token still having time left left, the database operation fails due to the 3 second token.\r\n\r\nMy question is: \r\nIs there functionality within the `CancellationTokenSource` class (or elsewhere) that creates a linked token where *all* of the subject tokens must be cancelled for the derived one to be considered cancelled?"
+    },
+    "satisfaction_conditions": [
+      "The solution must only trigger cancellation when ALL source tokens are cancelled",
+      "The solution must maintain accurate cancellation state tracking across multiple tokens",
+      "The solution must properly clean up resources when disposed",
+      "The solution must be thread-safe"
+    ],
+    "created_at": "2018-09-12T16:37:40Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/27285",
+    "source": {
+      "issue_number": 27285
+    },
+    "initial_question": {
+      "title": "Can not send email with SmtpClient on Ubuntu 18.4 LTS",
+      "body": "I'm trying to send email using Google SMTP server but its throwing exception:\r\n```\r\nAn unhandled exception occurred while processing the request.\r\nWin32Exception: GSSAPI operation failed with error - An invalid status code was supplied (Unknown error).\r\n\r\nSystem.Net.Security.NegotiateStreamPal.AcquireCredentialsHandle(string package, bool isServer, NetworkCredential credential)\r\nSmtpException: Failure sending mail.\r\n\r\nSystem.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()\r\n```\r\nAt `Startup` Class:\r\n```c#\r\n services.AddScoped<SmtpClient>((provider) =>\r\n            {\r\n                var config = provider.GetRequiredService<IConfiguration>();\r\n                return new SmtpClient()\r\n                {\r\n                    Host = config.GetValue<String>(\"MailService:Smtp\"),\r\n                    Port = config.GetValue<int>(\"MailService:Port\"),\r\n                    Credentials = new NetworkCredential(\r\n                            config.GetValue<String>(\"MailService:Username\"),\r\n                            config.GetValue<String>(\"MailService:Password\")\r\n                        )\r\n                };\r\n            });\r\n```\r\nAnd in `Controller`:\r\n```c#\r\n        private readonly SmtpClient _smtpClient;\r\n\r\n        public ValuesController(\r\n            SmtpClient smtpClient\r\n        )\r\n        {\r\n            _smtpClient = smtpClient;\r\n        }\r\n\r\n        [HttpGet]\r\n        public async Task<IActionResult> Get()\r\n        {\r\n            await _smtpClient.SendMailAsync(new MailMessage(\r\n                from: \"sender@domain.com\",\r\n                to: \"receiver@domain.com\",\r\n                subject: \"Test message subject\",\r\n                body: \"Test message body\"\r\n                        ));\r\n            return Ok();\r\n        }\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Email sending functionality works successfully on Ubuntu 18.04 LTS",
+      "GSSAPI/NTLM authentication capabilities are properly configured in the system",
+      "SMTP client can establish secure connection with Google SMTP server",
+      "No Win32Exception or SmtpException occurs during email sending",
+      "Solution maintains compatibility across different .NET versions (2.0+)"
+    ],
+    "created_at": "2018-09-01T04:58:33Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/27225",
+    "source": {
+      "issue_number": 27225
+    },
+    "initial_question": {
+      "title": "Why RSACng use SignHash with RSASignaturePadding.Pkcs1 need input hash length equal to HashAlgorithmName's hash's length?",
+      "body": "I'm use .NET Framework 4.6.1 on Windows.\r\n\r\nAnd I found when use RSACng SignHash, which is \r\n```c#\r\nbyte[] SignHash(byte[] hash, HashAlgorithmName hashAlgorithm, RSASignaturePadding padding);\r\n```\r\nwhen the parameter hash, the byte array 's length is not equal to hashAlgorithm's hash length, it will throw exception: wrong parameter.\r\nFor example:\r\nwhen use hashAlgorithm Sha256, whose result length is 32 , the length of hash must also be 32.\r\n\r\nPSS padding has no such restrictions.\r\nI think native library like Openssl also has no such restrictions."
+    },
+    "satisfaction_conditions": [
+      "Hash length matches algorithm specification when using PKCS1 padding",
+      "PSS padding operations complete without hash length restrictions",
+      "SignData method accepts arbitrary input lengths"
+    ],
+    "created_at": "2018-08-24T07:06:45Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/10674",
+    "source": {
+      "issue_number": 10674
+    },
+    "initial_question": {
+      "title": "Assembly.LoadFrom(\"System.Threading.Tasks.Extensions.dll\") fails with FileLoadException",
+      "body": "We (PostSharp) noticed a weird behavior of .NET Core CLR and are asking for clarifications so we can implement a proper solution.\r\n\r\nConsider the following program:\r\n\r\n```\r\n   class Program\r\n    {\r\n        static void Main(string[] args)\r\n        {\r\n           Assembly.LoadFrom(@\"C:\\Users\\gael\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.1\\lib\\netstandard2.0\\System.Threading.Tasks.Extensions.dll\");\r\n   \r\n        }\r\n    }\r\n```\r\n\r\nWhen executed with the default command line with .NET Core 2.0.9, this program throws:\r\n\r\n```\r\nUnhandled Exception: System.IO.FileLoadException: Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51'.\r\n   at System.Runtime.Loader.AssemblyLoadContext.LoadFromPath(IntPtr ptrNativeAssemblyLoadContext, String ilPath, String niPath, ObjectHandleOnStack retAssembly)\r\n   at System.Runtime.Loader.AssemblyLoadContext.LoadFromAssemblyPath(String assemblyPath)\r\n   at System.Reflection.Assembly.LoadFrom(String assemblyFile)\r\n   at ConsoleApp2.Program.Main(String[] args) in c:\\users\\gael\\documents\\visual studio 2017\\ConsoleApp2\\Program.cs:line 10\r\n```\r\n\r\nWe found the following workaround. First, define a file `my.deps.json` with the following content:\r\n\r\n```\r\n{\r\n  \"runtimeTarget\": {\r\n    \"name\": \".NETCoreApp,Version=v2.0\",\r\n    \"signature\": \"fc666d3b05189566bb68c07fa9bfb9b94dbee726\"\r\n  },\r\n  \"targets\": {\r\n    \".NETCoreApp,Version=v2.0\": {\r\n      \"System.Threading.Tasks.Extensions/4.5.1\": {\r\n        \"dependencies\": {\r\n          \"System.Runtime.CompilerServices.Unsafe\": \"4.5.0\"\r\n        },\r\n        \"runtime\": {\r\n          \"C:/Users/gael/.nuget/packages/system.threading.tasks.extensions/4.5.1/lib/netstandard2.0/System.Threading.Tasks.Extensions.dll\": {\r\n            \"assemblyVersion\": \"4.2.0.0\",\r\n            \"fileVersion\": \"4.6.26606.5\"\r\n          }\r\n        }\r\n      }\r\n    }\r\n  },\r\n  \"libraries\": {\r\n    \"System.Threading.Tasks.Extensions/4.5.1\": {\r\n      \"type\": \"package\",\r\n      \"serviceable\": true,\r\n      \"sha512\": \"sha512-rckdhLJtzQ3EI+0BGuq7dUVtCSnerqAoAmL3S6oMRZ4VMZTL3Rq9DS8IDW57c6PYVebA4O0NbSA1BDvyE18UMA==\",\r\n      \"path\": \"system.threading.tasks.extensions/4.5.1\",\r\n      \"hashPath\": \"system.threading.tasks.extensions.4.5.1.nupkg.sha512\"\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nThen use the following command line:\r\n\r\n```\r\ndotnet --additional-deps my.deps.json ConsoleApp2.dll\r\n```\r\n\r\nOur hypothesis is that `Assembly.LoadFrom` is not allowed for assemblies that are shipped with .NET Core (i.e. those under the directory `C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\2.0.9`). A viable workaround is to generate an additional `deps.json` file and include any assembly that we need to load at runtime but that are not a build-time dependency.\r\n\r\nCould you please spread some light on this situation?\r\n\r\nThank you.\r\n\r\n-gael\r\n"
+    },
+    "satisfaction_conditions": [
+      "Assembly with newer version must successfully load despite presence of older version in .NET Core runtime",
+      "Solution must work in context of dynamic assembly loading at runtime",
+      "Assembly dependencies must be properly resolved during runtime loading",
+      "Solution must work within .NET Core's assembly loading constraints",
+      "Assembly loading must work in automated build/transformation scenarios"
+    ],
+    "created_at": "2018-07-13T16:03:23Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/10483",
+    "source": {
+      "issue_number": 10483
+    },
+    "initial_question": {
+      "title": "StringBuidler  support Offset(int length)",
+      "body": "New API:\r\n```C#\r\n//\r\npublic void Offset(int length){\r\n   if(length<0)\r\n   {\r\n       // throw........   \r\n   }\r\n   if(length>count){\r\n       // alloc more space\r\n   }else{ \r\n      // reset the offset\r\n       m_ChunkLength=length;\r\n   }\r\n}\r\n```\r\n\r\nUse:\r\n```C#\r\nStringBuilder builder = new StringBuilder();\r\nfor(int i=0;i<10;i+=1)\r\n{\r\n    builder.Append(array[i]);\r\n    builder.Append(',');\r\n}\r\nbuilder.Offset(builder.length-1);\r\nbuilder.Append(others);\r\n\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Final string must not contain the trailing delimiter character",
+      "Original string content before the last character must be preserved",
+      "StringBuilder's internal state must remain valid after modification"
+    ],
+    "created_at": "2018-06-09T08:20:03Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/26332",
+    "source": {
+      "issue_number": 26332
+    },
+    "initial_question": {
+      "title": "Missing dlls in bin/pkg/netcoreapp/runtime for BinPlaceNETCoreAppPackage=true",
+      "body": "Hello.\r\n\r\nLooks like `bin/runtime` and `bin/pkg/netcoreapp/runtime` contain different sets of dlls on `release/2.0.0` branch for `BinPlaceNETCoreAppPackage=true`. For example, System.Memory.dll is missing in `bin/pkg/netcoreapp/runtime` but exists in `bin/runtime`. On `master` branch System.Memory.dll exists in both folders.\r\n\r\nCould you, please, clarify if this is correct behavior or this should be fixed?\r\n\r\ncc @alpencolt @Dmitri-Botcharnikov "
+    },
+    "satisfaction_conditions": [
+      "bin/pkg/netcoreapp/runtime must contain only shared framework DLLs",
+      "bin/runtime must contain all built DLLs except reference assemblies and test projects",
+      "DLL presence must be version-appropriate",
+      "Directory content differences must reflect intentional framework packaging decisions"
+    ],
+    "created_at": "2018-05-31T13:56:07Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/26310",
+    "source": {
+      "issue_number": 26310
+    },
+    "initial_question": {
+      "title": "Reflection is missing type information for ByRef generic arguments",
+      "body": "`IsGenericType` for generic byRef arugments returns false. For both .NET and .NET Core. Because of that, it's impossible to generic arguments for such types.\r\n\r\n```cs\r\npublic class MyClass<T1, T2>{}\r\n\r\npublic class GenericByRef\r\n{\r\n    public void TheMethod(ref MyClass<int, short> _) { }\r\n}\r\n\r\nclass Program\r\n{\r\n    static void Main(string[] args)\r\n    {\r\n        var byRefGenericType = typeof(GenericByRef).GetMethod(nameof(GenericByRef.TheMethod)).GetParameters().Single().ParameterType;\r\n        \r\n        Console.WriteLine($\"FullName = {byRefGenericType.FullName}\");\r\n        Console.WriteLine($\"Name = {byRefGenericType.Name}\");\r\n        Console.WriteLine($\"IsGenericType = {byRefGenericType.IsGenericType}\");\r\n        Console.WriteLine($\"UnderlyingSystemType.IsGenericType = {byRefGenericType.UnderlyingSystemType.IsGenericType}\");\r\n    }\r\n}\r\n```\r\n\r\nPrints:\r\n\r\n```log\r\nFullName = Tests.MyClass`2[[System.Int32, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int16, System.Private.CoreLib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]&\r\nName = MyClass`2&\r\nIsGenericType = False\r\nUnderlyingSystemType.IsGenericType = False\r\n```\r\n\r\n@jkotas @VSadov do you have any idea how can I get the generic arguments in that case?"
+    },
+    "satisfaction_conditions": [
+      "Must successfully retrieve generic type information from ByRef parameters",
+      "Must work with nested generic types (generic types with multiple type parameters)",
+      "Must preserve complete type information including assembly details",
+      "Must handle both the ref modifier and the underlying type separately"
+    ],
+    "created_at": "2018-05-30T10:59:22Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/25639",
+    "source": {
+      "issue_number": 25639
+    },
+    "initial_question": {
+      "title": "System.Security.Cryptography.Pkcs '1.2.840.113549.1.1.5' is not a known hash algorithm.",
+      "body": "i'm trying to compute a cms SHA1RSA using the pre release version(4.5.0-preview1-26216-02) of System.Security.Cryptography.Pkcs.\r\n\r\nOid.FromFriendlyName(\"SHA1RSA\",OidGroup.SignatureAlgorithm) returns the corect digest algorithem, but upon calling encode, i get the exception that i,m not using any known hash algorithm.\r\n\r\nIs there any short term plan to incorporate it?\r\n\r\nEncoding snippet:----------\r\nprotected byte[] GenerateSignature(byte[] fileContent)\r\n        {\r\n            CmsSigner signer = new CmsSigner(SubjectIdentifierType.IssuerAndSerialNumber, ClientCert);\r\n            SignedCms signedCms = new SignedCms(new ContentInfo(fileContent), false);\r\n            signer = new CmsSigner(SubjectIdentifierType.IssuerAndSerialNumber, ClientCert);\r\n            signer.DigestAlgorithm = Oid.FromFriendlyName(\"SHA1RSA\",OidGroup.SignatureAlgorithm);\r\n            signedCms.ComputeSignature(signer, false);\r\n            var signature = signedCms.Encode();\r\n            return signature;\r\n        }"
+    },
+    "satisfaction_conditions": [
+      "The digest algorithm must be specified as a hash algorithm, not a signature algorithm",
+      "The specified algorithm identifier must be recognized by the cryptographic system",
+      "The solution must maintain compatibility with the CmsSigner/SignedCms API contract"
+    ],
+    "created_at": "2018-03-27T13:12:38Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/24982",
+    "source": {
+      "issue_number": 24982
+    },
+    "initial_question": {
+      "title": "Crypto provider wrappers in System.Security.Cryptography.Algorithms",
+      "body": "PR dotnet/corefx#12964 added crypto wrappers.\r\n\r\nI'm able to use them targeting netstandard 2.x but not for netstandard1.x.\r\n\r\nI see that those providers are not included as part of `System.Security.Cryptography.Algorithms` package (v4.3.1). Would it be possible to include them as part of the nuget package?"
+    },
+    "satisfaction_conditions": [
+      "Code must compile and run when using cryptographic functionality in .NET Standard 1.x",
+      "Cryptographic operations must be accessible through version-appropriate APIs",
+      "Code must use framework-recommended patterns for instantiating cryptographic algorithms",
+      "Solution must work without requiring access to provider-specific implementations"
+    ],
+    "created_at": "2018-02-09T10:36:37Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/24764",
+    "source": {
+      "issue_number": 24764
+    },
+    "initial_question": {
+      "title": "Passing additional CMake arguments to Native build",
+      "body": "`build-native.sh` has options `cmakeargs` for passing additional arguments to CMake. But if I want add `-D_FORTIFY_SOURCE=2` option to `CXXFLAGS` it will be applied to `corefx/src/Native/Unix/configure.cmake` (which cause errors on test programs compilation).\r\nIf I add this option to `corefx/src/Native/Unix/CMakeLists.txt` it will applied to source code only (as expected).\r\n\r\nIs there other way to pass this and others options to build without patching source code? If not is it possible to change `cmakeargs` behavior or add some other logic?\r\n\r\nThis behavior is the same for CoreCLR too.\r\n\r\ncc @BruceForstall @jkotas \r\ncc @chunseoklee"
+    },
+    "satisfaction_conditions": [
+      "Additional compiler flags must apply only to main source code compilation, not to configuration tests",
+      "The solution must support passing multiple compiler options as a group",
+      "The solution must not require modifying source code for different builds",
+      "The mechanism must work through the build system's external interface"
+    ],
+    "created_at": "2018-01-22T12:47:37Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/24279",
+    "source": {
+      "issue_number": 24279
+    },
+    "initial_question": {
+      "title": "System.IO.FileNotFoundException: Could not load file or assembly 'System.Net.Http, Version=4.1.1.0",
+      "body": "I recently created a .NET Core 2.0 library that multitargeted `net46`. It included this in the .csproj file:\r\n\r\n```\r\n  <ItemGroup Condition=\"'$(TargetFramework)'=='net46'\">\r\n    <Reference Include=\"System.Net.Http\" />\r\n  </ItemGroup>\r\n\r\n  <ItemGroup Condition=\"'$(TargetFramework)'=='netstandard2.0'\">\r\n    <PackageReference Include=\"System.Net.Http\" Version=\"4.3.3\" />\r\n    <PackageReference Include=\"System.Net.Primitives\" Version=\"4.3.0\" />\r\n    <PackageReference Include=\"System.Net.Requests\" Version=\"4.3.0\" />\r\n    <PackageReference Include=\"System.Net.Sockets\" Version=\"4.3.0\" />\r\n  </ItemGroup>\r\n```\r\n\r\nI referenced this library is a .NET Framework 4.7 console app and get this exception:\r\n```\r\nUnhandled Exception: System.IO.FileNotFoundException: Could not load file or assembly 'System.Net.Http, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies. The system cannot find the file specified. ---> System.IO.FileNotFoundException: Could not load file or assembly 'System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies. The system cannot find the file specified.\r\n```\r\n\r\nI didn't see any warnings in the error list, but I decided to check the build log and found a conflict.\r\n\r\nThis is what I see in the detailed build log:\r\n```\r\n1>  There was a conflict between \"System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" and \"System.Net.Http, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\".\r\n1>      \"System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" was chosen because it was primary and \"System.Net.Http, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" was not.\r\n1>      References which depend on \"System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" [C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.7\\System.Net.Http.dll].\r\n1>          C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.7\\System.Net.Http.dll\r\n1>            Project file item includes which caused reference \"C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.7\\System.Net.Http.dll\".\r\n1>              System.Net.Http\r\n```\r\n\r\nMy `App.config` includes a redirect which should have been used\r\n```\r\n<dependentAssembly>\r\n        <assemblyIdentity name=\"System.Net.Http\" publicKeyToken=\"b03f5f7f11d50a3a\" culture=\"neutral\" />\r\n        <bindingRedirect oldVersion=\"0.0.0.0-4.1.1.0\" newVersion=\"4.1.1.0\" />\r\n      </dependentAssembly>\r\n```\r\n\r\nWhat I don't fully understand in why System.Net.Http includes a reference to itself. Is this corruption of some sort or am I missing something?"
+    },
+    "satisfaction_conditions": [
+      "Assembly version conflicts must be resolved",
+      "Application must successfully load the correct System.Net.Http assembly at runtime",
+      "Assembly binding configuration must properly direct to a compatible version"
+    ],
+    "created_at": "2017-11-30T00:14:33Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/23265",
+    "source": {
+      "issue_number": 23265
+    },
+    "initial_question": {
+      "title": "C# new operate bug?",
+      "body": "```c#\r\npublic class ListTest\r\n{\r\n    public List<int> MyList;\r\n    public ListTest()\r\n    {\r\n        MyList = new List<int> { 1, 2, 3 };\r\n    }\r\n}\r\n\r\nvar listTest = new ListTest()\r\n{\r\n    MyList = {4,5,6}\r\n};\r\n```\r\n\r\nDo you know the value of listTest.MyList ???\r\n\r\nIt would be {1,2,3,4,5,6}   (on .net framework 4.6.1)\r\n\r\nSomeone can explain that??\r\n\r\n[EDIT] Fixed proper code formatting by @karelz"
+    },
+    "satisfaction_conditions": [
+      "The final list must contain all elements from both the constructor initialization and object initializer",
+      "Elements must appear in the correct sequential order",
+      "The object initializer syntax must not create a new collection instance",
+      "The initialization must preserve class invariants and encapsulation"
+    ],
+    "created_at": "2017-08-20T05:49:39Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/22442",
+    "source": {
+      "issue_number": 22442
+    },
+    "initial_question": {
+      "title": "Quiet msbuild mode",
+      "body": "Can we get a build mode, maybe `msbuild /T:BuildAndTest /P:Quiet=true` that gets rid of all the build logs and just prints out the test results?\r\n\r\nThis is useful to compare test failures and I don't really care about what's compiling."
+    },
+    "satisfaction_conditions": [
+      "Build output is reduced to show only essential information",
+      "Solution works within MSBuild command line interface"
+    ],
+    "created_at": "2017-06-23T04:52:09Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/7731",
+    "source": {
+      "issue_number": 7731
+    },
+    "initial_question": {
+      "title": "Load unmanaged static dll in load context",
+      "body": "I have native unmanaged dll which is static and must be loaded each time when I need library to do some work if i want to run it in parallel. In .NET I would use AppDomain and load this dll when i need it, but in NET Core AppDomains are gone (for now). I have looked at AssemblyLoadContext but there is no proper documentation with LoadUnmanagedDll. Can this be done in netstandard1.6?"
+    },
+    "satisfaction_conditions": [
+      "Concurrent access to the unmanaged DLL must be handled without AccessViolationException",
+      "The unmanaged DLL's functionality must remain accessible to the application",
+      "The solution must work within .NET Core's constraints",
+      "The solution must handle the static nature of the unmanaged DLL"
+    ],
+    "created_at": "2017-03-27T11:06:45Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/2596",
+    "source": {
+      "issue_number": 2596
+    },
+    "initial_question": {
+      "title": "Programatically Getting the path to the directory containing the framework?",
+      "body": "Ok, I have a reaaaaly strange question now.\r\n\r\nWe have app that generates c# code. \r\n\r\nWe have unit tests that use the generator to generate c# code, then compiles the code using Roslyn, and then loads the generated assembly and  uses reflection to inspect the code to check that things went right.\r\n\r\nWhen we were running on desktop clr, we used `AppDomain.GetAssemblies()` to get the assemblies that were loaded and added them to the Roslyn compiler as references.\r\n\r\nSince we're now on `netcoreapp1.0` we don't have that. \r\n\r\nFor some assemblies, I was able to cheat a bit and use stuff like `typeof(RestException).GetAssembly().Location,`\r\n\r\nBut in the end I needed to get a handful of assemblies from the current runtime folder.\r\n\r\nI can hardcode them like this:\r\n\r\n``` csharp\r\n        protected static readonly string[] _assemblies = new[] {\r\n            \r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.Runtime.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.Net.Http.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\mscorlib.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.Threading.Tasks.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.Net.Primitives.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.Collections.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.Text.Encoding.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.Text.RegularExpressions.dll\",\r\n            @\"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\System.IO.dll\",\r\n        ]\r\n```\r\n\r\nAnd it works.\r\n\r\nThis only works because I know the `C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\1.0.3\\` part of the path.\r\n\r\nIs there *any means* to find out that path for the currently executing `netcoreapp1.0` program, so I can locate these programatically?"
+    },
+    "satisfaction_conditions": [
+      "Must programmatically determine the runtime framework directory path",
+      "Must work in a .NET Core 1.0 environment",
+      "Must locate system assembly files needed for compilation",
+      "Must remain functional across different installation locations",
+      "Must work in a test execution environment"
+    ],
+    "created_at": "2017-02-10T19:35:58Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/19682",
+    "source": {
+      "issue_number": 19682
+    },
+    "initial_question": {
+      "title": "EntryPointNotFoundException on .NET Core on Linux",
+      "body": "I want to prepare a wrapper library for a 3rd party library on linux\r\n\r\nI've created 2 simple functions, and from another C++ program they execute without a problem\r\n\r\nalso .. I've tried to use system library (libc) and it works without issues:\r\n\r\n[System.Runtime.InteropServices.DllImport(\"libc\")]\r\npublic static extern int puts(string str);\r\n\r\nputs(\"some test string\"); // <- this works\r\n\r\nhowever, when I try to use my 2 simple function from my wrapper library, I'm getting EntryPointNotFoundException exception\r\n\r\nhere is the code:\r\n\r\n[System.Runtime.InteropServices.DllImport(\"mywrapper\")]\r\npublic static extern void TestFunc1();\r\n[System.Runtime.InteropServices.DllImport(\"mywrapper\")]\r\npublic static extern string TestFunc2();\r\n\r\nUnhandled Exception: System.EntryPointNotFoundException: Unable to find an entry point named 'TestFunc1' in DLL 'mywrapper'.\r\n\r\nthe library is found, and from C++ these two functions just work\r\nalso ... a DLLImport puts(const char *) works in .NET Core\r\n\r\nonly my library has this problem\r\n\r\nany ideas ?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Library function names must be correctly exposed and accessible from .NET Core",
+      "Library file must be correctly located in system library search paths",
+      "Library version consistency must be maintained across the system"
+    ],
+    "created_at": "2016-12-14T15:46:38Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/18716",
+    "source": {
+      "issue_number": 18716
+    },
+    "initial_question": {
+      "title": "Strange dependency behavior",
+      "body": "Hi all,\n\nI have a library build for netstandard1.4, which corresponds to .NET 461.\nThen I build a desktop console application with .NET 4.5 and added reference to named library.\nAll worked fine.\n\nBut, this should not work, because v4.5 should not be able to use netstandard1.4.  Previously this was not the case.\nIs tat same new expected behavior?\n\nThanks\n"
+    },
+    "satisfaction_conditions": [
+      "Direct assembly references must be loadable despite framework version mismatches",
+      "Runtime execution succeeds when API compatibility exists",
+      "System acknowledges potential runtime risks",
+      "Build process completes successfully with direct references"
+    ],
+    "created_at": "2016-09-26T22:39:51Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/18284",
+    "source": {
+      "issue_number": 18284
+    },
+    "initial_question": {
+      "title": "Confusing empty directories in some runtime packages",
+      "body": "The package `runtime.win.System.Runtime.Extensions` contains (among the files and directories it should contain) the empty directories `ref/netstandard` and `runtimes/win/lib/net`.\n\nI don't think these directories should exist: normal framework version directories always have a version (e.g. `netstandard1.5`, not just `netstandard`). And the presence of a `ref` directory in a `runtime` package is especially puzzling to me.\n\nThis does not seem to be limited to `runtime.win.System.Runtime.Extensions`, other `runtime` packages also contain these strange empty directories.\n\nI'm not aware of any actual problem caused by this, but I thought it's strange and probably worth fixing.\n"
+    },
+    "satisfaction_conditions": [
+      "Empty directories must prevent reference assembly conflicts",
+      "Package structure must prevent duplicate runtime assets",
+      "Runtime packages must remain separate from the compile-time dependency graph"
+    ],
+    "created_at": "2016-08-24T22:09:42Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/17755",
+    "source": {
+      "issue_number": 17755
+    },
+    "initial_question": {
+      "title": "Assigning VectorX right to VectorX left",
+      "body": "CopyTo allows copying of value to arrays but not another Vector of the same length.\n"
+    },
+    "satisfaction_conditions": [
+      "Vector data must be successfully copied between instances",
+      "Performance overhead must be minimized",
+      "Vector data must be properly initialized",
+      "Solution must work within Vector<T>'s immutability constraints"
+    ],
+    "created_at": "2016-07-02T05:50:03Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/17680",
+    "source": {
+      "issue_number": 17680
+    },
+    "initial_question": {
+      "title": "Cant instal System.Net.Security 4.0.0-rc2-24027",
+      "body": "Hello,\ni instalig nuget System.Net.Security 4.0.0-rc2-24027 to new csproj project, but take this error:\nCould not install package 'runtime.native.System 4.0.0-rc2-24027'. You are trying to install this package into a project that targets '.NETFramework,Version=v4.6.1', but the package does not contain any assembly references or content files that are compatible with that framework. For more information, contact the package author.\n"
+    },
+    "satisfaction_conditions": [
+      "Package installation completes successfully without dependency errors",
+      "Package is compatible with .NET Framework 4.6.1 target framework",
+      "All required dependencies are available and compatible",
+      "System.Net.Security functionality is accessible in the project"
+    ],
+    "created_at": "2016-06-23T12:36:24Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/17594",
+    "source": {
+      "issue_number": 17594
+    },
+    "initial_question": {
+      "title": "Hello. Is it possible to install CoreFX to a custom folder?",
+      "body": "Is it possible to install CoreFX to a custom folder after the building from sources?\n\nCommand to build:\n`./build.sh x64 debug`\n\nBut in this case CoreFX installs to a current folder. What command I must enter to onfigure sources and instal to a custom folder?\nPS: OS Ubuntu 16.04 LTS. Problem with building are missing.\n"
+    },
+    "satisfaction_conditions": [
+      "Build output must be accessible for use in other projects",
+      "Built packages must be usable independently of source code",
+      "Build process must complete successfully in a git repository",
+      "Build artifacts must be relocatable after build completion",
+      "Package references must remain functional after relocation"
+    ],
+    "created_at": "2016-06-13T09:54:05Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/5463",
+    "source": {
+      "issue_number": 5463
+    },
+    "initial_question": {
+      "title": "How to print exception message and type from IL_Throw?",
+      "body": "Is there an easy way to print the exception object from gdb when we are in DispatchManagedException? I cannot do lldb as I'm on arm where it is not working.'\n\nThanks!\n"
+    },
+    "satisfaction_conditions": [
+      "Exception message must be accessible and readable in debugger",
+      "Solution must work on ARM architecture",
+      "Must work when debugging from DispatchManagedException context"
+    ],
+    "created_at": "2016-03-30T03:56:31Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/4878",
+    "source": {
+      "issue_number": 4878
+    },
+    "initial_question": {
+      "title": "JIT compilation compitible with .NET Framework 4.x ?",
+      "body": "The CoreCLR `corinfo.h` & `corjit.h` compatible with .NET Framework 4.x or only support .NET Framework 4.6 ? I tried on FW 4.0 doesn't work.\n"
+    },
+    "satisfaction_conditions": [
+      "Runtime version compatibility is confirmed",
+      "Interface stability status is addressed",
+      "Cross-version compatibility expectations are set"
+    ],
+    "created_at": "2015-12-30T08:09:07Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/8010",
+    "source": {
+      "issue_number": 8010
+    },
+    "initial_question": {
+      "title": "cleanup BCLDebug",
+      "body": "Is this the debug tracing mechanism we want corelib code to use long term? CoreRT uses Debug.xx exclusively, CoreCLR corelib uses Debug.xx in most cases but BCLDebug.xx in some. They need to be reconciled.\r\n\r\nBCLDebug has some other features: categories, verbosity, registry configuration."
+    },
+    "satisfaction_conditions": [
+      "Debug tracing functionality remains available for necessary debugging scenarios",
+      "Unused or redundant debug tracing features are addressed",
+      "Debug tracing implementation does not cause performance overhead in production",
+      "Solution aligns with modern CoreFX practices"
+    ],
+    "created_at": "2017-05-04T16:18:43Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/20041",
+    "source": {
+      "issue_number": 20041
+    },
+    "initial_question": {
+      "title": "Remove test attributes only necessary for running on older CoreFX versions",
+      "body": "Remove these\r\n`[SkipOnTargetFramework(TargetFrameworkMonikers.Netcoreapp1_0]`\r\n`[SkipOnTargetFramework(TargetFrameworkMonikers.Netcoreapp1_1]`\r\n\r\nWe do not have plans to run the CoreFX tests against older versions of .NET Core so these are unnecessary and we should remove them all.\r\n\r\nWe still need the versionless one `[SkipOnTargetFramework(TargetFrameworkMonikers.Netcoreapp)]` where a test only passes on Desktop"
+    },
+    "satisfaction_conditions": [
+      "Versionless test attributes are preserved where tests only pass on Desktop"
+    ],
+    "created_at": "2017-01-27T19:29:20Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/6887",
+    "source": {
+      "issue_number": 6887
+    },
+    "initial_question": {
+      "title": "Disassembly dump some times prints hex, sometimes doesn't",
+      "body": "I just noticed this while doing a JIT disassembly dump... sometimes the offsets of the memory addresses will be specified in hex, sometimes they'll be specified in decimal.\n\nRepro code to dump:\n\n``` cs\nusing System;\nusing System.Collections.Generic;\nusing System.Diagnostics;\nusing System.Linq;\nusing System.Runtime.CompilerServices;\nusing System.Threading;\nusing System.Threading.Tasks;\n\nnamespace ConsoleApplication\n{\n    public static class Program\n    {\n        [MethodImpl(MethodImplOptions.NoInlining)]\n        private static void LargeStructReturner(out ValueTuple<decimal, decimal, decimal, decimal> tuple)\n        {\n            tuple = default(ValueTuple<decimal, decimal, decimal, decimal>);\n        }\n\n        public static void Main()\n        {\n            ValueTuple<decimal, decimal, decimal, decimal> tuple;\n            LargeStructReturner(out tuple);\n        }\n    }\n}\n```\n\nOutput:\n\n``` asm\n; Assembly listing for method Program:LargeStructReturner():struct\n; Emitting BLENDED_CODE for X64 CPU with AVX\n; optimized code\n; rsp based frame\n; partially interruptible\n; Final local variable assignments\n;\n;  V00 RetBuf       [V00,T00] (  4,   4  )   byref  ->  rcx\n;  V01 loc0         [V01,T01] (  2,   2  )  struct (64) [rsp+0x08]   do-not-enreg[SB] must-init ld-addr-op\n;# V02 loc1         [V02    ] (  1,   1  )  lclBlk ( 0) [rsp+0x00]\n;\n; Lcl frame size = 72\n\nG_M9337_IG01:\n       57                   push     rdi\n       56                   push     rsi\n       4883EC48             sub      rsp, 72\n       488BF1               mov      rsi, rcx\n       488D7C2408           lea      rdi, [rsp+08H]\n       B910000000           mov      ecx, 16\n       33C0                 xor      rax, rax\n       F3AB                 rep stosd\n       488BCE               mov      rcx, rsi\n\nG_M9337_IG02:\n       33C0                 xor      rax, rax\n       488D542408           lea      rdx, bword ptr [rsp+08H]\n       C4E17957C0           vxorpd   ymm0, ymm0\n       C4E17A7F02           vmovdqu  qword ptr [rdx], ymm0\n       C4E17A7F4210         vmovdqu  qword ptr [rdx+16], ymm0\n       C4E17A7F4220         vmovdqu  qword ptr [rdx+32], ymm0\n       C4E17A7F4230         vmovdqu  qword ptr [rdx+48], ymm0 ; HERE\n       C4E17A6F442408       vmovdqu  ymm0, qword ptr [rsp+08H] ; HERE\n       C4E17A7F01           vmovdqu  qword ptr [rcx], ymm0\n       C4E17A6F442418       vmovdqu  ymm0, qword ptr [rsp+18H]\n       C4E17A7F4110         vmovdqu  qword ptr [rcx+16], ymm0\n       C4E17A6F442428       vmovdqu  ymm0, qword ptr [rsp+28H]\n       C4E17A7F4120         vmovdqu  qword ptr [rcx+32], ymm0\n       C4E17A6F442438       vmovdqu  ymm0, qword ptr [rsp+38H]\n       C4E17A7F4130         vmovdqu  qword ptr [rcx+48], ymm0\n       488BC1               mov      rax, rcx\n\nG_M9337_IG03:\n       4883C448             add      rsp, 72\n       5E                   pop      rsi\n       5F                   pop      rdi\n       C3                   ret\n\n; Total bytes of code 122, prolog size 26 for method Program:LargeStructReturner():struct\n; ============================================================\n```\n"
+    },
+    "satisfaction_conditions": [
+      "Display format consistently follows defined rules for memory offsets",
+      "Local variables and method arguments are displayed in hex format",
+      "Non-frame values under 1000 are displayed in decimal format",
+      "All hex values are marked with 'H' suffix"
+    ],
+    "created_at": "2016-10-26T21:39:37Z"
+  },
+  {
+    "id": "https://github.com/dotnet/runtime/issues/14029",
+    "source": {
+      "issue_number": 14029
+    },
+    "initial_question": {
+      "title": "2 tests fail when run build.cmd",
+      "body": "Discovering: MemoryMappedFile.Tests\nDiscovered:  MemoryMappedFile.Tests\nStarting:    MemoryMappedFile.Tests\nErr445! Got unexpected exception: System.IO.IOException: There is not enough space on the disk.\n\n```\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateCore(SafeFileHandle fileHandle, String mapName, HandleInheritability inheritability, MemoryMappedFileAccess access, MemoryMappedFileOptions options, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.Windows.cs:line 45\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity, MemoryMappedFileAccess access) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 180\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 107\n at CreateViewAccessor.RunTestLargeCapacity(Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\tests\\MemoryMappedFile\\CreateViewAccessor.cs:line 378\n```\n\n  Err445! Got unexpected exception: System.IO.IOException: There is not enough space on the disk.\n\n```\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateCore(SafeFileHandle fileHandle, String mapName, HandleInheritability inheritability, MemoryMappedFileAccess access, MemoryMappedFileOptions options, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.Windows.cs:line 45\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity, MemoryMappedFileAccess access) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 180\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 107\n at CreateViewAccessor.RunTestLargeCapacity(Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\tests\\MemoryMappedFile\\CreateViewAccessor.cs:line 378\n```\n\n  Err445! Got unexpected exception: System.IO.IOException: There is not enough space on the disk.\n\n```\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateCore(SafeFileHandle fileHandle, String mapName, HandleInheritability inheritability, MemoryMappedFileAccess access, MemoryMappedFileOptions options, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.Windows.cs:line 45\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity, MemoryMappedFileAccess access) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 180\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 107\n at CreateViewStream.RunTestLargeCapacity(Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\tests\\MemoryMappedFile\\CreateViewStream.cs:line 377\n```\n\n  Err445! Got unexpected exception: System.IO.IOException: There is not enough space on the disk.\n\n```\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateCore(SafeFileHandle fileHandle, String mapName, HandleInheritability inheritability, MemoryMappedFileAccess access, MemoryMappedFileOptions options, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.Windows.cs:line 45\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity, MemoryMappedFileAccess access) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 180\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 107\n at CreateViewAccessor.RunTestLargeCapacity(Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\tests\\MemoryMappedFile\\CreateViewAccessor.cs:line 378\n```\n\n  FAiL! iCountErrors==3\n  Err445! Got unexpected exception: System.IO.IOException: There is not enough space on the disk.\n\n```\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateCore(SafeFileHandle fileHandle, String mapName, HandleInheritability inheritability, MemoryMappedFileAccess access, MemoryMappedFileOptions options, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.Windows.cs:line 45\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity, MemoryMappedFileAccess access) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 180\n at System.IO.MemoryMappedFiles.MemoryMappedFile.CreateFromFile(String path, FileMode mode, String mapName, Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\src\\System\\IO\\MemoryMappedFiles\\MemoryMappedFile.cs:line 107\n at CreateViewStream.RunTestLargeCapacity(Int64 capacity) in e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\tests\\MemoryMappedFile\\CreateViewStream.cs:line 377\n CreateViewAccessor.CreateViewAccessorTestCases [FAIL]\n    One or more test cases failed.\n    Stack Trace:\n       e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\tests\\MemoryMappedFile\\CreateViewAccessor.cs(32,0): at CreateViewAccessor.CreateViewAccessorTestCases()\n```\n\n  Finished:    System.Diagnostics.FileVersionInfo.Tests\n\n=== TEST EXECUTION SUMMARY ===\n     System.Diagnostics.FileVersionInfo.Tests  Total: 6, Errors: 0, Failed: 0, Skipped: 0, Time: 2.371s\n  FAiL! iCountErrors==2\n     CreateViewStream.CreateViewStreamTestCases [FAIL]\n        One or more test cases failed.\n        Stack Trace:\n           e:\\Dev\\GitHub\\DotNet\\corefx\\src\\System.IO.MemoryMappedFiles\\tests\\MemoryMappedFile\\CreateViewStream.cs(31,0): at CreateViewStream.CreateViewStreamTestCases()\n  Finished:    MemoryMappedFile.Tests\n\n=== TEST EXECUTION SUMMARY ===\n     MemoryMappedFile.Tests  Total: 7, Errors: 0, Failed: 2, Skipped: 0, Time: 1.345s\n"
+    },
+    "satisfaction_conditions": [
+      "System can handle file sizes up to 4GB+"
+    ],
+    "created_at": "2015-01-30T00:44:59Z"
+  }
+]

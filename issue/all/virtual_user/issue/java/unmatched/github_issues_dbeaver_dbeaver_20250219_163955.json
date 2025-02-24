@@ -1,0 +1,23 @@
+[
+  {
+    "number": 20497,
+    "title": "Language preferences not being applied",
+    "created_at": "2023-07-06T18:36:22Z",
+    "closed_at": "2023-07-06T19:18:27Z",
+    "labels": [
+      "xo:windows",
+      "question"
+    ],
+    "url": "https://github.com/dbeaver/dbeaver/issues/20497",
+    "body": "### Description\n\nSince the last update, the language of the application has been changed to Portuguese and I cannot change the language to any other, when restarting the machine language (Portuguese) remains active and in the preferences settings \"English\" is displayed.\n\n### DBeaver Version\n\nCommunity Edition 23.1.1.202306251800\n\n### Operating System\n\nWindows 11 22H2\n\n### Database and driver\n\nPostgreSQL 14 -> PostgreSQL standard driver\r\nMySQL 8 -> Driver for MySQL 8 and later\r\n\r\n\n\n### Steps to reproduce\n\nOn top menu:\r\n\r\nJanela -> Prefer\u00eancias -> Interface de Usu\u00e1rio -> Idioma -> (Change to English/Spanish) -> Apply -> Yes -> Yes\r\n\r\nThe application will be restarted, but the language will not change.\n\n### Additional context\n\n_No response_",
+    "comments_url": "https://api.github.com/repos/dbeaver/dbeaver/issues/20497/comments",
+    "author": "caiocinel",
+    "comments": [
+      {
+        "user": "ShadelessFox",
+        "created_at": "2023-07-06T19:16:11Z",
+        "body": "Hello @caiocinel,\r\n\r\nAre you running DBeaver using the shortcut? If so, open its properties and remove the `-nl en` part from the \"target\".\r\n\r\nPlease let me know if it helps."
+      }
+    ]
+  }
+]

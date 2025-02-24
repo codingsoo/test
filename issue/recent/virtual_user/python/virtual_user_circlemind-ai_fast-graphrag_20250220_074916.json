@@ -1,0 +1,33 @@
+[
+  {
+    "id": "https://github.com/circlemind-ai/fast-graphrag/issues/65",
+    "source": {
+      "issue_number": 65
+    },
+    "initial_question": {
+      "title": "How to get the entity count?",
+      "body": "After generating the pkl files, how to get the total number of entities?\r\n"
+    },
+    "satisfaction_conditions": [
+      "Graph state must be properly initialized before counting entities",
+      "Asynchronous execution context must be properly managed",
+      "Method must return a numeric count of total entities",
+      "Graph resources must be properly released after counting"
+    ],
+    "created_at": "2025-01-14T04:20:00Z"
+  },
+  {
+    "id": "https://github.com/circlemind-ai/fast-graphrag/issues/58",
+    "source": {
+      "issue_number": 58
+    },
+    "initial_question": {
+      "title": "Wrong Dimensionality of Vectors Error",
+      "body": "Hi there, I am facing this error of wrong dimensionality of vectors.\r\nFollowing is my python code\r\n```python\r\n  working_dir = \"./myFile\"\r\n  grag = GraphRAG(\r\n      working_dir=working_dir,\r\n      domain=DOMAIN,\r\n      example_queries=\"\\n\".join(QUERIES),\r\n      entity_types=ENTITY_TYPES,\r\n      config=GraphRAG.Config(\r\n          llm_service=OpenAILLMService(\r\n              model=\"gpt-4o\",\r\n              base_url= os.getenv(\"AZURE_OPENAI_ENDPOINT\"),\r\n              api_key= os.getenv(\"AZURE_OPENAI_API_KEY\"),\r\n              client= os.getenv(\"OPENAI_API_TYPE\"), \r\n              mode=instructor.Mode.JSON\r\n          ),\r\n          embedding_service=OpenAIEmbeddingService(\r\n              model=\"text-embedding-3-large\",\r\n              base_url= os.getenv(\"AZURE_OPENAI_EMBED_ENDPOINT\"),\r\n              api_key= os.getenv(\"AZURE_OPENAI_API_KEY\"),\r\n              client= os.getenv(\"OPENAI_API_TYPE\"), \r\n              embedding_dim=512,  # the output embedding dim of the chosen model\r\n          ),\r\n      ),\r\n  )\r\n  with open(\"./data.txt\", encoding=\"utf8\") as f:\r\n    grag.insert(f.read())\r\n```\r\nAnd I am facing this error\r\n\r\n```python\r\nExtracting data: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:18<00:00, 18.24s/it]\r\nError during insertion: Wrong dimensionality of the vectors\r\n---------------------------------------------------------------------------\r\nRuntimeError                              Traceback (most recent call last)\r\nCell In[11], [line 2](vscode-notebook-cell:?execution_count=11&line=2)\r\n      [1](vscode-notebook-cell:?execution_count=11&line=1) with open(\"./data.txt\", encoding=\"utf8\") as f:\r\n----> [2](vscode-notebook-cell:?execution_count=11&line=2)     grag.insert(f.read())\r\n\r\nFile c:\\Users\\user\\Downloads\\python\\Expedio\\env\\Lib\\site-packages\\fast_graphrag\\_graphrag.py:75, in BaseGraphRAG.insert(self, content, metadata, params, show_progress)\r\n     [68](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:68) def insert(\r\n     [69](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:69)     self,\r\n     [70](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:70)     content: Union[str, List[str]],\r\n   (...)\r\n     [73](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:73)     show_progress: bool = True\r\n     [74](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:74) ) -> Tuple[int, int, int]:\r\n---> [75](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:75)     return get_event_loop().run_until_complete(self.async_insert(content, metadata, params, show_progress))\r\n\r\nFile c:\\Users\\user\\Downloads\\python\\Expedio\\env\\Lib\\site-packages\\nest_asyncio.py:98, in _patch_loop.<locals>.run_until_complete(self, future)\r\n     [95](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:95) if not f.done():\r\n     [96](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:96)     raise RuntimeError(\r\n     [97](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:97)         'Event loop stopped before Future completed.')\r\n---> [98](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:98) return f.result()\r\n\r\nFile C:\\Python312\\Lib\\asyncio\\futures.py:203, in Future.result(self)\r\n    [201](file:///C:/Python312/Lib/asyncio/futures.py:201) self.__log_traceback = False\r\n    [202](file:///C:/Python312/Lib/asyncio/futures.py:202) if self._exception is not None:\r\n--> [203](file:///C:/Python312/Lib/asyncio/futures.py:203)     raise self._exception.with_traceback(self._exception_tb)\r\n...\r\n     [63](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_storage/_vdb_hnswlib.py:63) if metadata:\r\n     [64](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_storage/_vdb_hnswlib.py:64)     self._metadata.update(dict(zip(ids, metadata)))\r\n---> [65](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_storage/_vdb_hnswlib.py:65) self._index.add_items(data=embeddings, ids=ids, num_threads=self.config.num_threads)\r\n\r\nRuntimeError: Wrong dimensionality of the vectors\r\n```\r\nThe models are set correctly, but this weird error is occuring"
+    },
+    "satisfaction_conditions": [
+      "The embedding service configuration must be valid and complete"
+    ],
+    "created_at": "2025-01-06T10:26:22Z"
+  }
+]

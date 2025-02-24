@@ -1,0 +1,47 @@
+[
+  {
+    "id": "https://github.com/tesseract-ocr/tesseract/issues/4280",
+    "source": {
+      "issue_number": 4280
+    },
+    "initial_question": {
+      "title": "Tesseract hangs when you run 2 or more instances of them at the same time.",
+      "body": "### Current Behavior\r\n\r\nIn Ubuntu 22.04.6 LTS it supports Tesseract 4.1.1 and my code executing multiple instances of Tesseract on that machine worked. But when I tried it on a newer release (Ubuntu 24.04 with Tesseract 5.3.4) this problem started occurring. To test this I opened to bash terminals and ran the command directly manually one after the other (around the same time) and it does indeed hang. Only after I ctrl+c one of them does the other finish.\r\n\r\n### Expected Behavior\r\n\r\nShould be able to run multiple instances of Tesseract at the same time. At least 2.\r\n\r\n### Suggested Fix\r\n\r\nSeems to be a new bug that go introduced at one point?\r\n\r\n### tesseract -v\r\n\r\n**New version with the issue:**\r\ntesseract 5.3.4\r\n leptonica-1.82.0\r\n  libgif 5.2.1 : libjpeg 8d (libjpeg-turbo 2.1.5) : libpng 1.6.43 : libtiff 4.5.1 : zlib 1.3 : libwebp 1.3.2 : libopenjp2 2.5.0\r\n Found AVX2\r\n Found AVX\r\n Found FMA\r\n Found SSE4.1\r\n Found OpenMP 201511\r\n Found libarchive 3.7.2 zlib/1.3 liblzma/5.4.5 bz2lib/1.0.8 liblz4/1.9.4 libzstd/1.5.5\r\n Found libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3 brotli/1.1.0 zstd/1.5.5 libidn2/2.3.7 libpsl/0.21.2 (+libidn2/2.3.7) libssh/0.10.6/openssl/zlib nghttp2/1.59.0 librtmp/2.3 OpenLDAP/2.6.7\r\n \r\n**Old version last known working:**\r\ntesseract 4.1.1\r\n leptonica-1.79.0\r\n  libgif 5.1.4 : libjpeg 8d (libjpeg-turbo 2.0.3) : libpng 1.6.37 : libtiff 4.1.0 : zlib 1.2.11 : libwebp 0.6.1 : libopenjp2 2.3.1\r\n Found AVX2\r\n Found AVX\r\n Found FMA\r\n Found SSE\r\n Found libarchive 3.4.0 zlib/1.2.11 liblzma/5.2.4 bz2lib/1.0.8 liblz4/1.9.2 libzstd/1.4.4\r\n\r\n### Operating System\r\n\r\nUbuntu 24.04 Noble\r\n\r\n### Other Operating System\r\n\r\n_No response_\r\n\r\n### uname -a\r\n\r\nLinux ip-172-31-13-132 6.8.0-1009-aws #9-Ubuntu SMP Fri May 17 14:39:23 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux\r\n\r\n### Compiler\r\n\r\n_No response_\r\n\r\n### CPU\r\n\r\n_No response_\r\n\r\n### Virtualization / Containers\r\n\r\n_No response_\r\n\r\n### Other Information\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "Instances must complete their processing without requiring manual intervention"
+    ],
+    "created_at": "2024-07-09T02:06:31Z"
+  },
+  {
+    "id": "https://github.com/tesseract-ocr/tesseract/issues/2803",
+    "source": {
+      "issue_number": 2803
+    },
+    "initial_question": {
+      "title": "build system: shared library is gone",
+      "body": "I believe that the recent improvements in the build system brought a major regression: `make install` does not (build and) install libtesseract.so anymore.\r\n\r\nThis is a huge problem for other software that wants to link to Tesseract (like `tesserocr`). Their build will fall back to the static library, but this can fail by not pulling in Tesseract's dependencies (like `-llept`), or by missing things like `-fsanitize=address`.\r\n\r\n@stweil do you want me to give detailed error messages?"
+    },
+    "satisfaction_conditions": [
+      "Shared library files are present after installation",
+      "Proper symbolic links are created for the shared library",
+      "Installation command completes successfully",
+      "Library files are installed in the correct location"
+    ],
+    "created_at": "2019-12-05T02:31:44Z"
+  },
+  {
+    "id": "https://github.com/tesseract-ocr/tesseract/issues/2436",
+    "source": {
+      "issue_number": 2436
+    },
+    "initial_question": {
+      "title": "Error param ALTO when using tessdata-dir param",
+      "body": "### Environment\r\n\r\n* **Tesseract Version**:  4.1.0-rc2-48-g5320\r\n* **Commit Number**: \r\n* **Platform**: Ubuntu 18.04 LTS\r\n\r\n### Current Behavior:\r\n\r\nCall `tesseract` from Bash with explicite `tessdata-dir` leads to improper processing of last Parameter `alto`:\r\n\r\n```\r\ntesseract --dpi 500 --tessdata-dir <path> <path-to-some-image> <output-name> -l deu_frak alto\r\n\r\n=>\r\n\r\nread_params_file: can't open alto\r\n```\r\nWhereas calling without `tessdata-dir`works fine\r\n\r\n```\r\ntesseract --dpi 500 <path-to-some-image> <output-name> -l deu_frak alto\r\n```\r\nwhich in turn works only if Language-Model-File was moved into `/usr/share/tesseract/4.00/tessdata`\r\n\r\n### Expected Behavior:\r\n\r\nNo difference in order or number of parameters, no side-effect from parameter `tessdata-dir` to any other parameters or their placements.\r\n\r\n### Suggested Fix:\r\n\r\nAdjust Parameter-Processing, introduce explicite output-format parameter, like `--output-format alto`\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "The system must be able to locate and use the correct configuration files from the specified tessdata directory"
+    ],
+    "created_at": "2019-05-15T13:00:01Z"
+  }
+]

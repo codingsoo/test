@@ -1,0 +1,191 @@
+[
+  {
+    "number": 76175,
+    "title": "Incorrect marshalling of IntPtr in union",
+    "created_at": "2022-09-26T11:05:43Z",
+    "closed_at": "2022-09-26T15:12:07Z",
+    "labels": [
+      "question",
+      "area-Interop-coreclr"
+    ],
+    "url": "https://github.com/dotnet/runtime/issues/76175",
+    "body": "### Description\r\n\r\nNext example shows incorrect output in managed code of `StructA.Y`. For some reason the value is truncated.\r\n\r\nManaged part:\r\n```c#\r\nusing System;\r\nusing System.Runtime.InteropServices;\r\n\r\npublic class Program\r\n{\r\n  [StructLayout(LayoutKind.Sequential)]\r\n  internal struct StructA\r\n  {\r\n    internal IntPtr X;\r\n    internal IntPtr Y;\r\n    internal IntPtr Z;\r\n    internal uint XLength;\r\n    internal uint YLength;\r\n    internal uint ZLength;\r\n  }\r\n\r\n  [StructLayout(LayoutKind.Sequential)]\r\n  internal struct StructB\r\n  {\r\n    internal IntPtr Data;\r\n    internal uint DataLength;\r\n    internal bool Flag;\r\n  }\r\n\r\n  [StructLayout(LayoutKind.Explicit)]\r\n  internal struct UnionStruct\r\n  {\r\n    [FieldOffsetAttribute(0)]\r\n    internal StructA A;\r\n    [FieldOffsetAttribute(0)]\r\n    internal StructB B;\r\n  }\r\n\r\n  [DllImport(\"tmp.so\", EntryPoint = \"test_func\")]\r\n  internal static extern IntPtr testFunc(int value);\r\n\r\n  static void Main(string[] args)\r\n  {\r\n    Console.WriteLine(\"Hello World!\");\r\n\r\n    IntPtr ptr = testFunc(10);\r\n\r\n    var unmanagedStruct = Marshal.PtrToStructure<UnionStruct>(ptr);\r\n\r\n    Console.WriteLine(\">>> managed:\");\r\n    Console.WriteLine(unmanagedStruct.A.X);\r\n    Console.WriteLine(unmanagedStruct.A.Y);\r\n    Console.WriteLine(unmanagedStruct.A.Z);\r\n    Console.WriteLine(unmanagedStruct.A.XLength);\r\n    Console.WriteLine(unmanagedStruct.A.YLength); \r\n    Console.WriteLine(unmanagedStruct.A.ZLength);\r\n\r\n    Console.WriteLine(unmanagedStruct.B.Data);\r\n    Console.WriteLine(unmanagedStruct.B.DataLength);\r\n    Console.WriteLine(unmanagedStruct.B.Flag);\r\n  }\r\n}\r\n```\r\n\r\nNative part:\r\n```c\r\n#include <malloc.h>\r\n#include <string.h>\r\n#include <stdio.h>\r\n#include <stdbool.h>\r\n\r\ntypedef union {\r\n  struct {\r\n    unsigned char *x;\r\n    unsigned char *y;\r\n    unsigned char *z;\r\n    unsigned int x_length;\r\n    unsigned int y_length;\r\n    unsigned int z_length;\r\n  } A;\r\n\r\n  struct {\r\n    unsigned char *data;\r\n    unsigned int size;\r\n    bool flag;\r\n  } B;\r\n} union_s;\r\n\r\nvoid* test_func()\r\n{\r\n  printf(\">>> test_func:\\n\");\r\n\r\n  union_s * x = (union_s *) malloc(sizeof(union_s));\r\n\r\n  x->A.x = (unsigned char *) (0x7ea33f5000);\r\n  x->A.y = (unsigned char *) (0x7ea3440000);\r\n  x->A.z = (unsigned char *) (0x7ea3452c00);\r\n  x->A.x_length = (555);\r\n  x->A.y_length = (666);\r\n  x->A.z_length = (1010);\r\n\r\n  printf(\"x = %p, y = %p, z = %p, x_length = %u, y_length = %u, z_length = %u\\n\", \r\n    x->A.x, x->A.y, x->A.z, x->A.x_length, x->A.y_length, x->A.z_length);\r\n\r\n  return x;\r\n}\r\n```\r\n\r\n\r\n### Reproduction Steps\r\n\r\nCompile native part with `gcc -shared -fPIC 1.c -o tmp.so`. \r\n\r\n\r\n\r\n### Expected behavior\r\n\r\nExpected output:\r\n```\r\nHello World!\r\n>>> test_func:\r\nx = 0x7ea33f5000, y = 0x7ea3440000, z = 0x7ea3452c00, x_length = 555, y_length = 666, z_length = 1010\r\n>>> managed:\r\n543904714752\r\n543905021952\r\n543905098752\r\n555\r\n666\r\n1010\r\n543904714752\r\n2739142656\r\nTrue\r\n```\r\n\r\n### Actual behavior\r\n\r\nActual output:\r\n```\r\nHello World!\r\n>>> test_func:\r\nx = 0x7ea33f5000, y = 0x7ea3440000, z = 0x7ea3452c00, x_length = 555, y_length = 666, z_length = 1010\r\n>>> managed:\r\n543904714752\r\n7034109952\r\n543905098752\r\n555\r\n666\r\n1010\r\n543904714752\r\n2739142656\r\nTrue\r\n```\r\n\r\n`7034109952` value corresponds to truncated `543905021952`.\r\n\r\n### Regression?\r\n\r\n_No response_\r\n\r\n### Known Workarounds\r\n\r\n_No response_\r\n\r\n### Configuration\r\n\r\n- Reproduces on x64/arm64. Managed part of test is built with dotnet sdk 6.0.201 or dotnet sdk 5.0.408.\r\n- Reproduces on 6.0.0, 6.0.9 and main (8bf6a86f1bc309529604430c568c14490d44d069).\r\n- Reproduces with Release/Debug builds of managed part of test.\r\n- Reproduces both for Release/Debug builds of runtime.\r\n- Reproduces both with and without any R2R images.\r\n- Doesn't reproduce if type of `Struct.B.DataLength` is changed to ulong (as well as type of corresponding field in native part).\r\n\r\n### Other information\r\n\r\ncc @alpencolt @jkotas ",
+    "comments_url": "https://api.github.com/repos/dotnet/runtime/issues/76175/comments",
+    "author": "gbalykov",
+    "comments": [
+      {
+        "user": "DaZombieKiller",
+        "created_at": "2022-09-26T12:20:57Z",
+        "body": "The issue here is that your `StructB` type contains a managed `bool` field, which causes it to be treated as a non-blittable type. Since `UnionStruct` contains a field of `StructB`, it too is considered non-blittable. This means that `Marshal.PtrToStructure` will attempt to marshal your type instead of just blitting the data across, resulting in the corruption of your pointer.\r\n\r\nFor ease of reproduction, here is a managed replacement for the native `test_func` method, which still reproduces the problem:\r\n```cs\r\nstatic unsafe IntPtr testFunc(int value)\r\n{\r\n    Console.WriteLine(\">>> test_func:\");\r\n    var a = (StructA*)NativeMemory.Alloc((uint)sizeof(StructA));\r\n    a->X = unchecked((nint)0x7ea33f5000);\r\n    a->Y = unchecked((nint)0x7ea3440000);\r\n    a->Z = unchecked((nint)0x7ea3452c00);\r\n    a->XLength = 555;\r\n    a->YLength = 666;\r\n    a->ZLength = 1010;\r\n    Console.WriteLine($\"x = 0x{a->X:X}, y = 0x{a->Y:X}, z = 0x{a->Z:X}, x_length = {a->XLength}, y_length = {a->YLength}, z_length = {a->ZLength}\");\r\n    return (IntPtr)a;\r\n}\r\n```\r\n\r\nThere are a few solutions:\r\n1. Use `*(UnionStruct*)ptr` instead of `Marshal.PtrToStructure`.\r\n2. Change the `bool` field to `byte`, which will cause the types to be considered blittable and no marshaling will occur.\r\n3. Add `[assembly: DisableRuntimeMarshaling]` and use `*(UnionStruct*)ptr` instead of `Marshal.PtrToStructure`.\r\n\r\nMy personal recommendation would be to go with option 2 and use `*(UnionStruct*)ptr` to read the value."
+      },
+      {
+        "user": "DaZombieKiller",
+        "created_at": "2022-09-26T12:54:36Z",
+        "body": "I think this is expected behaviour, even if it may be a bit confusing.\r\n\r\nThink about how the type would be marshaled. Each field will be written in order. The marshaller normalizes booleans to `0` (`false`) or `1` (`true`).\r\n\r\nThey are also marshaled as a Win32 `BOOL` by default, which is a 32-bit integer (so it actually needs `[MarshalAs(UnmanagedType.U1)]` to have a matching layout with native).\r\n\r\nThis means that if your pointer overlaps with a `bool`, the overlapping byte will be normalized, corrupting the value once the marshaller starts marshaling `StructB`.\r\n\r\nTo help with understanding the problem, you can try performing the marshaling yourself. Define `StructB` as:\r\n```cs\r\n[StructLayout(LayoutKind.Sequential)]\r\ninternal struct StructB\r\n{\r\n    internal IntPtr Data;\r\n    internal uint DataLength;\r\n    internal int Flag; // Win32 BOOL = int\r\n}\r\n```\r\nAnd then read the value with:\r\n```cs\r\nvar unmanagedStruct = *(UnionStruct*)ptr;\r\n\r\n// normalize the bool\r\nunmanagedStruct.B.Flag = unmanagedStruct.B.Flag != 0 ? 1 : 0;\r\n```\r\nAnd you will see the same pointer corruption.\r\nAs a result, you can actually \"hide\" the problem by defining `UnionStruct` like this:\r\n```cs\r\n[StructLayout(LayoutKind.Explicit)]\r\ninternal struct UnionStruct\r\n{\r\n    [FieldOffset(0)]\r\n    internal StructB B;\r\n    [FieldOffset(0)]\r\n    internal StructA A;\r\n}\r\n```\r\nBecause `StructB` is marshaled first, you won't see the pointer corruption."
+      },
+      {
+        "user": "jkotas",
+        "created_at": "2022-09-26T15:12:07Z",
+        "body": "```\r\n  struct {\r\n    unsigned char *data;\r\n    unsigned int size;\r\n    bool flag;\r\n  } B;\r\n```\r\nNote that your managed definition of B does not match this structure. Size of `bool` is likely 1 byte in your C/C++ compiler. The default marshalling for `bool` assumes that the size is 4 bytes. This mismatch is contributing to the confusing behavior that you are seeing.\r\n\r\nManual marshalling that @DaZombieKiller suggested is the best way to avoid problems like this for more complex structs with unions, etc. You should use `byte` as managed equivalent for unmanaged `bool`.\r\n\r\nAlso, take a look at `DisableRuntimeMarshallingAttribute` that is new in .NET 7."
+      }
+    ]
+  },
+  {
+    "number": 44623,
+    "title": "ThrowAsyncIOInProgress invoked from time to time",
+    "created_at": "2020-11-13T01:05:17Z",
+    "closed_at": "2020-11-13T02:31:59Z",
+    "labels": [
+      "question",
+      "area-System.IO"
+    ],
+    "url": "https://github.com/dotnet/runtime/issues/44623",
+    "body": "### Description\r\nCalling into the following method (single threaded) throws exception from time to time. Please help understanding why:\r\n```csharp\r\n        public Task SerializeAsync(IEnumerable<SampleActivity> samples, string destinationFilePath)\r\n        {\r\n            using StreamWriter file = File.CreateText(destinationFilePath);\r\n            return file.WriteAsync(JsonConvert.SerializeObject(samples));\r\n        }\r\n```\r\n\r\nCall stack:\r\n```shell\r\n2020-11-11 17:18:12.819 -08:00 [VRB] System.InvalidOperationException: The stream is currently in use by a previous operation on the stream.\r\n   at System.IO.StreamWriter.ThrowAsyncIOInProgress()\r\n   at System.IO.StreamWriter.Dispose(Boolean disposing)\r\n   at System.IO.TextWriter.Dispose()\r\n   at Project.Client.SampleActivitySerializer.SerializeAsync(IEnumerable`1 samples, String destinationFilePath) in D:\\Repos\\Project\\src\\SampleActivitySerializer.cs:line 14\r\n   at Project.Client.ServiceProfilerProvider.PostStopProcessAsync(PostStopOptions e) in D:\\Repos\\Project\\src\\Provider.cs:line 251\r\n```\r\n\r\n\r\n### Configuration\r\n.NET Core 3.1;\r\nOS: x64, Windows / x64 Ubuntu 16.04 LTS\r\n* Do you know whether it is specific to that configuration?\r\nNot as I know.\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/runtime/issues/44623/comments",
+    "author": "xiaomi7732",
+    "comments": [
+      {
+        "user": "stephentoub",
+        "created_at": "2020-11-13T02:31:39Z",
+        "body": "The code you wrote is basically:\r\n```C#\r\nStreamWriter file = File.CreateText(destinationFilePath);\r\nTask t = file.WriteAsync(JsonConvert.SerializeObject(samples));\r\nfile.Dispose();\r\nreturn t;\r\n```\r\nIn other words, you're Dispose'ing of the file while the async operation is still in flight.\r\n\r\nI think you likely wanted this instead:\r\n```C#\r\n        public async Task SerializeAsync(IEnumerable<SampleActivity> samples, string destinationFilePath)\r\n        {\r\n            using StreamWriter file = File.CreateText(destinationFilePath);\r\n            return await file.WriteAsync(JsonConvert.SerializeObject(samples));\r\n        }\r\n```"
+      },
+      {
+        "user": "xiaomi7732",
+        "created_at": "2020-11-13T18:26:49Z",
+        "body": "Thanks @stephentoub for the pointer. I thought the state machine would be the same between those 2, they aren't.\r\n\r\nThis is notes just for myself:\r\nThe state machine, on the caller, for the original code looks like this: no dispose() involved because it is called inside  SerializeAsync(), and as pointed out, at that moment, the task, aka WriteAsyncTask, is not fully completed yet:\r\n\r\n```csharp\r\n\tprivate sealed class <Caller>d__1 : IAsyncStateMachine\r\n\t{\r\n\t\tpublic int <>1__state;\r\n\r\n\t\tpublic AsyncTaskMethodBuilder <>t__builder;\r\n\r\n\t\tpublic Program <>4__this;\r\n\r\n\t\tprivate string <fileName>5__1;\r\n\r\n\t\tprivate SampleActivitySerializer <target>5__2;\r\n\r\n\t\tprivate ConfiguredTaskAwaitable.ConfiguredTaskAwaiter <>u__1;\r\n\r\n\t\tprivate void MoveNext()\r\n\t\t{\r\n\t\t\tint num = <>1__state;\r\n\t\t\ttry\r\n\t\t\t{\r\n\t\t\t\tConfiguredTaskAwaitable.ConfiguredTaskAwaiter awaiter;\r\n\t\t\t\tif (num != 0)\r\n\t\t\t\t{\r\n\t\t\t\t\t<fileName>5__1 = null;\r\n\t\t\t\t\t<target>5__2 = new SampleActivitySerializer();\r\n\t\t\t\t\tawaiter = <target>5__2.SerializeAsync(GenSample(), <fileName>5__1).ConfigureAwait(false).GetAwaiter();\r\n\t\t\t\t\tif (!awaiter.IsCompleted)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tnum = (<>1__state = 0);\r\n\t\t\t\t\t\t<>u__1 = awaiter;\r\n\t\t\t\t\t\t<Caller>d__1 stateMachine = this;\r\n\t\t\t\t\t\t<>t__builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tawaiter = <>u__1;\r\n\t\t\t\t\t<>u__1 = default(ConfiguredTaskAwaitable.ConfiguredTaskAwaiter);\r\n\t\t\t\t\tnum = (<>1__state = -1);\r\n\t\t\t\t}\r\n\t\t\t\tawaiter.GetResult();\r\n\t\t\t}\r\n\t\t\tcatch (Exception exception)\r\n\t\t\t{\r\n\t\t\t\t<>1__state = -2;\r\n\t\t\t\t<fileName>5__1 = null;\r\n\t\t\t\t<target>5__2 = null;\r\n\t\t\t\t<>t__builder.SetException(exception);\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\t<>1__state = -2;\r\n\t\t\t<fileName>5__1 = null;\r\n\t\t\t<target>5__2 = null;\r\n\t\t\t<>t__builder.SetResult();\r\n\t\t}\r\n\t\tvoid IAsyncStateMachine.MoveNext()\r\n\t\t{\r\n\t\t\t//ILSpy generated this explicit interface implementation from .override directive in MoveNext\r\n\t\t\tthis.MoveNext();\r\n\t\t}\r\n\r\n\t\t[DebuggerHidden]\r\n\t\tprivate void SetStateMachine(IAsyncStateMachine stateMachine)\r\n\t\t{\r\n\t\t}\r\n\r\n\t\tvoid IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine)\r\n\t\t{\r\n\t\t\t//ILSpy generated this explicit interface implementation from .override directive in SetStateMachine\r\n\t\t\tthis.SetStateMachine(stateMachine);\r\n\t\t}\r\n\t}\r\n```\r\n\r\nWrite it the other way, the dispose is called on 'final' statement, after all the operation is done, right before returning.\r\n\r\n```csharp\r\n[CompilerGenerated]\r\nprivate sealed class <SerializeAsync2>d__1 : IAsyncStateMachine\r\n{\r\n\tpublic int <>1__state;\r\n\r\n\tpublic AsyncTaskMethodBuilder <>t__builder;\r\n\r\n\tpublic IEnumerable<SampleActivity> samples;\r\n\r\n\tpublic string destinationFilePath;\r\n\r\n\tpublic SampleActivitySerializer <>4__this;\r\n\r\n\tprivate StreamWriter <file>5__1;\r\n\r\n\tprivate TaskAwaiter <>u__1;\r\n\r\n\tprivate void MoveNext()\r\n\t{\r\n\t\tint num = <>1__state;\r\n\t\ttry\r\n\t\t{\r\n\t\t\tif (num != 0)\r\n\t\t\t{\r\n\t\t\t\t<file>5__1 = File.CreateText(destinationFilePath);\r\n\t\t\t}\r\n\t\t\ttry\r\n\t\t\t{\r\n\t\t\t\tTaskAwaiter awaiter;\r\n\t\t\t\tif (num != 0)\r\n\t\t\t\t{\r\n\t\t\t\t\tawaiter = <file>5__1.WriteAsync(JsonConvert.SerializeObject(samples)).GetAwaiter();\r\n\t\t\t\t\tif (!awaiter.IsCompleted)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tnum = (<>1__state = 0);\r\n\t\t\t\t\t\t<>u__1 = awaiter;\r\n\t\t\t\t\t\t<SerializeAsync2>d__1 stateMachine = this;\r\n\t\t\t\t\t\t<>t__builder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tawaiter = <>u__1;\r\n\t\t\t\t\t<>u__1 = default(TaskAwaiter);\r\n\t\t\t\t\tnum = (<>1__state = -1);\r\n\t\t\t\t}\r\n\t\t\t\tawaiter.GetResult();\r\n\t\t\t}\r\n\t\t\tfinally\r\n\t\t\t{\r\n\t\t\t\tif (num < 0 && <file>5__1 != null)\r\n\t\t\t\t{\r\n\t\t\t\t\t((IDisposable)<file>5__1).Dispose();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t\tcatch (Exception exception)\r\n\t\t{\r\n\t\t\t<>1__state = -2;\r\n\t\t\t<file>5__1 = null;\r\n\t\t\t<>t__builder.SetException(exception);\r\n\t\t\treturn;\r\n\t\t}\r\n\t\t<>1__state = -2;\r\n\t\t<file>5__1 = null;\r\n\t\t<>t__builder.SetResult();\r\n\t}\r\n\r\n\tvoid IAsyncStateMachine.MoveNext()\r\n\t{\r\n\t\t//ILSpy generated this explicit interface implementation from .override directive in MoveNext\r\n\t\tthis.MoveNext();\r\n\t}\r\n\r\n\t[DebuggerHidden]\r\n\tprivate void SetStateMachine(IAsyncStateMachine stateMachine)\r\n\t{\r\n\t}\r\n\r\n\tvoid IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine)\r\n\t{\r\n\t\t//ILSpy generated this explicit interface implementation from .override directive in SetStateMachine\r\n\t\tthis.SetStateMachine(stateMachine);\r\n\t}\r\n}\r\n```\r\n"
+      }
+    ]
+  },
+  {
+    "number": 33935,
+    "title": "System.Runtime.Loader Nuget out of date AssemblyLoadContext constructors",
+    "created_at": "2020-03-22T20:50:28Z",
+    "closed_at": "2020-03-23T06:57:58Z",
+    "labels": [
+      "question",
+      "area-AssemblyLoader-coreclr",
+      "untriaged"
+    ],
+    "url": "https://github.com/dotnet/runtime/issues/33935",
+    "body": "I am making use of the collectable assemblies functionality in AssemblyLoadContext released with Core3.1.  It works fine within a Core3.1 project, but if i try to move it out to a Standard2.1 library for reuse, the System.Runtime.Loader Nuget is out of date and does not have the new collectable constructor.\r\n\r\nDoes the Nuget need updating, or is there another reason for this?",
+    "comments_url": "https://api.github.com/repos/dotnet/runtime/issues/33935/comments",
+    "author": "luhis",
+    "comments": [
+      {
+        "user": "jkotas",
+        "created_at": "2020-03-23T03:44:45Z",
+        "body": ".NET Standard 2.1 does not include collectible assemblies feature. You have to target netcoreapp3.0+ to use collectible assemblies.\r\n\r\nSystem.Runtime.Loader is left over from .NET Core 1.0 where the platform was composed from many small NuGet packages. We are not planning to update these NuGet packages."
+      }
+    ]
+  },
+  {
+    "number": 31698,
+    "title": "Encoding.UTF8.GetString: The output char buffer is too small...",
+    "created_at": "2020-02-03T21:57:21Z",
+    "closed_at": "2020-02-04T00:46:00Z",
+    "labels": [
+      "question",
+      "area-System.Text.Encoding",
+      "untriaged"
+    ],
+    "url": "https://github.com/dotnet/runtime/issues/31698",
+    "body": "NET 3.1\r\n\r\nFeeding some garbage data into Encoding.UTF8.GetString, I occasionally get this exception:\r\n`System.ArgumentException: 'The output char buffer is too small to contain the decoded characters, encoding 'Unicode (UTF-8)' fallback 'System.Text.DecoderReplacementFallback'. (Parameter 'chars')'`\r\n\r\nStack trace:\r\n```\r\n   at System.Text.Encoding.ThrowCharsOverflow()\r\n   at System.Text.Encoding.ThrowCharsOverflow(DecoderNLS decoder, Boolean nothingDecoded)\r\n   at System.Text.Encoding.GetCharsWithFallback(ReadOnlySpan`1 bytes, Int32 originalBytesLength, Span`1 chars, Int32 originalCharsLength, DecoderNLS decoder)\r\n   at System.Text.UTF8Encoding.GetCharsWithFallback(ReadOnlySpan`1 bytes, Int32 originalBytesLength, Span`1 chars, Int32 originalCharsLength, DecoderNLS decoder)\r\n   at System.Text.Encoding.GetCharsWithFallback(Byte* pOriginalBytes, Int32 originalByteCount, Char* pOriginalChars, Int32 originalCharCount, Int32 bytesConsumedSoFar, Int32 charsWrittenSoFar)\r\n   at System.Text.UTF8Encoding.GetChars(Byte* bytes, Int32 byteCount, Char* chars, Int32 charCount)\r\n   at System.String.CreateStringFromEncoding(Byte* bytes, Int32 byteLength, Encoding encoding)\r\n   at System.Text.Encoding.GetString(ReadOnlySpan`1 bytes)\r\n   at ...Our code...\r\n```\r\n\r\nI was accidentally using it on binary data while doing some debugging.  \r\n\r\nIt happened using the ReadOnlySpan<byte> overload, but these byte arrays are the data:\r\n```\r\nnew byte[] { 1,6,104,97,115,104,116,120,1,32,125,34,109,16,93,67,238,247,111,164,124,222,214,204,168,122,3,194,48,190,150,196,26,251,175,111,65,1,97,0,30,248,0,4,207,225,40,0 } ;\r\nnew byte[] { 1,6,104,97,115,104,116,120,1,32,146,49,170,24,95,32,149,96,115,203,170,163,193,27,202,95,134,122,121,85,104,162,76,212,216,15,177,166,148,80,204,57,0,4,222,80,41,0 } ;\r\n```\r\n\r\nNeither of these is reproducible though.\r\n\r\nEven when visual studio has the \"Exception Thrown!\" exception window open and highlighted, re-executing the same statement doesn't throw an exception the second time.\r\n\r\nMy suspicion would be something to do with ArrayPool, if that's even used by this method.\r\n\r\nNot sure how to be more useful with this one...",
+    "comments_url": "https://api.github.com/repos/dotnet/runtime/issues/31698/comments",
+    "author": "joshlang",
+    "comments": [
+      {
+        "user": "GrabYourPitchforks",
+        "created_at": "2020-02-04T00:40:04Z",
+        "body": "Normally this means that the input buffer's contents have changed in the middle of the operation. The `Encoding.GetString(ReadOnlySpan<char>)` API performs two passes: the first pass to calculate the necessary `string` length, and the second pass to perform the actual conversion. If the data within the byte buffer changes between these two operations, the conversion routine might fail because the number of resulting output chars could have increased."
+      },
+      {
+        "user": "GrabYourPitchforks",
+        "created_at": "2020-02-04T00:42:34Z",
+        "body": "@joshlang - double-check that another thread in your application isn't mutating the buffers passed to this API while the operation is in progress. If you're seeing that this exception still occurs with static data, please let me know so that we can investigate further."
+      }
+    ]
+  },
+  {
+    "number": 26689,
+    "title": "TreatControlCAsInput always throws",
+    "created_at": "2018-07-03T20:29:49Z",
+    "closed_at": "2020-01-31T22:02:25Z",
+    "labels": [
+      "question",
+      "area-System.Console",
+      "os-windows"
+    ],
+    "url": "https://github.com/dotnet/runtime/issues/26689",
+    "body": "OS: Windows\r\n.NET Version: .NET Core 2.1.1\r\n\r\nI have this app:\r\n\r\n```csharp\r\nusing System;\r\n\r\nnamespace ControlC\r\n{\r\n    class Program\r\n    {\r\n        static void Main(string[] args)\r\n        {\r\n            Console.WriteLine(\"Hello World!\");\r\n            Console.TreatControlCAsInput = true;\r\n        }\r\n    }\r\n}\r\n```\r\n\r\nIt always throws:\r\n\r\n```console\r\nException has occurred: CLR/System.IO.IOException\r\nAn unhandled exception of type 'System.IO.IOException' occurred in System.Console.dll: 'The handle is invalid'\r\n   at System.ConsolePal.set_TreatControlCAsInput(Boolean value)\r\n   at System.Console.set_TreatControlCAsInput(Boolean value)\r\n   at ControlC.Program.Main(String[] args) in C:\\Users\\rich\\ControlC\\Program.cs:line 10\r\n```\r\n\r\nI wasn't expecting this. What is the correct behavior?\r\n\r\nI am having some trouble getting the behavior I want with CTRL-C. I was using this property in a larger app and see the same behavior.  This is the minimal use case. I want to run code in the `CancelKeyPress` w/o it exiting before execution of the handler is complete.",
+    "comments_url": "https://api.github.com/repos/dotnet/runtime/issues/26689/comments",
+    "author": "richlander",
+    "comments": [
+      {
+        "user": "stephentoub",
+        "created_at": "2018-07-03T20:47:16Z",
+        "body": "I can't repro this, and I've never seen an error like this.  TreatControlCAsInput is supported.\r\n\r\nAlso, what is the `Exception has occurred: CLR/System.IO.IOException` in your output?  Where is that coming from?\r\n\r\nHow are you executing this?"
+      },
+      {
+        "user": "richlander",
+        "created_at": "2018-07-03T21:40:53Z",
+        "body": "I see now that it works with `dotnet run`. I can repro it with F5 in VS Code (still on Windows).\r\n\r\nOnly other info in the exception is this HRESULT, which I assume is generic: 2147024890"
+      },
+      {
+        "user": "stephentoub",
+        "created_at": "2018-07-04T03:35:00Z",
+        "body": "> I can repro it with F5 in VS Code (still on Windows).\r\n\r\nIt sounds like the issue then is with VS Code and how it's creating the console.  Most likely it's redirecting stdin such that there isn't actually a Windows console to interact with, and you get the IOException outlined in the docs: \"Unable to get or set the input mode of the console input buffer.\"."
+      }
+    ]
+  },
+  {
+    "number": 8071,
+    "title": "dotnet build failed",
+    "created_at": "2017-05-12T10:44:27Z",
+    "closed_at": "2020-01-31T01:47:13Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/runtime/issues/8071",
+    "body": "I have just installed documentation in the VS 2017 Help Viewer and am attempting to complete the first C# Tutorial which is for a console application:\r\nThe initial instructions are : \r\nin a command window enter\r\ndotnet new console   ( to which I had to add -all)                      .... this worked ok\r\ndotnet restore                                                                             .... this worked ok\r\ndotnet build                                                                                .... this failed as follows\r\n\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(225,99): error CS0117: 'Environment' does not contain a definition for 'GetFolderPath' [C:\\Windows\\System32\\system32.csproj]\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(225,125): error CS0117: 'Environment' does not contain a definition for 'SpecialFolder' [C:\\Windows\\System32\\system32.csproj]\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(232,88): error CS0117: 'Environment' does not contain a definition for 'GetFolderPath' [C:\\Windows\\System32\\system32.csproj]\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(232,114): error CS0117: 'Environment' does not contain a definition for 'SpecialFolder' [C:\\Windows\\System32\\system32.csproj]\r\n\r\nBuild FAILED.\r\n\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(225,99): error CS0117: 'Environment' does not contain a definition for 'GetFolderPath' [C:\\Windows\\System32\\system32.csproj]\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(225,125): error CS0117: 'Environment' does not contain a definition for 'SpecialFolder' [C:\\Windows\\System32\\system32.csproj]\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(232,88): error CS0117: 'Environment' does not contain a definition for 'GetFolderPath' [C:\\Windows\\System32\\system32.csproj]\r\nWindowsPowerShell\\v1.0\\Modules\\PSDesiredStateConfiguration\\DSCClassResources\\WindowsPackageCab\\WindowsPackageCab.cs(232,114): error CS0117: 'Environment' does not contain a definition for 'SpecialFolder' [C:\\Windows\\System32\\system32.csproj]\r\n    0 Warning(s)\r\n    4 Error(s)\r\n\r\n\r\nCan anyone please advise what I need to do to overcome this problem ?\r\n\r\nThanking you in anticipation.\r\n\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/runtime/issues/8071/comments",
+    "author": "Whomsonever",
+    "comments": [
+      {
+        "user": "jkotas",
+        "created_at": "2017-05-12T15:05:30Z",
+        "body": "> dotnet new console\r\n> dotnet restore\r\n> dotnet build\r\n\r\nTry to execute these steps in a new empty directory.\r\n\r\nThe error suggest that you have done them in c:\\windows\\system32 and unrelated powershell files under this directory are getting picked up by `dotnet build` causing the error. `dotnet build` will try to build everything under current directory by default."
+      },
+      {
+        "user": "jkotas",
+        "created_at": "2017-05-12T16:09:04Z",
+        "body": "Try this:\r\n\r\n```\r\nmkdir c:\\HelloWorld\r\ncd /d c:\\HelloWorld\r\ndotnet new console\r\ndotnet restore\r\ndotnet build\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 20833,
+    "title": "Problems building library with Novell.Directory.Ldap.NETStandard for Core 1.1",
+    "created_at": "2017-03-31T00:02:57Z",
+    "closed_at": "2020-01-31T14:44:57Z",
+    "labels": [
+      "question",
+      "area-Infrastructure-libraries"
+    ],
+    "url": "https://github.com/dotnet/runtime/issues/20833",
+    "body": "I have a library I am building for Core 1.0, and it builds fine:\r\n```json\r\n{\r\n  \"version\": \"1.0.0-*\",\r\n\r\n  \"dependencies\": {\r\n    \"Microsoft.AspNet.WebApi.Client\": \"5.2.3\",\r\n    \"Microsoft.AspNetCore.Mvc.ViewFeatures\": \"1.0.0\",\r\n    \"Microsoft.AspNetCore.Razor.Runtime\": \"1.0.0\",\r\n    \"NETStandard.Library\": \"1.6.0\",\r\n    \"Novell.Directory.Ldap.NETStandard\":  \"2.3.6\" \r\n  },\r\n\r\n  \"frameworks\": {\r\n    \"netstandard1.6\": {\r\n      \"imports\": [ \"dnxcore50\", \"portable-net451+win8\" ]\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nTo update to Core 1.1, the project.json is updated:\r\n```json\r\n{\r\n  \"version\": \"1.0.0-*\",\r\n\r\n  \"dependencies\": {\r\n    \"Microsoft.AspNet.WebApi.Client\": \"5.2.3\",\r\n    \"Microsoft.AspNetCore.Mvc.ViewFeatures\": \"1.1.1\",\r\n    \"Microsoft.AspNetCore.Razor.Runtime\": \"1.1.0\",\r\n    \"NETStandard.Library\": \"1.6.1\",\r\n    \"Novell.Directory.Ldap.NETStandard\": \"2.3.6\"\r\n  },\r\n\r\n  \"frameworks\": {\r\n    \"netstandard1.6\": {\r\n      \"imports\": [ \"portable-net462+win8\" ]\r\n    }\r\n  }\r\n}\r\n```\r\n\r\nIt builds fine in Visual Studio 2015 on my local machine, but when it gets built via my TFS build process,, it errors on dotnet restore:\r\n```\r\n2017-03-29T17:08:59.6868965Z dotnet restore e:\\tfs_work\\11\\s\\CcpWebClient\\Trunk\\CcpWebClient\r\n2017-03-29T17:08:59.6868965Z Error message highlight pattern: \r\n2017-03-29T17:08:59.6868965Z Warning message highlight pattern: \r\n2017-03-29T17:08:59.9364981Z log  : Restoring packages for e:\\tfs_work\\11\\s\\CcpWebClient\\Trunk\\CcpWebClient\\src\\CcpWebClient.Common\\project.json...\r\n2017-03-29T17:09:00.8725041Z log  : Restoring packages for e:\\tfs_work\\11\\s\\CcpWebClient\\Trunk\\CcpWebClient\\src\\CcpWebClient.Web\\project.json...\r\n2017-03-29T17:09:02.0581117Z error: Package System.Net.WebSockets 4.3.0 is not compatible with netstandard1.6 (.NETStandard,Version=v1.6). Package System.Net.WebSockets 4.3.0 supports:\r\n2017-03-29T17:09:02.0581117Z error:   - monoandroid10 (MonoAndroid,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - monotouch10 (MonoTouch,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - netstandard1.3 (.NETStandard,Version=v1.3)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarinios10 (Xamarin.iOS,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarinmac20 (Xamarin.Mac,Version=v2.0)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarintvos10 (Xamarin.TVOS,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarinwatchos10 (Xamarin.WatchOS,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error: Package System.Collections.Specialized 4.3.0 is not compatible with netstandard1.6 (.NETStandard,Version=v1.6). Package System.Collections.Specialized 4.3.0 supports:\r\n2017-03-29T17:09:02.0737118Z error:   - monoandroid10 (MonoAndroid,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - monotouch10 (MonoTouch,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - netstandard1.3 (.NETStandard,Version=v1.3)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarinios10 (Xamarin.iOS,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarinmac20 (Xamarin.Mac,Version=v2.0)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarintvos10 (Xamarin.TVOS,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error:   - xamarinwatchos10 (Xamarin.WatchOS,Version=v1.0)\r\n2017-03-29T17:09:02.0737118Z error: One or more packages are incompatible with .NETStandard,Version=v1.6.\r\n```\r\n\r\nThe WebSockets package is a dependency for Novell.Directory.Ldap.NETStandard.\r\n\r\nI don't understand why these packages are suddenly complaining about compatibility with .NETStandard,Version=v1.6 when they were building fine before.\r\n\r\nAny ideas?\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/runtime/issues/20833/comments",
+    "author": "ksatokcc",
+    "comments": [
+      {
+        "user": "weshaggard",
+        "created_at": "2017-03-31T16:52:25Z",
+        "body": "Perhaps @ericstj or @emgarten understand what might be happening here as I've never seen this error. The funny part is that it lists that it supports netstandard1.3 which is what should be chosen when restoring for netstandard1.6."
+      },
+      {
+        "user": "ericstj",
+        "created_at": "2017-03-31T16:56:50Z",
+        "body": "Seems funny.  Your project works for me.  Try deleting your nuget packages cache (or rename it for forensic purposes).  I suspect a corrupt package folder."
+      }
+    ]
+  }
+]

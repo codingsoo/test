@@ -1,0 +1,49 @@
+[
+  {
+    "id": "https://github.com/Francis-Rings/StableAnimator/issues/64",
+    "source": {
+      "issue_number": 64
+    },
+    "initial_question": {
+      "title": "\u5173\u4e8e\u5fae\u8c03",
+      "body": "\u8bf7\u95ee\u5927\u4f6c\r\n\u4f7f\u7528\u5fae\u8c03\u540e\u7684 pose_net.pth\u3001face_encoder.pth\u3001unet.pth \u53bb\u505a\u63a8\u7406\uff0c\u63a8\u7406\u65f6\u53c2\u8003\u56fe\u7247\u968f\u4fbf\u9009\u62e9\u4e00\u5f20\u4eba\u7269\u56fe\uff0c\u4e3a\u5565\u63a8\u7406\u51fa\u6765\u751f\u6210\u7684\u52a8\u753b/\u89c6\u9891\u90fd\u8fd8\u662f\u5fae\u8c03\u65f6\u5019\u7684\u4eba\u7269\uff0c\u4f3c\u4e4e\u53c2\u8003\u56fe\u7247\u7684\u4eba\u7269\u56fe\u5e76\u6ca1\u6709\u751f\u6548\r\n\u8bf7\u95ee\u8fd9\u662f\u4e3a\u5565\u5462\uff1f"
+    },
+    "satisfaction_conditions": [
+      "Training configuration correctly distinguishes between fine-tuning and fresh training modes"
+    ],
+    "created_at": "2025-01-02T02:28:01Z"
+  },
+  {
+    "id": "https://github.com/Francis-Rings/StableAnimator/issues/45",
+    "source": {
+      "issue_number": 45
+    },
+    "initial_question": {
+      "title": "the file \"inference\" cannot be opened",
+      "body": null
+    },
+    "satisfaction_conditions": [
+      "Complete file download verification",
+      "Successful file extraction",
+      "File integrity verification"
+    ],
+    "created_at": "2024-12-17T02:33:53Z"
+  },
+  {
+    "id": "https://github.com/Francis-Rings/StableAnimator/issues/16",
+    "source": {
+      "issue_number": 16
+    },
+    "initial_question": {
+      "title": "How much VRAM does it need",
+      "body": null
+    },
+    "satisfaction_conditions": [
+      "System must operate within available VRAM constraints for specified resolutions",
+      "System must support multiple resolution options",
+      "VRAM usage must be accurately reported or predictable",
+      "System must maintain functionality at lower VRAM configurations"
+    ],
+    "created_at": "2024-12-10T18:36:50Z"
+  }
+]

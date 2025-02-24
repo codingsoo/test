@@ -1,0 +1,33 @@
+[
+  {
+    "id": "https://github.com/genmoai/mochi/issues/127",
+    "source": {
+      "issue_number": 127
+    },
+    "initial_question": {
+      "title": "Setting batch_cfg=True produces slightly different results",
+      "body": "Hi, I was playing around with `batch_cfg` and am seeing different results when I enable/disable batching. Is this intended behaviour?\r\n\r\nCode to reproduce:\r\n```py\r\nimport numpy as np\r\nimport os\r\nfrom genmo.mochi_preview.pipelines import (\r\n    DecoderModelFactory,\r\n    DitModelFactory,\r\n    MochiPipeline,\r\n    T5ModelFactory,\r\n    linear_quadratic_schedule,\r\n)\r\n\r\nimport pickle\r\n\r\nMOCHI_DIR = \"./weights\"\r\n\r\npipeline = MochiPipeline(\r\n    text_encoder_factory=T5ModelFactory(),\r\n    dit_factory=DitModelFactory(\r\n        model_path=f\"{MOCHI_DIR}/dit.safetensors\", model_dtype=\"bf16\"\r\n    ),\r\n    decoder_factory=DecoderModelFactory(\r\n        model_path=f\"{MOCHI_DIR}/decoder.safetensors\",\r\n    ),\r\n    decode_type=\"tiled_full\",\r\n    cpu_offload=True\r\n)\r\n\r\ncfgs = [\r\n    (dict(\r\n        height=480,\r\n        width=848,\r\n        num_frames=31,\r\n        num_inference_steps=64,\r\n        sigma_schedule=linear_quadratic_schedule(64, 0.025),\r\n        cfg_schedule=[4.5] * 64,\r\n        batch_cfg=False,\r\n        prompt=\"A spinning globe on a wooden desk.\",\r\n        negative_prompt=\"\",\r\n        seed=12345,\r\n    ), \"ref_unbatched.pkl\"),\r\n    (dict(\r\n        height=480,\r\n        width=848,\r\n        num_frames=31,\r\n        num_inference_steps=64,\r\n        sigma_schedule=linear_quadratic_schedule(64, 0.025),\r\n        cfg_schedule=[4.5] * 64,\r\n        batch_cfg=True,\r\n        prompt=\"A spinning globe on a wooden desk.\",\r\n        negative_prompt=\"\",\r\n        seed=12345,\r\n    ), \"ref_batched.pkl\")\r\n]\r\n\r\nvideos = []\r\nfor cfg, fname in cfgs:\r\n    video = pipeline(**cfg)\r\n    videos.append(video)\r\n        \r\nprint(np.allclose(videos[0], videos[1]))\r\n```\r\n\r\nNote: The generated videos look roughly the same"
+    },
+    "satisfaction_conditions": [
+      "Visual similarity between batched and unbatched outputs is maintained",
+      "Minor numerical differences between modes are acceptable",
+      "Core functionality remains intact across modes"
+    ],
+    "created_at": "2025-01-12T20:32:53Z"
+  },
+  {
+    "id": "https://github.com/genmoai/mochi/issues/93",
+    "source": {
+      "issue_number": 93
+    },
+    "initial_question": {
+      "title": "TypeError: configure_model() missing 1 required positional argument: 'cpu_offload_'",
+      "body": "TypeError: configure_model() missing 1 required positional argument: 'cpu_offload_'\r\nstart gradio\r\nI will encounter this problem regardless of whether I pass this parameter or not\r\nHere are some startup parameters I have tried\r\npython3 ./demos/gradio_ui.py --model_dir weights/ --cpu_offload true\r\npython3 ./demos/gradio_ui.py --model_dir weights/ --cpu_offload false\r\npython3 ./demos/gradio_ui.py --model_dir weights/ "
+    },
+    "satisfaction_conditions": [
+      "The gradio_ui.py script executes without TypeError about cpu_offload_ argument",
+      "The script accepts both presence and absence of --cpu_offload parameter"
+    ],
+    "created_at": "2024-11-28T16:18:48Z"
+  }
+]

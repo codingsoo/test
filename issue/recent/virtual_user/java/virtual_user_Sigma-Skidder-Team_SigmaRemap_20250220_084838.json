@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/Sigma-Skidder-Team/SigmaRemap/issues/45",
+    "source": {
+      "issue_number": 45
+    },
+    "initial_question": {
+      "title": "Cannot build",
+      "body": "I get an error when I try to build as described, like no Cleaner class, etc. If you don't do #7 in the instructions, you can build, but you will get an error at runtime. downloaded from release will start."
+    },
+    "satisfaction_conditions": [
+      "Project successfully builds without compilation errors",
+      "Java version compatibility is correctly configured"
+    ],
+    "created_at": "2025-01-25T07:04:51Z"
+  }
+]

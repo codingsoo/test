@@ -1,0 +1,1285 @@
+[
+  {
+    "number": 7991,
+    "title": "Setting RequestContext by IIncomingGrainCallFilter from a gRPC service",
+    "created_at": "2022-09-22T17:10:05Z",
+    "closed_at": "2022-09-22T22:32:28Z",
+    "labels": [
+      "question",
+      ":heavy_check_mark: Resolution: Answered"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/7991",
+    "body": "As far as I understood correctly, when RequestContext.Set is called the given metadata is passed to every grain method call from that point automatically. What is not clear for me in the docs whether the same metadata is being passed to another grain if that is created using GrainFactory.GetGrain<>() during a call that has the metadata passed to already by the mentioned mechanism.\r\n\r\nThe metadata I need to pass is a context identifier that can be used to identify the user and other contextual info. I would use the grain filter mechanism (IIncomingGrainCallFilter) for the purpose. However, I do not know how to pass the required information to the filter.\r\n\r\nI use a gRPC service endpoint that gets the IClusterClient from service provider, then creates a grain and calls some of its methods. The context information that I would like to set to the RequestContext comes from the ServerCallContext parameter of the gRPC method. These 3 (service endpoint, grain filter, grain) could run in different threads, I presume. The filter is instantiated by Orleans so I have no control over its life cycle.  As I experienced it is created as a singleton, no matter how I register it in the DI container.\r\n\r\nWhat is the suggested way of passing data to the grain filter?\r\nIn which thread is the Invoke method called? Can I use some thread synchronization mechanism to communicate between the gRPC method and the grain filter?\r\n\r\nAny suggestions are appreciated. Thank you.\r\n\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/7991/comments",
+    "author": "danielleiszen",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2022-09-22T19:14:58Z",
+        "body": "Thanks for the question, @danielleiszen.\r\n\r\n`GrainFactory.GetGrain<T>(...)` does not create a grain, it just creates a reference to a grain (think of it like creating a URI, but with a type). \r\n\r\nThe `RequestContext` is async-local, which means that it will flow along your async calls. So, to implement what you want, you should propagate the `ServerCallContext` to the `RequestContext` in your gRPC server method bodies. I'm not sure what a grain call filter would be necessary for here, unless you have some other ambient context which you could access from there to flow to `RequestContext`.\r\n\r\nDoes that answer it?"
+      }
+    ]
+  },
+  {
+    "number": 7688,
+    "title": "Calling IGrainFactory.GetGrain<T>(pk) from constructor is a bad practice ?",
+    "created_at": "2022-04-14T03:49:37Z",
+    "closed_at": "2022-04-14T18:40:53Z",
+    "labels": [
+      "question",
+      ":heavy_check_mark: Resolution: Answered"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/7688",
+    "body": "I'm doing some experiments with the Orleans.\r\n\r\nI tried to find the answer but i could not...\r\n\r\nIs it a bad idea reusing another grain gathered from the constructor like this ?\r\n\r\n```csharp\r\npublic class MainGrain : Grain, IMainGrain\r\n{\r\n    private readonly IOtherGrain _otherGrain;\r\n\r\n    public MainGrain(IGrainActivationContext context, IGrainFactory grainFactory) \r\n    {\r\n        _otherGrain = grainFactory.GetGrain<IOtherGrain>(context.GrainIdentity.PrimaryKeyString);\r\n    }\r\n\r\n    public ValueTask<Item> GetCurrentValue() =>\r\n        _otherGrain.GetItem();\r\n\r\n   //others methods here\r\n}\r\n````\r\n\r\nMainGrain stay in memory longer then IOtherGrain... (Calling GetCurrentValue() may call a already collected grain)",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/7688/comments",
+    "author": "fernandozago",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2022-04-14T03:53:19Z",
+        "body": "It's fine to call GetGrain in the grain's constructor.\r\n\r\nGetGrain doesn't return the grain itself, just a reference to it. It's similar to a URL or a typed HttpClient wrapper. It's a fast, synchronous operation and doesn't perform any IO."
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2022-04-14T03:57:18Z",
+        "body": "That's exactly right, Orleans will make sure to activate it on-demand for you"
+      }
+    ]
+  },
+  {
+    "number": 7451,
+    "title": "Silos cannot find each other after a re-run when using RedisClustring",
+    "created_at": "2021-12-27T08:24:05Z",
+    "closed_at": "2021-12-27T10:34:10Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/7451",
+    "body": "Hi \r\nI'm trying to run orleans locally for development  but i'm using redis clustring.\r\nI have 2 silo each host different kind of grains. On first run everything work fine but when i try to re-run my silos they cannot find each other and they try to connect to dead silos for about 10 minutes.\r\n\r\n`Failed to get ping responses from 1 of 1 active silos. Newly joining silos validate connectivity with all active silos that have recently updated their 'I Am Alive' value before joining the cluster. Successfully contacted: []. Silos which did not respond successfully are: [S10.163.245.127:11111:378287550]. Will continue attempting to validate connectivity until 12/27/2021 08:08:04. Attempt #3`\r\n\r\nHere my configurations for silos:\r\n```\r\n    siloBuilder.UseRedisClustering(options => \r\n                    { \r\n                         options.ConnectionString = redisConnectionString; options.Database = 0; \r\n                    })\r\n                    .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000)\r\n                    .Configure<ClusterOptions>(options =>\r\n                    {\r\n                        options.ClusterId = \"dev\";\r\n                        options.ServiceId = \"OrleansBasics\";\r\n                    })\r\n                    .ConfigureLogging(logging => logging.AddConsole())\r\n```\r\n\r\n```\r\nsiloBuilder\r\n                    .UseRedisClustering(options => \r\n                    { \r\n                        options.ConnectionString = redisConnectionString; options.Database = 0; \r\n                    })\r\n                    .ConfigureEndpoints(siloPort: 11112, gatewayPort: 30002)\r\n                    .Configure<ClusterOptions>(options =>\r\n                    {\r\n                        options.ClusterId = \"dev\";\r\n                        options.ServiceId = \"OrleansBasics\";\r\n                    })\r\n                    .ConfigureLogging(logging => logging.AddConsole())\r\n```",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/7451/comments",
+    "author": "zeinali0",
+    "comments": [
+      {
+        "user": "benjaminpetit",
+        "created_at": "2021-12-27T09:09:29Z",
+        "body": "It's expected, previous silo instances did not shutdown properly. \r\n\r\nTwo solutions:\r\n\r\n- make sure that your silo can shutdown properly (might not be practical in dev environment, but you need to make sure it actually works for production)\r\n- use another `ClusterId`  every time you deploy a new cluster"
+      },
+      {
+        "user": "zeinali0",
+        "created_at": "2021-12-27T10:06:02Z",
+        "body": "Even in production there is possibility to silo not shutdown properly \r\nwhat should we do if we want to immediately replace dead silo with new one?\r\nIs there any reason it configured such a long time to detect a silo is dead?\r\nUsing new `ClusterId` mean if one silo died we should re-run all other silos and clients again with new clusterId. this may cause no problem in development but it can be problematic in production."
+      },
+      {
+        "user": "benjaminpetit",
+        "created_at": "2021-12-27T10:21:31Z",
+        "body": "What you are experiencing here is only happening because all silos from the cluster are dead. When a silo tries to join an existing cluster, it will tries to ping all silos marked alive (ignoring values not updated for more than `NumMissedTableIAmAliveLimit * IAmAliveTablePublishTimeout`, by default 10min).\r\n\r\nIf you have a 3-silo cluster, and one of them crashes, the two remaining would vote the 3rd dead quite quickly, updating the membership table. A new silo would be able to start without any troubles.\r\n\r\nIn your case the silo trying to join the cluster is a bit stuck: why it is not able to ping the silo marked `Alive` in the membership table? Is it because they are dead? Is it because of a network/config issue? It is safer in this case to just give up with a clear error message."
+      }
+    ]
+  },
+  {
+    "number": 7206,
+    "title": "[Question] - Same silo deployment for associated grains",
+    "created_at": "2021-08-20T15:24:10Z",
+    "closed_at": "2021-08-25T15:12:30Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/7206",
+    "body": "I am implementing a game application using orleans. For every instance of the game, I have `GameGrain`, `PlayerGrain `and `WeaponsGrain`. `GameGrain ` is keyed using a GameGuid. `PlayerGrain `is keyed using GameGuid+PlayerGuid and `WeaponsGrain `is keyed using GameGuid. I could potentially have hundreds of instances of games running. I want to implement a placement strategy that enables for any game instance i.e. `GameGrain `the associated `PlayerGrain `and `WeaponsGrain `to be activated on same silo.\r\n\r\nHashbased placement strategy could achieve something like this but that doesn't guarantee same silo placement because silos could go offline in a cluster. \r\n\r\nWondering if guys have any suggestions?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/7206/comments",
+    "author": "sheeri185adidam",
+    "comments": [
+      {
+        "user": "nkosi23",
+        "created_at": "2021-08-20T17:10:37Z",
+        "body": "The difficulty here is that you are interested in an implementation detail that you shouldn't be interested in as Orleans is supposed to take care of that for you. What you would need is being able to override the PlacementService.GetCompatibleSilos(PlacementTarget target) method to alter the definition of what is a compatible silo. Right now the only discriminant is whether or not your grains are versioned, and if the silo has the right version of the grain it is deemed compatible. But this class is marked internal as users are not expected to be interested in this level of implementation details.\r\n\r\nBut even if the class wasn't internal, while your id generation scheme allows you to have convenient access to the id of the game grain, the Placement runtime has no API allowing you to know which grains are currently activated in a Silo. You are not supposed to be interested in the content of individual silos, this is out of intended usage.\r\n\r\nOnce this is said, what you could do is segment your silos in subnetworks and create a variation of the HashBased placement strategy (since the placement runtime gives you access to the IP addresses of compatible silos). This would allow you to ensure that a particular game id is only serviced by a particular silo.\r\n\r\nHowever, once you have done that, keep in mind that you will have no way to load balance the silo under heavy load (which is one of the key benefits of using Orleans). And if you want to add this capability, you are back to square one as this is exactly the behavior of built-in placement strategies.\r\n\r\nI strongly feel that you do not actually want to do that. Just ensure that your silos are all based in the same data center and latency shouldn't ever be an issue. LANs are very fast these days. I have a sense that this may be an unnecessary optimization concern. The magic of Orleans is that it takes care of that and many other things extremely well."
+      },
+      {
+        "user": "sheeri185adidam",
+        "created_at": "2021-08-20T17:21:03Z",
+        "body": "@nkosi23 The more I think about this now the more I agree with you. I am leaning towards _prefer_ to have this placement. I am thinking to write a custom placement director that does the following. It will to some extent place these grains on same silo but if not, not a big deal. \r\n\r\n```\r\npublic Task<SiloAddress> OnAddActivation(PlacementStrategy strategy, PlacementTarget target,\r\n            IPlacementContext context)\r\n{\r\n\tvar allSilos = context.GetCompatibleSilos(target).OrderBy(s => s).ToArray();\r\n\tvar key = GetTargetPrimaryKey(target);\r\n\tvar hash = key.GetHashCode() & 0x7fffffff;\r\n\r\n\tvar index = hash % allSilos.Length;\r\n\treturn Task.FromResult(allSilos[index]);\r\n}\r\n\r\nprivate static string GetTargetPrimaryKey(PlacementTarget target)\r\n{\r\n\tvar key = target.GrainIdentity.PrimaryKeyString;\r\n\tvar result = key;\r\n\tif (key.Contains(\"__\"))\r\n\t{\r\n\t\tresult = key[..key.IndexOf(\"__\", StringComparison.Ordinal)].Trim();\r\n\t}\r\n\r\n\treturn result;\r\n}\r\n```"
+      },
+      {
+        "user": "benjaminpetit",
+        "created_at": "2021-08-24T08:09:59Z",
+        "body": "I agree with @nkosi23 , you should not **force** placement on a specific silo. Generally, the default random one is the best to use long term.\r\n\r\nHowever, you could experiment with `PreferLocalPlacement`. If the `GameGrain` is the one that do the first call to `PlayerGrain` `WeaponsGrain`, then they will be placed on the same silo if possible."
+      }
+    ]
+  },
+  {
+    "number": 7073,
+    "title": "[Question]: Difference between MemoryStreams and SimpleMessageStreamProvider",
+    "created_at": "2021-05-08T13:43:04Z",
+    "closed_at": "2021-09-03T14:38:57Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/7073",
+    "body": "Hi;\r\nWhat is the difference between SimpleMessageStreamProvider and MemoryStreams? \r\nThe guide document only mentions SMS and there is no explanation for MemoryStreams.\r\nWhere can I study the difference between them?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/7073/comments",
+    "author": "doctorcode-org",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2021-09-02T20:50:29Z",
+        "body": "Hi @doctorcode-org, the difference is roughly this:\r\n\r\nSMS (Simple Message Stream Provider) uses direct grain messaging from the producers of a message to all consumers.\r\nMemoryStream uses an in-memory buffer to decouple producers and consumers.\r\n\r\nBoth should be considered *best efforts* as neither uses persistent storage to store messages.\r\nI hope that helps.\r\n\r\ncc @benjaminpetit are we missing documentation here?"
+      }
+    ]
+  },
+  {
+    "number": 6646,
+    "title": "Detected application deadlock on message",
+    "created_at": "2020-07-12T23:56:46Z",
+    "closed_at": "2020-09-26T23:45:56Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/6646",
+    "body": "prerequisite: PerformDeadlockDetection = true;\r\n\r\nI need some help, I use Azure Event Hub for Streams. Following situation, GrainA publishes a message and GrainB receive it, do any jobs and publish an update about his state. GrainA can not receive this update because get a Deadlock exception. \r\n\r\n\r\nIsn't that possible?\r\n\r\nThx for your help",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/6646/comments",
+    "author": "ebbservices",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2020-07-14T23:44:15Z",
+        "body": "If you use an external queue, such as EventHub, for streaming, the grain that publishes an event succeeds with that when a stream event is written to the queue, but before it is actually delivered and processed by subscribers to that stream. Because of that, you shouldn't get any deadlocks in the scenario you described.\r\n\r\nSuch deadlocks are possible with the SMS stream provider that doesn't use any external queues and instead delivers events directly as grain calls between grains."
+      },
+      {
+        "user": "ebbservices",
+        "created_at": "2020-07-15T15:03:19Z",
+        "body": "Thx for your answer. That was also what I was thinking about streams with EventHub. But then I got this logs. I will search perhaps there is a other problem. :(\r\n\r\n\r\n{\r\n  \"_index\": \"2020.07.13\",\r\n  \"_type\": \"_doc\",\r\n  \"_id\": \"94yFRXMBxwDa4XbtRq1o\",\r\n  \"_score\": 1,\r\n  \"_source\": {\r\n    \"@timestamp\": \"2020-07-13T00:13:47.3171111+00:00\",\r\n    \"level\": \"Warning\",\r\n    \"messageTemplate\": \"Detected application deadlock on message {Message} and activation {Activation}\",\r\n    \"message\": \"Detected application deadlock on message \\\"Request S10.244.0.181:11111:332295207*stg/7872883655142754957/d6c34a8d@Sd6c34a8d->S10.244.0.181:11111:332295207*grn/E4F58DB0/9ccbb316@6285d9a0 #260\\\" and activation \\\"[Activation: S10.244.0.181:11111:332295207*grn/E4F58DB0/9ccbb316@6285d9a0 #GrainType=Grains.MemberGrain Placement=RandomPlacement State=Valid]\\\"\",\r\n    \"exceptions\": [\r\n      {\r\n        \"Depth\": 0,\r\n        \"ClassName\": \"Orleans.Runtime.DeadlockException\",\r\n        \"Message\": \"Deadlock Exception for grain call chain [*grn/E4F58DB0/9ccbb316, *grn/8206F545/7e16f2b1, *grn/E4F58DB0/9ccbb316].\",\r\n        \"Source\": \"Orleans.Runtime\",\r\n        \"StackTraceString\": \"   at Orleans.Runtime.Dispatcher.CheckDeadlock(Message message)\\n   at Orleans.Runtime.Dispatcher.ReceiveRequest(Message message, ActivationData targetActivation)\\n--- End of stack trace from previous location where exception was thrown ---\\n   at Orleans.Internal.OrleansTaskExtentions.<ToTypedTask>g__ConvertAsync|4_0[T](Task`1 asyncTask)\\n   at Orleans.Streams.PersistentStreamPullingAgent.DeliverBatchToConsumer(StreamConsumerData consumerData, IBatchContainer batch)\\n   at Orleans.Internal.AsyncExecutorWithRetries.ExecuteWithRetriesHelper[T](Func`2 function, Int32 callCounter, Int32 maxNumSuccessTries, Int32 maxNumErrorTries, TimeSpan maxExecutionTime, DateTime startExecutionTime, Func`3 retryValueFilter, Func`3 retryExceptionFilter, IBackoffProvider onSuccessBackOff, IBackoffProvider onErrorBackOff)\",\r\n        \"RemoteStackTraceString\": null,\r\n        \"RemoteStackIndex\": 0,\r\n        \"HResult\": -2146233088,\r\n        \"HelpURL\": null\r\n      }\r\n    ],\r\n    \"fields\": {\r\n      \"Message\": \"Request S10.244.0.181:11111:332295207*stg/7872883655142754957/d6c34a8d@Sd6c34a8d->S10.244.0.181:11111:332295207*grn/E4F58DB0/9ccbb316@6285d9a0 #260\",\r\n      \"Activation\": \"[Activation: S10.244.0.181:11111:332295207*grn/E4F58DB0/9ccbb316@6285d9a0 #GrainType=Grains.MemberGrain Placement=RandomPlacement State=Valid]\",\r\n      \"EventId\": {\r\n        \"Id\": 101528,\r\n        \"Name\": \"Orleans.Messaging.Dispatcher.DetectedDeadlock\"\r\n      },\r\n      \"SourceContext\": \"Orleans.Messaging\"\r\n    }\r\n  },\r\n  \"fields\": {\r\n    \"@timestamp\": [\r\n      \"2020-07-13T00:13:47.317Z\"\r\n    ]\r\n  }\r\n}"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2020-07-17T00:17:19Z",
+        "body": "What happens if you don't set `PerformDeadlockDetection` to `true`? I wonder if this is a false positive as deadlock detection is turned off by default."
+      },
+      {
+        "user": "Rohansi",
+        "created_at": "2021-03-29T23:51:29Z",
+        "body": "@sergeybykov I just ran into this as well. Are there any plans to correct this false positive? I'm using Orleans 3.4.1."
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2021-03-31T00:53:48Z",
+        "body": "@Rohansi is this an issue specific to Azure Queues? It may be worth opening a new issue referencing this. It's difficult for us to track closed issues."
+      }
+    ]
+  },
+  {
+    "number": 6116,
+    "title": "Can two grains of the same interface handle one reminder?",
+    "created_at": "2019-11-12T19:17:31Z",
+    "closed_at": "2019-11-14T12:14:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/6116",
+    "body": "Hi!\r\n\r\nSuppose we have two grains implementing one grain interface. `Grain-1` defines a reminder that was persisted, so on the next silo start it will be rised. Can `Grain-2` consume this reminder if `Grain-1` wasn't registered after reboot (but `Grain-2` was)?\r\n\r\nSpecifically, my case is this: I need to implement a way to disable some functionality (`Grain-1`), while retaining the ability to dummy-access it (`Grain-2` - dummy). At the same time, `Grain-1` creates a reminder that must be processed in a dummy way.\r\n\r\nI hope for your help.",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/6116/comments",
+    "author": "vyshkant",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-11-13T21:30:17Z",
+        "body": "Reminders are registered per grain. So, only the grain that registered a reminder will receive ticks from it.\r\n\r\nI'm not sure what you mean by \"registered\" in the following sentence:\r\n> if Grain-1 wasn't registered after reboot (but Grain-2 was)?\r\n\r\nIf Grain-1 registered a reminder, it will be invoked when the time comes. It can call Grain-2 as that point if needed. Unless I misunderstood your question."
+      }
+    ]
+  },
+  {
+    "number": 5882,
+    "title": "Reminders spinning up on silos with different clusterId",
+    "created_at": "2019-08-21T20:05:13Z",
+    "closed_at": "2019-08-23T14:15:19Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5882",
+    "body": "Hi, I have an orleans setup where we have different silos with different clusterId's (staging, dev, prod, etc). I noticed that every now and then a reminder that was created on staging would spin up in dev silos.\r\n\r\nI am using AdoNetReminderService with SQL Server, when I looked at the ReminderTable, I noticed that it only had ServiceId as the column, no reference to ClusterId, so I changed all of the silos to have different serviceId's to prevent the issue. However, it was brought to my attention that the Orleans documentation recommends keeping all of the ServiceId's of the silos the same. Am I missing anything? Are reminders supposed to be able to distinguish between silos with different clusterId's even with same ServiceId's?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5882/comments",
+    "author": "TulkasLaugh",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-08-21T21:40:59Z",
+        "body": "`ServiceId` acts as a high-level application ID. It stays the same over time through multiple subsequent versions of the application (clusters) getting deployed one after another. Hence, application state that needs continuity through those deployments id keyed off `ServiceId`. Reminders and grain state are examples of that.\r\n\r\n`ClusterId` is a unique ID for a set of silos (cluster) running at some point in time. Typically, only one cluster is up at a time for any `ServiceId`. `ClusterId` is used for silos and clients to discover each other.\r\n\r\nYou likely want to use different `ServiceId`s for staging, dev, and prod clusters, and for sure a unique `ClusterId` for each of them."
+      }
+    ]
+  },
+  {
+    "number": 5725,
+    "title": "hot grain best way to do?",
+    "created_at": "2019-06-27T02:00:20Z",
+    "closed_at": "2019-06-27T02:39:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5725",
+    "body": "The grain is designed to obtain the tenant token. The token is from a third party and will be refreshed and updated every 2 hours. But there are more customers who visit a tenant token at the same time, and may reach thousands. Is this hot grain? If so, how to avoid it. Note that the token is not related to the customer and is only relevant to the tenant.",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5725/comments",
+    "author": "gwhzh21",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2019-06-27T02:21:25Z",
+        "body": "@gwhzh21 here are two ways to alleviate pressure on a hot grain here:\r\n\r\n1. Create a local cache for the tenant token, eg a class which caches the value. Other grains can access the value using that cache.\r\n2. Use stateless workers so that there are multiple copies of the grain on each silo.\r\n\r\nI recommend option 1, since it's simple and most of the time you can avoid making a grain call."
+      }
+    ]
+  },
+  {
+    "number": 5494,
+    "title": "does GrainServiceClient   accessing the GrainService is load balanced\uff1f",
+    "created_at": "2019-04-01T12:38:56Z",
+    "closed_at": "2019-04-02T01:16:07Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5494",
+    "body": "",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5494/comments",
+    "author": "zjsjmvn",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-04-01T20:52:15Z",
+        "body": "It is hash-partitioned, but, strictly specking, not balanced (doesn't get repartitioned based on the actual load)."
+      }
+    ]
+  },
+  {
+    "number": 5478,
+    "title": "Question about registered reminders and cluster id",
+    "created_at": "2019-03-27T18:44:17Z",
+    "closed_at": "2019-03-29T19:50:41Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5478",
+    "body": "We have a lot of errors like this one:\r\n```\r\nCould not deliver reminder tick for [Default, GrainReference:*grn/9827AB60/0000000000000000000000000000000006ffffff9827ab60+Default-0x0BF7DC4E, 00:30:00, 2019-02-03 20:15:18.833 GMT, W/\"datetime'2019-02-03T20%3A15%3A19.0436877Z'\", 34, Ticking], next 3/27/2019 6:15:21 PM.\r\n\r\n```\r\nI checked the reminders table and found that following reminder has been renamed and has cluster id that already not in use . We increment the cluster id during devops. This is like zombie record. Is this expected?\r\n\r\nFull error\r\n```\r\nCould not deliver reminder tick for [Default, GrainReference:*grn/9827AB60/0000000000000000000000000000000006ffffff9827ab60+Default-0x0BF7DC4E, 00:30:00, 2019-02-03 20:15:18.833 GMT, W/\"datetime'2019-02-03T20%3A15%3A19.0436877Z'\", 34, Ticking], next 3/27/2019 6:15:21 PM.\r\n\r\nOrleans.OrleansCodeGenRemindableMethodInvoker+<Invoke>d__0.MoveNext\r\n\r\nSystem.InvalidCastException:\r\n   at Orleans.OrleansCodeGenRemindableMethodInvoker+<Invoke>d__0.MoveNext (Orleans.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null)\r\n   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw (mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification (mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)\r\n   at Orleans.Runtime.GrainMethodInvoker+<Invoke>d__21.MoveNext (Orleans.Runtime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null)\r\n   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw (mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification (mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)\r\n   at Orleans.Runtime.InsideRuntimeClient+<Invoke>d__62.MoveNext (Orleans.Runtime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null)\r\n   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw (mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)\r\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification (mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)\r\n   at Orleans.Runtime.ReminderService.LocalReminderService+LocalReminderData+<OnTimerTick>d__20.MoveNext (Orleans.Runtime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null)\r\n\r\n```\r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5478/comments",
+    "author": "ifle",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-03-27T23:39:28Z",
+        "body": "Reminders have a service wide scope - they survive changing of the cluster ID (by design). If you want a fresh deployment with no state like reminders or grain state carried from the old cluster, you need to deploy a new cluster with a difference Service ID."
+      }
+    ]
+  },
+  {
+    "number": 5383,
+    "title": "How to access Orleans inside Service Fabric from outside? ",
+    "created_at": "2019-02-21T16:47:18Z",
+    "closed_at": "2019-02-22T13:00:54Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5383",
+    "body": "Hi, I'm trying to deploy Orleans Silo to a Service Fabric cluster. I need my Orleans client to be outside of the SF cluster. With the sample code, the address saved in the Membership table is the internal SF ip.\r\nHow can I properly configure Orleans Silo to expose the external addresses for the client to use?\r\nOr maybe there is a way to use Static clustering to connect to the service fabric service?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5383/comments",
+    "author": "drakerunner",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2019-02-21T16:59:53Z",
+        "body": "You can change the `EndpointOptions.AdvertisedIPAddress` property, but you should only access the cluster from within a given network: it should not be exposed to the Internet.\r\n\r\nInstead, put a web server in front of it."
+      }
+    ]
+  },
+  {
+    "number": 5330,
+    "title": "Every call to the grain sends a packet over the network for a request? ",
+    "created_at": "2019-01-23T16:46:36Z",
+    "closed_at": "2019-01-24T02:49:59Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5330",
+    "body": "Is there a way to get the requested data directly to silo, because each time the requested parameter is a complex object, it will take some time to make a memory copy and then send it over the network. Assuming my program is only running on one server, the above operations will waste a lot of performance.\r\nThank you for reading\u3002",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5330/comments",
+    "author": "guopenglun",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-23T16:55:57Z",
+        "body": "If a call to a grain is made within the same silo where that grain is activated, no data is sent over the network, only memory copy of the arguments is performed. Memory copy can be eliminated by wrapping argument type with `Immutable<>`. However, in that case the code must not mutate the arguments after making a call."
+      }
+    ]
+  },
+  {
+    "number": 5321,
+    "title": "Message / Request Priority",
+    "created_at": "2019-01-18T13:15:58Z",
+    "closed_at": "2019-01-25T06:06:23Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5321",
+    "body": "Hi, we are using Orleans as back-end in our IoT project, briefly it relies on ConnectionPoint's and Devices. Devices are connected to CP's. Each CP support only one connection in the same time so it's very suitable for CP's to work within single-threaded nature of grains. There are various reminders on CP for each Devices, like read device setup, read device data, heartbeat, health-check and some other domain specific operations. CPGrain is not re-entrant, and we are using asynchronous socket for communication.\r\n\r\nMy question is; there is being multiple request by reminders on the CPGrain's mailboxes naturally, but we also have some instant request that must be run instantly, so expected behavior would be like that, even if there are 20 messages in the mailbox, cancel current process first (we can handle it with grain cancellation token) and **process instant request before other requests in the mailbox (that is I am asking for) is there a way to do that with Orleans**\r\n\r\nCurrently we are using priority queue in CPGrain to schedule and prioritize messages/requests, but we have to check queue with timer to process. So we are loosing natural flow of Orleans by this custom solution, besides lower time interval for that timer would result with high CPU consumption, contrary higher time interval would result higher latency. Do you have any suggestion?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5321/comments",
+    "author": "berataydin",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-18T19:16:33Z",
+        "body": "A short answer is that there is no notion of priority of incoming requests and the runtime never cancels execution of a request. So requests to a grain always start executing in the order of their arrival. There were requests to allow reordering of incoming requests based on priority or other considerations. But that hasn't been implemented so far.\r\n\r\nA longer answer is based on the assumption that processing of requests and reminder callbacks doesn't take a significant amount of time on the thread, and the latency is primarily determined by asynchronous IO calls. Please correct me if that's not true for your application.\r\n\r\nIf my assumption is correct, then full or partial reentrancy might be a way to achieve what you are looking for. Toady `[Reentrant]` is a class level attribute. So it applies to all method of the grain. @jason-bragg is currently looking at making it also a method level, so that individual methods could be marked for reentrancy. That would allow to make 'priority' methods reentrant, and they would be able to start executing whenever the currently running methods hits an `await`. \r\n\r\nThere is also the `[AlwaysInterleave]`, which is a method level attribute. I personally consider it more of a 'hack', but it can also be useful until we improve and extend the reentrancy story. Semantics of `[AlwaysInterleave]` are different from `[Reentrant]` - it allows to interleave with other grain methods, but not with those also marked as `[AlwaysInterleave]`.\r\n\r\nWhat's not clear to me in your description though is that you are talking about potentially having 20 messages in a grain's queue. What is the reason for such a jam? You mentioned reminders. But they are intended to fire relatively infrequently, and mostly for fault tolerance purpose. Is a grain is managing a single device, I would assume it shouldn't get too many messages. Is that a real case or a potential corner case you want to be prepared for?"
+      },
+      {
+        "user": "berataydin",
+        "created_at": "2019-01-21T08:04:32Z",
+        "body": "Ok let me explain my situation more detailed.\r\n\r\nIn some situations, we have more than 20+ devices connected to same ConnectionPoint (up to 32 devices). Each CP is a grain because of we have only one socket connection to communicate for all devices that are connected to same CP. \r\nWe are polling all devices per 5 minutes (read 400+ register data per device), so when the time is up we will have 20 poll request in our message queue at the same time. Each poll taking 5 to 10 seconds to finish(but all the communication is non-blocking as I told before).\r\n\r\nSo when there are 20 poll request in the queue that are currently processing, **there may come instant request from user interface like _'Read Device Setup'_, this request have more priority because when device polling is a background process that can be handled later, but this request is coming from UI by user interaction that must be replied asap, but it takes time to response because there are already 20 currently processing polling message in the queue.**\r\n\r\nFirst we designed each Device as a grain, but it would be meaningless because they have to use same connection that is related with Connection Point.\r\nAlso there is a Device model object that involves all register of device that is very heavy to serialize, so ve designed CP as a grain and devices are members by following Orleans Best Practices.\r\n \r\nWe couldn't be sure about using [Reentrant] because of our ConnectionPointGrain is statefull, has complex state operations and coarse grained by its nature. We were thinking about [AlwaysInterleave] working on some PoC currently. "
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-23T06:26:07Z",
+        "body": ">We are polling all devices per 5 minutes (read 400+ register data per device), so when the time is up we will have 20 poll request in our message queue at the same time. Each poll taking 5 to 10 seconds to finish(but all the communication is non-blocking as I told before).\r\n\r\nWith CP grain being non-reentrant, poll requests at the end of the queue might take up to 200 seconds to start executing. Is that correct?\r\n\r\n>We couldn't be sure about using [Reentrant] because of our ConnectionPointGrain is statefull, has complex state operations and coarse grained by its nature. We were thinking about [AlwaysInterleave] working on some PoC currently.\r\n\r\nWhat are you concerns about `[Reentrant]`? Grain is still single-threaded. Are you worried about the complexity of thinking through possible interleaving cases? `[AlwaysInterleave]` will let you interleave read methods marked with it while awaiting inside poll requests. Is that what you think you need?"
+      },
+      {
+        "user": "berataydin",
+        "created_at": "2019-01-25T06:06:04Z",
+        "body": "> With CP grain being non-reentrant, poll requests at the end of the queue might take up to 200 seconds to start executing. Is that correct?\r\n\r\nYes it's true.\r\n\r\n> What are you concerns about [Reentrant]? Grain is still single-threaded. Are you worried about the complexity of thinking through possible interleaving cases? [AlwaysInterleave] will let you interleave read methods marked with it while awaiting inside poll requests. Is that what you think you need?\r\n\r\nRather than complexity there are some operations like ReadDeviceSetup that shouldn't be interleaved so Grain can not be Re-entrant. In the light of these information, it looks best option for us signing all the other methods with [AlwaysInterleave] except critical one's like ReadDeviceSetup. Thank you very much."
+      }
+    ]
+  },
+  {
+    "number": 5316,
+    "title": "Is storing state data inside of a grain redundant?",
+    "created_at": "2019-01-16T10:33:08Z",
+    "closed_at": "2019-01-17T08:27:25Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5316",
+    "body": "Hi guys.\r\nI'm wondering if it makes any sense to store State data inside a grain.\r\nI'm adding State to a `Foo` grain.\r\n\r\nWhen it was stateless (`Foo : Grain`), having `_bar` did make sense.\r\nNow that a state has been added and persisted, Foo's Bar can be accessed though its State, so I totally see `_bar` as redundant info, but just in case I'm missing something.\r\n\r\n```c#\r\n    [StorageProvider(ProviderName = \"MyProvider\")]\r\n    public class Foo : Grain<Bar>\r\n    {\r\n        private readonly Bar _bar;  // Redundant?\r\n        // ...\r\n    }\r\n\r\n    public class Bar\r\n    {\r\n        public int A { get; set; }\r\n\r\n        public double B { get; set; }\r\n    }\r\n```\r\n\r\nThanks in advance for your answers!",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5316/comments",
+    "author": "eduherminio",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-16T17:55:28Z",
+        "body": "Yes, if for `Foo : Grain<Bar>` it would be redundant to keep another copy of the same state of type `Bar` in `_bar`. "
+      }
+    ]
+  },
+  {
+    "number": 5299,
+    "title": "Grain Persistence and GrainCancellationTokenSource",
+    "created_at": "2019-01-07T19:57:25Z",
+    "closed_at": "2019-03-05T22:26:31Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5299",
+    "body": "Hi, I am creating grain persistence for a master grain that manages the work of other worker grains. I am utilizing GrainCancellationTokenSource so the master grain can cancel all of the worker grains, however when I try to use Grain Persistence for the GrainCancellationTokenSource I get an error saying that GrainCancellationTokenSource cannot be deep copied. Do you guys have any recommendations around this error or have any recommendations for managing cancellation of worker grains? Thanks.",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5299/comments",
+    "author": "TulkasLaugh",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-08T00:00:06Z",
+        "body": "`GrainCancellationTokenSource` is not meant to be persistent. It's a transient object that allows to try to cancel an in-flight requests. Why do you want to persist it when it has no meaning after the grain call it's used for completes?"
+      },
+      {
+        "user": "TulkasLaugh",
+        "created_at": "2019-01-08T17:46:58Z",
+        "body": "I was thinking that if a silo goes down in the middle of polling a job that's taking a long time and needs to be reactivated it would need the same CancellationTokenSource in order to still be able to cancel. Do you have a recommendation on trying to handle that kind of scenario?"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-08T21:19:05Z",
+        "body": "The general recommendation is not to make long running calls. Instead, make a call to *initiate* a long running operation, and get later notified (via a grain call, an observer or a stream) about its completion. If the grain that is executing the long running operation (on a separate thread or on the thread pool to avoid blocking grain threads) is marked as `[Reentrant]`, it can receive an explicit request to cancel the operation (without using the cancellation token) or get polled about the progress of the operation.\r\n\r\nIn other words, the recommended pattern is to make quick grain calls and manage any long running process via a series of them instead of a one long call. This pattern is more robust in the face of failures and in general makes the app logic more responsive and flexible."
+      }
+    ]
+  },
+  {
+    "number": 5286,
+    "title": "Grain Persistence and polling",
+    "created_at": "2019-01-02T19:36:18Z",
+    "closed_at": "2019-03-05T22:26:22Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/5286",
+    "body": "I'm working on a project with a design where individual Grains would make Http calls to poll on web services. My code has it so the grain would do Task.Run(), to poll on the web service until it's finished. I'm trying to implement grain persistence and thinking through a scenario where a silo goes down while a grain is polling and I'm not sure how to ensure it will pick back up where it left off. \r\n\r\nDo you guys have a recommended way to do something like that?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/5286/comments",
+    "author": "TulkasLaugh",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-02T22:52:46Z",
+        "body": "Why `Task.Run` and not regular asynchronous calls from within the grain cotext, e.g. from a timer callback?\r\n\r\nFor fault tolerance, in general, you likely want to persist the request and schedule a reminder (that will reactivate the grain if necessary) before returning success from the call that initiates polling. "
+      },
+      {
+        "user": "TulkasLaugh",
+        "created_at": "2019-01-03T15:27:20Z",
+        "body": "In my scenario, once the asynchronous function finishes polling, it will pipe its result into a stream to notify another grain that it has completed. So that has to be awaited but the caller of the grain that does polling doesn't want to wait for polling to complete to report back that it started a polling job.\r\n\r\nSo to apply what you're recommending for fault tolerance, do I persist the request, schedule a reminder so that if a silo goes down, the reminder will start the grain back up again?"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-04T00:08:08Z",
+        "body": ">So to apply what you're recommending for fault tolerance, do I persist the request, schedule a reminder so that if a silo goes down, the reminder will start the grain back up again?\r\n\r\nYes, I think you need the polling grain to do all of that *before* responding to the caller that it started the polling job successfully. "
+      },
+      {
+        "user": "TulkasLaugh",
+        "created_at": "2019-01-04T23:46:01Z",
+        "body": "Cool, I followed your advice and got the reminders to work with grain persistence. However, I am noticing that Console.Write that I would rely on for local development are no longer working when code is being executed inside of a reminder. It won't affect staging, or production because we use a logger, but is there any explanation for why code being executed within a Reminder is not being displayed in console and is there any way to set it up so that it can (having the logger send to console also is not working in context of Reminder)?"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2019-01-09T19:24:27Z",
+        "body": "That's strange. Console should work. I don't believe we are interfering with it in any way. Could it be buffering? Have you tried `Console.WriteLine()`?"
+      }
+    ]
+  },
+  {
+    "number": 4885,
+    "title": "What kind of scenario will the SiloName of the two nodes be the same?",
+    "created_at": "2018-08-24T16:31:08Z",
+    "closed_at": "2018-09-12T03:30:51Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4885",
+    "body": "When I read the code, I saw the following code, from `Orleans.Runtime.MembershipService.MembershipOracle`.\r\n```csharp\r\nprivate async Task DetectNodeMigration(string myHostname)\r\n{\r\n    MembershipTableData table = await membershipTableProvider.ReadAll();\r\n\r\n    string mySiloName = SiloName;\r\n    MembershipEntry mostRecentPreviousEntry = null;\r\n    foreach (MembershipEntry entry in table.Members.Select(tuple => tuple.Item1).Where(data => mySiloName.Equals(data.SiloName)))\r\n    {\r\n        bool iAmLater = MyAddress.Generation.CompareTo(entry.SiloAddress.Generation) > 0;\r\n        // more recent\r\n        if (iAmLater && (mostRecentPreviousEntry == null || entry.SiloAddress.Generation.CompareTo(mostRecentPreviousEntry.SiloAddress.Generation) > 0))\r\n            mostRecentPreviousEntry = entry;\r\n    }\r\n\r\n    if (mostRecentPreviousEntry != null)\r\n    {\r\n        bool physicalHostChanged = !myHostname.Equals(mostRecentPreviousEntry.HostName) || !MyAddress.Endpoint.Equals(mostRecentPreviousEntry.SiloAddress.Endpoint);\r\n        if (physicalHostChanged)\r\n        {\r\n            string error = String.Format(\"Silo {0} migrated from host {1} silo address {2} to host {3} silo address {4}.\",\r\n                mySiloName, myHostname, MyAddress.ToLongString(), mostRecentPreviousEntry.HostName, mostRecentPreviousEntry.SiloAddress.ToLongString());\r\n            logger.Warn(ErrorCode.MembershipNodeMigrated, error);\r\n        }\r\n        else\r\n        {\r\n            string error = String.Format(\"Silo {0} restarted on same host {1} New silo address = {2} Previous silo address = {3}\",\r\n                mySiloName, myHostname, MyAddress.ToLongString(), mostRecentPreviousEntry.SiloAddress.ToLongString());\r\n            logger.Warn(ErrorCode.MembershipNodeRestarted, error);\r\n        }\r\n    }\r\n}\r\n```\r\n\r\nThis code first reads all the columns of the member table, then select the entry with the same silo name as the current node.\r\nBut according to the code, SiloName is generated by GUID.\r\nSo how can there be the same SiloName? Or what is the `DetectNodeMigration` method used to handle?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4885/comments",
+    "author": "buzzers",
+    "comments": [
+      {
+        "user": "benjaminpetit",
+        "created_at": "2018-08-28T16:21:52Z",
+        "body": "It's used to detect that a silo rebooted, or the silo migrated from one VM to another. You should be able to put your own `SiloName` if needed.\r\n\r\nWhen a new silo tries to join a cluster, it will try to connect to all silos in the cluster, to validate connectivity.\r\n\r\nSo this check tries to find a previous instance of the new silo. If the previous instance was killed ungracefully, the new instance is able to update its previous state to `Dead` in the membership table and start normally, without trying to connect to the `Dead` entry.\r\n\r\n\r\n"
+      },
+      {
+        "user": "buzzers",
+        "created_at": "2018-09-04T03:44:36Z",
+        "body": "OK, I get it. That is, if a completely new instance is started, then the code here is not going to work, is it?"
+      }
+    ]
+  },
+  {
+    "number": 4822,
+    "title": "Which code files are maintained for memberships tables and grain directory tables?",
+    "created_at": "2018-08-07T14:35:42Z",
+    "closed_at": "2018-08-16T09:10:40Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4822",
+    "body": "  I'm studying the implementation of Orleans, but I've found that I can't find the specific maintenance code for the memberships table and the grain directory table. Including the entry of members, normal exit and abnormal exit, Grain activation and deactivation, and node failure when the table recovery operations.\r\n\r\n  Could you tell me which files are the specific implementation codes of these operations?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4822/comments",
+    "author": "buzzers",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-08-13T18:27:39Z",
+        "body": "Did you inside the following folders?\r\n\r\n`src\\Orleans.Runtime\\MembershipService`\r\n`src\\Orleans.Runtime\\GrainDirectory`\r\n\r\nIs that not what you are looking for?"
+      },
+      {
+        "user": "buzzers",
+        "created_at": "2018-08-14T10:01:11Z",
+        "body": "I also read the code under these two folders, but I didn't know where the remote request was received and caused the two services to be invoked."
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-08-16T02:34:19Z",
+        "body": "Take a look at `MembershipOracle` and `RemoteGrainDirectory` classes."
+      }
+    ]
+  },
+  {
+    "number": 4700,
+    "title": "Grain Disambiguation",
+    "created_at": "2018-06-19T22:04:19Z",
+    "closed_at": "2018-06-20T07:07:27Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4700",
+    "body": "I am working on the project that some grain implementations inherit from an abstract grain implementation . \r\nSome just like this:\r\npublic abstract class A: Grain, IGrainInterface\r\n{\r\nabstract method(); \r\n}\r\n\r\npublic class B: A\r\n{\r\noverride method();\r\n}\r\n\r\npublic class C: A\r\n{\r\noverride method()\r\n}\r\n\r\nIt seems I can use a grainClassNamePrefix to solve this problem, but I haven't found any documents to describe how to use it. \r\n\r\nThanks!",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4700/comments",
+    "author": "w14525555",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-06-19T23:17:45Z",
+        "body": "You can pass a fully qualified class name to `GetGrain()` as optional parameter:\r\n```csharp\r\nGetGrain<IGrainInterface>(key, \"your-namespace.B\");\r\nGetGrain<IGrainInterface>(key, \"your-namespace.C\");\r\n```\r\n\r\nor just a prefix of the fully qualified name, if the grain classes are defined in different namespaces:\r\n```csharp\r\nGetGrain<IGrainInterface>(key, \"B-namespace\");\r\nGetGrain<IGrainInterface>(key, \"C-namespace\");\r\n```\r\nThe namespace approach works well for switching between different implementations of multiple grain classes, for example, between test and production."
+      }
+    ]
+  },
+  {
+    "number": 4600,
+    "title": "Grain activation",
+    "created_at": "2018-05-16T16:23:26Z",
+    "closed_at": "2018-06-19T16:17:03Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4600",
+    "body": "Hello,\r\nFew queries on grain activation:\r\n\r\n1) Lets assume we have an application deployed in a cluster of three silos. Client connected to a silo and have grain activation with it. And now if that silo goes down for some reason, does orleans framework create entirely new grain activation in other silo? Will grain have new primary key?\r\n2) I have been experimenting explict stream subscription with RabbitMQ. \r\n\r\n\tAnd my application looke likes this:\r\n\t**SILOHOST** \r\n\r\n\t\t\t1.  CommandBusGrain \t\r\n                             1.  OnactivateAsync creates a stream (stream id: GUID.Empty)\r\n                             2.  Register method does subscription to the stream\r\n                             3.  Send method publish message to stream (that is _stream.OnNextAsync(msg))\r\n\t\t\t2.  On silo startup\r\n                             1.  calls CommandBusGrain register method to initiate subscription\r\n\t\t\t\r\n\t\t\t\r\n    **SILO Client**\r\n\r\n\t\t\t1.  Create CommandBusGrain reference (Graind id: GUID.Empty)\r\n\t\t\t2.  Triggers \"Send\" method to publish message.\r\n\r\n\t\t\r\n     This works fine, but I need some suggestion on whether to call grain method to publish message to \r\n     the stream or create stream reference in the client and publish message directly to stream instead of \r\n     calling grain.\r\n     Which one would be a better implementation?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4600/comments",
+    "author": "srinathgnath",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-06-08T22:26:27Z",
+        "body": "Sorry about delayed response.\r\n\r\n> if that silo goes down for some reason, does orleans framework create entirely new grain activation in other silo? Will grain have new primary key?\r\n\r\nYes, after the cluster learns that the silo went down, a new request to the grain will trigger a new activation of it on one of the remaining silos. The primary keys will stay the same - it's the key that the request was sent for.\r\n\r\n> 1.  OnactivateAsync creates a stream\r\n\r\nWhat is this exactly. Streams are virtual, just like grains. They always exist, and don't need to be created.\r\n\r\n>This works fine, but I need some suggestion on whether to call grain method to publish message to\r\nthe stream or create stream reference in the client and publish message directly to stream instead of\r\ncalling grain.\r\n\r\nPublishing directly from client is more efficient - the message will get written directly to the queue. No need to send it to the grain to be written to the queue from there I think."
+      }
+    ]
+  },
+  {
+    "number": 4523,
+    "title": "Orleans call grain within a grain",
+    "created_at": "2018-04-27T17:19:10Z",
+    "closed_at": "2018-04-27T21:15:29Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4523",
+    "body": "I've got a requirement to call a grain within a grain. I had tried this in version 1.5 not sure how it works in 2.0. If somebody can provide a sample it would be great. This was what I was trying.\r\n\r\n public class CustomerRule : Grain, ICustomerRule\r\n{\r\n    private ISomeGrain _someGrain;\r\n    public override async Task OnActivateAsync()\r\n        {\r\n              _someGrain = GrainFactory.GetGrain<ISomeGrain>(this.GetPrimaryKeyString());\r\n              await base.OnActivateAsync();\r\n         }\r\n     public Task<bool> TestHello(GrainCancellationToken tc, string customer)\r\n     {\r\n               var string =  _someGrain.SayHello(tc, customer);\r\n              return Task.FromResult(string);\r\n      }\r\n}\r\n\r\nDue to some reason SayHello() is not being invoked. \r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4523/comments",
+    "author": "satishviswanathan",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-04-27T18:00:58Z",
+        "body": "The code is missing `await` in front of `_someGrain.SayHello(tc, customer);`. Is this the exact code or pseudo-code?\r\n\r\n`GrainFactory.GetGrain(this.GetPrimaryKeyString());` doesn't look right either."
+      },
+      {
+        "user": "satishviswanathan",
+        "created_at": "2018-04-27T18:23:16Z",
+        "body": "Sorry that was a psedo code.\r\n\r\npublic  async Task TestHello(GrainCancellationToken tc, string customer)\r\n{\r\nvar string = await _someGrain.SayHello(tc, customer);\r\nreturn await Task.FromResult(string);\r\n}\r\n\r\nWhat I'm not sure is how we can access another grain within the CustomerRule grain. Any sample code ?\r\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-04-27T18:37:18Z",
+        "body": "You can simply do\r\n```csharp\r\npublic async Task TestHello(GrainCancellationToken tc, string customer)\r\n{\r\n  return await _someGrain.SayHello(tc, customer);\r\n}\r\n```\r\nor even\r\n```csharp\r\npublic Task TestHello(GrainCancellationToken tc, string customer)\r\n{\r\n  return _someGrain.SayHello(tc, customer);\r\n}\r\n```\r\ninstead of that code.\r\n\r\n>What I'm not sure is how we can access another grain within the CustomerRule grain. \r\n\r\nCalling a grain from another grain is a bread-and-butter scenario for Orleans. The code you wrote should just work for that. How do you determine that `SayHello` is not getting invoked? Do you get a error/exception?"
+      },
+      {
+        "user": "satishviswanathan",
+        "created_at": "2018-04-27T19:29:22Z",
+        "body": "How is this _someGrain created on the calling grain in this case CustomerRule ?\r\n\r\nbasically I was not getting any results from the method SayHello(). also I had a break point and log return to see if it hits there but both didn't work."
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2018-04-27T19:33:47Z",
+        "body": "@satishviswanathan `Grain` has a `GrainFactory` property, so you can create the grain reference, `_someGrain`, by using `this.GrainFactory.GetGrain<ICustomerGrain>(customer)`.\r\n\r\nIn the end, your method might look like this:\r\n\r\n```C#\r\npublic Task TestHello(GrainCancellationToken tc, string customer)\r\n{\r\n  var grain = this.GrainFactory.GetGrain<ICustomerGrain>(customer)\r\n  return grain.SayHello(tc, customer);\r\n}\r\n```\r\n\r\nHere I am assuming you have `ICustomerRuleGrain` with a `TestHello` method and it calls into `ICustomerGrain`'s `SayHello` method."
+      }
+    ]
+  },
+  {
+    "number": 4478,
+    "title": "Is it possible to configure silo using DNS name instead of IP address",
+    "created_at": "2018-04-16T21:16:38Z",
+    "closed_at": "2018-04-18T14:54:36Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4478",
+    "body": "Team,\r\nBelow is code snippet for Silo host. Is there any option where I can configure endpoint using DNS name instead of IP address.\r\n\r\n            var siloPort = Convert.ToInt32(ConfigurationManager.AppSettings[\"SiloPort\"]);\r\n            var gatewayPort = Convert.ToInt32(ConfigurationManager.AppSettings[\"GatewayPort\"]);\r\n            var advertisedIp = IPAddress.Parse(ConfigurationManager.AppSettings[\"AdvertisedIP\"]);\r\n            var builder = new SiloHostBuilder()\r\n                .Configure<ClusterOptions>(options =>\r\n                {\r\n                    options.ClusterId = ConfigurationManager.AppSettings(\"CLUSTER_ID\");\r\n                    options.ServiceId = ConfigurationManager.AppSettings(\"SERVICE_ID\");\r\n                })\r\n                .ConfigureEndpoints(siloPort: siloPort, gatewayPort: gatewayPort, advertisedIP: advertisedIp)\r\n                .UseConsulClustering(gatewayOptions =>\r\n                {\r\n                    gatewayOptions.Address =\r\n                        new Uri(ConfigurationManager.AppSettings(\"ServiceDiscoverEndPoint\"));\r\n                })\r\n\r\nThanks",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4478/comments",
+    "author": "srinathgnath",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2018-04-16T21:36:52Z",
+        "body": "HI @srinathgnath, there is an overload of ConfigureEndpoints which accepts a hostname:\r\n```C#\r\npublic static ISiloHostBuilder ConfigureEndpoints(\r\n    this ISiloHostBuilder builder, \r\n    string hostname, \r\n    int siloPort, \r\n    int gatewayPort,\r\n    AddressFamily addressFamily = AddressFamily.InterNetwork,\r\n    bool listenOnAnyHostAddress = false)\r\n```\r\n\r\nDoes that work for you?"
+      }
+    ]
+  },
+  {
+    "number": 4466,
+    "title": "Question - Heterogenous Silo configuration in runtime",
+    "created_at": "2018-04-13T11:32:38Z",
+    "closed_at": "2020-01-14T18:15:15Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4466",
+    "body": "Hello guys, \r\nis it possible to make Heterogenous Silos configuration by supplying the same build package with all grain implementations, but configuring which parts to host by AddApplicationParts or any similar way (but still referencing all grains)?\r\nWe are just considering to supply the silo with some config and select required set of grains ( and dependent services to inject etc. ) to host when starting the silo. \r\nIt will be very useful if you have the silo capable of hosting N feature-sets, and when the demand arises for some parts of functionality/services, you can choose for which features you need to allocate more resources (and resource configurations required) and start additional silos only for these, instead of running the one big silo.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4466/comments",
+    "author": "tinpl",
+    "comments": [
+      {
+        "user": "DarkCow",
+        "created_at": "2018-04-13T15:21:46Z",
+        "body": "I think placement directors are a better option... I made a role placement director. Then you decorate your Grain class with `[RolePlacement( \"fileserver\" )]`\r\n\r\nYou can use it by calling `siloHostBuilder.AddPlacementDirector<RolePlacementStrategy, RolePlacementDirector>( )`\r\n\r\nUsing this technique, I can change the roles of servers during runtime, and their cache will be fixed every min or so. I leave the implementation of m_SiloRoleRepository to you. But it is a service that returns SiloAddress <--> Supported Roles\r\n\r\n```\r\n    [Serializable]\r\n    public class RolePlacementStrategy : PlacementStrategy\r\n    {\r\n        public string RoleName { get; private set; }\r\n\r\n        internal RolePlacementStrategy( string roleName )\r\n        {\r\n            RoleName = roleName;\r\n        }\r\n\r\n        public override string ToString( )\r\n        {\r\n            return String.Format( $\"RolePlacementStrategy(role={RoleName})\" );\r\n        }\r\n\r\n        public override bool Equals( object obj )\r\n        {\r\n            if( obj is RolePlacementStrategy other )\r\n                return other.RoleName == RoleName;\r\n            else\r\n                return false;\r\n        }\r\n\r\n        public override int GetHashCode( )\r\n        {\r\n            return GetType( ).GetHashCode( ) ^ RoleName.GetHashCode( );\r\n        }\r\n    }\r\n```\r\n```\r\n    public class RolePlacementDirector : IPlacementDirector\r\n    {\r\n        public RolePlacementDirector( ISiloRoleRepository siloRoleRepository )\r\n        {\r\n            m_SiloRoleRepository = siloRoleRepository;\r\n        }\r\n\r\n        public virtual async Task<SiloAddress> OnAddActivation( PlacementStrategy strategy, PlacementTarget target, IPlacementContext context )\r\n        {\r\n            var allSilos = context.GetCompatibleSilos( target );\r\n            var rolePlacementStrategy = (RolePlacementStrategy)strategy;\r\n            var siloRoleInfos = await GetSiloRoleInfosAsync( );\r\n\r\n            var silosInRole = siloRoleInfos\r\n                .Where( r => r.Roles.Contains( rolePlacementStrategy.RoleName ) )\r\n                .Join( allSilos,\r\n                    r => r.IPAddress,\r\n                    s => s.Endpoint,\r\n                    ( r, s ) => new { SiloRoleInfo = r, SiloAddress = s } )\r\n                .ToList( );\r\n\r\n\r\n            if( silosInRole.Count == 0 )\r\n                throw new SiloRoleNotFoundException( rolePlacementStrategy.RoleName );\r\n\r\n            return silosInRole[ m_Random.Next( silosInRole.Count ) ].SiloAddress;\r\n        }\r\n\r\n        protected async Task<List<SiloRoleInfo>> GetSiloRoleInfosAsync( )\r\n        {\r\n            var siloRoleInfos = m_MemoryCache.Get<List<SiloRoleInfo>>( \"SiloRoleInfo\" );\r\n\r\n            if( siloRoleInfos == null )\r\n            {\r\n                await m_CacheLock.WaitAsync( );\r\n\r\n                try\r\n                {\r\n                    // Check twice\r\n                    siloRoleInfos = m_MemoryCache.Get<List<SiloRoleInfo>>( \"SiloRoleInfo\" );\r\n\r\n                    if( siloRoleInfos == null )\r\n                    {\r\n                        siloRoleInfos = await m_SiloRoleRepository.GetAsync( );\r\n\r\n                        m_MemoryCache.Set( \"SiloRoleInfo\", siloRoleInfos, DateTime.Now.Add( ms_Interval ) );\r\n                    }\r\n                }\r\n                finally\r\n                {\r\n                    m_CacheLock.Release( );\r\n                }\r\n            }\r\n\r\n            return siloRoleInfos;\r\n        }\r\n\r\n        private Random m_Random = new Random( );\r\n        private ISiloRoleRepository m_SiloRoleRepository;\r\n        private MemoryCache m_MemoryCache = new MemoryCache( new MemoryCacheOptions( ) );\r\n        private SemaphoreSlim m_CacheLock = new SemaphoreSlim( 1, 1 );\r\n        private ILogger m_Logger = Log.ForContext<RolePlacementDirector>( );\r\n        private static readonly TimeSpan ms_Interval = TimeSpan.FromMinutes( 1 );\r\n    }\r\n```\r\n```\r\n    /// <summary>\r\n    /// Directs Orleans to only place new activations on a Silo supporting the Role\r\n    /// </summary>\r\n    [AttributeUsage( AttributeTargets.Class, AllowMultiple = false )]\r\n    public sealed class RolePlacementAttribute : PlacementAttribute\r\n    {\r\n        public string Role { get; private set; }\r\n\r\n        public RolePlacementAttribute( string role ) :\r\n            base( new RolePlacementStrategy( role ) )\r\n        {\r\n            Role = role;\r\n        }\r\n    }\r\n```\r\n"
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2018-04-16T04:02:49Z",
+        "body": "I said I would comment on this, so here goes:\r\nThere are a few ways to exclude grains from a silo. The placement solution mentioned by @DarkCow is one of them. Another is using `GrainClassOptions.ExcludedGrainTypes`:\r\n``` C#\r\nsiloBuilder.Configure<GrainClassOptions>(options.ExcludedGrainTypes.Add(typeof(MyGrain).FullName)));\r\n```\r\n\r\nI was originally thinking of another method, but it's quite ugly. You would replace the default `ApplicationPartManager` / `IApplicationPartManager` with your own implementation which filters out the unwanted grain classes from `GrainClassFeature` when it's being populated (in `PopulateFeature`). I don't recommend that approach."
+      },
+      {
+        "user": "tinpl",
+        "created_at": "2018-04-20T19:00:08Z",
+        "body": "Thank you for your responses, both of them do what we want to achieve!\r\n\r\n`ApplicationPartManager` seems to be more conventional way to configure the silo at the startup, if you don't want to change hosted types in the future. Kind of you are building the silo here, so that should be the place to define what should it host. Maybe adding one more class (similar to `AssemblyPart`),something like `GrainPart: IAssemblyPart { ... }`, which can be added like `builder.AddApplicationPart(typeof(GrainClass))` will do the work. So if you want to just put in the assembly, use one method. If you need more control -> add Grains explicitly one by one (or `IEnumerable<IAssemblyPart>` of them, probably, this will be more common usage).\r\nExcluded Grain types approach functionally seems to be good one, but intuitively you expect to tell what to Include, not what to Exclude (so if I don't say to Include this grain/assembly of grains -> it shouldn't be here). imho, seems to be slightly misleading.\r\nPlacement director seems to be the most flexible one, with the possibility to add additional rules etc. \r\n\r\nSeems my solution will look like:\r\n1. Set basic capabilities for a silo from config using `ExcludedGrainTypes` (when deploying you just don't want to have some kind of Grains to be on this silo because of this instance resource constraints)\r\n2. Arrange some custom placement strategy using the `PlacementDirector`, based on the Silo's capabilities in terms of hosted 'features' and results of monitoring/metrics, or something similar.\r\n\r\nAny drawbacks in this approach? Or maybe places I should consider to put more attention in, because of possible reliability/performance issues?"
+      }
+    ]
+  },
+  {
+    "number": 4229,
+    "title": "Is IServiceCollection.AddScoped seemingly invalid in Orleans?",
+    "created_at": "2018-03-15T12:53:57Z",
+    "closed_at": "2018-03-21T02:08:55Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4229",
+    "body": "",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4229/comments",
+    "author": "lfzm",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2018-03-16T02:23:21Z",
+        "body": "@aqa510415008 each grain activation has its own scope, so when you call AddScoped, you are adding a service which is created per activation"
+      }
+    ]
+  },
+  {
+    "number": 4168,
+    "title": "RequestContext not available in next operation",
+    "created_at": "2018-03-08T11:06:29Z",
+    "closed_at": "2018-03-12T09:02:09Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/4168",
+    "body": "We have a Grain that uses the RequestContext to pass along the user information. When we use the same Grain instance twice in our calling code, the second call no longer has access to the RequestContext, which seems normal since it (the second operation) is completed on another thread. However it would seem to me that the RequestContext should be migrated to the new thread, or am I completely missing the point?\r\nShould every Grain instance be used only once? Likely refetching the instance would resolve the issue (not tested, will try this out later).\r\n\r\nClient:\r\nRequestContext.Set(\"User\", User.Id);\r\nvar grain = ClusterClient.GetGrain<OurGrain>();\r\ngrain.Operation1();\r\ngrain.Operation2();\r\n\r\nOurGrain:\r\nOperation1():\r\nRequestContext.Get(\"User\") => Fine\r\n\r\nOperation2():\r\nRequestContext.Get(\"User\") => null",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/4168/comments",
+    "author": "wiezykrwi",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2018-03-08T18:58:33Z",
+        "body": "`RequestContext` is mean to be set per grain call.\r\n\r\nSince a grain can be called in parallel by multiple callers (clients and other grains), between `grain.Operation1()` and `grain.Operation2()` it could have processed a number of requests from other callers, and you probably don't want those calls to be process with the request context you set before `grain.Operation1()`. Likewise, you most likely don't want `grain.Operation2()` to operate with a context set by other caller. Hence, the behavior of request context only use for a single call."
+      },
+      {
+        "user": "Jens-G",
+        "created_at": "2020-12-13T23:14:04Z",
+        "body": "Old thread but ran into same situation today. And found it a bit unexpected, as the OP did. \r\n\r\n**Suggestion:** Can we have some sort of an optional flag that allows to have values persistent on a per-key basis?\r\nWould be perfectly fine to have the default set to the current behaviour."
+      }
+    ]
+  },
+  {
+    "number": 3903,
+    "title": "how to use IClusterClient ",
+    "created_at": "2018-01-25T02:41:41Z",
+    "closed_at": "2018-01-25T06:23:59Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/3903",
+    "body": "1.Create a static IClusterClient, all use it. ex: static IClusterClient clusterClient = clusterClient.Connect().Wait();\r\n\r\n2.or each client's method build a instance (IClusterClient clusterClient=IClientBuilder.Build() cost 0.5second),\r\nthen clusterClient.Connect()-> todo->clusterClient.Dispose(),  \r\nnext time IClusterClient clusterClient=IClientBuilder.Build()  clusterClient.Connect()-> todo->clusterClient.Dispose()\r\n\r\nWhich one? or other?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/3903/comments",
+    "author": "Qoooooooooooo",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2018-01-25T03:27:35Z",
+        "body": "Use **1**. Share a single client.\r\nBuild & Connect the client when the app starts and stop it when the application finishes."
+      }
+    ]
+  },
+  {
+    "number": 3847,
+    "title": "Dependency Injection in ASP.NET Core",
+    "created_at": "2018-01-10T11:04:51Z",
+    "closed_at": "2018-01-11T02:31:08Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/3847",
+    "body": "Hi there .. for orleans 2.0, what I should register to IServiceCollection? ClientBuilder? what will be its lifetimes? Transient or Scoped or Singleton? Thanks for help.",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/3847/comments",
+    "author": "darting",
+    "comments": [
+      {
+        "user": "alirezajm",
+        "created_at": "2018-01-10T15:46:38Z",
+        "body": "From my short experience with orleans:\r\nWithin a grain the scope is the lifetime of the grain activation.\r\n\r\nSo as the grains will live a long time normally (2 hours I believe is the default), which means the same instance will process requests, the services are injected only once per activation (If you're doing constructor injection). And when you resolve services within a grain yourself you'll get the same instance if you register them as scoped. So it's \"a little\" different compared to per request scopes like in asp.net mvc."
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2018-01-10T21:38:41Z",
+        "body": "The lifetime is whatever you decide: Singleton, Scoped (per-activation), or Transient\r\n\r\nAs for what you should register to: there is only one IServiceCollection per ClientBuilder or SiloHostBuilder, so it doesn't matter how you register a service."
+      },
+      {
+        "user": "SebastianStehle",
+        "created_at": "2018-01-10T21:50:17Z",
+        "body": "I think the question was, what he should register TO the asp.net core application.\r\n\r\nI would register the IClusterClient as Singleton to the Asp.Net Core DI. "
+      },
+      {
+        "user": "ReubenBond",
+        "created_at": "2018-01-10T22:10:54Z",
+        "body": "Oh, got it!\r\n\r\nYes, register the `IClusterClient` as a singleton.\r\nOptionally also register it as `IGrainFactory` in case that's all you need."
+      },
+      {
+        "user": "SebastianStehle",
+        "created_at": "2018-01-10T22:23:57Z",
+        "body": "The `IGrainFactory` is also nice for co-hosting. Then you have 2 DI containers. One for the Silo and the other one for the asp.net part. But I need to access the grains from both parts. The IGrainFactory is a common interface and therefore you do not have to care, whether you are in the Silo or not."
+      }
+    ]
+  },
+  {
+    "number": 3712,
+    "title": "How to write a circuit breaker in orleans",
+    "created_at": "2017-11-27T02:06:11Z",
+    "closed_at": "2017-11-29T02:53:34Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/3712",
+    "body": "Is there a demo?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/3712/comments",
+    "author": "Qoooooooooooo",
+    "comments": [
+      {
+        "user": "jdom",
+        "created_at": "2017-11-27T19:49:48Z",
+        "body": "You mean against external services? It should be no different than from non-Orleans code. You can use Polly or some other library normally. Just be conscious of the total time it can take for the call to complete, as by default the grain call will time-out after 30 seconds. Total time starts ticking from the client perspective the moment it sent the request, so on a hot grain it means that even if total cut-off time for the retries and circuit breaker has calls taking 10 seconds in normal conditions, but you have more than 3 calls enqueued for that grain, then some calls might start timing out, even if they didn't start executing on the grain."
+      },
+      {
+        "user": "ccerrato147",
+        "created_at": "2020-05-28T03:40:26Z",
+        "body": "> You mean against external services? It should be no different than from non-Orleans code. You can use Polly or some other library normally. Just be conscious of the total time it can take for the call to complete, as by default the grain call will time-out after 30 seconds. Total time starts ticking from the client perspective the moment it sent the request, so on a hot grain it means that even if total cut-off time for the retries and circuit breaker has calls taking 10 seconds in normal conditions, but you have more than 3 calls enqueued for that grain, then some calls might start timing out, even if they didn't start executing on the grain.\r\n\r\nFor calls between grains is the a circuit breaker not needed or implemented already inside Orleans?"
+      },
+      {
+        "user": "jdom",
+        "created_at": "2020-05-28T14:16:51Z",
+        "body": "Retries is built-in. Circuit breaker isn't needed since the cluster will self-heal and reactivate a grain in another silo if the original activation is unreachable due to a dead silo."
+      }
+    ]
+  },
+  {
+    "number": 3507,
+    "title": "What is the purpose of specifying multiple seed nodes?",
+    "created_at": "2017-10-06T01:44:25Z",
+    "closed_at": "2017-11-30T22:04:11Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/3507",
+    "body": "In my development scenario with 2 silos, I am using MembershipTableGrain as Livenesstype and have only 1 seed node pointing to my primary node with the second silo being secondary node.\r\n\r\nI can see in Globals that seed node is an array of addresses therefore **what is the purpose of specifying multiple seed nodes?**",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/3507/comments",
+    "author": "Kimserey",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2017-10-06T23:48:02Z",
+        "body": "Support for multiple seed nodes is there for historical reasons. In early prototypes of Orleans we had that. I'm almost sure it doesn't work anymore with more than one seed (a.k.a. primary) node configured. Should probably remove that in 2.0."
+      },
+      {
+        "user": "xiazen",
+        "created_at": "2017-10-07T00:15:51Z",
+        "body": "It is confusing indeed. So We are thinking about reducing the confusion there by changing `List<SeedNode> SeedNodes` to be `IpEndpoint SeedNode` in 2.0. \r\n\r\nBut we are also migrating off GlobalConfiguration in 2.0, so that GlobalConfiguration will become obsolete after 2.0. So there maybe not much value in 2.0 to fix it. \r\n\r\nOr there's a third option: update the documentation on SeedNodes and warn user to not use more than one seed nodes. \r\n\r\nWhich one do you like personally? \r\n"
+      },
+      {
+        "user": "Kimserey",
+        "created_at": "2017-10-07T02:31:30Z",
+        "body": "> Support for multiple seed nodes is there for historical reasons. In early prototypes of Orleans we had that. \r\n\r\nI got confused because I thought that if the seed node stated as primary would go down, the membership state together with the primary status would be passed to the next seed node alive.\r\n\r\n> Or there's a third option: update the documentation on SeedNodes and warn user to not use more than one seed node.\r\n\r\nI think this would be enough since GlobalConfiguration will be obsolete."
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2017-10-11T17:56:09Z",
+        "body": "What Sergey said: we should remove seed nodes and move to a single primary node."
+      },
+      {
+        "user": "xiazen",
+        "created_at": "2017-10-11T18:17:36Z",
+        "body": "But `GlobalConfiguration` are going to be deprecated in 2.0, its settings will be break down into a collection of smaller options (Microsoft.Extensions.Options) .  Do you still think it is worthy to fix it? "
+      }
+    ]
+  },
+  {
+    "number": 3242,
+    "title": "What is ServiceId & DeploymentId when running under Service Fabric?",
+    "created_at": "2017-07-20T12:40:43Z",
+    "closed_at": "2017-07-22T12:11:12Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/3242",
+    "body": "I wanted to ask what we should be setting these to be while running under service fabric? Our deployment would look something like the following. We have one silo \"Silo A\" that is responsible for grains 1 & 2. The silo will be deployed on 3 nodes in the service fabric cluster.\r\n\r\n- Node 1\r\n-- Silo A\r\n--- Grain 1\r\n--- Grain 2\r\n- Node 2\r\n-- Silo A\r\n--- Grain 1\r\n--- Grain 2\r\n- Node 3\r\n-- Silo A\r\n--- Grain 1\r\n--- Grain 2\r\n\r\nDeploymentId is required for the Azure Queue stream provider so I need to set it to something. However, i wasnt sure what the semantics were around these two values and what they control.",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/3242/comments",
+    "author": "charleszipp",
+    "comments": [
+      {
+        "user": "ReubenBond",
+        "created_at": "2017-07-21T03:37:36Z",
+        "body": "@charleszipp set `ServiceId` and `DeploymentId` to a value which is consistent between all silos and clients in the cluster."
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2017-07-21T14:51:01Z",
+        "body": "`ServiceId` is supposed to stay the same across multiple deployments of the same service over time as you deploy new versions of the deployment/cluster."
+      },
+      {
+        "user": "talarari",
+        "created_at": "2017-11-08T17:48:44Z",
+        "body": "@ReubenBond  @sergeybykov Does DeploymentId need to be different across deployments?\r\nwhat will happen if i just set it to a hardcoded string?"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2017-11-22T22:02:52Z",
+        "body": ">@ReubenBond @sergeybykov Does DeploymentId need to be different across deployments?\r\nwhat will happen if i just set it to a hardcoded string?\r\n\r\nThe danger here is that you may end up deploying at some point have a different service/cluster with the same DeploymentId. "
+      },
+      {
+        "user": "talarari",
+        "created_at": "2017-11-22T22:10:03Z",
+        "body": "Im not sure i understand what's the purpose of deployment id.\r\nWhat is it used for?"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2017-11-22T22:24:28Z",
+        "body": "It should have been caller `ClusterId` instead. It is the unique identifier of a cluster, and silos in a cluster find each other using it as a key.\r\n"
+      },
+      {
+        "user": "talarari",
+        "created_at": "2017-11-22T22:41:03Z",
+        "body": "Ok that sounds more clear to me.\r\nI was under the impression that deployment id should be different between two vervsion deployments to the same cluster, something like a versionid.\r\nSo basically if its the only orleans cluster running on those machines this can just be a costant name?\r\nOr is it used for things like versioned grains and placements strategies?"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2017-11-22T22:46:30Z",
+        "body": ">So basically if its the only orleans cluster running on those machines this can just be a costant name?\r\n\r\nYes.\r\n\r\n>Or is it used for things like versioned grains and placements strategies?\r\n\r\nNo.\r\n\r\nIt's just a key for silos and clients to find each other in the membership table."
+      }
+    ]
+  },
+  {
+    "number": 3132,
+    "title": "[Question] Bootstrapping DI and logging",
+    "created_at": "2017-06-15T13:26:27Z",
+    "closed_at": "2017-06-16T16:56:54Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/3132",
+    "body": "I have a simple question: when bootstrapping my services in the `Startup` class using dependency injection I want to do some logging using Orleans logger. But how will I get a logger instance in my `ConfigureServices` method?",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/3132/comments",
+    "author": "peter-perot",
+    "comments": [
+      {
+        "user": "jdom",
+        "created_at": "2017-06-15T16:27:29Z",
+        "body": "Hmmm, interesting question, but it is currently not possible. The logging infrastructure should be configured by then, but it's not really accessible from the startup type.\r\nIf this is temporary just to troubleshoot a few things, what you can do for now is use reflection to get the logger. Note that this might not be supported in the future, especially since we are looking to migrate to `Microsoft.Extensions.Logging` in the release following 1.5 (but this hack will work in 1.5 still). Nevertheless, once we move to that, the logger will be usable when configuring the silo, so hopefully no hack will be necessary.\r\n\r\nTo get the logger via reflection, you'd have to do something like this:\r\n```csharp\r\n// Call LogManager.GetLogger(this.GetType().Name) with reflection, as it's internal\r\nvar getLoggerMethod = typeof(LogManager).GetMethod(\"GetLogger\", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static, null, new Type[] { typeof(string) }, null);\r\nLogger logger = (Logger)getLoggerMethod.Invoke(null, new object[] { this.GetType().Name });\r\n\r\nlogger.Info(\"Now I can use the logger\");\r\n```"
+      }
+    ]
+  },
+  {
+    "number": 3009,
+    "title": "Unable to immediately restart a Silo after entire cluster shuts down unexpectedly.",
+    "created_at": "2017-05-10T14:02:06Z",
+    "closed_at": "2017-05-11T16:23:24Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/3009",
+    "body": "Hey there,\r\n\r\nAs noted in the title, it appears that we are unable to restart a Silo after the entire cluster dies unexpectedly.\r\n\r\nTo replicate this issue, we have two Silos running together on the same machine. \r\nOne is using Port 22222 and Proxy Port 40000 (Silo A), the other Port 22223 and Proxy Port 40001 (Silo B). \r\nAfter them running for a period of time (the length of which doesn't seem to matter), we close both of them together.\r\nAt this point the OrleansMembershipTable displays both Silos as Active (3) due to nothing being able to update this.\r\nWe then restart the Silo A.\r\nThis then takes 5 minutes (almost exactly) before failing to initialize the Silo.\r\nIt then reports that Silo A became unavailable for messaging.\r\n\r\nUpon inspecting the OrleansMembershipTable at this point, we can see that Silo A has had its status changed to 'Joining' (2).\r\n\r\nAfter this, starting Silo A or B is fine, regardless of their current status in the OrleansMembershipTable.\r\n\r\nThrough some investigation, we've managed to determine that the issue is in SiloHost.StartOrleansSilo();\r\n\r\nWhat we're wanting to know is if there is any way around this issue.\r\n\r\nThank you\r\n\r\nExtra Info:\r\nOrleans Version 1.3\r\n\r\nStartupError Log (Side note: the C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\Silo\\Silo.cs is not my directory)\r\n\r\n>2017-05-10-10.34.19.856ZZ\r\n>ERROR starting Orleans silo name=[REDACTED] Exception=\r\n>Exc level 0: System.AggregateException: One or more errors occurred.\r\n>   at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)\r\n>   at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)\r\n>   at System.Threading.Tasks.Task.Wait(TimeSpan timeout)\r\n>   at Orleans.OrleansTaskExtentions.WaitWithThrow(Task task, TimeSpan timeout) in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\TaskExtensions.cs:line 210\r\n>   at Orleans.Runtime.Silo.DoStart() in C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\Silo\\Silo.cs:line 550\r\n>   at Orleans.Runtime.Silo.Start() in C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\Silo\\Silo.cs:line 439\r\n>   at Orleans.Runtime.Host.SiloHost.StartOrleansSilo(Boolean catchExceptions) in C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\Silo\\SiloHost.cs:line 178\r\n>Exc level 1: Orleans.Runtime.OrleansException: -Silo S127.0.0.1:22222:232108136 failed to update its status to Active in the table due to failures (socket failures or table read/write failures) after 38 attempts: ExecuteWithRetries has exceeded its max execution time of 00:05:00. Now is 2017-05-10 10:34:19.828 GMT, started at 2017-05-10 10:29:17.236 GMT, passed 00:05:02.5922384\r\n>   at Orleans.Runtime.MembershipService.MembershipOracle.<UpdateMyStatusGlobal>d__48.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\MembershipService\\MembershipOracle.cs:line 390\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.Runtime.MembershipService.MembershipOracle.<BecomeActive>d__30.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\MembershipService\\MembershipOracle.cs:line 168\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.Runtime.Scheduler.SchedulerExtensions.<>c__DisplayClass1_0.<<QueueTask>b__0>d.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\Scheduler\\ShedulerExtensions.cs:line 38\r\n>Exc level 2: System.TimeoutException: ExecuteWithRetries has exceeded its max execution time of 00:05:00. Now is 2017-05-10 10:34:19.828 GMT, started at 2017-05-10 10:29:17.236 GMT, passed 00:05:02.5922384\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 185\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.AsyncExecutorWithRetries.<ExecuteWithRetriesHelper>d__5`1.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\Orleans\\Async\\AsyncExecutorWithRetries.cs:line 179\r\n>--- End of stack trace from previous location where exception was thrown ---\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\r\n>   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\r\n>   at Orleans.Runtime.MembershipService.MembershipOracle.<UpdateMyStatusGlobal>d__48.MoveNext() in C:\\w\\Git\\Orleans_GeoSamples\\src\\OrleansRuntime\\MembershipService\\MembershipOracle.cs:line 366",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/3009/comments",
+    "author": "Saraphite",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2017-05-10T14:34:09Z",
+        "body": "This is by design. Silo A is waiting for silo B to respond. One workaround is to start both silos . Another workaround is to wipe the table before you restart.\r\nThere is also a way to shorten the wait period, so silo a will wait less time for b. I will add a details of the config parameter to do that later."
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2017-05-11T05:18:08Z",
+        "body": "The third and easiest option is to set orleansConfig.Globals.ValidateInitialConnectivity to false. \r\n\r\nThat will completely disable the check in A of B. A will start OK and will just ignore this old entry of B saying Active.\r\nOnce B will start, it will mark its own old entry in the table as Dead and write a new entry and will be OK.\r\n"
+      }
+    ]
+  },
+  {
+    "number": 2690,
+    "title": "Question - which is the right configuration for Production?",
+    "created_at": "2017-02-07T21:49:15Z",
+    "closed_at": "2017-03-01T16:47:20Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/2690",
+    "body": "Can you please recommend which should be the right configuration for production, we are using SQL Server\r\n\r\n        <SeedNode Address=\"\" Port=\"11111\" />    \r\n(With this, we are seeing this as our startup log\r\n[2017-01-31 21:01:41.895 GMT     4\tINFO   \t100403\tSilo\t10.163.2.182:11111]\t-------------- Initializing Primary silo on host XXXXXXX MachineName)\r\n\r\nor\r\n       \r\n        <Liveness LivenessType=\"SqlServer\" />\r\n\r\n(With this, we are seeing, \r\n[2017-02-07 15:46:34.205 GMT    10\tINFO   \t100403\tSilo\t10.210.55.41:11111]\t-------------- Initializing Secondary silo on host XXXXXX MachineName )",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/2690/comments",
+    "author": "mohammad-sadiq",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2017-02-16T22:28:57Z",
+        "body": "The latter is the right one. The configuration option with a primary is primarily for test scenarios, where reliability isn't a concern. "
+      }
+    ]
+  },
+  {
+    "number": 2544,
+    "title": "AzureSilo Config TableName",
+    "created_at": "2016-12-24T08:15:24Z",
+    "closed_at": "2017-01-03T08:20:48Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/2544",
+    "body": "Hello\r\nIn AzureSilo's Config it is possible to configure TableName (by default OrleansGrainState). I was expecting to be able to configure TableName in AzureClient; I could no find how to set that value.\r\nEven changing TableName in the AzureSilo the AzureClient kept working, this raised a couple of questions:\r\n1. How does AzureClient know about AzureSilos?\r\n2. Having multiple silos (with different grains each), should I use different GrainState tables or just one is good enough?\r\nThank you",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/2544/comments",
+    "author": "mauriciomagni",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2017-01-03T05:30:07Z",
+        "body": "There seems to be some confusion here. Grain state isn't visible or accessible to clients. So the `TableName` setting, when it comes to grain state, makes sense only on the silo side.\r\n\r\nThe cluster membership protocol, on the other hand, is what, among other things, allows clients to discover silos to connect to them. That's kind of the answer to your first question.\r\n\r\n>2. Having multiple silos (with different grains each), should I use different GrainState tables or just one is good enough?\r\n\r\nAll silo use the same configuration because grains are not permanently affiliated with any silo, and only get activated on a particular silo for some time. Hence, all silos need to write and read grain state to/from the same storage, table-based or nor."
+      }
+    ]
+  },
+  {
+    "number": 1736,
+    "title": "Configuring Reminders with the silo process",
+    "created_at": "2016-05-05T18:56:46Z",
+    "closed_at": "2016-05-06T16:10:42Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/1736",
+    "body": "We have implemented our silohost in a windows service. We have a number of grains, which should run \"batch-like\". Some with 2-hour interval, some with 24-hour interval and some with monthly interval. We thought a good implementation of that would be as reminders.\n\nWe need a place to configure these reminders in Orleans, and we thought a natural place for that is when starting the windows, service which holds the silo. Something like the below.\n\nHowever, Orleans will not let use GrainClient to get a reference to a grain. And as I understand we need a grain to register a reminder. We get an error \"You are running inside the provider code, on the silo. GrainClient.GrainFactory should only be used on the client side. Inside the provider code use GrainFactory that is passed via IProviderRuntime (use providerRuntime.GrainFactory).\"\n\nIs there any way to register a grain when starting the silo host process?\n\n```\n        _siloHost = new SiloHost(\"MySilo\", ClusterConfiguration.LocalhostPrimarySilo());\n        _siloHost.InitializeOrleansSilo();\n        _siloHost.StartOrleansSilo();\n\n        GrainClient.GrainFactory.GetGrain<IMyBatchGrain>(\"MyBatchGrain\").Register();\n```\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/1736/comments",
+    "author": "FenrisWolfAtMiddleEarth",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2016-05-05T19:14:10Z",
+        "body": "You should write this code inside bootstrap provider.\n\nYour other option is to create a grain client inside a separate app domain, or even process. But it cannot be in the same memory domain with the silo and not inside provider or grain.\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-05-05T21:58:09Z",
+        "body": "> We need a place to configure these reminders in Orleans, and we thought a natural place for that is when starting the windows, service which holds the silo. Something like the below.\n\nIf those reminders need to be registered once, then trying to do the same upon each restart of each node seems excessive to me. Reminders survive restarts and redeployments of a service. I think it would be more logical to execute an explicit 'configuration' task once right after a first deployment via a separate process or something, and not deal with that after.\n"
+      },
+      {
+        "user": "FenrisWolfAtMiddleEarth",
+        "created_at": "2016-05-06T16:10:42Z",
+        "body": "Thanks\nBootstrapprovider seems to do the job nicely for us.\nWe understand your suggestion about an explicit configuration task which just runs once. however that just complicates spinning up a fresh system on a phoenix server. (We do that for automated integration tests etc.)\nHopefully silo nodes are rarely restarted, so re-registering at those rare occasions should not be a problem.\n"
+      }
+    ]
+  },
+  {
+    "number": 1690,
+    "title": "Warning from WindowsPerfCountersStatistics about counters not found",
+    "created_at": "2016-04-19T10:43:15Z",
+    "closed_at": "2016-04-27T08:54:06Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/1690",
+    "body": "I found a warning in traces of my Orleans based cloud service regarding windows perf counters not found, and would like to know if Orleans expects me too run OrleansCounterControl.exe as startup task of my worker role, or is there something else that I can do to my worker role/cloud service in order to have the perf counters Orleans is looking for? Any help would be appreciated. The trace:\n\n[2016-04-19 06:56:44.580 GMT     7  WARNING 100701  WindowsPerfCountersStatistics   100.108.102.18:30000]   Windows perf counters not found -- defaulting to in-memory counters. Run OrleansCounterControl.exe as Administrator to create perf counters for Orleans.\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/1690/comments",
+    "author": "Eldar1205",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-04-19T20:33:54Z",
+        "body": "Yes, you need to run `OrleansCounterControl.exe` as an elevated task before starting a silo, so that the perf counter categories are registered.\n"
+      }
+    ]
+  },
+  {
+    "number": 1687,
+    "title": "Can I access other silos from within a silo",
+    "created_at": "2016-04-18T10:27:16Z",
+    "closed_at": "2016-04-19T05:08:04Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/1687",
+    "body": "Is it possible to access other silo's from within a silo?\n\nMy use case is this: We would like to have a silo with all of our business logic grains, and another silo with all of our database-grains. The business logic grains will of course use the database-grains. The purpose of separating the two is that we can \"mock\" the database grains in an automated test by simply replacing the silo with the database grains with a corresponding silo mocking the database.\n\nThanks\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/1687/comments",
+    "author": "FenrisWolfAtMiddleEarth",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-04-18T14:29:08Z",
+        "body": "This is not directly supported, and even if it was, it would be an anti-pattern - to try to use a silo as an isolation container. Silo are meant to be simply an abstraction over available compute resources that are shared by all grains in the cluster and can be added/removed to/from a cluster on an as needed basis for resource management or as a result of a failure.\n\nThere are other, more straightforward, ways to achieve mocking, for example, by passing an explicit class name prefix to `GetGrain()` methods of `GrainFactory`, so that you can switch between production and test versions of the grain class by changing a single string in config.\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-04-19T21:12:17Z",
+        "body": "> As I see it, passing an explicit class to GetGrain / GrainFactory is more for unit-testing.\n\nYes, but no necessarily. You can also have multiple grain classes that implement the same grain interface, and explicitly choose the desired grain class to use.\n"
+      }
+    ]
+  },
+  {
+    "number": 1686,
+    "title": "Warnings from AssemblyLoader not finding Applications directory",
+    "created_at": "2016-04-17T16:36:10Z",
+    "closed_at": "2016-04-27T08:54:54Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/1686",
+    "body": "I found the following warning in traces when running Orleans on my cloud service, it wasn't there first time I ran that cloud service with Orleans. Can someone please tell me why Orleans is looking for that directory and what are my options to make the warning go away?\n\n[2016-04-17 16:21:03.792 GMT     7  WARNING 101705  AssemblyLoader.Silo 100.106.4.23:30000] Unable to find directory E:\\approot\\Applications; skipping. \n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/1686/comments",
+    "author": "Eldar1205",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-04-18T14:46:16Z",
+        "body": "`Applications` is the hardcoded path where silo looks for app assemblies. The warning is harmless. If you create such a directory before starting a silo, the warning will go away.\n"
+      },
+      {
+        "user": "Eldar1205",
+        "created_at": "2016-04-19T10:41:03Z",
+        "body": "And if there won't be any assemblies in that directory, won't that cause issues for the silo?\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-04-19T20:38:30Z",
+        "body": "No issues. This warning probably should change to an info.\n"
+      }
+    ]
+  },
+  {
+    "number": 1465,
+    "title": "Best way to maintain a list of active grains?",
+    "created_at": "2016-02-16T17:56:31Z",
+    "closed_at": "2016-02-18T10:47:22Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/1465",
+    "body": "I have a number of grains of type A and I want to have another grain of type B (or anything else) to be able to give me a list of ID's for all active type A grains.\n\nI thought of having grain B as:\n\n```\n    Task Register(string key);\n\n    Task Unregister(string key);\n\n    Task<List<string>> GetAll();\n```\n\nBut that is a bad idea because this will have to be a single grain that all A grains call when they activate/deactivate, so it's a bottleneck.\n\nMy questions are:\n- **Is it possible to make this grain Reentrant to get rid of the bottleneck? The problem is that \"List\" is not thread-safe and I have a feeling that using \"lock\" inside a grain is a bad idea.**\n- **Is there another way to maintain a list of active grains of type A?** There has to be a better way of doing this.\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/1465/comments",
+    "author": "amamh",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2016-02-18T01:44:12Z",
+        "body": "There is nothing better way at the moment. There are separate relevant discussions of adding support for querying and about broadcast messaging.\n\nYou can make B reentrant. Using a List is safe because the grain is still single-threaded even if reentrant. However, reentrancy can only help here if within the methods you await other async operations, e.g. IO or calls to other grains. If methods are simple with a single turn, then reentrant won't give you anything.\n\nTo avoid the bottleneck, you could consider partitioning a single B into a grain pool of multiple B grains, where each A grain would register with a B grain deterministically picked based on its own ID, e.g. by calculating a modulo. For querying, you would have to fan out a call to all B grains and merge their responses.\n"
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2016-02-18T06:13:42Z",
+        "body": "Just to add the obvious (for a random person reading this issue) that what you are asking about is non-idiomatic in Orleans and basically breaks the fundamental abstraction of Virtual Actors. With Virtual Actors you should NOT be asking or be interested to know \"all active type A grains\" (I presume by active you mean those that have activation in memory).\n"
+      },
+      {
+        "user": "amamh",
+        "created_at": "2016-02-18T10:47:22Z",
+        "body": "@gabikliot  Thanks, but what if I want to have a monitoring grain that keeps track of how many grains are currently alive for example?\n\n@sergeybykov \n\n> Using a List is safe because the grain is still single-threaded even if reentrant. \n\nThanks for pointing that out.. there was some serious misunderstanding on my part. I thought that Reentrant means multiple calls can execute in parallel. I have read the documentation again and I understand now it means methods can interleave but are still single threaded.\n\nI think since I had the wrong idea of what \"Reentrant\" means, this issue should be closed now.\n"
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2016-02-18T15:54:45Z",
+        "body": "We have statistics API via management grain for that.\n"
+      }
+    ]
+  },
+  {
+    "number": 890,
+    "title": "Receiving events from Azure Queue Stream Provider multiple times",
+    "created_at": "2015-10-08T22:57:40Z",
+    "closed_at": "2015-11-16T17:26:03Z",
+    "labels": [
+      "bug",
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/890",
+    "body": "I appear to have an issue which I have been chasing for a few weeks now, where when I push messages down a stream the consumer/handler is not receiving them.\n\nI have this issue in my main solution which has 23 projects, but managed to replicate it in a simple solution as well.\n\nI'll take some time to explain the set up I have: \n\nI have three grain types: Red, Blue and Green.\n\nThe Red grain has one function which takes a string and posts it as a byte array down into two separate streams, both with an id of `guid.empty`\n\nThe Blue and Green grains have an `ImplicitStreamSubscription` to `TestStream` and `TestStream2` respectively.\n\nTo start with, everything works as expected, the Red grain sends the events down `TestStream` and `TestStream2` and the handlers in both the Blue and Green grains receive the events, but within a few minutes (I appear unable to work out 'why') the handlers stop receiving the events, even though they appear to be submitted.\n\nWhen trying to replicate the issue, just having one stream, it didn't appear to cause any issues and firing at streams with different id's for each request didn't have an issue either. It only appeared to be an issue if firing off to a stream which had already had data sent to it. \n\nHowever, after reading #884 it could be the cause of the issue, as I am getting a log full of `QueueCacheMissExceptions` - if it is will reverting back to an older version of Orleans be a workaround until the next release?\n\n```\n[2015-10-08 22:44:48.073 GMT    17  ERROR   103315  PullingAgentSystemTarget/FF/821b63b5-QueueStore 127.0.0.1:11111]    !!!!!!!!!! Ignored RunConsumerCursor Error  \nExc level 0: Orleans.Streams.QueueCacheMissException: Item not found in cache.  Requested: [EventSequenceToken: SeqNum=31, EventIndex=0], Low: [EventSequenceToken: SeqNum=190, EventIndex=0], High: [EventSequenceToken: SeqNum=191, EventIndex=0]\n   at Orleans.Providers.Streams.Common.SimpleQueueCache.InitializeCursor(SimpleQueueCacheCursor cursor, StreamSequenceToken sequenceToken)\n   at Orleans.Providers.Streams.Common.SimpleQueueCache.TryGetNextMessage(SimpleQueueCacheCursor cursor, IBatchContainer& batch)\n   at Orleans.Providers.Streams.Common.SimpleQueueCacheCursor.MoveNext()\n   at Orleans.Streams.PersistentStreamPullingAgent.<RunConsumerCursor>d__46.MoveNext()\n```\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/890/comments",
+    "author": "BenjaminGibbs",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2015-10-08T23:02:59Z",
+        "body": "@BenjaminGibbs , you are using Azure queue stream provider, right?\n\nIf you try the latest version from master, including #884, does it work? There indeed have been a number of fixes around those issues lately (multiple streams, some cache miss exceptions), and unfortunately you need all of them for things to work properly.\n"
+      },
+      {
+        "user": "BenjaminGibbs",
+        "created_at": "2015-10-12T17:51:13Z",
+        "body": "On the surface the issues appear to be fixed when using the master. I am going to do a bit more testing this evening and see if anything else pops up.\n"
+      },
+      {
+        "user": "BenjaminGibbs",
+        "created_at": "2015-10-13T01:18:35Z",
+        "body": "So it works fine on the surface, when I push a similar workload to before it works like a dream, however when I push the workload so the streams get a backlog I start losing items and they don't get delivered. This is looking like a different error to before.\n\nFrom the log: I am using the AzureQueueStreamProvider with the default settings, queue count and cache size.\n\n```\n[2015-10-13 00:20:52.053 GMT    19  ERROR   103211  AzureQueueDataManager   127.0.0.1:11111]    !!!!!!!!!! Error doing DeleteMessage for Azure storage queue beta-queuestore-3 \nException = Microsoft.WindowsAzure.Storage.StorageException: The remote server returned an error: (404) Not Found. ---> System.Net.WebException: The remote server returned an error: (404) Not Found.\n   at Microsoft.WindowsAzure.Storage.Shared.Protocol.HttpResponseParsers.ProcessExpectedStatusCodeNoException[T](HttpStatusCode expectedStatusCode, HttpStatusCode actualStatusCode, T retVal, StorageCommandBase`1 cmd, Exception ex) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\Common\\Shared\\Protocol\\HttpResponseParsers.Common.cs:line 50\n   at Microsoft.WindowsAzure.Storage.Queue.CloudQueue.<DeleteMessageImpl>b__3a(RESTCommand`1 cmd, HttpWebResponse resp, Exception ex, OperationContext ctx) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Queue\\CloudQueue.cs:line 2676\n   at Microsoft.WindowsAzure.Storage.Core.Executor.Executor.EndGetResponse[T](IAsyncResult getResponseResult) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Core\\Executor\\Executor.cs:line 299\n   --- End of inner exception stack trace ---\n   at Microsoft.WindowsAzure.Storage.Core.Executor.Executor.EndExecuteAsync[T](IAsyncResult result) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Core\\Executor\\Executor.cs:line 50\n   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)\n--- End of stack trace from previous location where exception was thrown ---\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\n   at Orleans.AzureUtils.AzureQueueDataManager.<DeleteQueueMessage>d__20.MoveNext()\nRequest Information\nRequestID:a09f9118-0003-0044-0f4c-052ccc000000\nRequestDate:Tue, 13 Oct 2015 00:20:34 GMT\nStatusMessage:The specified message does not exist.\nErrorCode:MessageNotFound\n\nExc level 0: Microsoft.WindowsAzure.Storage.StorageException: Message = The remote server returned an error: (404) Not Found., HttpStatusCode = 404, HttpStatusMessage = The specified message does not exist., ExtendedErrorInformation.ErrorCode = MessageNotFound, ExtendedErrorInformation.ErrorMessage = The specified message does not exist.\nRequestId:a09f9118-0003-0044-0f4c-052ccc000000\nTime:2015-10-13T00:20:35.0431917Z.\n   at Microsoft.WindowsAzure.Storage.Core.Executor.Executor.EndExecuteAsync[T](IAsyncResult result) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Core\\Executor\\Executor.cs:line 50\n   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)\n--- End of stack trace from previous location where exception was thrown ---\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\n   at Orleans.AzureUtils.AzureQueueDataManager.<DeleteQueueMessage>d__20.MoveNext()\nExc level 1: System.Net.WebException: The remote server returned an error: (404) Not Found.\n   at Microsoft.WindowsAzure.Storage.Shared.Protocol.HttpResponseParsers.ProcessExpectedStatusCodeNoException[T](HttpStatusCode expectedStatusCode, HttpStatusCode actualStatusCode, T retVal, StorageCommandBase`1 cmd, Exception ex) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\Common\\Shared\\Protocol\\HttpResponseParsers.Common.cs:line 50\n   at Microsoft.WindowsAzure.Storage.Queue.CloudQueue.<DeleteMessageImpl>b__3a(RESTCommand`1 cmd, HttpWebResponse resp, Exception ex, OperationContext ctx) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Queue\\CloudQueue.cs:line 2676\n   at Microsoft.WindowsAzure.Storage.Core.Executor.Executor.EndGetResponse[T](IAsyncResult getResponseResult) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Core\\Executor\\Executor.cs:line 299\n[2015-10-13 00:20:52.061 GMT    19  ERROR   103211  AzureQueueDataManager   127.0.0.1:11111]    !!!!!!!!!! Error doing DeleteMessage for Azure storage queue beta-queuestore-3 \nException = Microsoft.WindowsAzure.Storage.StorageException: The remote server returned an error: (404) Not Found. ---> System.Net.WebException: The remote server returned an error: (404) Not Found.\n   at Microsoft.WindowsAzure.Storage.Shared.Protocol.HttpResponseParsers.ProcessExpectedStatusCodeNoException[T](HttpStatusCode expectedStatusCode, HttpStatusCode actualStatusCode, T retVal, StorageCommandBase`1 cmd, Exception ex) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\Common\\Shared\\Protocol\\HttpResponseParsers.Common.cs:line 50\n   at Microsoft.WindowsAzure.Storage.Queue.CloudQueue.<DeleteMessageImpl>b__3a(RESTCommand`1 cmd, HttpWebResponse resp, Exception ex, OperationContext ctx) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Queue\\CloudQueue.cs:line 2676\n   at Microsoft.WindowsAzure.Storage.Core.Executor.Executor.EndGetResponse[T](IAsyncResult getResponseResult) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Core\\Executor\\Executor.cs:line 299\n   --- End of inner exception stack trace ---\n   at Microsoft.WindowsAzure.Storage.Core.Executor.Executor.EndExecuteAsync[T](IAsyncResult result) in c:\\Program Files (x86)\\Jenkins\\workspace\\release_dotnet_master\\Lib\\ClassLibraryCommon\\Core\\Executor\\Executor.cs:line 50\n   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)\n--- End of stack trace from previous location where exception was thrown ---\n   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)\n   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)\n   at Orleans.AzureUtils.AzureQueueDataManager.<DeleteQueueMessage>d__20.MoveNext()\nRequest Information\nRequestID:c7b6bad1-0003-002f-364c-05719a000000\nRequestDate:Tue, 13 Oct 2015 00:20:34 GMT\nStatusMessage:The specified message does not exist.\nErrorCode:MessageNotFound\n```\n"
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2015-10-13T01:33:09Z",
+        "body": "This indeed looks a different issue.\nMy guess is that we try to delete twice from the queue and second time it fails, naturally.\nJason, I would check how we handle failed deletes. What happened for example if first delete succeeded but response timed out, would we retry and how. It can explain this log error.\n\nIt does looks though as a benign issue, if we failed to delete (maybe second time) its not a problem.\nBenjamin, is there any application visible problem? If not, it may be the 2nd delete case, and there is no problem \n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2015-10-13T01:37:37Z",
+        "body": "I'll review the error handling logic.  We set a retry policy on the storage account, which would make this a natural error to receive any time the azure client library retries due to timeouts.  Our error handling should catch, log, and ignore this error when deleting messages.  If it does not, this is a bug.\n"
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2015-10-13T01:43:58Z",
+        "body": "Thanks Jason. Agree with what you wrote. Of course, it could also be, in theory,  a different bug where we somehow try to delete a wrong msg that was never in the queue,,but I doubt.\n\nThe most important thing I think is to make sure that if the above error happens, we do ignore it and keep processing as nothing happened. If the msg was not deleted, it will re appear and we will re deliver, later on, in accordance with azure queue at least once semantics.\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2015-10-13T01:53:55Z",
+        "body": "I've confirmed that we don't ignore this error.  It is logged and re-thrown, which will cause the main reader loop in the agent to exit until the next timer.  In general, this is not good, but should not cause data loss.\n\nTo mitigate this some, until we get a fix, you can set \"GetQueueMessagesTimerPeriod\" to TimeSpan.FromMilliseconds(10) in the provider configuration.  This will reduce the effect of this exception.\n\n\"When I push the workload so the streams get a backlog I start losing items and they don't get delivered\"\nThe posted exceptions 'should' not be causing data loss.  Can you log any OnErrorAsync calls to your grains?  If the stream infrastructure is having difficulties delivering events, it will attempt to notify the grain of these errors via the OnErrorAsync handler.\n"
+      },
+      {
+        "user": "BenjaminGibbs",
+        "created_at": "2015-10-13T17:27:52Z",
+        "body": "So after somewhat alot more testing in the last 12 hours, I am not losing message they are being delivery multiple times - my mistake.\n\nI am now sending Random GUID's down 4 different streams with the aim that at the end of each run they state should be the same - And it is; \n\nHowever I am also counting how many times we try to add an item which is already in the state and it fails, ie it is a re submission. - This is not triggering onErrorAsync.\n\nIf I push 10,000 items at once it gets backloged but in the end it all the states match, however the reprocess count is up to 10 times that of the times in the list, each stream has a different reprocess count. \n\nBut if I drop the cache size to a low value like 10 this doesn't happen. It should be noted I an intentionally creating a backlog on the grain at the moment, to see how it would handle a spike in traffic.\n\nA possible explanation could be that the the stream cache could be holding the items longer than the time out which means the AzureQueue is making the items reappear which then get re-added to the Stream Cache so in effect an never ending loop as in items are getting processed multiple times.\n\nI was able to replicate this theory by adding a delay to the processing of the grain that consumes the message, I could push in 100 items in to the streams and when I had the delay it re-processed in excess of 1700 extra messages, on top of the items. - If I repeated I get the same number of excess if I increase the delay it goes up, reduce the delay it goes down.\n\nOn error is not being fired.\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2015-10-13T18:21:56Z",
+        "body": "\"This is not triggering onErrorAsync\"\nThat is correct.  It should not.  Azure queues allow multiple delivery, so this is not an error.  If you see data loss, you should see OnErrorAsync calls.\n\n\"the AzureQueue is making the items reappear\"\nThis can happen.  When using azure queue's it's important to keep event processing time lower than azure queues re-add time.\n\nSetting the GetQueueMessagesTimerPeriod as mentioned before should help some with this, but in general, you'll need to perform some load tests and capacity planning to ensure that you've enough processing power for your load.\nTuning queue count and cache size can also help.\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2015-10-13T18:38:24Z",
+        "body": "Depending on how much effort you want to put into this, a custom queue cache could be developed, based off of SimpleQueueCache, which tracks how long messages have been in the cache and adjusts back pressure with this info.  Basically, if the time in the cache starts to approach the (configured) redelivery time, the cache could trigger the reader to back off, thereby reducing load.\n\nThis is more work of course, but it would be a more robust solution for azure queues with unbounded load.\n"
+      },
+      {
+        "user": "BenjaminGibbs",
+        "created_at": "2015-10-13T19:06:21Z",
+        "body": "Thanks Jason for clarification.\n\nI am pleased the original Issue I posted is fixed, I think extending the SimpleQueueCache would be a useful thing to do to in long run so I will look at doing that, currently I can control this with cache size and timer period.\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2015-10-13T19:43:25Z",
+        "body": "@BenjaminGibbs The SimpleQueueCache, as its name probably indicates, is a general all-purpose queue cache.  It is not queue specific.  If you do decide to make a custom adapter cache that is more tuned to azure queues, I could see that being useful to others in the community.  I fully expect that you're primary focus will be to build out the tech you need, but If you find the time, I'd be interested in seeing a issue opened regarding contributing your azure queue adapter cache to Orleans to be maintained as an alternative implementation of IQueueCache.\n"
+      },
+      {
+        "user": "jason-bragg",
+        "created_at": "2015-10-13T21:57:50Z",
+        "body": "@BenjaminGibbs A question in issue \"Talk about the stream (Feedback on the stream and QueueCacheMissException) #850\" reminded me of a cache behavior that may explain why you see more redeliveries with larger cache sizes. \n\nEvents are removed from the queue (via the MessagesDeliveredAsync call) once they are purged from the cache.  In general they are purged from the cache when all consumers have delivered the event, however the SimpleQueueCache purges events in bulk, not on an individual event by event basis.  It has buckets of events and does not purge a bucket until all of the events in the bucket have been delivered.  If the cache size is increased the bucket size will be increased, increasing the number of events that must be delivered before all events in the bucket can be released.\n"
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2015-10-15T09:44:42Z",
+        "body": "We can also allow to configure the number of buckets.\n"
+      }
+    ]
+  },
+  {
+    "number": 854,
+    "title": "Question - What happen when a stream producer fails?",
+    "created_at": "2015-09-29T02:33:23Z",
+    "closed_at": "2015-09-30T19:42:29Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/854",
+    "body": "Question\n\nI have a scenario where a need to return a lot of results ~10,000 and fetching them could be long. Long enough to exceed the request timeout. I was thinking on leveraging the Orleans Streams to achieve this and avoid time outs. Delegating the load to another grain which I will not wait on, and that will stream back the results.\n\nIf I'm in a at-least-one delivery scenario.\nWhat happen if the producer of the stream results fails? Will the producer be reactivated? and will it re-execute the `LoadRawData` or will the message be lost forever and I will receive no more results in my `MyGrain`?\n\nAlso, if you have any better solution so handle this kind of scenario, I'm open to suggestions :D\n\nthis is a simple example of what it could look like\n\n```\npublic class MyGrain : IGrain\n{\n    public Task LoadStuff()\n    {\n        var pg = GrainFactory.GetGrain<ProducerGrain>(\"foo\");\n\n        // Subscribe on stream X (streamHandleX)\n        // ...\n\n        // Don't wait on the return as this is a long running operation that will result in a time out\n        pg.LoadRawData();\n    }\n\n    public Task OnNext(object item)\n    {\n        // Save result in state\n    }\n\n    public Task OnCompleted()\n    {\n        // Set load as completed\n    }\n}\n\npublic class ProducerGrain : IGrain\n{\n    public async Task LoadRawData()\n    {\n        // This is a potentially long operation\n        // ...\n        // Get stream handle and stream each result as they come in\n        foreach(var result in results)\n        {\n            await streamHandleX.OnNext(result);\n        }\n\n        await streamHandleX.OnCompleted();\n    }\n}\n\n```\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/854/comments",
+    "author": "mbernard",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2015-09-29T22:44:48Z",
+        "body": "If a `ProducerGrain` fails in the middle, it will not be recreated by itself. You need someone to send it a new message to reactivate it. The options are:\n\n1) Make `MyGrain` watch the production process and keep periodically pocking the producer. So for example,  `MyGrain` will create a timer (not a reminder) that will periodically check when was the last OnNext called and it looks like  producer was idle for some time, just pick it, also telling him - hei, I got X chunks (this part of the data), where is the rest? The not failed producer will ignore, while the failed producer will be reactivated and can restart from the latest point. \n\n2) Use reminder. `ProducerGrain` will subscribe to a reminder that will tick periodically. Once all data was produced, it can unregister the reminder. In that solution, producer will need to remember by itself how much it already produced, so it does not start from the beginning (unless you don't care to resend all). He will need to store this reliably in storage. \n\nIf the `ProducerGrain`  is non reentrant (default), you will actually not get neither consumer pocks nor reminder ticks until `LoadRawData` is done. Which is fine, just need to be aware. And after you are done, just ignore them.\n"
+      }
+    ]
+  },
+  {
+    "number": 741,
+    "title": "Accessing GrainFactory from IBootstrapProvider in 1.0.9.",
+    "created_at": "2015-08-26T21:17:31Z",
+    "closed_at": "2015-08-27T13:38:38Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/741",
+    "body": "I have been working through the process of upgrading to orleans 1.0.9 from 1.0.8.  We have some code that implements IBootstrapProvider, which is used to load some starting data into the system at startup.  \nBefore: \n`var cropGrain = GrainFactory.GetGrain<ICrop>(crop.CropId);`\n\nAfter:\n`var cropGrain = GrainClient.GrainFactory.GetGrain<ICrop>(crop.CropId);`\n\nThis was working fine in 1.0.8.  Now, the calls to get grain references from the GrainFactory are failing due to the GrainClient not being initialized.  Since this code is running on the Silo, I wouldn't expect to need to configure a client.  Attempts to do so have failed.\n\nAre there any examples of how to properly interact with grains in the bootstrap providers, which are set up to be deployed on Azure?  \n\nThanks\nPhil\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/741/comments",
+    "author": "philreindl",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2015-08-26T21:24:37Z",
+        "body": "The `GrainFactory` is available via a member field in `IProviderRuntime` that is passed to `IBootstrapProvider.Init()`.\n"
+      }
+    ]
+  },
+  {
+    "number": 692,
+    "title": "Grain faulted state",
+    "created_at": "2015-08-12T15:55:13Z",
+    "closed_at": "2015-08-12T20:32:32Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/692",
+    "body": "Trying to figure out what is the approach for the following scenario.\n\nThere is operation (async method) in grain which updates the state and the state persisted at the end. In case there is failure during state change (logical Exception) or while writing to storage, I want to \"rollback\". By \"rollback\" I mean:\n- Either re-read the state from storage and throw exception, so the caller will be aware that operation failed\n- Or kill (deactivate?) the grain\n\nIn first case there also possibility that the re-read state will also fail, which takes me to second approach. \n\nWhat is the best practice to handle faulted state of actors in Orleans?\n\nThanks.\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/692/comments",
+    "author": "jenyayel",
+    "comments": [
+      {
+        "user": "gabikliot",
+        "created_at": "2015-08-12T18:01:57Z",
+        "body": "Both are valid approaches. You can force activation to deactivate by calling `DeactovateOnIdle`. On the other hand, the 1st approach allows you a more fined grained and application specific error recovery.\nWe deliberately did not want to constrain the system to only do 1 or 2, and allow the app to pick its own.\n\nWe do have an open work item to treat eTag mismatch exceptions from the storage automatically. We will use strategy 2 - if the grain got eTag mismatch exception upon write, we plan to automatically deactivate this activation. The reason is that eTag mismatch exception basically means we got 2 activations of that grain, which is an error condition, and one of the activations should be deactivated anyway. But for other errors we leave it to the app code to handle.\n"
+      }
+    ]
+  },
+  {
+    "number": 662,
+    "title": "grain call from grain: \"You must initialize the Grain Client before accessing the GrainFactory\"",
+    "created_at": "2015-07-29T10:06:41Z",
+    "closed_at": "2015-07-29T17:02:30Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/662",
+    "body": "Hi,\n\nSince I updated to 1.09 I have a problem with a grainfunction that calls another grain. The call throws an exception \"You must initialize the Grain Client before accessing the GrainFactory\".\n\nThe problem only occurs if I get the grain with \"GrainClient.GrainFactory.GetGrain<IMyGrain>(grainid)\". If I use the autogenerated (deprecated) grainfactory everything works as before. \n\nIn GrainClient.cs from the orleanscode I see the comment \"//TODO: prevent client code from using this from inside a Grain\". Does that mean, that you should not (or cannot) use a grain from another grain?\n\nThanks for any hints.\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/662/comments",
+    "author": "ghost",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2015-07-29T16:04:14Z",
+        "body": "From within a grain it's `this.GrainFactory.GetGrain(grainid)`. `GrainClient` is to be used only from outside of a silo.\n"
+      },
+      {
+        "user": "gabikliot",
+        "created_at": "2015-07-29T17:49:32Z",
+        "body": "I added a more explicit and more helpful exception here: #663.\n"
+      }
+    ]
+  },
+  {
+    "number": 525,
+    "title": "Connection Silos from Multiple Cloud services",
+    "created_at": "2015-06-16T18:14:48Z",
+    "closed_at": "2015-07-14T16:26:33Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/dotnet/orleans/issues/525",
+    "body": "We currently have our Orleans Silo and Client running within the same cloud service so we are just using the basic Azure Configuration using the AzureSilo and AzureClient. Everything is working very well.\n\nWe now want to start up another version of that cloud service and we want the silos from both the be in the same \"Silo Cluster\". Is it possible to continue using Azure Silo and AzureClient(They will both be using the same AzureTable storage) or do I have to instead use SiloHost and GrainClient to implement the the silo so that we can set the Deployment Id??\n\nThanks in advance!\n",
+    "comments_url": "https://api.github.com/repos/dotnet/orleans/issues/525/comments",
+    "author": "clintonsweetnam",
+    "comments": [
+      {
+        "user": "sergeybykov",
+        "created_at": "2015-06-16T19:41:26Z",
+        "body": "Yes, this should be possible, so long as you have direct TCP connectivity between the two services, e.g. via a vNet.\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2015-06-17T14:15:51Z",
+        "body": "Why would they not share Azure Table storage? They have to use the same cluster membership table.\n"
+      },
+      {
+        "user": "clintonsweetnam",
+        "created_at": "2015-06-17T14:36:56Z",
+        "body": "Hi Sergey,\n\nI guess the issue we are predicting is that even though both cloud services will be sharing the same Azure Storage Table, they will have different deployment Id's. Even if these deployment Id's don't match will it still allow the Silos on both Cloud Services to act as a Silo Cluster. In essence will deployments with different DeploymentId's share the same customer membership table?\n\nJust a a reference we are using hte standard azure configurations for both our Silo's and Clients as detailed in the samples.\n\nThanks,\n\nClinton\n"
+      },
+      {
+        "user": "sergeybykov",
+        "created_at": "2015-06-17T14:44:03Z",
+        "body": "Deployment ID is the primary key in the membership table. So both deployments have to use the same deployment ID, in this case different from Azure Hosted Service deployment ID. So you'll need to use SiloHost and GrainClient directly, instead of the AzureSilo and AzureClient wrapper classes.\n"
+      },
+      {
+        "user": "clintonsweetnam",
+        "created_at": "2015-07-14T08:30:43Z",
+        "body": "Hey Gabriel\n\nWe implemented it by using the SiloHost and GrainClient directly with a self-generated deployment Id and using AzureTable as a backing store.\n\nAppears to be be working very well!\n\nThanks for you help guys!\n\nClinton\n"
+      }
+    ]
+  }
+]

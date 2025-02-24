@@ -1,0 +1,29 @@
+[
+  {
+    "number": 1703,
+    "title": "Loading the GIF causes the project to crash",
+    "created_at": "2017-03-17T11:30:05Z",
+    "closed_at": "2017-03-18T14:10:50Z",
+    "labels": [
+      "duplicate",
+      "build",
+      "question"
+    ],
+    "url": "https://github.com/facebook/fresco/issues/1703",
+    "body": "\r\n\r\n```java\r\n//my code\r\n\r\n Uri uri = Uri.parse(address);\r\n        DraweeController draweeController =\r\n                Fresco.newDraweeControllerBuilder()\r\n                        .setUri(uri)\r\n                        .setAutoPlayAnimations(true) \r\n                        .build();\r\n        nivShowImg.setController(draweeController);\r\n```\r\n\r\n```java\r\n//my version\r\ncompile 'com.facebook.fresco:fresco:1.1.0'\r\ncompile 'com.facebook.fresco:animated-gif:1.1.0'\r\n```\r\n\r\n```java\r\n//my error\r\n java.lang.NoSuchFieldError: com.facebook.imagepipeline.common.ImageDecodeOptions.forceOldAnimationCode\r\n                                                               at com.facebook.imagepipeline.animated.factory.AnimatedImageFactoryImpl.decodeGif(AnimatedImageFactoryImpl.java:84)\r\n                                                               at com.facebook.imagepipeline.decoder.DefaultImageDecoder.decodeGif(DefaultImageDecoder.java:142)\r\n                                                               at com.facebook.imagepipeline.decoder.DefaultImageDecoder$1.decode(DefaultImageDecoder.java:65)\r\n                                                               at com.facebook.imagepipeline.decoder.DefaultImageDecoder.decode(DefaultImageDecoder.java:123)\r\n                                                               at com.facebook.imagepipeline.producers.DecodeProducer$ProgressiveDecoder.doDecode(DecodeProducer.java:239)\r\n                                                               at com.facebook.imagepipeline.producers.DecodeProducer$ProgressiveDecoder.access$200(DecodeProducer.java:111)\r\n                                                               at com.facebook.imagepipeline.producers.DecodeProducer$ProgressiveDecoder$1.run(DecodeProducer.java:144)\r\n                                                               at com.facebook.imagepipeline.producers.JobScheduler.doJob(JobScheduler.java:207)\r\n                                                               at com.facebook.imagepipeline.producers.JobScheduler.access$000(JobScheduler.java:27)\r\n                                                               at com.facebook.imagepipeline.producers.JobScheduler$1.run(JobScheduler.java:78)\r\n                                                               at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1112)\r\n                                                               at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:587)\r\n                                                               at com.facebook.imagepipeline.core.PriorityThreadFactory$1.run(PriorityThreadFactory.java:43)\r\n                                                               at java.lang.Thread.run(Thread.java:841)\r\n\r\n```\r\n#question\r\nWhat is the solution to this problem, or what is the cause of the problem",
+    "comments_url": "https://api.github.com/repos/facebook/fresco/issues/1703/comments",
+    "author": "bxhuhu",
+    "comments": [
+      {
+        "user": "oprisnik",
+        "created_at": "2017-03-17T14:17:04Z",
+        "body": "I guess some of your Gradle dependencies got mixed up. We removed `forceOldAnimationCode`. Try and clean/rebuild your project"
+      },
+      {
+        "user": "oprisnik",
+        "created_at": "2017-03-18T14:10:50Z",
+        "body": "See also #1660"
+      }
+    ]
+  }
+]

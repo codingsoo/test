@@ -1,0 +1,23 @@
+[
+  {
+    "number": 47,
+    "title": "Too easy to select a tab on mobile (iOS/iPadOS)",
+    "created_at": "2024-10-30T22:25:24Z",
+    "closed_at": "2024-11-01T15:06:41Z",
+    "labels": [
+      "bug",
+      "enhancement"
+    ],
+    "url": "https://github.com/oxdc/obsidian-vertical-tabs/issues/47",
+    "body": "I noticed that, if there are too much tabs opened (I know that is not a good way to proceed I hope you could forgive me) and you have to scroll the list, basically if the point on which you tap to scroll is the name of a tab, it will be selected after the scrolling ends.\n\nTo avoid it I started to tap on the name of a group when I would scroll to search if a tab is open (for instance) but I don't want to change the current tab.\n\nThis behaviour is evident on my iPhone and makes difficult to manage a long list of tabs on it, while on my iPad is not so noticeable but it is still here.",
+    "comments_url": "https://api.github.com/repos/oxdc/obsidian-vertical-tabs/issues/47/comments",
+    "author": "Azmoinal",
+    "comments": [
+      {
+        "user": "oxdc",
+        "created_at": "2024-11-03T12:58:23Z",
+        "body": "Hi! Scrolling should work on mobile now ~ Please update to v0.10.0. If you encounter any problem, please reopen this issue. Thank you."
+      }
+    ]
+  }
+]

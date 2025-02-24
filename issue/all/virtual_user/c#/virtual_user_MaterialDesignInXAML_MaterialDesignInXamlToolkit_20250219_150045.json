@@ -1,0 +1,132 @@
+[
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/3493",
+    "source": {
+      "issue_number": 3493
+    },
+    "initial_question": {
+      "title": "Cant switch themes after updating to 5.0",
+      "body": "### Bug explanation\n\nI have the following code to switch between dark and light themes.  Since updating to 5.0 this no longer works.  Theme.Dark and Theme.Light dont exist any more.  Also swatch.AccentExemplarHue is gone.  I cant remember where I got this code from but it was working.  The Advanced theming page in the wiki will also be incorrect now.\r\n\r\n```\r\nvar sp = new SwatchesProvider();\r\nvar swatch = sp.Swatches.FirstOrDefault(p => p.Name == \"deeppurple\");\r\nif (swatch != null)\r\n{\r\n  var darkTheme = Theme.Create(Theme.Dark, swatch.ExemplarHue.Color, swatch.AccentExemplarHue.Color);\r\n  var lightTheme = Theme.Create(Theme.Light, swatch.ExemplarHue.Color, swatch.AccentExemplarHue.Color);\r\n  new PaletteHelper().SetTheme(_darkTheme ? darkTheme : lightTheme);\r\n}\r\n```\n\n### Version\n\n5.0"
+    },
+    "satisfaction_conditions": [
+      "Theme switching between dark and light modes must be functional",
+      "Custom color scheme (deep purple) must be preserved during theme switches",
+      "Solution must be compatible with MaterialDesign version 5.0",
+      "Theme changes must persist and be immediately visible in the UI"
+    ],
+    "created_at": "2024-03-13T15:50:17Z"
+  },
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/2420",
+    "source": {
+      "issue_number": 2420
+    },
+    "initial_question": {
+      "title": "Value is not updated when using \"materialDesign:HintAssist.HasClearButton\".",
+      "body": "Hello,\r\n\r\nI have a Textbox like below in MVVM design. If I press the Clear button in the Textbox, the value in the Textbox is deleted, but my Angle value does not change. There is no problem when I delete it with the normal keyboard key.\r\n\r\nIs this an expected behavior? How can I update the Angle value to 0 or \"\" when I press the button.\r\n\r\n```\r\n<TextBox Width=\"160\"\r\n                Margin=\"10,0,0,0\"\r\n                 Style=\"{StaticResource MaterialDesignOutlinedTextBox}\"\r\n                 TextWrapping=\"Wrap\"\r\n                  materialDesign:HintAssist.Hint=\"{Binding ControlView_Angle, Source={StaticResource Resources}}\"\r\n                  materialDesign:TextFieldAssist.HasClearButton=\"True\"\r\n                  materialDesign:HintAssist.FloatingScale=\"1\">\r\n                  <TextBox.Text>\r\n                           <Binding Path=\"Angle\"\r\n                                           UpdateSourceTrigger=\"PropertyChanged\">\r\n                                   <Binding.ValidationRules>\r\n                                            <local:NotEmptyValidationRule ValidatesOnTargetUpdated=\"True\" ValidationStep=\"UpdatedValue\"/>\r\n                                    </Binding.ValidationRules>\r\n                            </Binding>\r\n                 </TextBox.Text>\r\n</TextBox>\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Solution must handle null/empty values appropriately for numeric data types",
+      "Solution must preserve MVVM pattern compliance"
+    ],
+    "created_at": "2021-09-10T08:23:42Z"
+  },
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/2010",
+    "source": {
+      "issue_number": 2010
+    },
+    "initial_question": {
+      "title": "How to set TextAlignment of the materialDesign:HintAssist.Hint",
+      "body": "I have TextBox with the `MaterialDesignOutlinedTextFieldTextBox` styles. Now I want to align text in the center of TextBox, But I can't find any option in `materialDesign:HintAssist` to align hint text.\r\nPlease help me, what can I do?"
+    },
+    "satisfaction_conditions": [
+      "Hint text appears centered in the TextBox",
+      "TextBox maintains MaterialDesignOutlinedTextFieldTextBox styling",
+      "Solution works with HintAssist.Hint property"
+    ],
+    "created_at": "2020-08-04T20:26:04Z"
+  },
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/1167",
+    "source": {
+      "issue_number": 1167
+    },
+    "initial_question": {
+      "title": "Some resources are missing in latest version",
+      "body": "Hi\r\nIn latest version (2.5.0.1205) my project can't resolve some resources. \r\n- MaterialDesignTextAreaTextBox\r\n- MaterialDesignTextFieldBoxTextBox\r\n\r\nMaybe there are other resources missing but these aren't present for me. Maybe the names changed?\r\nThanks for this amazing project"
+    },
+    "satisfaction_conditions": [
+      "Resource names are correctly identified and accessible",
+      "Documentation or reference is provided for the changes"
+    ],
+    "created_at": "2019-01-14T20:32:45Z"
+  },
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/1157",
+    "source": {
+      "issue_number": 1157
+    },
+    "initial_question": {
+      "title": "How to change the FontSize of DataGrid Column Headers?",
+      "body": "Hi Guys,\r\n\r\nI got a little problem with the FontSize of my DataGrid Column Headers.\r\nFor my requirements the normal Material Design Font Size of DataGrid Column Headers are a bit to small.\r\nSo I tried to change the FontSize by setting the Property like following example:\r\n\r\n     <DataGrid x:Name=\"MyDataGrid1\" AutoGenerateColumns=\"False\" IsReadOnly=\"True\">                                                                                                                    \r\n               <DataGrid.Columns>\r\n                         <DataGridTextColumn x:Name=\"Column1\" Header=\"Column1\" FontSize=\"18\" />\r\n                         <DataGridTextColumn x:Name=\"Column2\" Header=\"Column2\" FontSize=\"20\" />\r\n               </DataGrid.Columns>\r\n     </DataGrid>\r\nThe problem here was that the FontSize Property didn't affect the size of the Headers Font, so it was basically like before.\r\n\r\nAfterwards I tried to set the FontSize Property in the DataGrid itself like in the following code example:\r\n\r\n`<DataGrid Name=\"MyDataGrid1\" AutoGenerateColumns=\"False\" IsReadOnly=\"True\" FontSize=\"18\">`\r\n\r\nThis only affected the FontSize of the Data in the DataGrid, but not of the Column Headers.\r\n\r\nAs a last try I tried to set the Font Size per DataGrid.Resources as you can see here:\r\n\r\n      <DataGrid.Resources>\r\n                <Style TargetType=\"{x:Type DataGridColumnHeader}\">                                            \r\n                     <Setter Property=\"FontSize\" Value=\"18\" />\r\n                </Style>\r\n      </DataGrid.Resources>\r\n\r\nBut that also didn't work as I wanted. After the implementation of the code abovetThe FontSize changed to the Value I set, but the Column Headers hadn't the Material Design font anymore and so on...it changed to the standard C# WPF Style, which I don't want as well.\r\n\r\nSo now I ask you guys, if there is an easy way to change the FontSize of DataGrid Column Headers?\r\nThanks for every help."
+    },
+    "satisfaction_conditions": [
+      "Column header font size must be modifiable to a larger size than default",
+      "Material Design styling must be preserved",
+      "Font size changes must affect headers independently of grid content",
+      "Solution must work with DataGridTextColumn elements"
+    ],
+    "created_at": "2018-12-27T01:55:21Z"
+  },
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/1112",
+    "source": {
+      "issue_number": 1112
+    },
+    "initial_question": {
+      "title": "Header of Expander can't change  properties include fontsize ,VerticalContentAlignment and so on.",
+      "body": "`<Expander Grid.Row=\"8\" Grid.Column=\"0\" Grid.ColumnSpan=\"2\" HorizontalAlignment=\"Stretch\" VerticalAlignment=\"Stretch\" VerticalContentAlignment=\"Center\" HorizontalContentAlignment=\"Left\" Header=\"admin\" Foreground=\"#35A3DD\" FontFamily=\"\u5fae\u8f6f\u96c5\u9ed1\" FontSize=\"20\" FontWeight=\"Medium\" Background=\"Transparent\">\r\n                        <Grid>\r\n                        </Grid>\r\n                    </Expander>`\r\nI found that the header of Expander  can't change these properties.\r\nIs there some solutions to deal with this problem?\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Header visual properties must be customizable",
+      "Solution maintains Expander functionality",
+      "Header content remains visible and properly formatted",
+      "Changes integrate with XAML-based layout system"
+    ],
+    "created_at": "2018-11-12T02:29:48Z"
+  },
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/1084",
+    "source": {
+      "issue_number": 1084
+    },
+    "initial_question": {
+      "title": "Set color of input to use PrimaryLight instead of PrimaryMid when selected?",
+      "body": "I'm trying to use text inputs on the dark theme background but the primary mid hue of the default color scheme is too dark. Is there a way to set the input to use the light variant of the color scheme when it's focused? Looking at the source it appears to be hardcoded.\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Input field color must be visually distinguishable when focused on dark theme",
+      "Color customization must persist through theme changes",
+      "Modified color must maintain visual hierarchy consistency with other UI elements"
+    ],
+    "created_at": "2018-10-23T16:04:01Z"
+  },
+  {
+    "id": "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/issues/1047",
+    "source": {
+      "issue_number": 1047
+    },
+    "initial_question": {
+      "title": "How to change packicon on run time?",
+      "body": "hi, guys, i am a  newbie C# programmer.\r\nnow we know Packicon can be added from XAML:\r\n\r\n`<Button Style=\"{StaticResource MaterialDesignFlatButton}\" Width=\"30\" Height=\"25\" Margin=\"0,0,0,0\" ToolTip=\"{DynamicResource LISTENCONTENT}\" Tag=\"LISTENCONTENT\" Click=\"Button_Click\">\r\n                    <materialDesign:PackIcon Kind=\"CommentOutline\" Margin=\"-10,0,-5,0\"/>\r\n                </Button>`\r\n\r\nbut how to change using c# code?\r\nButton_click(){\r\n  // change the icon here\r\n  button.content = FindResource(\"\") ; // what is the name for packicon ???\r\n}\r\n\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "PackIcon's Kind property must be modifiable at runtime",
+      "Icon must be accessible from the click event handler",
+      "Modified icon must be visible in the UI after change",
+      "Solution must work within existing button structure"
+    ],
+    "created_at": "2018-09-25T02:26:48Z"
+  }
+]

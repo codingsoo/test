@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/LauZzL/ltzj-nem/issues/53",
+    "source": {
+      "issue_number": 53
+    },
+    "initial_question": {
+      "title": "\ud83d\udc1b [ Bug ]: \u4f7f\u7528\u5bfb\u5b9d\u88c5\u5907\u5b9d\u7bb1\u4f1a\u51fa\u73b0\u81ea\u52a8\u4f7f\u7528\u94a5\u5319\u7684\u60c5\u51b5",
+      "body": "<!-- \u8bf7\u5728\u60a8\u63d0\u4ea4 bug \u4e4b\u524d\uff0c\u56de\u7b54\u4ee5\u4e0b\u8fd9\u4e9b\u95ee\u9898\u3002 -->\r\n\r\n#### \u60a8\u4f7f\u7528\u7684\u7248\u672c\uff1f\r\nLTZJ-NEM.Build.3.0.7\r\n\r\n#### \u7cfb\u7edf\u7248\u672c\uff1f\r\nWin11\r\n\r\n#### \u60a8\u9047\u5230\u4e86\u4ec0\u4e48\u95ee\u9898\uff1f\r\n\u4f7f\u7528\u5bfb\u5b9d\u88c5\u5907\u5b9d\u7bb1\u4f1a\u51fa\u73b0\u81ea\u52a8\u4f7f\u7528\u94a5\u5319\u7684\u60c5\u51b5\r\n\r\n#### \u8bf7\u63d0\u4f9b\u9519\u8bef\u622a\u56fe\uff1f\r\n"
+    },
+    "satisfaction_conditions": [
+      "Key usage behavior matches user expectations",
+      "User has control over key usage"
+    ],
+    "created_at": "2024-09-26T11:58:33Z"
+  }
+]

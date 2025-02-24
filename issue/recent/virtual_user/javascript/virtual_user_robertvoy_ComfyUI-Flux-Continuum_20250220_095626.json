@@ -1,0 +1,20 @@
+[
+  {
+    "id": "https://github.com/robertvoy/ComfyUI-Flux-Continuum/issues/8",
+    "source": {
+      "issue_number": 8
+    },
+    "initial_question": {
+      "title": "Need more info!",
+      "body": "Hi!\r\n\r\nI really love your approach with this workflow, but I really can't grasp the procedure for, say, using canny or other controls for img2img. More specifically, I don't understand how to define the starting image: is it the latest image I generated, or the image I have in the Img Load tab?\r\n\r\nAt the end of the tutorial video you ask for feedback on the need for more videos\u2026 Well, here's feedback: yes, please! \ud83d\ude43"
+    },
+    "satisfaction_conditions": [
+      "Input image source location is clearly identified",
+      "Workflow sequence for canny operations is defined",
+      "Image transfer method between operations is explained",
+      "Tab purposes and functions are distinguished",
+      "Preview and adjustment capabilities are described"
+    ],
+    "created_at": "2024-12-01T21:37:11Z"
+  }
+]

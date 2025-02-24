@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/quackscience/duckdb-extension-httpclient/issues/18",
+    "source": {
+      "issue_number": 18
+    },
+    "initial_question": {
+      "title": "Arm support",
+      "body": "Can you also compile and publish for arm ? \r\nthanks"
+    },
+    "satisfaction_conditions": [
+      "Extension is compatible with the user's ARM architecture",
+      "Extension version matches DuckDB version",
+      "Extension successfully loads and operates on macOS",
+      "Installation process completes without errors"
+    ],
+    "created_at": "2025-01-03T12:22:51Z"
+  }
+]

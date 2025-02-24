@@ -1,0 +1,67 @@
+[
+  {
+    "number": 512,
+    "title": "Option for button instead of toggle for switches",
+    "created_at": "2015-10-12T00:57:50Z",
+    "closed_at": "2016-06-02T06:14:27Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/home-assistant/core/issues/512",
+    "body": "I have a pi connected to my garage door opener. I am using a command line switch option to open/close my garage door. I am using the same command to both open and close the door, because all it does is turn on a relay for a few seconds and then back off. Would it be possible to have just a push button with one command option. Then maybe in history just show an event and not lable them as on/off?\n",
+    "comments_url": "https://api.github.com/repos/home-assistant/core/issues/512/comments",
+    "author": "w1ll1am23",
+    "comments": [
+      {
+        "user": "balloob",
+        "created_at": "2015-10-12T01:01:00Z",
+        "body": "It doesn't sound like you want a switch at all. Why not use a script, they show up as a button on the top.\n"
+      },
+      {
+        "user": "w1ll1am23",
+        "created_at": "2015-10-12T01:10:58Z",
+        "body": "Hmm okay I'll have to try that out, but what would happen if it was grouped with a sensor? I have a sensor as well that tells me the sate of the the door, open or closed. \n"
+      },
+      {
+        "user": "balloob",
+        "created_at": "2015-10-12T01:12:58Z",
+        "body": "Scripts have a switch to turn them on or cancel when they are running.\n"
+      },
+      {
+        "user": "balloob",
+        "created_at": "2015-10-12T04:31:23Z",
+        "body": "I have opened PR #513 that will allow you to expose shell commands as services so you can call them from a script. \n"
+      },
+      {
+        "user": "michaelarnauts",
+        "created_at": "2015-11-14T20:02:46Z",
+        "body": "I'm having the exact same use case. I don't have a sensor yet to detect if the door is open, but executing the script will make the door close if it was open. I like to have my controls in the group (Living room, Garage, ...), so a script at the top of the screen isn't really the best way. I currently have a command_switch that executes the same command at oncmd and offcmd, but the state can be out of sync offcourse.\n"
+      },
+      {
+        "user": "balloob",
+        "created_at": "2015-11-14T20:06:54Z",
+        "body": "You can add a script to a group :+1: \n"
+      },
+      {
+        "user": "michaelarnauts",
+        "created_at": "2015-11-14T20:41:27Z",
+        "body": "Hmm, the script is still showing up as a toggle switch, so it is exactly the same as if I would define a command_switch.\n"
+      },
+      {
+        "user": "balloob",
+        "created_at": "2015-11-14T20:46:32Z",
+        "body": "Scripts will show a toggle because execution can be cancelled. However, they will behave as a button if they have no delay\n"
+      },
+      {
+        "user": "michaelarnauts",
+        "created_at": "2015-11-14T20:55:18Z",
+        "body": "I have created the following bash-script\n\n``` bash\n#!/bin/bash\nsleep 1\n```\n\nand my `configuration.yaml` contains this:\n\n``` yaml\nshell_command:\n  signal_garage_door: /opt/test.sh\n\nscript:\n  garage_door:\n    sequence:\n      - service: shell_command.signal_garage_door\n```\n\nBut the toggle stays in the on-position.\n\nThe log contains this info:\n\n```\nINFO:homeassistant.core:Bus:Handling <Event call_service[L]: domain=homeassistant, service_call_id=140051254539712-1, entity_id=script.garage_door, service=turn_on>\nINFO:homeassistant.core:Bus:Handling <Event call_service[L]: domain=script, service_call_id=140051254539712-2, entity_id=['script.garage_door'], service=turn_on>\nINFO:homeassistant.core:Bus:Handling <Event call_service[L]: domain=script, service_call_id=140051254539712-3, service=garage_door>\nINFO:homeassistant.core:Bus:Handling <Event service_executed[L]: service_call_id=140051254539712-2>\nINFO:homeassistant.components.script:Executing script garage_door\nINFO:homeassistant.components.script:Executing script garage_door step shell_command.signal_garage_door\nINFO:homeassistant.core:Bus:Handling <Event call_service[L]: domain=shell_command, service_call_id=140051254539712-4, service=signal_garage_door>\nINFO:homeassistant.core:Bus:Handling <Event service_executed[L]: service_call_id=140051254539712-1>\nINFO:homeassistant.core:Bus:Handling <Event service_executed[L]: service_call_id=140051254539712-3>\nINFO:homeassistant.components.http:\"POST /api/services/homeassistant/turn_on HTTP/1.1\" 200 -\n\n* sleeps here for 1 second *\n\nINFO:homeassistant.core:Bus:Handling <Event service_executed[L]: service_call_id=140051254539712-4>\n```\n\nI need to turn the toggle back off manually before I can execute it again.\n"
+      },
+      {
+        "user": "balloob",
+        "created_at": "2015-11-15T07:38:53Z",
+        "body": "@michaelarnauts that's a bug in the frontend that I just fixed a couple of minutes ago. Should be ok in the next release.\n"
+      }
+    ]
+  }
+]

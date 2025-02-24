@@ -1,0 +1,664 @@
+[
+  {
+    "id": "https://github.com/skypjack/entt/issues/1150",
+    "source": {
+      "issue_number": 1150
+    },
+    "initial_question": {
+      "title": "Iterating over all entities",
+      "body": "For some housekeeping tasks in a game after a level is complete I wish to iterate over all entities in a registry and delete every entity that does not have the persistence compontnt.\r\n\r\n`registry::each` would be the function that I wanted to use since that ahs been widely noted as the function for this exact task but it appears that in version `3.13.2` this function is no longer available on the registry.\r\nWhat replaced this functionality or how do I createh the desired behavior with this version of the library?\r\n\r\n```\r\n---\\sources\\GameplayScreen.cpp(208): error C2039: 'each': is not a member of 'entt::basic_registry<entt::entity,std::allocator<Entity>>'\r\n        with\r\n        [\r\n            Entity=entt::entity\r\n        ]\r\n```\r\n"
+    },
+    "satisfaction_conditions": [
+      "Code must successfully iterate over all entities in the registry",
+      "Must be able to identify entities that lack a specific component type",
+      "Must compile with entt version 3.13.2 or later"
+    ],
+    "created_at": "2024-06-21T11:22:45Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/1140",
+    "source": {
+      "issue_number": 1140
+    },
+    "initial_question": {
+      "title": "Acecss components of an entity, without giving full registry access",
+      "body": "I have a function to initialize an entity with a bunch of components\r\n\r\nMy first attempt has been something like receiving only an entity, but that doesn't work. I have no way to create new components for that entity\r\n\r\n```\r\ntemplate <>\r\nvoid initialize<SomeObjectType>(entt::entity entity) {\r\n    // Initialize components for this entity\r\n    // but really can initialize anything, I can't store the components in the registry\r\n}\r\n```\r\n\r\nSo I add the registry to the function signature\r\n\r\n```\r\ntemplate <>\r\nvoid initialize<SomeObjectType>(entt:registry reg, entt::entity entity) {\r\n    // Initialize components for this entity\r\n    // This works fine, but it has too much access\r\n}\r\n```\r\n\r\nThis works from a usability perspective, but it gives the control full access to the whole registry, so now all the \"encapsulation\" is gone. Someone implementing that function might make something wrong with the registry, so I will have to double check every commited code...\r\n\r\nIs there anyway to allow to create new components or modify existing components but only for the particular entity I passed to the function? For modifying it might be possible to receive a `view` (althought getting the type right might be tricky), but how can I initialize the components if I only receive the entity?\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Component creation must be restricted to a single target entity",
+      "Solution must allow adding new components to the target entity",
+      "Access to global registry operations must be prevented",
+      "Interface must be usable within component initialization functions",
+      "Solution must preserve compile-time type safety"
+    ],
+    "created_at": "2024-04-28T15:54:46Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/1135",
+    "source": {
+      "issue_number": 1135
+    },
+    "initial_question": {
+      "title": "Working with multiple storages for the same type and preparing a view for each of the storages",
+      "body": "There a couple of different posts that are similar to this. I apologize if this seems like a duplicate but I am not clear on how to achieve the following:\r\n\r\nI have a component `UserDefinedStruct` that I would like to add to an Entity multiple times where the component is differentiated by an index that is generated at runtime.\r\n\r\n```\r\nPool<UserDefinedStruct>(0)\r\nPool<UserDefinedStruct>(1)\r\nPool<UserDefinedStruct>(2)\r\n...\r\n```\r\n\r\nWhich then allows an `entity` to have the component `UserDefinedStruct` multiple times as long as they have a different index.\r\n\r\nI would then like to `view` each pool such that I get `UserDefinedStruct&` and the `entity` that the component is associated with.\r\n\r\nI realize this is not a valid call in `entt`, but something like:\r\n```cpp\r\nconst int runtime_id_from_somewhere = Get_RuntimeId();\r\nreg.view<UserDefinedStruct>(runtime_id_from_somewhere).each(...)\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Multiple instances of the same component type must be attachable to a single entity",
+      "Components must be distinguishable by a runtime-determined index",
+      "Each indexed component collection must be individually queryable",
+      "Queries must return both the entity and its associated component data",
+      "Component storage must be accessible at runtime using dynamic indices"
+    ],
+    "created_at": "2024-04-05T04:03:17Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/1110",
+    "source": {
+      "issue_number": 1110
+    },
+    "initial_question": {
+      "title": "Combine snapshot and meta features",
+      "body": "Hey\r\nI just started using the library and I love it. I have not fully understood how to use the meta feature but in below code I am trying to serialize components with the help of the meta information. There must be a better way to do what I am trying to do inside the Archive class below. Can you please help me understand how to achive the same thing but without having to compare strings?\r\n\r\n`\r\n\r\n\tstruct SomeStruct\r\n\t{\r\n\t\tfloat x = 0.f;\r\n\t\tfloat y = 0.f;\r\n\t\tfloat z = 0.f;\r\n\t\tbool b = false;\r\n\t\tuint8_t u8 = 0;\r\n\t\tuint16_t u16 = 0;\r\n\r\n\r\n\t\tSomeStruct(float in_x, float in_y, float in_z, bool in_b, uint8_t in_u8, uint16_t in_u16)\r\n\t\t\t: x(in_x), y(in_y), z(in_z), b(in_b), u8(in_u8), u16(in_u16)\r\n\t\t{\r\n\t\t}\r\n\t};\r\n\r\n\ttemplate<typename T>\r\n\tclass BitPacker\r\n\t{\r\n\tpublic:\r\n\t\tBitPacker(T& storage)\r\n\t\t{}\r\n\r\n\t\ttemplate<typename T>\r\n\t\tvoid serialize(T value) \r\n\t\t{}\r\n\t};\r\n\r\n\r\n\ttemplate<typename T>\r\n\tclass Archive\r\n\t{\r\n\tpublic:\r\n\t\tArchive(T& storage)\r\n\t\t\t: m_bitPacker(storage)\r\n\t\t{}\r\n\r\n\t\tvoid operator()(std::underlying_type_t<entt::entity> size) \r\n\t\t{}\r\n\r\n\t\tvoid operator()(entt::entity entity) \r\n\t\t{}\r\n\r\n\t\ttemplate<typename T>\r\n\t\tvoid operator() (const T& component)\r\n\t\t{\r\n\t\t\tentt::meta_any any(component);\r\n\r\n\t\t\tfor (auto&& key_value : any.type().data())\r\n\t\t\t{\r\n\t\t\t\tauto member = key_value.second.get(component);\r\n\t\t\t\tauto type = member.type();\r\n\r\n\t\t\t\tif (type.info().name() == \"bool\")\r\n\t\t\t\t{\r\n\t\t\t\t\tstd::cout << \"bool value \" << member.cast<bool>() << std::endl;\r\n\t\t\t\t\tm_bitPacker.serialize(member.cast<bool>());\r\n\t\t\t\t\tcontinue;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (type.info().name() == \"unsigned char\")\r\n\t\t\t\t{\r\n\t\t\t\t\tstd::cout << \"uint8_t value \" << member.cast<uint8_t>() << std::endl;\r\n\t\t\t\t\tm_bitPacker.serialize(member.cast<uint8_t>());\r\n\t\t\t\t\tcontinue;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (type.info().name() == \"unsigned short\")\r\n\t\t\t\t{\r\n\t\t\t\t\tstd::cout << \"uint16_t value \" << member.cast<uint16_t>() << std::endl;\r\n\t\t\t\t\tm_bitPacker.serialize(member.cast<uint16_t>());\r\n\t\t\t\t\tcontinue;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (type.info().name() == \"float\")\r\n\t\t\t\t{\r\n\t\t\t\t\tstd::cout << \"float value \" << member.cast<float>() << std::endl;\r\n\t\t\t\t\tm_bitPacker.serialize(member.cast<float>());\r\n\t\t\t\t\tcontinue;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\r\n\tprivate:\r\n\t\tBitPacker<T> m_bitPacker;\r\n\t};\r\n\r\n\tint main()\r\n\t{\r\n\t\tusing namespace entt::literals;\r\n\t\r\n\t\tentt::meta<SomeStruct>()\r\n\t\t\t.type(entt::type_hash<SomeStruct>::value())\r\n\t\t\t.data<&SomeStruct::x>(\"x\"_hs)\r\n\t\t\t.data<&SomeStruct::y>(\"y\"_hs)\r\n\t\t\t.data<&SomeStruct::y>(\"z\"_hs)\r\n\t\t\t.data<&SomeStruct::b>(\"b\"_hs)\r\n\t\t\t.data<&SomeStruct::u8>(\"u8\"_hs)\r\n\t\t\t.data<&SomeStruct::u16>(\"u16\"_hs);\r\n\r\n\t\tentt::registry registry;\r\n\t\tauto entity1 = registry.create();\r\n\t\tregistry.emplace<SomeStruct>(entity1, 0.f, 0.f, 0.f, false, 0, 0);\r\n\r\n\t\tauto entity2 = registry.create();\r\n\t\tregistry.emplace<SomeStruct>(entity2, 10.f, 10.f, 10.f, true, 10, 1222);\r\n\r\n\t\tstd::stringstream stream;\r\n\t\tArchive<std::stringstream> archive(stream);\r\n\t\r\n\t\tentt::snapshot{ registry }\r\n\t\t\t//.get<entt::entity>(archive)\r\n\t\t\t.get<SomeStruct>(archive);\r\n\r\n\t\treturn 0;\r\n\t}\r\n\r\n`"
+    },
+    "satisfaction_conditions": [
+      "Type comparisons must be performed without string matching",
+      "Type information must be resolved at compile-time where possible",
+      "Memory efficiency must be maintained during component processing"
+    ],
+    "created_at": "2024-02-02T11:35:14Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/1073",
+    "source": {
+      "issue_number": 1073
+    },
+    "initial_question": {
+      "title": "registry.create() returning entt::entity of id greater than entt::null?",
+      "body": "After destroying created entities and creating new ones, registry.create() returns ids that are greater than entt::null. Is this normal?"
+    },
+    "satisfaction_conditions": [
+      "Entity IDs must be correctly interpreted as composite values containing both entity and version components",
+      "Entity ID comparison with entt::null must account for the entity portion only, not the full composite ID",
+      "Entity ID recycling behavior must be predictable and documented",
+      "Methods must be available to extract and examine individual components of entity IDs"
+    ],
+    "created_at": "2023-09-27T06:29:01Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/1051",
+    "source": {
+      "issue_number": 1051
+    },
+    "initial_question": {
+      "title": "`entt::registry::empty()` is deprecated, but (...) has no member named `in_use()`",
+      "body": "Hi,\r\nI have the following code:\r\n```c\r\nif(registry.empty()) {\r\n    consoleLog.push_back({0, \"No entities in scene.\"});\r\n    return;\r\n}\r\n```\r\nMy compiler tells me:\r\n```\r\nwarning: 'empty' is deprecated: use .storage<Entity>().in_use() instead\r\n```\r\nSo I change the code to this:\r\n```c\r\nif(!registry.storage().in_use()) {\r\n    consoleLog.push_back({0, \"No entities in scene.\"});\r\n    return;\r\n}\r\n```\r\nNow, my compiler tells me this:\r\n```\r\nerror: no member named 'in_use' in 'entt::iterable_adaptor<entt::internal::registry_storage_iterator<entt::internal::dense_map_iterator<__gnu_cxx::__normal_iterator<entt::internal::dense_map_node<unsigned int, std::shared_ptr<entt::basic_sparse_set<>>> *, std::vector<entt::internal::dense_map_node<unsigned int, std::shared_ptr<entt::basic_sparse_set<>>>>>>>>'\r\n```\r\n\r\nWhat's going on? I'm using `single_include/entt/entt.hpp` with version v3.12.2."
+    },
+    "satisfaction_conditions": [
+      "Code must correctly check if the registry has no entities",
+      "Code must compile without deprecation warnings",
+      "Code must explicitly specify the entity type when accessing storage",
+      "Code must handle the registry's storage access in a type-safe manner"
+    ],
+    "created_at": "2023-08-06T21:48:46Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/1020",
+    "source": {
+      "issue_number": 1020
+    },
+    "initial_question": {
+      "title": "clone a registry, or at least a subset of components",
+      "body": "Hey, I have an use case where I need to multi buffer a `registry`, or at least the entities and most of the components. What would be the best way for copy/cloning a `registry`?\r\n\r\nI couldn't manage to find a way to do it, based on previous issues and discussions, the api seems to have changed quite a bit.\r\n\r\nThanks."
+    },
+    "satisfaction_conditions": [
+      "Successfully copies entities from source registry to destination registry",
+      "Successfully copies specified components from source registry to destination registry",
+      "Maintains correct entity-component associations in the destination registry",
+      "Supports selective component copying",
+      "Creates independent copies that can exist simultaneously"
+    ],
+    "created_at": "2023-06-09T12:26:33Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/1006",
+    "source": {
+      "issue_number": 1006
+    },
+    "initial_question": {
+      "title": "Entity id de/serialize",
+      "body": "How can an entity id be de/serialized in order to send it over network?\r\nI found `entt::to_integral`, which seems to convert the `entt::entity` to the underlying type (guess uint64 is the default).\r\nWhat would be the counterpart, which converts the uint64 back to a `entt::entity`, so it can be get over the registry again?\r\n\r\nBackground: One node has the registry with all it's entities, it sends a network message (containing the `entt::entity`) to another node and this node would respond with the same entt::entity again, on receive of the response, the entt::entity should be get from the registry again.\r\nIt seems like there is some version encoded in the entt::entity as well, so I'm not sure if the to_integral would be enough and how to convert the uint64 back to the corresponding entity."
+    },
+    "satisfaction_conditions": [
+      "Entity identifier must be successfully converted to a primitive numeric type",
+      "Numeric value must be convertible back to a valid entity identifier",
+      "Serialization format must be network-transmittable"
+    ],
+    "created_at": "2023-04-13T16:46:57Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/987",
+    "source": {
+      "issue_number": 987
+    },
+    "initial_question": {
+      "title": "Is there any specific component in my entity?",
+      "body": "Hello, I would like to know how I can find out if there is a certain component in my entity. I know there used to be a \"has\" function, but now I can't find it. Thank you in advance for your answer"
+    },
+    "satisfaction_conditions": [
+      "Entity component presence can be checked programmatically",
+      "Method returns a boolean or equivalent result",
+      "Component check works on a per-entity basis"
+    ],
+    "created_at": "2023-02-25T19:43:05Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/972",
+    "source": {
+      "issue_number": 972
+    },
+    "initial_question": {
+      "title": "entt::basic_registry<uint64_t> causing bugs",
+      "body": "Hi, I want to use entt::basic_registry<uint64_t>, and then I can use the id to serialize in my file, and deserialize to the Entity. (I think uint32_t is not enough for the UUID, so I want to use uint64_t and pass straightly to entt like `mRegistry.create(uuid)`)\r\n\r\nBut it causes some bugs in here:\r\n```\r\n  /**\r\n   * @brief Returns the identifier that occupies the given position.\r\n   * @param pos Position of the element to return.\r\n   * @return The identifier that occupies the given position.\r\n   */\r\n  [[nodiscard]] entity_type operator[](const size_type pos) const {\r\n      return begin()[pos];\r\n  }\r\n\r\n  /**\r\n   * @brief Returns the component assigned to the given entity.\r\n   * @param entt A valid identifier.\r\n   * @return The component assigned to the given entity.\r\n   */\r\n  [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {\r\n      return get<Component>(entt);\r\n  }\r\n```\r\n\r\nbug: `error : functions that differ only in their return type cannot be overloaded`\r\n\r\nAs you can see, because the size_type (std::size_t) is same with the entity_type, which is the template argument of basic_registry.\r\n\r\nMy computer is Windows10 64bit environment.\r\n\r\nHow can I fix these and still use entt::basic_registry<uint64_t>? Hope for your help!"
+    },
+    "satisfaction_conditions": [
+      "The entity type must be distinct from size_type to avoid function overloading conflicts",
+      "The entity type must be able to store 64-bit values",
+      "The entity type must be usable with entt::basic_registry"
+    ],
+    "created_at": "2023-01-12T15:15:03Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/963",
+    "source": {
+      "issue_number": 963
+    },
+    "initial_question": {
+      "title": "Get TypeName and not TypeSignature from type_info",
+      "body": "`entt::type_id<ArcEngine::TransformComponent>().name().data();` results in `\"struct ArcEngine::TransformComponent>(void) noexcept\"`\r\n\r\nWhich is the signature I think, is there any way to get a compile time name which in this case should be: `\"ArcEngine::TransformComponent\"` or `\"struct ArcEngine::TransformComponent\"`"
+    },
+    "satisfaction_conditions": [
+      "Returns only the type name without signature information",
+      "Properly handles the string_view data to extract the correct substring"
+    ],
+    "created_at": "2022-12-28T07:04:29Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/948",
+    "source": {
+      "issue_number": 948
+    },
+    "initial_question": {
+      "title": "No more ``.has<T>`` for ``entt::registry``?",
+      "body": "Hello!\r\nThanks for this convenient library, handy.\r\nI'd like to know how I can check if an entity has a particular component. I checked some tutorials online and most of them use ``registry.has<T>(entity)`` to check if the entity has component T. However, there is no ``has`` member for registry :/\r\nCould you tell me what I'm doing wrong, maybe the function was deprecated?"
+    },
+    "satisfaction_conditions": [
+      "Component presence check functionality is available",
+      "Code compiles with current entt API"
+    ],
+    "created_at": "2022-10-31T11:06:31Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/937",
+    "source": {
+      "issue_number": 937
+    },
+    "initial_question": {
+      "title": "Collector for construct and destruct?",
+      "body": "When using class `entt::observer`, only collector for update signal `entt::collector.update` is available. But we do have three kinds of signals associated with component. Perhaps for some reasons Entt cannot add them?\r\n\r\nIt's not a feature request. Just for curiosity. Maybe don't be worried about adding them."
+    },
+    "satisfaction_conditions": [
+      "Must provide a way to observe component construction and destruction events",
+      "Solution must integrate with the existing entt registry system",
+      "Must allow combining the observation results with other registry views"
+    ],
+    "created_at": "2022-09-23T12:50:14Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/936",
+    "source": {
+      "issue_number": 936
+    },
+    "initial_question": {
+      "title": "About setting value to entt::meta_data",
+      "body": "I have a generic buffer(void*) storing an arbitrary value, I just want to set this buffer back to meta_data using memcpy instead of using the strong type setter(`entt::meta_data.set(instance, value)`), I can get the raw data by `entt::meta_data.get(instance).data()`, but copying memory data seems not work. Is there any way to achieve this? Thanks!"
+    },
+    "satisfaction_conditions": [
+      "Data modification through void pointer must persist in the original object",
+      "Memory address of target data must remain stable during modification",
+      "Type safety must be maintained despite using type-erased pointers"
+    ],
+    "created_at": "2022-09-20T08:46:39Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/897",
+    "source": {
+      "issue_number": 897
+    },
+    "initial_question": {
+      "title": "Single component basic_view::get returning tuple",
+      "body": "Is it intended that you can no longer call `registry.view<T>().get(id)` without specifying a component type or index?"
+    },
+    "satisfaction_conditions": [
+      "Access to single component data must be possible through valid syntax",
+      "API consistency between single and multi-component views must be maintained",
+      "Alternative access syntax must be documented and functional"
+    ],
+    "created_at": "2022-06-16T01:37:40Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/893",
+    "source": {
+      "issue_number": 893
+    },
+    "initial_question": {
+      "title": "Question : Is it possible to add components (of the same type) while iterating a view?",
+      "body": "Currently, I've created a component (named [ScriptingComponent] ) to contain all user-defined scripts attached to an entity. However, when I was iterating through all of the OnUpdate() functions in scripts with a view, user might need to create entities. During the creation process, [ScriptingComponent] is attached to an entity as default, because one might need to add scripts right afterward. Due to the reason, delay wouldn't be optimal.\r\n\r\nSo, is it possible to add components (of the same type) while iterating a view? Or, are there any other alternatives that I could take?\r\n\r\n(Below is a simplified version of what I'm doing)\r\n```\r\nauto view = registry.view<ScriptingComponent>();\r\nfor (auto e : view)\r\n{\r\n    auto& scriptingComponent = view.get<ScriptingComponent>(e);\r\n    for (Script* script : scriptingComponent.Scripts)\r\n    {\r\n        script->OnUpdate();\r\n    }\r\n}\r\n``` \r\n```\r\nvoid SomeScript::OnUpdate()\r\n{\r\n    // Create an additional entity\r\n    auto entity = registry.create();\r\n    // Adding a component while the view is still alive\r\n    registry.emplace<ScriptingComponent>(entity);\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Components can be safely added during view iteration",
+      "Existing component references remain valid after adding new components"
+    ],
+    "created_at": "2022-06-05T08:09:42Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/891",
+    "source": {
+      "issue_number": 891
+    },
+    "initial_question": {
+      "title": "Issue emplacing component to entity",
+      "body": "Hi,\r\n\r\nI am getting the following error:\r\n`Assertion failed: (entity_traits::to_version(elem) == entity_traits::to_version(tombstone)), function assure_at_least, file sparse_set.hpp, line 210.`\r\n\r\nwhen I emplace a component to an entity that I know is alive (because I have printed out all the entities that have been \"destroyed\" by calling the method destroy and I didn't see that one on the list). The emplace happens within a view each and the entity that I am emplacing the component to is the current entity.\r\n\r\nI basically only call destroy from one single place in the codebase. I am assuming that this error message refers to a emplacing a component to an invalid/tombstoned entity, is that right? if so or not, what could be another situation when this message is shown?\r\nP.S. I am not using the in-place delete functionality.\r\n\r\nThanks"
+    },
+    "satisfaction_conditions": [
+      "Entity must be valid/alive at time of component emplacement"
+    ],
+    "created_at": "2022-05-28T23:42:30Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/886",
+    "source": {
+      "issue_number": 886
+    },
+    "initial_question": {
+      "title": "What are entity versions used for aside from marking tombstones?",
+      "body": "I have been reading through the documentation and the source for entities and i am a bit confused on what are entity versions used for except for marking tombstones. What i understand is that tombstone entities are identified by a special version number, and that when an entity is removed from a registry the version is incremented (or set explicitly). \r\n\r\nWhat are other possible uses for entity versions (both within the library and in general)?"
+    },
+    "satisfaction_conditions": [
+      "Entity version changes must be detectable when entities are recycled",
+      "Version information must persist when entity references are stored externally",
+      "Version comparison must definitively determine entity identity",
+      "Version mechanism must support entity lifecycle management"
+    ],
+    "created_at": "2022-05-10T04:03:41Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/835",
+    "source": {
+      "issue_number": 835
+    },
+    "initial_question": {
+      "title": "Is there a way to deduce the unupdated (the opposite of entt::observer)?",
+      "body": "So far I'm digging the observer design but there's a case where I also need to iterate the unupdated. Is there a way to know if an entity has been updated or not while iterating the entire view?\r\n\r\nI know this seems really strange in hindsight but I just don't want to populate my classes with unnecessary variables and sometimes I only want to iterate the unupdated."
+    },
+    "satisfaction_conditions": [
+      "Must support efficient removal of multiple entities meeting specific criteria",
+      "Must maintain data consistency while iterating and modifying entities",
+      "Must perform efficiently when operating on entities with single components"
+    ],
+    "created_at": "2022-02-02T12:39:34Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/770",
+    "source": {
+      "issue_number": 770
+    },
+    "initial_question": {
+      "title": "[Question] How to discard a group after use?",
+      "body": "Hi, another beginner's question here~ I'm trying to use groups inside a function, where I need to process some combinations of components using multiple groups, and I got a runtime assertion error.\r\n```c++\r\nvoid Foo() {\r\n    ....\r\n    \r\n    if (auto group = registry.group<A, B>(); !group.empty()) {\r\n        auto& b = group.get<B>(group.front());\r\n        ....\r\n    }\r\n\r\n    if (ctx.lightmask.test(0)) {\r\n        auto group = registry.group<C, A>();\r\n        group.sort([](const entt::entity a, const entt::entity b) { return a < b; });\r\n        ....\r\n    }\r\n}\r\n```\r\nAs per the documentation, these are conflicting groups and the second one is going to fail, so before creating the second group, I need to somehow discard the first group, but I couldn't find a function for that. I tried to wrap them inside an if-else block so that each group has a local scope, but it seems that the first group is still alive in the registry after it goes out of scope, I wonder if there's a way to manually clean it up? or perhaps the way I'm using groups is not correct?"
+    },
+    "satisfaction_conditions": [
+      "No runtime assertion errors occur when accessing multiple groups",
+      "Groups with conflicting component ownership patterns can coexist",
+      "Component access patterns remain performant",
+      "Group relationships remain valid throughout their intended lifecycle"
+    ],
+    "created_at": "2021-08-25T06:31:09Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/762",
+    "source": {
+      "issue_number": 762
+    },
+    "initial_question": {
+      "title": "How to access key-only associative container's values with meta?",
+      "body": "Hi!\r\n\r\nI am having issues accessing values of an `std::set` that is stored in a `meta_any` object.\r\nHow i understand it, when iterating over an associative container i get a `pair` where the first item is the key, and the second one is the value.\r\nWhen iterating over a set (which is not empty, i have checked with a debugger) which is a key only type, the returned key has the correct type (`std::string` in this case) but the try_cast returns a nullptr. Am i doing something wrong?"
+    },
+    "satisfaction_conditions": [
+      "Successfully retrieves values from a key-only associative container stored in meta_any",
+      "Handles const-correctness appropriately when accessing set elements",
+      "Returns non-null results when accessing valid set elements",
+      "Maintains type safety when accessing the container elements"
+    ],
+    "created_at": "2021-08-15T10:41:11Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/753",
+    "source": {
+      "issue_number": 753
+    },
+    "initial_question": {
+      "title": "[Question] Cache the result of the `get()` function?",
+      "body": "Sorry for the basic question from a beginner, but I'd like to know about the price of calling `registry.get<T>()`. I have a `Entity` class like this:\r\n\r\n```c++\r\nclass Entity {\r\n  private:\r\n    std::string name = \"\";\r\n    entt::entity id = entt::null;\r\n    entt::registry* registry;\r\n\r\n  public:\r\n    Entity(const std::string& name, entt::entity id, entt::registry* registry);\r\n    ~Entity() {}\r\n\r\n    template<typename T>\r\n    T& GetComponent() {\r\n        CORE_ASERT(registry->all_of<T>(id), \"Component T not found in {0}!\", name);\r\n        return registry->get<T>(id);\r\n    }\r\n}\r\n```\r\n\r\nSince I come from Unity, whose `GetComponent()` method is known to be slow and not supposed to be invoked every frame, I'm thinking about caching the result of `registry->get<T>()` so that subsequent calls won't need to query the registry again. While caching is easy outside the class (on caller's side), it's a bit difficult to cache inside the class with generics (I'm still new to C++), and I wonder if this is at all necessary......\r\n\r\nCan you tell me a bit more about the `get()` function? Does it check `registry->all_of<T>()` automatically? Is it costly? Also, I don't understand why the documentation says `get_or_emplace()` is slightly faster. Thank you~!"
+    },
+    "satisfaction_conditions": [
+      "Performance impact of get() operation is clearly explained",
+      "Caching trade-offs are addressed",
+      "Internal behavior of get() regarding component existence checking is explained",
+      "Pointer stability implications are addressed",
+      "Performance difference between get_or_emplace() and separate operations is explained"
+    ],
+    "created_at": "2021-08-05T23:22:14Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/752",
+    "source": {
+      "issue_number": 752
+    },
+    "initial_question": {
+      "title": "How to Sort Entities",
+      "body": "I'm using EnTT for my game and I'm trying to render some objects in a particular order, specifically by their distance to the camera. I need to create a view in which the entities are in a specific order. I read  the docs and I wrote this:\r\n\r\n```\r\nvoid systems::piece_render(entt::registry& registry, entt::entity hovered_entity, entt::entity camera_entity) {\r\n    auto& camera_transform = registry.get<TransformComponent>(camera_entity);\r\n\r\n    auto func = [&camera_transform](const TransformComponent& lhs, const TransformComponent& rhs) {\r\n        float distance1 = glm::length(camera_transform.position - lhs.position);\r\n        float distance2 = glm::length(camera_transform.position - rhs.position);\r\n        return distance1 < distance2;\r\n    };\r\n\r\n    registry.sort<TransformComponent>(func);\r\n\r\n    auto view = registry.view<TransformComponent, MeshComponent,\r\n                              MaterialComponent, TextureComponent,\r\n                              OutlineComponent, PieceComponent>();\r\n\r\n    for (entt::entity entity : view) {\r\n        auto [transform, mesh, material, textures, outline, piece] = view.get(entity);\r\n        // Render code here\r\n    }\r\n}\r\n```\r\n\r\nBut it doesn't seem to do what I want. Looks like the objects are still rendered like before. I think I'm using `sort` wrongly. **The docs aren't clear to me for some reason**. My question is: How can I achieve what I want?"
+    },
+    "satisfaction_conditions": [
+      "Entities must be rendered in order of their distance from the camera",
+      "The sorting must be respected during iteration/rendering",
+      "Performance impact must be acceptable for frame-by-frame rendering",
+      "Sorting must work with multi-component entities"
+    ],
+    "created_at": "2021-08-05T11:31:53Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/708",
+    "source": {
+      "issue_number": 708
+    },
+    "initial_question": {
+      "title": "What is the correct to add new components during iteration?",
+      "body": "Hi.\r\n\r\nI know that after adding new components duration iteration, the reference will be invalid. But I don't know what is the correct way to do it. Here is an example.\r\n\r\n```c++\r\nauto view = registry.view<const Com>();\r\nfor (auto [parent, c] : view.each()) {\r\n    for (auto i = 0u; i < c.repeat; ++i) {\r\n        const auto child = registry.create();\r\n        const auto new_c = Com(c.value);\r\n        registry.emplace<Com>(child, new_c);\r\n    }\r\n}\r\n```\r\n\r\nShould I generate all `new_c` before emplacing like this?\r\n\r\n```c++\r\nauto view = registry.view<const Com>();\r\nfor (auto [parent, c] : view.each()) {\r\n    std::vector<Com> vec;\r\n    for (auto i = 0u; i < c.repeat; ++i) {\r\n        vec.push_back(Com(c.value)); \r\n    }\r\n    for (auto i = 0u; i < c.repeat; ++i) {\r\n        const auto child = registry.create();\r\n        registry.emplace<Com>(child, vec[i]);\r\n    }\r\n}\r\n```\r\n\r\nThank you."
+    },
+    "satisfaction_conditions": [
+      "Component references remain valid for all non-iterated entities",
+      "New components are successfully added during iteration",
+      "Registry maintains consistency after modifications",
+      "Component values are correctly propagated to new entities"
+    ],
+    "created_at": "2021-05-20T08:51:48Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/706",
+    "source": {
+      "issue_number": 706
+    },
+    "initial_question": {
+      "title": "Questions about resource_handle",
+      "body": "1. Is there a way I can clear the reference of resource_handle just like std::shared_ptr::reset?\r\n2. There seems no == operator overloading, how can I compare two resource_handles?\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Resource handle must support nulling/clearing its reference",
+      "Resource handles must be comparable for equality",
+      "Null handle comparisons must be handled safely",
+      "Resource handles must support conversion from derived to base types",
+      "Handle validity must be checkable"
+    ],
+    "created_at": "2021-05-17T05:17:48Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/691",
+    "source": {
+      "issue_number": 691
+    },
+    "initial_question": {
+      "title": "What happened to entt::registry.has?",
+      "body": "I used to be able to use registry.has, and it is still present in the single include. However, in the most updated version of entt, no such function exists. I can't seem to find an alternative, does anyone know what it is?"
+    },
+    "satisfaction_conditions": [
+      "Developer can locate the replacement functionality in documentation or codebase",
+      "Existing entt::registry functionality is preserved"
+    ],
+    "created_at": "2021-04-11T06:50:06Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/645",
+    "source": {
+      "issue_number": 645
+    },
+    "initial_question": {
+      "title": "Component using aligned type like Eigen::Matrix3d",
+      "body": "Hello! I am looking into using entt and want to know about storing an aligned type, like an Eigen::Matrix3d, as a component type in an entt::registry. I have seen multiple mentions that the only requirement for a component is that the type is movable. But eigen alignment issues have been a pain for me (outside of entt) for a while, so I just wanted to check and see about the consequences of using an aligned type as a component.\r\n\r\nThanks for making entt available!"
+    },
+    "satisfaction_conditions": [
+      "Component type must be properly aligned in memory when stored in the registry",
+      "Component storage must be compatible with the alignment requirements of the type",
+      "Component type must work reliably with container operations"
+    ],
+    "created_at": "2021-01-28T19:05:57Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/614",
+    "source": {
+      "issue_number": 614
+    },
+    "initial_question": {
+      "title": "Search by Component",
+      "body": "I'm reimplementing a certain game, and try to map its logical system to entt. In this system, most objects (but not all) have a certain ID, which is used for example for accessing them through scripts. I realized this ID through an additional component, and now my question is what is the \"standard\" way of searching an entity by a component?"
+    },
+    "satisfaction_conditions": [
+      "Must provide a way to locate entities based on component value",
+      "Solution must work with non-unique component values",
+      "Performance characteristics must be appropriate for game usage",
+      "Must integrate with existing entt entity system"
+    ],
+    "created_at": "2020-12-19T17:14:55Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/567",
+    "source": {
+      "issue_number": 567
+    },
+    "initial_question": {
+      "title": "size() of multi component view seems wrong?",
+      "body": "```c++\r\n#include <entt/entt.hpp>\r\n\r\nstruct A {};\r\nstruct B {};\r\nstruct C {};\r\n\r\nint main() {\r\n   entt::registry registry;\r\n\r\n   {\r\n      auto A_and_B = registry.create();\r\n      registry.emplace<A>(A_and_B);\r\n      registry.emplace<B>(A_and_B);\r\n   }\r\n   {\r\n      auto A_and_C = registry.create();\r\n      registry.emplace<A>(A_and_C);\r\n      registry.emplace<C>(A_and_C);\r\n   }\r\n\r\n   const auto before = registry.view<A, B>().size(); // 1\r\n   {\r\n      auto only_B = registry.create();\r\n      registry.emplace<B>(only_B);\r\n   }\r\n   const auto after = registry.view<A, B>().size(); // 2\r\n\r\n   return 0;\r\n}\r\n```\r\nAs I understand it, multi component views mean entities that contain *all* the components. Quoting from `view.hpp`: \"Multi component views iterate over those entities that have at least all the given components in their bags\". So why is the view size two when there was no second entity added with both A and B? I'm probably understanding something wrong."
+    },
+    "satisfaction_conditions": [
+      "View size reporting must accurately reflect its behavior as a size hint rather than exact count",
+      "System must provide a way to determine exact entity counts when needed",
+      "Behavior must be consistent with component-count requirements"
+    ],
+    "created_at": "2020-10-09T10:31:11Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/563",
+    "source": {
+      "issue_number": 563
+    },
+    "initial_question": {
+      "title": "Is it possible to create a view from begin/end iterators?",
+      "body": "I have a vector of entities that are a subset of all entities within my registry. These entities contain `>=1` component I am interested in viewing. Is this code possible?\r\n\r\n```C++\r\nstd::vector<entt::entity> ids;\r\n...\r\nauto begin = std::begin(ids);\r\nauto end   = std::end(ids);\r\n\r\n// Does something like this exist? (constructing a view from a pair of iterators)\r\nauto view = registry.view<ComponentA, ComponentB>(begin, end);\r\n```\r\n\r\nI know it's possible to do this manually like so: \r\n```C++\r\nfor (auto const id : ids)\r\n{\r\n    auto const& ca = registry.get<ComponentA>(id);\r\n    auto const& cb = registry.get<ComponentB>(id);\r\n    ...\r\n}\r\n```\r\n\r\nHowever this feels like I'm programming at a lower level, instead of programming what I want to do, it feels like I'm programming how to do it. I'm sorry again if I missed a way to do this that's spelled out in the wiki / inline documentation, if it's there I haven't been able to find it.\r\n\r\nThanks :)"
+    },
+    "satisfaction_conditions": [
+      "Must access components for a specific subset of entities",
+      "Must ensure component type safety",
+      "Must provide access to multiple components per entity",
+      "Must maintain registry consistency"
+    ],
+    "created_at": "2020-10-02T16:29:41Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/492",
+    "source": {
+      "issue_number": 492
+    },
+    "initial_question": {
+      "title": "std::hash is not specialized for entt::hashed_string",
+      "body": "Hi there,\r\n\r\nas far as I can tell, there is no specialization of `std::hash` for `entt::hashed_string`, making the simple construction of an `std::unordered_map<hashed_string, T>` impossible without defining a custom hash functor. Is this an oversight or intended? And if it is the latter, why?\r\n\r\nThanks in advance,\r\nScarabytes"
+    },
+    "satisfaction_conditions": [
+      "The solution must enable using hashed_string values as keys in hash-based containers",
+      "The solution must maintain the performance characteristics of using pre-computed hash values",
+      "The solution must be compatible with entt::hashed_string's design of not storing string data",
+      "The solution must work with both compile-time and runtime hash generation"
+    ],
+    "created_at": "2020-05-22T16:49:02Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/488",
+    "source": {
+      "issue_number": 488
+    },
+    "initial_question": {
+      "title": "Clarify constructor/destructor calls in documentation",
+      "body": "Currently it's not very clear when constructors/destructors are called for components in the ECS wiki text. Could this be clarified?\r\n\r\nFrom my understanding (I could be wrong), component constructors are called before `on_construct` is ever emitted, and `on_destroy` is emitted before destructors are called. Is that correct/guaranteed?"
+    },
+    "satisfaction_conditions": [
+      "Component constructors must execute before any on_construct listeners are invoked",
+      "Component on_destroy listeners must execute before destructors are called",
+      "During component replacement, proper construction and destruction order must be maintained",
+      "Component instances must be in a valid state when listeners access them"
+    ],
+    "created_at": "2020-05-14T21:21:54Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/460",
+    "source": {
+      "issue_number": 460
+    },
+    "initial_question": {
+      "title": "invoking an entt::meta function doesn't change caller by-ref parameter ",
+      "body": "Hi, \r\n  I was implementing a JsonRPC web-socket server based on entt::meta when I fell into this flaws (??):\r\npassing the parameter by reference (to be mutated) yields no change in the caller's instance.\r\n\r\nBecause I trust reproducibility is still a value, I've written a couple of unit tests which behaves differently, but should (??) be interchangeable in my opinion.\r\n\r\ng++ _Ubuntu 7.5.0-3ubuntu1~18.04_\r\n\r\n```\r\n#include <gtest/gtest.h>\r\n#include <entt/entt.hpp>\r\n\r\nstruct Base {\r\n    virtual ~Base() = 0;\r\n\r\n    static constexpr auto jsonrpc = \"2.0\";\r\n};\r\n\r\ninline Base::~Base() = default;\r\n\r\nstruct get_last_hour_data : public Base {\r\n    static get_last_hour_data create(std::string const &jsonValue);\r\n\r\n    [[nodiscard]] static bool exec(std::string &s);\r\n\r\n    [[nodiscard]] static bool exec_ptr(std::shared_ptr<std::string> &s);\r\n\r\nprivate:\r\n    [[nodiscard]] static bool init(std::string const &options);\r\n};\r\n\r\nget_last_hour_data get_last_hour_data::create(std::string const &jsonValue) {\r\n    get_last_hour_data glhd;\r\n    if(!get_last_hour_data::init(jsonValue)) {\r\n        return {};\r\n    }\r\n    return glhd;\r\n}\r\n\r\nbool get_last_hour_data::exec(std::string &s) {\r\n    s += \".\";\r\n    return true;\r\n}\r\n\r\nbool get_last_hour_data::exec_ptr(std::shared_ptr<std::string> &s) {\r\n    *s += \".\";\r\n    return false;\r\n}\r\n\r\nbool get_last_hour_data::init(std::string const &options) {\r\n    return true;\r\n}\r\n\r\nTEST(EnTTMeta, MutateByRef) {\r\n    entt::meta<get_last_hour_data>().alias(\"/getLastHourData\"_hs).template base<Base>().\r\n            template func<&get_last_hour_data::exec>(\"exec\"_hs).\r\n                                            template ctor<&get_last_hour_data::create>();\r\n    auto type = entt::resolve(\"/getLastHourData\"_hs);\r\n    assert (type);\r\n\r\n    auto func = type.func(\"exec\"_hs);\r\n    assert (func);\r\n\r\n    auto any = type.construct(std::string{});\r\n    assert (any);\r\n\r\n    std::string s;\r\n    auto any_2 = func.invoke(any, s);\r\n    assert (any_2);\r\n    ASSERT_EQ(\".\", s);\r\n}\r\n\r\nTEST(EnTTMeta, MutateBySharedPtrRef) {\r\n    entt::meta<get_last_hour_data>().template func<&get_last_hour_data::exec_ptr>(\"exec_ptr\"_hs);\r\n\r\n    auto type = entt::resolve(\"/getLastHourData\"_hs);\r\n    assert (type);\r\n\r\n\r\n    auto func = type.func(\"exec_ptr\"_hs);\r\n    assert (func);\r\n\r\n    auto any = type.construct(std::string{});\r\n    assert (any);\r\n\r\n    auto s = std::make_shared<std::string>();\r\n    auto any_2 = func.invoke(any, s);\r\n    assert (any_2);\r\n    ASSERT_EQ(\".\", *s);\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "By-reference parameters must be modifiable from within meta function calls",
+      "Changes to referenced parameters must be visible in the calling scope",
+      "The solution must work with both plain variables and smart pointer contents",
+      "Reference behavior must be explicitly indicated at the call site"
+    ],
+    "created_at": "2020-04-10T23:55:57Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/427",
+    "source": {
+      "issue_number": 427
+    },
+    "initial_question": {
+      "title": "Unexpected behaviour when iterating a view",
+      "body": "Sorry if I'm massively misunderstanding here, but I'm getting some quite unexpected behaviour from running the following code (part of my test suite, but I've put together a Minimal Reproducible Example):\r\n\r\n```cpp\r\n#include <iostream>\r\n\r\n#include <entt/entt.hpp>\r\n\r\nstruct Parent\r\n{\r\n    unsigned int children = 0;\r\n    entt::entity first = entt::null;\r\n};\r\n\r\nstruct Child\r\n{\r\n    entt::entity parent = entt::null;\r\n    entt::entity next = entt::null;\r\n};\r\n\r\nint main()\r\n{\r\n    entt::registry registry;\r\n\r\n    const auto parent_entity = registry.create();\r\n    const auto child_entity_1 = registry.create();\r\n    const auto child_entity_2 = registry.create();\r\n\r\n    auto &parent_component = registry.assign<Parent>(parent_entity);\r\n    auto &child_component_1 = registry.assign<Child>(child_entity_1);\r\n    auto &child_component_2 = registry.assign<Child>(child_entity_2);\r\n\r\n    parent_component.children = 2;\r\n    parent_component.first = child_entity_1;\r\n\r\n    child_component_1.next = child_entity_2;\r\n    child_component_1.parent = parent_entity;\r\n    child_component_2.parent = parent_entity;\r\n\r\n    registry.view<Child>().each([&](const auto entity, const auto &child) {\r\n        if (!registry.valid(child.parent))\r\n        {\r\n            registry.destroy(entity);\r\n        }\r\n    });\r\n\r\n    std::cout << registry.valid(child_entity_1) << \"\\n\";\r\n    std::cout << registry.valid(child_entity_2) << \"\\n\";\r\n    std::cout << registry.valid(parent_entity) << \"\\n\";\r\n}\r\n```\r\n\r\nOutput:\r\n```\r\n1\r\n1\r\n0\r\n```\r\n\r\nDuring the `registry.view<Child>().each()` call, first `child_entity_1` is visited, but then `parent_entity` is visited (even though it doesn't have a `Child` component!). This results in `parent_entity` being destroyed. `child_entity_2` is never visited.\r\n\r\nAm I misunderstanding something concept here? I was under the impression that all the entities with a `Child` component should be visited, and since they all have a valid parent entity they shouldn't be destroyed."
+    },
+    "satisfaction_conditions": [
+      "Entity relationships must maintain referential integrity"
+    ],
+    "created_at": "2020-02-25T06:42:58Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/387",
+    "source": {
+      "issue_number": 387
+    },
+    "initial_question": {
+      "title": "In which cases would sorting a full-owning group cause an assertion to fail?",
+      "body": "Apologies for so many tickets \ud83d\ude43 \r\n\r\nI have a full-owning group of components called `global_transform_group` that holds a three-component tuple of components. I also have a nested group called `global_render_group` that has the same three components, along with an additional render-related component.\r\n\r\nWith any more than 1 entity belonging to those groups (0 works fine, too), I either get an assertion failure when calling `global_transform_group.sort()` or `false` when calling `global_transform_group.sortable()`.\r\n\r\nThe documentation seems to contradict itself:\r\n\r\n> Sorting owned components is no longer allowed once the group has been created. However, full-owning groups can be sorted by means of their sort member functions. Sorting a full-owning group affects all its instances.\r\n\r\nWhich, at least to me, starts by saying you cannot sort, but then goes on to say that full-owning groups _can_ sort, which leaves me a bit confused \ud83d\ude05 \r\n\r\nSo, in which circumstances can I sort a full-owning group? Should I eliminate the nested group and just use a single full-owning group with all four components?\r\n\r\nIt's worth mentioning I'm using a custom sort function."
+    },
+    "satisfaction_conditions": [
+      "Only the most restrictive group (with more components) in a nested group hierarchy can be sorted",
+      "The group's sortable() method must return true before sorting can be performed",
+      "Nested group relationships must be preserved after any sorting operation",
+      "If sorting of multiple groups is required, they must not have overlapping owned components"
+    ],
+    "created_at": "2020-01-10T17:52:34Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/383",
+    "source": {
+      "issue_number": 383
+    },
+    "initial_question": {
+      "title": "Is there a reason why you can't do single-component full-owning groups?",
+      "body": "I have a group of components I'd like packed together and fully-owned via an `entt::group` but the API doesn't like that there's only one component in the `registry.group<component>()` template specifier.\r\n\r\nThis seems like a deliberate design decision, leading me to believe I'm missing something about groups.\r\n\r\nIs what I'm doing an anti-pattern for some reason?"
+    },
+    "satisfaction_conditions": [
+      "Iteration must access all instances of a single component type",
+      "Iteration performance must be optimal for sequential access",
+      "Memory layout must support contiguous component access",
+      "Solution must work without requiring multiple component types"
+    ],
+    "created_at": "2020-01-04T04:09:36Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/369",
+    "source": {
+      "issue_number": 369
+    },
+    "initial_question": {
+      "title": "Signature change question",
+      "body": "Hi,\r\n\r\nThis is more of a \"how can I do this better\" question. I just went from 3.1.1 -> 3.2.1 and it went mostly smoothly with one exception, and I was hoping I could get some insight as to what is going on under the hood. The signature to some of my functions have changed, and I'm keen to know why. I've only been using cpp for a few months so excuse my ignorance. Is the `entt::exclude_t` required here?\r\n\r\n```cpp\r\n// 3.1.1\r\nglm::vec3 rule1(entt::basic_view<entt::entity, position, velocity, fish> &sortedFish, entt::entity &ourEntity) {\r\n    // do stuff\r\n}\r\n\r\n// 3.2.1\r\nglm::vec3 rule1(entt::basic_view<entt::entity, entt::exclude_t<>, position, velocity, fish> &sortedFish, entt::entity &ourEntity) {\r\n    // do stuff\r\n}\r\n```\r\n\r\nThanks!"
+    },
+    "satisfaction_conditions": [
+      "Code compiles successfully with the new version (3.2.1) syntax",
+      "View functionality remains unchanged from previous version",
+      "Explanation clarifies the reason for signature change",
+      "Solution maintains type safety and compile-time checks"
+    ],
+    "created_at": "2019-12-03T21:31:39Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/239",
+    "source": {
+      "issue_number": 239
+    },
+    "initial_question": {
+      "title": "Polymorphic components?",
+      "body": "Is there a way to have polymorphic components, where a component can do something like:\r\n```cpp\r\nstruct behaviour {\r\n  virtual void print() {}\r\n};\r\n\r\nstruct printer: public behaviour {\r\n  void print() override {\r\n    // Perform print action.\r\n  }\r\n};\r\n\r\n// Later...\r\nentt::registry registrar;\r\nentt::entity e0 = registrar.create();\r\nregistrar.assign<printer>(e0);\r\n\r\n// Even later...\r\nregistrar.view<behaviour>().each([](auto& component) {\r\n  component.print();\r\n});\r\n```\r\n\r\nI've tried this and it didn't work, and after reading the docs I'm not sure what the correct way to do this would be. I could use a bit of guidance to making this work. And I believe I understand why it doesn't work but I'd appreciate it if you could also explain why it doesn't."
+    },
+    "satisfaction_conditions": [
+      "Components must be able to execute different behaviors based on their type",
+      "The solution must work within EnTT's component system",
+      "The system must be able to process multiple components with different behaviors",
+      "The solution must maintain performance characteristics suitable for an ECS architecture",
+      "Components must be retrievable and processable in a systematic way"
+    ],
+    "created_at": "2019-05-02T06:44:11Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/187",
+    "source": {
+      "issue_number": 187
+    },
+    "initial_question": {
+      "title": "Why is it bad to store a view? ",
+      "body": "Hi,\r\n\r\nI want to ask you for a clarification about views. It's mentioned in the code documentation \r\n\r\n> As a rule of thumb, storing a view should never be an option.\r\n\r\nHowever, the main documentation states that:\r\n\r\n> Views and Groups\r\n> [...]\r\n> Briefly, they are a good tool to enforce single responsibility. A system that has access to a registry can create and destroy entities, as well as assign and remove components. On the other side, a system that has access to a view or a group can only iterate entities and their components, then read or update the data members of the latter. \r\n\r\nHow a system can have access to a view and only a view if it can't store it? Also why shouldn't I store a view? The documentation only mentions that creating a view is quick and cheap but not why storing a view is bad.\r\n\r\nI see solutions but they are less obvious than just storing an instance of a view.\r\n\r\nTo give a better context, let's imagine an `AudioSystem` in an entity-based environment. I don't want that system to be able to create/remove entities. If I can't store a view, the right solution is to pass a lambda (e.g. `[&registry] { return registry.view<CanProduceSound>(); }` over a view (e.g. `entt::view<CanProduceSound>&&`)?\r\n\r\nThanks.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Views must be created and used within a limited scope rather than stored long-term",
+      "Systems must be able to access component data without having full registry modification permissions",
+      "View access must be provided in a way that maintains data structure validity",
+      "The solution must allow for component iteration functionality while maintaining system constraints"
+    ],
+    "created_at": "2019-02-19T20:23:28Z"
+  },
+  {
+    "id": "https://github.com/skypjack/entt/issues/164",
+    "source": {
+      "issue_number": 164
+    },
+    "initial_question": {
+      "title": "Get Owner of Component",
+      "body": "Assuming that I only have a reference to a component available, would there be any way for that component to get the entity it belongs to, and through that access other components? The best solution I've come up with so far is iterating all entities with the component until the one I want appears, but perhaps I've overlooked a better way of doing this that already exists. Couldn't find anything in the wiki or in other issues.\r\n\r\n```C++\r\ntemplate<typename ComponentType>\r\nuint32_t getOwner(const ComponentType& component)\r\n{   \r\n    auto view = registry.view<ComponentType>();\r\n    for (auto e : view)\r\n    {\r\n        if (&view.get(e) == &component)\r\n        {\r\n            return e;\r\n        }\r\n    }\r\n\r\n    /* It should never come here as all components logically should have an owner */\r\n    return entt::null;\r\n}\r\n```\r\nI'm not sure if this is something you want to have as a part of the library at all, but I had a use for it, so thought I'd ask! Thanks a lot for your great work!"
+    },
+    "satisfaction_conditions": [
+      "Entity ownership of a component must be retrievable",
+      "Component references must remain valid throughout their lifetime",
+      "Access to other components of the same entity must be possible",
+      "Performance impact must be acceptable for the use case",
+      "Component lifetime management must be handled safely"
+    ],
+    "created_at": "2018-12-05T09:56:47Z"
+  }
+]

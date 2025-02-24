@@ -1,0 +1,67 @@
+[
+  {
+    "number": 3545,
+    "title": "Mapping with a constructor doesn't work if a target property is mapped using MapFrom",
+    "created_at": "2020-12-10T17:26:35Z",
+    "closed_at": "2020-12-10T17:47:03Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3545",
+    "body": "### Source/destination types\r\n\r\n```csharp\r\nrecord Foo(int Id, string Name, string Description);\r\n\r\nrecord FooDto(int Id, string Name, string Text);\r\n```\r\n\r\n(I'm using records here, but I don't think it matters)\r\n\r\n### Mapping configuration\r\n\r\n```csharp\r\n    var mapper = new MapperConfiguration(cfg =>\r\n    {\r\n        cfg.CreateMap<Foo, FooDto>()\r\n            .ForMember(dto => dto.Text, o => o.MapFrom(f => f.Description));\r\n    }).CreateMapper();\r\n```\r\n\r\n### Version: 10.1.1\r\n\r\n### Expected behavior\r\n\r\nShould map successfully\r\n\r\n### Actual behavior\r\n\r\n> **ArgumentException**: FooDto needs to have a constructor with 0 args or only optional args. (Parameter 'type')\r\n\r\n### Steps to reproduce\r\n\r\n```csharp\r\n    var foo = new Foo(123, \"hello\", \"test\");\r\n    var dto = mapper.Map<FooDto>(foo);\r\n```\r\n\r\n### Additional remarks\r\n\r\nIt works fine if `FooDto.Text` is renamed to `Description` and I remove the `ForMember(... MapFrom(...))` configuration, so I'm pretty sure that's what causing the problem.",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3545/comments",
+    "author": "thomaslevesque",
+    "comments": [
+      {
+        "user": "lbargaoanu",
+        "created_at": "2020-12-10T17:47:03Z",
+        "body": "You need `ForCtorParam`."
+      }
+    ]
+  },
+  {
+    "number": 3166,
+    "title": "Mapping fails to recognize existing constructor parameters",
+    "created_at": "2019-07-12T21:41:49Z",
+    "closed_at": "2019-07-12T22:18:20Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3166",
+    "body": "### Source/destination types\r\n\r\n```csharp\r\nSrc: \r\n public class UserClaim : AuditableEntity\r\n    {\r\n        [Key]\r\n        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]\r\n        public int UserClaimId { get; set; }\r\n\r\n        [Required]\r\n        public int UserId { get; set; }\r\n\r\n        [Required]\r\n        [ForeignKey(\"ClaimType\")]\r\n        public ClaimTypeEnum ClaimTypeId { get; set; }\r\n        \r\n        [Required]\r\n        public ClaimType ClaimType { get; set; }\r\n\r\n        [Required]\r\n        [MaxLength(50)]\r\n        public string ClaimValue { get; set; }\r\n    }\r\n}\r\npublic class ClaimType : AuditableEntity\r\n    {\r\n        [Key]\r\n        public ClaimTypeEnum ClaimTypeId { get; set; }\r\n        public string ClaimTypeName { get; set; }\r\n    }\r\nDest: System.Security.Claims.Claim\r\n\r\n\r\npublic class Claim\r\n    {\r\n        ...\r\n        //\r\n        // Summary:\r\n        //     Initializes a new instance of the System.Security.Claims.Claim class with the\r\n        //     specified claim type, and value.\r\n        //\r\n        // Parameters:\r\n        //   type:\r\n        //     The claim type.\r\n        //\r\n        //   value:\r\n        //     The claim value.\r\n        //\r\n        // Exceptions:\r\n        //   T:System.ArgumentNullException:\r\n        //     type or value is null.\r\n        public Claim(string type, string value);\r\n...\r\n\r\n```\r\n\r\n### Mapping configuration\r\n\r\n```csharp\r\nAutoMapper.Mapper.Initialize(config =>\r\n            {\r\n                config.CreateMap<UserClaim, Claim>()\r\n                .ForCtorParam(\"value\", opt => opt.MapFrom(src => src.ClaimValue))\r\n                .ForCtorParam(\"type\", opt => opt.MapFrom(src => src.ClaimType.ClaimTypeName));\r\n            });\r\n```\r\n\r\n### Version: 8.0.0\r\n\r\n### Expected behavior\r\n\r\nsuccessfully map?\r\n\r\n### Actual behavior\r\n\r\n\r\nException has occurred: CLR/AutoMapper.AutoMapperConfigurationException\r\nAn exception of type 'AutoMapper.AutoMapperConfigurationException' occurred in AutoMapper.dll but was not handled in user code: 'Claim does not have a constructor with a parameter named 'value'.\r\nSystem.Security.Claims.Claim'\r\n   at AutoMapper.CtorParamConfigurationExpression`1.Configure(TypeMap typeMap)\r\n   at AutoMapper.Configuration.MappingExpression`2.Configure(TypeMap typeMap)\r\n   at AutoMapper.ProfileMap.BuildTypeMap(IConfigurationProvider configurationProvider, ITypeMapConfiguration config)\r\n   at AutoMapper.ProfileMap.Register(IConfigurationProvider configurationProvider)\r\n   at AutoMapper.MapperConfiguration.Seal()\r\n   at AutoMapper.MapperConfiguration..ctor(MapperConfigurationExpression configurationExpression)\r\n   at AutoMapper.MapperConfiguration..ctor(Action`1 configure)\r\n   at AutoMapper.Mapper.Initialize(Action`1 config)\r\n   at Wellspring.Eqp.Api.Startup.SetUpAutoMapper() in /home/brian/clients/walsh/eqp-api/src/Wellspring.Eqp.Api/Startup.cs:line 362\r\n   at Wellspring.Eqp.Api.Startup.Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger`1 logger) in /home/brian/clients/walsh/eqp-api/src/Wellspring.Eqp.Api/Startup.cs:line 241\r\n   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)\r\n   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)\r\n   at Microsoft.AspNetCore.Hosting.Internal.ConfigureBuilder.Invoke(Object instance, IApplicationBuilder builder)\r\n   at Microsoft.AspNetCore.Hosting.Internal.ConfigureBuilder.<>c__DisplayClass4_0.<Build>b__0(IApplicationBuilder builder)\r\n   at Microsoft.AspNetCore.Hosting.Internal.GenericWebHostBuilder.<>c__DisplayClass13_0.<UseStartup>b__2(IApplicationBuilder app)\r\n   at Microsoft.AspNetCore.Mvc.Filters.MiddlewareFilterBuilderStartupFilter.<>c__DisplayClass0_0.<Configure>g__MiddlewareFilterBuilder|0(IApplicationBuilder builder)\r\n   at Microsoft.AspNetCore.HostFilteringStartupFilter.<>c__DisplayClass0_0.<Configure>b__0(IApplicationBuilder app)\r\n   at Microsoft.AspNetCore.Hosting.Internal.GenericWebHostService.<StartAsync>d__31.MoveNext()\r\n",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3166/comments",
+    "author": "WellspringCS",
+    "comments": [
+      {
+        "user": "spydacarnage",
+        "created_at": "2019-07-12T21:57:20Z",
+        "body": "Due to the way that constructor mapping currently works, your source object must contain all the properties contained in the destination constructor.\r\n\r\nThere is currently an active PR (#3160) to resolve this issue, but in the meantime, you can create a dummy parameter (`public object Value => null;`) in `UserClaim` and it should work."
+      },
+      {
+        "user": "lbargaoanu",
+        "created_at": "2019-07-13T06:35:42Z",
+        "body": "There is no need for that. You can use `ConstructUsing` or optional parameters. Or just take advantage of the naming convention:\r\n\r\n  \tpublic Claim(string claimValue, string claimTypeClaimTypeName)\r\n"
+      }
+    ]
+  },
+  {
+    "number": 3125,
+    "title": "Problem with mapping if the maps are in separate classes",
+    "created_at": "2019-06-17T12:01:03Z",
+    "closed_at": "2019-06-17T12:55:23Z",
+    "labels": [
+      "Question"
+    ],
+    "url": "https://github.com/AutoMapper/AutoMapper/issues/3125",
+    "body": "AutoMapper versions: 8.1.1\r\nThe previous version worked!\r\n\r\nLet's look at the code below:\r\n\r\n```\r\n    public class A\r\n    {\r\n        public int P1 { get; set; }\r\n    }\r\n\r\n    public class B\r\n    {\r\n        public int P1 { get; set; }\r\n    }\r\n\r\n    public class C\r\n    {\r\n        public List<A> List { get; set; }\r\n    }\r\n\r\n    public class D\r\n    {\r\n        public List<B> List { get; set; }\r\n    }\r\n\r\n    public sealed class C_To_D : MapperConfigurationExpression\r\n    {\r\n        public C_To_D()\r\n        {\r\n             // \u2193 it would work \u2193\r\n            //CreateMap<A, B>()\r\n            //    .ForMember(_ => _.P1, _ => _.MapFrom(v => v.P1));\r\n\r\n            CreateMap<C, D>()\r\n                .ForMember(_ => _.List, _ => _.MapFrom(v => v.List));\r\n        }\r\n    }\r\n\r\n    public sealed class A_To_B : MapperConfigurationExpression\r\n    {\r\n        public A_To_B()\r\n        {\r\n             // \u2193 it does not work \u2193\r\n            CreateMap<A, B>()\r\n                .ForMember(_ => _.P1, _ => _.MapFrom(v => v.P1));\r\n        }\r\n    }\r\n```\r\nIf the map from A to B is in a separate class then:\r\n\r\n**Message: AutoMapper.AutoMapperConfigurationException : The following member on ...D cannot be mapped: \r\n\tList \r\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type ...D.\r\nContext:\r\n\tMapping to member List from ...C to ...D\r\nException of type 'AutoMapper.AutoMapperConfigurationException' was thrown.**\r\n\r\nThe project is so large that it is impossible to have maps in this way. Please help.",
+    "comments_url": "https://api.github.com/repos/AutoMapper/AutoMapper/issues/3125/comments",
+    "author": "Tomaszczubaszek",
+    "comments": [
+      {
+        "user": "jbogard",
+        "created_at": "2019-06-17T12:33:33Z",
+        "body": "Why are your classes inheriting from `MapperConfigurationExpression`? That's the class that performs configuration once for the entire mapper.\r\n\r\nTypically you use `Profile` classes to segregate configuration."
+      }
+    ]
+  }
+]

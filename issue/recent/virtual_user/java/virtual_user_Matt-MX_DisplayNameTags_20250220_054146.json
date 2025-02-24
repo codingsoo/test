@@ -1,0 +1,17 @@
+[
+  {
+    "id": "https://github.com/Matt-MX/DisplayNameTags/issues/37",
+    "source": {
+      "issue_number": 37
+    },
+    "initial_question": {
+      "title": "Scale property not working",
+      "body": "Setting \"scale\" in the config for either default or groups does not change the size of the displays"
+    },
+    "satisfaction_conditions": [
+      "Scale configuration must be properly structured with x, y, z components",
+      "Configuration changes must be reflected in the YAML format"
+    ],
+    "created_at": "2024-12-10T03:40:35Z"
+  }
+]

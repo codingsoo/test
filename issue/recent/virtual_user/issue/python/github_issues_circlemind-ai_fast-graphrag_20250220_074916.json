@@ -1,0 +1,58 @@
+[
+  {
+    "number": 65,
+    "title": "How to get the entity count?",
+    "created_at": "2025-01-14T04:20:00Z",
+    "closed_at": "2025-01-17T03:27:17Z",
+    "labels": [],
+    "url": "https://github.com/circlemind-ai/fast-graphrag/issues/65",
+    "body": "After generating the pkl files, how to get the total number of entities?\r\n",
+    "comments_url": "https://api.github.com/repos/circlemind-ai/fast-graphrag/issues/65/comments",
+    "author": "timelesshc",
+    "comments": [
+      {
+        "user": "liukidar",
+        "created_at": "2025-01-15T11:23:29Z",
+        "body": "Hello, once you load the graph class, you can call `await graph.state_manager.get_num_entities()`"
+      },
+      {
+        "user": "timelesshc",
+        "created_at": "2025-01-16T10:06:05Z",
+        "body": "@liukidar hi, thanks so much for the response. I tried your method but it gives me below error. Any suggestions?\r\n\r\n```\r\nTraceback (most recent call last):\r\n  File \"E:\\zhipu\\\u9879\u76ee\\fast-graphrag\\hotpotQA\\fast-graphrag_zhipu.py\", line 46, in <module>\r\n    count = asyncio.run(get_entity_count())\r\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"E:\\Program Files\\conda_env\\envs\\GraphRAG\\Lib\\asyncio\\runners.py\", line 194, in run\r\n    return runner.run(main)\r\n           ^^^^^^^^^^^^^^^^\r\n  File \"E:\\Program Files\\conda_env\\envs\\GraphRAG\\Lib\\asyncio\\runners.py\", line 118, in run\r\n    return self._loop.run_until_complete(task)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"E:\\Program Files\\conda_env\\envs\\GraphRAG\\Lib\\asyncio\\base_events.py\", line 687, in run_until_complete\r\n    return future.result()\r\n           ^^^^^^^^^^^^^^^\r\n  File \"E:\\zhipu\\\u9879\u76ee\\fast-graphrag\\hotpotQA\\fast-graphrag_zhipu.py\", line 43, in get_entity_count\r\n    count = await grag.state_manager.get_num_entities()\r\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"E:\\Program Files\\conda_env\\envs\\GraphRAG\\Lib\\site-packages\\fast_graphrag\\_services\\_state_manager.py\", line 56, in get_num_entities\r\n    return await self.graph_storage.node_count()\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"E:\\Program Files\\conda_env\\envs\\GraphRAG\\Lib\\site-packages\\fast_graphrag\\_storage\\_gdb_igraph.py\", line 41, in node_count\r\n    return self._graph.vcount()  # type: ignore\r\n           ^^^^^^^^^^^^^^^^^^\r\nAttributeError: 'NoneType' object has no attribute 'vcount'\r\n```\r\n\r\nMy code:\r\n```\r\nworking_dir = \"./output\"\r\ngrag = GraphRAG(\r\n    working_dir=working_dir,\r\n    domain=DOMAIN,\r\n    example_queries=\"\\n\".join(EXAMPLE_QUERIES),\r\n    entity_types=ENTITY_TYPES,\r\n    config=GraphRAG.Config(\r\n        llm_service=OpenAILLMService(\r\n            model=LLM, base_url=URL, api_key=API_KEY\r\n        ),\r\n        embedding_service=OpenAIEmbeddingService(\r\n            model=EMBEDDER,\r\n            base_url=URL,\r\n            api_key=API_KEY,\r\n            embedding_dim=2048,  # the output embedding dim of the chosen model\r\n        )\r\n    ),\r\n)\r\nasync def get_entity_count():\r\n    count = await grag.state_manager.get_num_entities()\r\n    return count\r\n\r\ncount = asyncio.run(get_entity_count())\r\nprint(count)\r\n```"
+      },
+      {
+        "user": "liukidar",
+        "created_at": "2025-01-16T14:54:05Z",
+        "body": "Sorry, i forgot to explain what I meant with \"load the graph class\". The following code should work:\n\n```python\nworking_dir = \"./output\"\ngrag = GraphRAG(\n    working_dir=working_dir,\n    domain=DOMAIN,\n    example_queries=\"\\n\".join(EXAMPLE_QUERIES),\n    entity_types=ENTITY_TYPES,\n    config=GraphRAG.Config(\n        llm_service=OpenAILLMService(\n            model=LLM, base_url=URL, api_key=API_KEY\n        ),\n        embedding_service=OpenAIEmbeddingService(\n            model=EMBEDDER,\n            base_url=URL,\n            api_key=API_KEY,\n            embedding_dim=2048,  # the output embedding dim of the chosen model\n        )\n    ),\n)\nasync def get_entity_count():\n    await grag.state_manager.query_start()\n    count = await grag.state_manager.get_num_entities()\n    await grag.state_manager.query_done()\n    return count\n\ncount = asyncio.run(get_entity_count())\nprint(count)\n```"
+      }
+    ]
+  },
+  {
+    "number": 58,
+    "title": "Wrong Dimensionality of Vectors Error",
+    "created_at": "2025-01-06T10:26:22Z",
+    "closed_at": "2025-01-06T10:40:31Z",
+    "labels": [],
+    "url": "https://github.com/circlemind-ai/fast-graphrag/issues/58",
+    "body": "Hi there, I am facing this error of wrong dimensionality of vectors.\r\nFollowing is my python code\r\n```python\r\n  working_dir = \"./myFile\"\r\n  grag = GraphRAG(\r\n      working_dir=working_dir,\r\n      domain=DOMAIN,\r\n      example_queries=\"\\n\".join(QUERIES),\r\n      entity_types=ENTITY_TYPES,\r\n      config=GraphRAG.Config(\r\n          llm_service=OpenAILLMService(\r\n              model=\"gpt-4o\",\r\n              base_url= os.getenv(\"AZURE_OPENAI_ENDPOINT\"),\r\n              api_key= os.getenv(\"AZURE_OPENAI_API_KEY\"),\r\n              client= os.getenv(\"OPENAI_API_TYPE\"), \r\n              mode=instructor.Mode.JSON\r\n          ),\r\n          embedding_service=OpenAIEmbeddingService(\r\n              model=\"text-embedding-3-large\",\r\n              base_url= os.getenv(\"AZURE_OPENAI_EMBED_ENDPOINT\"),\r\n              api_key= os.getenv(\"AZURE_OPENAI_API_KEY\"),\r\n              client= os.getenv(\"OPENAI_API_TYPE\"), \r\n              embedding_dim=512,  # the output embedding dim of the chosen model\r\n          ),\r\n      ),\r\n  )\r\n  with open(\"./data.txt\", encoding=\"utf8\") as f:\r\n    grag.insert(f.read())\r\n```\r\nAnd I am facing this error\r\n\r\n```python\r\nExtracting data: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:18<00:00, 18.24s/it]\r\nError during insertion: Wrong dimensionality of the vectors\r\n---------------------------------------------------------------------------\r\nRuntimeError                              Traceback (most recent call last)\r\nCell In[11], [line 2](vscode-notebook-cell:?execution_count=11&line=2)\r\n      [1](vscode-notebook-cell:?execution_count=11&line=1) with open(\"./data.txt\", encoding=\"utf8\") as f:\r\n----> [2](vscode-notebook-cell:?execution_count=11&line=2)     grag.insert(f.read())\r\n\r\nFile c:\\Users\\user\\Downloads\\python\\Expedio\\env\\Lib\\site-packages\\fast_graphrag\\_graphrag.py:75, in BaseGraphRAG.insert(self, content, metadata, params, show_progress)\r\n     [68](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:68) def insert(\r\n     [69](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:69)     self,\r\n     [70](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:70)     content: Union[str, List[str]],\r\n   (...)\r\n     [73](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:73)     show_progress: bool = True\r\n     [74](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:74) ) -> Tuple[int, int, int]:\r\n---> [75](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_graphrag.py:75)     return get_event_loop().run_until_complete(self.async_insert(content, metadata, params, show_progress))\r\n\r\nFile c:\\Users\\user\\Downloads\\python\\Expedio\\env\\Lib\\site-packages\\nest_asyncio.py:98, in _patch_loop.<locals>.run_until_complete(self, future)\r\n     [95](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:95) if not f.done():\r\n     [96](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:96)     raise RuntimeError(\r\n     [97](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:97)         'Event loop stopped before Future completed.')\r\n---> [98](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/nest_asyncio.py:98) return f.result()\r\n\r\nFile C:\\Python312\\Lib\\asyncio\\futures.py:203, in Future.result(self)\r\n    [201](file:///C:/Python312/Lib/asyncio/futures.py:201) self.__log_traceback = False\r\n    [202](file:///C:/Python312/Lib/asyncio/futures.py:202) if self._exception is not None:\r\n--> [203](file:///C:/Python312/Lib/asyncio/futures.py:203)     raise self._exception.with_traceback(self._exception_tb)\r\n...\r\n     [63](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_storage/_vdb_hnswlib.py:63) if metadata:\r\n     [64](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_storage/_vdb_hnswlib.py:64)     self._metadata.update(dict(zip(ids, metadata)))\r\n---> [65](file:///C:/Users/user/Downloads/python/Expedio/env/Lib/site-packages/fast_graphrag/_storage/_vdb_hnswlib.py:65) self._index.add_items(data=embeddings, ids=ids, num_threads=self.config.num_threads)\r\n\r\nRuntimeError: Wrong dimensionality of the vectors\r\n```\r\nThe models are set correctly, but this weird error is occuring",
+    "comments_url": "https://api.github.com/repos/circlemind-ai/fast-graphrag/issues/58/comments",
+    "author": "idreesghazi",
+    "comments": [
+      {
+        "user": "liukidar",
+        "created_at": "2025-01-06T10:30:51Z",
+        "body": "Hello, the line `embedding_dim=512` should be modified to reflect the size of the output of your chosen embedding model. In this case, `\"text-embedding-3-large\"` uses 1536 dimensions."
+      },
+      {
+        "user": "idreesghazi",
+        "created_at": "2025-01-06T10:35:24Z",
+        "body": "I have tried this too, but the error is still the same\r\n\r\n```pyhon\r\nworking_dir = \"./myFile\"\r\ngrag = GraphRAG(\r\n    working_dir=working_dir,\r\n    domain=DOMAIN,\r\n    example_queries=\"\\n\".join(QUERIES),\r\n    entity_types=ENTITY_TYPES,\r\n    config=GraphRAG.Config(\r\n        llm_service=OpenAILLMService(\r\n            model=\"gpt-4o\",\r\n            base_url= os.getenv(\"AZURE_OPENAI_ENDPOINT\"),\r\n            api_key= os.getenv(\"AZURE_OPENAI_API_KEY\"),\r\n            client= os.getenv(\"OPENAI_API_TYPE\"), \r\n            mode=instructor.Mode.JSON\r\n        ),\r\n        embedding_service=OpenAIEmbeddingService(\r\n            model=\"text-embedding-3-large\",\r\n            base_url= os.getenv(\"AZURE_OPENAI_EMBED_ENDPOINT\"),\r\n            api_key= os.getenv(\"AZURE_OPENAI_API_KEY\"),\r\n            client= os.getenv(\"OPENAI_API_TYPE\"), \r\n            embedding_dim=1536,\r\n        ),\r\n    ),\r\n)\r\nwith open(\"./data.txt\", encoding=\"utf8\") as f:\r\n    grag.insert(f.read())\r\n```\r\n```python\r\nExtracting data: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:18<00:00, 18.24s/it]\r\nError during insertion: Wrong dimensionality of the vectors\r\n```"
+      },
+      {
+        "user": "liukidar",
+        "created_at": "2025-01-06T10:38:51Z",
+        "body": "Sorry, didn't notice the \"-large\", that embedding model uses 3072 dimensions. It could be a bit overkill for this usage, but it would be interesting to benchmark against the default \"-small\" one."
+      }
+    ]
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "https://github.com/NVIDIA/TensorRT/issues/1678",
+    "source": {
+      "issue_number": 1678
+    },
+    "initial_question": {
+      "title": "How to use the ONNX model with int8 calibration? ",
+      "body": "Hi,\r\n\r\nI am trying to following the example in PyTorch-Quantization Toolkit to do the int8 Quantization.\r\nHowever, after I manager to get the generated onnx file. I am not sure how to use this onnx file and use trtexec to complete the inference of python tensorrt."
+    },
+    "satisfaction_conditions": [
+      "ONNX model successfully converts to INT8 format",
+      "Model can be executed using TensorRT",
+      "Performance impact is understood and explained",
+      "Memory usage behavior is explained"
+    ],
+    "created_at": "2021-12-21T09:59:19Z"
+  },
+  {
+    "id": "https://github.com/NVIDIA/TensorRT/issues/1630",
+    "source": {
+      "issue_number": 1630
+    },
+    "initial_question": {
+      "title": "How to save the calibration.bin files?",
+      "body": "## Description\r\nCurrently, I'm trying to generate INT8 TRT engine with calibrations, like that\r\n`calibrator = Calibrator(data_loader=calib_data(), cache=\"identity-calib.cache\")\r\n    build_engine = EngineFromNetwork(\r\n        NetworkFromOnnxPath(\"identity.onnx\"), config=CreateConfig(int8=True, calibrator=calibrator)\r\n    )`\r\nBut I was really confused about the mechanisms:\r\n1. when was calibration performed? within the 'EngineFromNetwork' process? I tried to set break-point at calibration::get_batch(), but It did not works;\r\n2. How to get the calibration.bin files? I have tried to call the function of \"write_calibration_cache(self, cache)\",  But I don't know which 'cache' to pass in.\r\nPlease help me with these two problems, Thanks a lot.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Calibration process successfully executes during engine building",
+      "Calibration cache is automatically saved when calibration completes",
+      "Calibrator receives representative input data",
+      "Engine building process completes with INT8 configuration"
+    ],
+    "created_at": "2021-11-20T09:29:05Z"
+  },
+  {
+    "id": "https://github.com/NVIDIA/TensorRT/issues/1349",
+    "source": {
+      "issue_number": 1349
+    },
+    "initial_question": {
+      "title": "Do I have to create and run the engine on the same Nvidia Graphics Card?",
+      "body": "I generate tensorrt model (.trt) from pytorch model in machine A, and want to run the .trt file in machine B, (A and B have different  Graphics Cards). Is it allowed?"
+    },
+    "satisfaction_conditions": [
+      "TensorRT model must be executed on the same GPU architecture it was built for",
+      "Model generation and deployment environments must have hardware compatibility"
+    ],
+    "created_at": "2021-07-07T03:51:21Z"
+  },
+  {
+    "id": "https://github.com/NVIDIA/TensorRT/issues/1255",
+    "source": {
+      "issue_number": 1255
+    },
+    "initial_question": {
+      "title": "Saving a context",
+      "body": "Hi,\r\n\r\nI am using your inference.py algorithm in the demo/BERT folder. To run inference, you need to load the engine to build the context as follows:\r\n\r\n  with open(args.engine, \"rb\") as f, \\\r\n      trt.Runtime(TRT_LOGGER) as runtime, \\\r\n      runtime.deserialize_cuda_engine(f.read()) as engine, \\\r\n      engine.create_execution_context() as context:\r\n\r\nIs it possible to save the context so that we don't have to load it every time we want to run inference? \r\nThank you for your answer!"
+    },
+    "satisfaction_conditions": [
+      "Context object remains valid for multiple inference runs",
+      "No engine reloading required between inferences"
+    ],
+    "created_at": "2021-05-18T08:20:16Z"
+  },
+  {
+    "id": "https://github.com/NVIDIA/TensorRT/issues/1184",
+    "source": {
+      "issue_number": 1184
+    },
+    "initial_question": {
+      "title": "A question about TensorRT cancel point and IExecutionContext",
+      "body": "Hello there, I am a developer of inference task serving system. We use TensorRT 6/TensorRT 7 as our inference execute framework. Due to soft realtime limitation, we sometimes need to cancel current context->execute() / context->executeV2() for next inference task running safely.\r\nI didn't find any solution on TensorRT documentation, can TensorRT development team gives me some advice of cancel context->execute()? My context->execute() is running on a single POSIX thread, can I cancel it safely? Or can you give me more information about TensorRT cancellation point? Thanks a lot!"
+    },
+    "satisfaction_conditions": [
+      "CUDA kernel execution cannot be cancelled once enqueued",
+      "IExecutionContext instances must not be used simultaneously on multiple CUDA streams without synchronization",
+      "Device memory management must be properly handled when using custom memory allocation",
+      "Multiple execution contexts from the same engine must respect CUDA stream synchronization rules"
+    ],
+    "created_at": "2021-04-12T16:14:55Z"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "https://github.com/ggml-org/llama.cpp/issues/228",
+    "source": {
+      "issue_number": 228
+    },
+    "initial_question": {
+      "title": "7B/13B: Inability to write certain words/names with smaller models",
+      "body": "Hey!\r\n\r\nWhen I attempted to tell the bot in a chat-like prompt that my name is \"Nils\", I ran into an issue where the bot kept interpreting my name as \"Nil\" instead. I then noticed further issues with the word \"guild\" and some other words too.\r\nIs this a bug or to be expected? It does not happen on 30B, I couldn't give 65B a try.\r\n\r\nThanks\r\nNiansa"
+    },
+    "satisfaction_conditions": [
+      "Expected behavior differences between model sizes are explained",
+      "Clarification of whether the behavior is a bug or expected limitation"
+    ],
+    "created_at": "2023-03-17T07:46:08Z"
+  },
+  {
+    "id": "https://github.com/ggml-org/llama.cpp/pull/5745",
+    "source": {
+      "issue_number": 5745
+    },
+    "initial_question": {
+      "title": "build(python): Package scripts with pep-0517 compliance",
+      "body": "## Gist\n\nPackages the python scripts in this repo in a PEP 517-compliant way.\nOther changes:\n- Script names had to be converted to snake_case so they could be used as modules via\n  entrypoints declared in `pyproject.toml`.\n\nRef: #5664\n"
+    },
+    "satisfaction_conditions": [
+      "Python package structure complies with PEP 517 standards",
+      "All script names follow Python module naming conventions (snake_case)"
+    ],
+    "created_at": "2024-02-27T06:34:38Z"
+  }
+]

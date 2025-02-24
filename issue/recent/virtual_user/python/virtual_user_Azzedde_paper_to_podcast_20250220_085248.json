@@ -1,0 +1,19 @@
+[
+  {
+    "id": "https://github.com/Azzedde/paper_to_podcast/issues/8",
+    "source": {
+      "issue_number": 8
+    },
+    "initial_question": {
+      "title": "API Key",
+      "body": "Hello Azzedine, great project indeed, can't wait to test it.\r\n\r\nI'm not that expert when it comes to LLMs or NLP in general, yet when i try to test the project  I receive the following error : **API Key not found**. \r\nI understand that there must be some kind of access key to use the API, yet you haven't specified anything related to in your readme file, so how what you suggestion as a solution to this issue ?\r\n\r\nThanks.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Valid API credentials must be configured in the project",
+      "Credentials must be accessible to the application at runtime",
+      "User must have an active account with an LLM service provider",
+      "Project documentation must explain credential configuration requirements"
+    ],
+    "created_at": "2024-12-09T15:58:46Z"
+  }
+]

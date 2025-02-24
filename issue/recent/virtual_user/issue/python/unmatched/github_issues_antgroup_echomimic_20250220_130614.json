@@ -1,0 +1,38 @@
+[
+  {
+    "number": 20,
+    "title": "\u8fd0\u884c    python -u infer_audio2vid.py \u51fa\u73b0\u9519\u8bef ImportError: cannot import name 'PositionNet' from 'diffusers.models.embeddings' (",
+    "created_at": "2024-07-11T10:41:31Z",
+    "closed_at": "2024-07-14T04:53:30Z",
+    "labels": [],
+    "url": "https://github.com/antgroup/echomimic/issues/20",
+    "body": "Traceback (most recent call last):\r\n  File \"E:\\ai3\\EchoMimic\\infer_audio2vid.py\", line 23, in <module>\r\n    from src.models.unet_2d_condition import UNet2DConditionModel\r\n  File \"E:\\ai3\\EchoMimic\\src\\models\\unet_2d_condition.py\", line 18, in <module>\r\n    from diffusers.models.embeddings import (\r\nImportError: cannot import name 'PositionNet' from 'diffusers.models.embeddings' (E:\\ai3\\EchoMimic\\venv\\Lib\\site-packages\\diffusers\\models\\embeddings.py)\r\n",
+    "comments_url": "https://api.github.com/repos/antgroup/echomimic/issues/20/comments",
+    "author": "anstonjie",
+    "comments": [
+      {
+        "user": "yuange250",
+        "created_at": "2024-07-11T10:42:17Z",
+        "body": "pip install diffusers==0.24.0"
+      }
+    ]
+  },
+  {
+    "number": 3,
+    "title": "ImportError: cannot import name 'PositionNet' from 'diffusers.models.embeddings'",
+    "created_at": "2024-07-09T18:03:12Z",
+    "closed_at": "2024-07-10T03:34:00Z",
+    "labels": [],
+    "url": "https://github.com/antgroup/echomimic/issues/3",
+    "body": "(echomimic) D:\\AI\\EchoMimic>python -u infer_audio2vid.py\r\nTraceback (most recent call last):\r\n  File \"infer_audio2vid.py\", line 23, in <module>\r\n    from src.models.unet_2d_condition import UNet2DConditionModel\r\n  File \"D:\\AI\\EchoMimic\\src\\models\\unet_2d_condition.py\", line 18, in <module>\r\n    from diffusers.models.embeddings import (\r\nImportError: cannot import name 'PositionNet' from 'diffusers.models.embeddings' (C:\\Users\\Renel\\anaconda3\\envs\\echomimic\\lib\\site-packages\\diffusers\\models\\embeddings.py)",
+    "comments_url": "https://api.github.com/repos/antgroup/echomimic/issues/3/comments",
+    "author": "oisilener1982",
+    "comments": [
+      {
+        "user": "yuange250",
+        "created_at": "2024-07-10T01:37:56Z",
+        "body": "Upgrading the 'diffusers' to higher version may solve the problem, try:\r\npip install diffusers==0.24.0"
+      }
+    ]
+  }
+]

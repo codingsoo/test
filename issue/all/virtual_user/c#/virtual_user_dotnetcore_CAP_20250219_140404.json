@@ -1,0 +1,180 @@
+[
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/1535",
+    "source": {
+      "issue_number": 1535
+    },
+    "initial_question": {
+      "title": "Optimizing RabbitMQ Performance and Managing Multiple Instances in CAP",
+      "body": "\u4f60\u597d\uff0c\u6211\u6709\u51e0\u4e2a\u95ee\u9898\u60f3\u8bf7\u6559\r\n\r\n\u4f7f\u7528RabbitMQ\uff1a\r\n\r\n1\u3001cap\u91c7\u7528\u4e86\u5355\u4e2a\u961f\u5217\uff08\u5982\uff1acap.queue.XXXX.v1\uff09\u6765\u5904\u7406\u6240\u6709\u7684\u6d88\u606f\uff0c\u8fd9\u5bf9\u6027\u80fd\u662f\u5426\u6709\u5f71\u54cd\u3002\r\n\u6bd4\u5982\u5728\u4e24\u4e2a\u573a\u666f\u4e2d\uff0c\u573a\u666f1\u4e2d\u670910w\u4e2a\u6d88\u606f\uff0c\u573a\u666f2\u4e2d\u670910\u4e2a\u6d88\u606f\uff0c\u4f46\u4ed6\u4eec\u90fd\u4f1a\u6295\u9012\u5230\u540c\u4e00\u4e2a\u961f\u5217\uff0c\u9020\u6210\u573a\u666f2\u7684\u65e0\u6545\u7b49\u5f85\u3002\u6211\u53ef\u4ee5\u5982\u4f55\u5904\u7406\u8fd9\u79cd\u60c5\u51b5\r\n\r\n2\u3001\u6211\u53ef\u4ee5\u5982\u4f55\u6ce8\u5165\u591a\u4e2a\u5b9e\u4f8b\r\n\u9879\u76ee\u4e2d\u6211\u53ef\u80fd\u4f1a\u4f7f\u7528\u591a\u4e2aCAP\uff0c\u5728\u5bf9\u63a5\u591a\u4e2a\u9879\u76ee\u65f6\uff0c\u53ef\u80fd\u9879\u76eeA\u4f7f\u7528MQ1\u5b9e\u4f8b\uff0c\u9879\u76eeB\u4f7f\u7528MQ2\u5b9e\u4f8b\uff0c\u6211\u53ef\u4ee5\u5982\u4f55\u6ce8\u5165\u5e76\u83b7\u53d6\u5230\u4e0d\u540c\u7684\u5b9e\u4f8b\u6765\u53d1\u9001\u6216\u5904\u7406\u6d88\u606f"
+    },
+    "satisfaction_conditions": [
+      "Queue performance must handle high message volumes efficiently",
+      "Message isolation capability must exist",
+      "Architecture alignment with event-driven patterns",
+      "Message processing independence between different scenarios"
+    ],
+    "created_at": "2024-05-22T01:22:23Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/1323",
+    "source": {
+      "issue_number": 1323
+    },
+    "initial_question": {
+      "title": "Disabling cap logs",
+      "body": "hi,\r\n\r\nwhile using cap library, it writes a lot of log in addition to my app's logs. Is there a way to disable cap's log?"
+    },
+    "satisfaction_conditions": [
+      "CAP library logging output is reduced",
+      "Application's own logs remain unaffected"
+    ],
+    "created_at": "2023-05-02T22:13:29Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/1070",
+    "source": {
+      "issue_number": 1070
+    },
+    "initial_question": {
+      "title": "Share the same SQL server as CAP storage for multiple services",
+      "body": "Hi, I'm wondering if it's a good practice to share the same message storage for multiple services using CAP? For example, some of our microservices doesn't have a database, it just receives messages from azure service bus and process them. Can I just create a centralised SQL server as CAP message store and share them between these services? \r\n\r\nThanks"
+    },
+    "satisfaction_conditions": [
+      "Multiple services must be able to use the same SQL server instance for CAP message storage",
+      "Message data from different services must be logically separated",
+      "Solution must work with services that don't have their own database",
+      "Configuration must allow unique identification of each service's message storage"
+    ],
+    "created_at": "2022-01-15T01:14:41Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/386",
+    "source": {
+      "issue_number": 386
+    },
+    "initial_question": {
+      "title": "How to subscribe multiple message in console app",
+      "body": "Hi yang-xiaodong\r\n\r\n Follow by issues #275.\r\n I'd like to ask you how to subscribe multiple message in console app?\r\n\r\nTks so much\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple distinct message subscriptions must be able to coexist in the same console application",
+      "Each subscription must function independently",
+      "Message subscription implementation must be compatible with console application lifecycle",
+      "Subscriptions must be able to process messages when received"
+    ],
+    "created_at": "2019-08-26T06:29:24Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/304",
+    "source": {
+      "issue_number": 304
+    },
+    "initial_question": {
+      "title": "\u591a\u6570\u636e\u5e93\uff0c\u53ea\u5efa\u4e86\u4e00\u4e2a\u5e93\u7684\u8868\u7684\u95ee\u9898",
+      "body": "\u4f7f\u7528\u4e86\u4e24\u4e2a\u6570\u636e\u5e93\uff0c\u53ea\u6709\u5176\u4e2d\u4e00\u4e2a\u6570\u636e\u5e93\u81ea\u52a8\u521b\u5efa\u4e86\u6570\u636e\u8868\uff0c\u53e6\u4e00\u4e2a\u9700\u8981\u624b\u5de5\u521b\u5efa\u6570\u636e\u8868\r\nx.UseSqlServer(ConnnectionFactory.ConnectionString);\r\nx.UseSqlServer(ConnnectionFactory.ConnectionString2);\r\n\r\n\u80fd\u770b\u5230CapOptions.Extensions\u6709\u4e24\u4e2a\u6570\u636e\u5e93\u7684\u5bf9\u50cf\uff0c\u6309\u6211\u7684\u7406\u89e3\u5e94\u8be5\u662f\u652f\u6301\u591a\u6570\u636e\u5e93\u5efa\u8868\u7684"
+    },
+    "satisfaction_conditions": [
+      "System must maintain data consistency when handling transactions",
+      "Solution must accommodate different data storage requirements for different types of data"
+    ],
+    "created_at": "2019-03-22T09:00:25Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/264",
+    "source": {
+      "issue_number": 264
+    },
+    "initial_question": {
+      "title": "How to configure RabbitMQ Cluster?",
+      "body": "- [\u221a] Question or discussion\r\n___\r\n### Question\r\n- \u5982\u679cRabbitMQ\u96c6\u7fa4\uff0c\u5728UseRabbitMQ\u7684\u65f6\u5019\u5e94\u8be5\u600e\u4e48\u914d\u7f6e\u5462\uff1f\r\n___"
+    },
+    "satisfaction_conditions": [
+      "Multiple RabbitMQ server nodes can be accessed by the client",
+      "Client configuration correctly specifies cluster node addresses"
+    ],
+    "created_at": "2019-01-03T02:11:13Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/202",
+    "source": {
+      "issue_number": 202
+    },
+    "initial_question": {
+      "title": "Does CAP support ASP.NET MVC\uff1f",
+      "body": "\u6211\u73b0\u5728\u6709\u4e2a\u9879\u76ee\u662f\u7528 \u4f20\u7edf\u7684asp.net mvc \u6846\u67b6\u8fdb\u884c\u5f00\u53d1\u7684\uff0c\u6846\u67b6\u662f netframework 4.6 \u3002cap\u63d0\u4f9b\u4e86\u50cf\u652f\u6301asp.net core \u90a3\u6837\u5bf9 asp.net mvc \u6846\u67b6\u63d0\u4f9b\u4e86\u652f\u6301\u4e86\u5417\uff1f\r\n PS:\u6211\u4eec\u9879\u76ee\u7528kafka\u4f5c\u4e3a\u4e86\u6d88\u606f\u961f\u5217"
+    },
+    "satisfaction_conditions": [
+      "Framework compatibility requirements are met",
+      "Dependency Injection support is verified"
+    ],
+    "created_at": "2018-09-10T02:32:03Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/124",
+    "source": {
+      "issue_number": 124
+    },
+    "initial_question": {
+      "title": "Problems with multiple subscriptions",
+      "body": "```\r\npublic void ConfigureServices(IServiceCollection services)\r\n{\r\n    ...\r\n    services.AddTransient<ITestMessage, TestMessage>();\r\n    //services.AddTransient<ITestMessage2, TestMessage2>();\r\n    services.AddCap(x => {  });\r\n}\r\n```\r\n\r\nThe above code works well after commenting out one subscription. However,  there is a puzzling problem when I try to open two subscriptions. Publishers can publish successfully, but subscribers can't receive any messages, I'm very confused. Is it the wrong way I use it? \r\nSee the code below\uff1a\r\n```\r\nprivate async Task SendRequest()\r\n{\r\n    using (var trans = context.Database.BeginTransaction())\r\n    {\r\n        await publisher.PublishAsync(\"Test.Message\", \"\");\r\n        ...\r\n        trans.Commit();\r\n    }\r\n}\r\n\r\npublic interface ITestMessage\r\n{\r\n    void TestSubscriber(string text); \r\n}\r\n\r\npublic class TestMessage : ITestMessage, ICapSubscribe\r\n{\r\n    [CapSubscribe(\"Test.Message\")]\r\n    public void TestSubscriber(string text)\r\n    {\r\n    }\r\n}\r\n```"
+    },
+    "satisfaction_conditions": [
+      "Multiple subscribers must be able to receive messages from the same topic",
+      "Each subscriber must be properly registered in the dependency injection container",
+      "Message broker configuration must be defined only once",
+      "Subscribers listening to the same topic must have unique group identifiers",
+      "Message publishing must successfully trigger all properly configured subscribers"
+    ],
+    "created_at": "2018-04-29T08:49:42Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/79",
+    "source": {
+      "issue_number": 79
+    },
+    "initial_question": {
+      "title": "Can we use CAP without storing messages to Database?",
+      "body": "I can see it takes benefits store messages to database, but will it make the process slower since we want to use RabbitMQ to fire&forget in many cases?"
+    },
+    "satisfaction_conditions": [
+      "Data consistency requirements are properly evaluated",
+      "Message reliability guarantees match use case needs",
+      "Selected architecture aligns with consistency model"
+    ],
+    "created_at": "2018-01-21T15:40:50Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/52",
+    "source": {
+      "issue_number": 52
+    },
+    "initial_question": {
+      "title": "how dapper user works?",
+      "body": "   \r\n```\r\n        [Route(\"publish\")]\r\n        public async Task<IActionResult> PublishMessage()\r\n        {\r\n            const string cstr = \"Data Source=192.168.0.250;Initial Catalog=CapDemo;User ID=sa;Password=123123;\";\r\n\r\n            var sql1 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo\", new Person { Name = \"\u8001\u5f20\", Age = 30 }, sql1);\r\n\r\n            var sql2 = new System.Data.SqlClient.SqlConnection(cstr);\r\n            await _publisher.PublishAsync(\"CapDemo.Service\", new Person { Name = \"\u8001\u674e\", Age = 40 }, sql2);\r\n\r\n            return Ok();\r\n        }\r\n```\r\n\r\nshould I create a instance of SqlConnection when publish a message ? "
+    },
+    "satisfaction_conditions": [
+      "Transaction integrity must be maintained across multiple publish operations",
+      "Connection and transaction resources must be properly managed",
+      "Multiple messages must be publishable in a single operation context"
+    ],
+    "created_at": "2017-10-20T03:15:52Z"
+  },
+  {
+    "id": "https://github.com/dotnetcore/CAP/issues/1299",
+    "source": {
+      "issue_number": 1299
+    },
+    "initial_question": {
+      "title": "Kafka partitioning and consumer Client Id property.",
+      "body": "Hi,\r\nWe are using this great library heavily in our projects. And our projects require heavy message processing. So we need multi-core processing. It is known that if you need concurrent processing you need to have partitions in kafka. When you set `ConsumerThreadCount` greater than 1 it will have no effect on the concurrency. As the topics will have just 1 partition created by the CAP. This part is manageable you can of course set the partition count manually via kafka command line tools. But when you do this you need to set the `client.id` for each thread that is consuming. Currently, the library only allows for passing config only in the startup stage, and this config is shared by all the consumers. So we need to be able to configure each consumer id individually. If you can provide a callback (it would be better if an async callback) kind of setting which will determine the client id of the consumer it will super useful. \r\nIf anyone has the same issue as us, we are currently using a workaround that requires setting the `ConsumerThreadCount` to 1 and setting the client id at startup. Instead of having multi-threading in a single app, we are using multiple apps to consume concurrently. This is easy to implement in a k8s environment you can easily increase the pod count. But I don't know about self-hosted applications (In IIS you can also increase the worker process count.). Also, I don't know if it is as efficient as having multiple threads.\r\n"
+    },
+    "satisfaction_conditions": [
+      "Multiple consumer threads must be able to process messages from the same topic concurrently",
+      "Consumer instances within the same consumer group must maintain distinct identities",
+      "Consumer thread count must align with partition count for effective parallelization",
+      "Consumer configuration must support distributed deployment scenarios"
+    ],
+    "created_at": "2023-03-22T14:53:01Z"
+  }
+]

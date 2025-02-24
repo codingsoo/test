@@ -1,0 +1,52 @@
+[
+  {
+    "id": "https://github.com/ThreeMammals/Ocelot/issues/361",
+    "source": {
+      "issue_number": 361
+    },
+    "initial_question": {
+      "title": "how can i config consul in ocelot if there is a consul cluster?  use virtual ip?",
+      "body": " \"ServiceDiscoveryProvider\": {\r\n      \"Provider\": \"Consul\",\r\n      \"Host\": \"localhost\",\r\n      \"Port\": 8500\r\n    }"
+    },
+    "satisfaction_conditions": [
+      "Ocelot must be able to communicate with the Consul cluster",
+      "Failed Ocelot instances must not receive traffic",
+      "Local service discovery endpoint must be accessible to Ocelot",
+      "Load balancing mechanism must detect and handle service unavailability"
+    ],
+    "created_at": "2018-05-16T08:42:15Z"
+  },
+  {
+    "id": "https://github.com/ThreeMammals/Ocelot/issues/623",
+    "source": {
+      "issue_number": 623
+    },
+    "initial_question": {
+      "title": "How to get RemoteIPAddress in Asp.Net core 2.1 Service behind ocelot",
+      "body": "## Expected Behavior / New Feature\r\nGet User Real IP Address\r\n\r\n## Actual Behavior / Motivation for New Feature\r\nGet Ocelot gateway IP Address\r\n\r\n## Steps to Reproduce the Problem\r\n\r\n  1.Ocelot route http request to my asp.net core 2.1 service;\r\n  2.In asp.net core 2.1 controller get remoteIPAddress from method \"var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();\"\r\n\r\n\r\n## Specifications\r\n\r\n  - Version:9.0.0\r\n  - Platform:CentOS7\r\n  - Subsystem:\r\n"
+    },
+    "satisfaction_conditions": [
+      "The system must correctly obtain the original client IP address when requests pass through Ocelot gateway",
+      "The forwarded client IP information must be preserved across the request chain",
+      "The solution must work within ASP.NET Core 2.1 service architecture",
+      "The implementation must handle header forwarding between proxy layers"
+    ],
+    "created_at": "2018-09-17T08:32:46Z"
+  },
+  {
+    "id": "https://github.com/ThreeMammals/Ocelot/issues/41",
+    "source": {
+      "issue_number": 41
+    },
+    "initial_question": {
+      "title": "Get Cake build working on MacOS",
+      "body": "Think the problem is that cake cannot reference variables declared at top of page in private methods on macos...no idea why it can on windows!"
+    },
+    "satisfaction_conditions": [
+      "Variables are accessible within private methods",
+      "Code executes consistently across operating systems",
+      "No modification of the variable declarations is required"
+    ],
+    "created_at": "2017-02-12T14:59:15Z"
+  }
+]

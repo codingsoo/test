@@ -1,0 +1,20 @@
+[
+  {
+    "number": 83,
+    "title": "construction problem",
+    "created_at": "2024-10-21T12:42:15Z",
+    "closed_at": "2024-10-22T14:36:31Z",
+    "labels": [],
+    "url": "https://github.com/gusye1234/nano-graphrag/issues/83",
+    "body": "when i input the construction \"pip install -e .\", there is a error hint\"ERROR: file:///Users/liuxiang/Desktop/nano-graphrag-main/nano_graphrag does not appear to be a Python project: neither 'setup.py' nor 'pyproject.toml' found.\" I can't find such files in that directory.",
+    "comments_url": "https://api.github.com/repos/gusye1234/nano-graphrag/issues/83/comments",
+    "author": "qhlx",
+    "comments": [
+      {
+        "user": "gusye1234",
+        "created_at": "2024-10-21T14:59:00Z",
+        "body": "You maybe in the wrong dir. Make sure you're running the command in the root dir of this project, where `setup.py` is located"
+      }
+    ]
+  }
+]

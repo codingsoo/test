@@ -1,0 +1,22 @@
+[
+  {
+    "number": 18,
+    "title": "[Bug] Compilation error: 'isPointerActive' undeclared",
+    "created_at": "2024-09-19T09:36:27Z",
+    "closed_at": "2024-09-19T19:21:15Z",
+    "labels": [
+      "Attempted Fix"
+    ],
+    "url": "https://github.com/nicbarker/clay/issues/18",
+    "body": "Hello,\r\n\r\nI wanted to give Clay a try but when compiling this:  \r\n```c\r\n#include \"../deps/clay.h\"\r\n\r\nint main(void) {\r\n    uint64_t clay_memory_size = Clay_MinMemorySize();\r\n    \r\n    Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(clay_memory_size, malloc(clay_memory_size));\r\n    Clay_Initialize(arena, (Clay_Dimensions){800, 600});\r\n}\r\n```\r\n\r\nI got this compilation error from gcc:\r\n```\r\n/src/../deps/clay.h:3059:14: error: \u2018isPointerActive\u2019 undeclared (first use in this function)\r\n 3059 |         if (!isPointerActive && scrollData->pointerScrollActive)\r\n```\r\n\r\nThe build command I used:\r\n```\r\ngcc -o test ./src/main.c $(curl-config --libs) -lraylib -std=c99 -Wall\r\n```\r\n\r\nDo you know how I can fix this ?",
+    "comments_url": "https://api.github.com/repos/nicbarker/clay/issues/18/comments",
+    "author": "Quentindeve",
+    "comments": [
+      {
+        "user": "nicbarker",
+        "created_at": "2024-09-19T19:12:59Z",
+        "body": "Hi, thanks for the report. Silly mistake on my part here, badly merged two sets of changes. Have fixed `main` for you, should be good to go \ud83d\udc4d "
+      }
+    ]
+  }
+]

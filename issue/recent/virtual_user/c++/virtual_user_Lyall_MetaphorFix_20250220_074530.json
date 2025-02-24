@@ -1,0 +1,49 @@
+[
+  {
+    "id": "https://github.com/Lyall/MetaphorFix/issues/78",
+    "source": {
+      "issue_number": 78
+    },
+    "initial_question": {
+      "title": "0.8.2 broken on Windows (ASI fails to load and then auto-deletes itself)",
+      "body": "See title, release 0.8.2 is broken on Windows.\r\n\r\n0.8.1 works fine."
+    },
+    "satisfaction_conditions": [
+      "ASI file remains present in the intended directory after loading",
+      "Security software does not interfere with the file's operation"
+    ],
+    "created_at": "2024-10-17T00:22:45Z"
+  },
+  {
+    "id": "https://github.com/Lyall/MetaphorFix/issues/73",
+    "source": {
+      "issue_number": 73
+    },
+    "initial_question": {
+      "title": "[Game Window] issue when set to true",
+      "body": "Hi Lyall.\r\n\r\nI have an issue on my side whenever I set the Game Window to true.\r\nWhenever I close the game it seems that a process keeps on running and I have to manually shut it down with task manager.\r\nEven though the game is closed, music keeps on playing.\r\n\r\nI don't know how much more I can provide here to help but anything I can do to help solve this issue feel free to ask back.\r\n\r\nEdit: On a sidenote I noticed this because for some reason setting this to true allowed me to be able to enter the characters name at the start while it being false did not.\r\nAlso I am using specialK because of not having true borderless fullscreen (and wanted the game running the audio when tabbed out)\r\n\r\nThanks in advance and also thanks for the other amazing features coming from this fix.\r\n\r\n"
+    },
+    "satisfaction_conditions": [
+      "Game process terminates completely upon closing",
+      "Audio playback stops when game is closed",
+      "No conflicts between window management tools"
+    ],
+    "created_at": "2024-10-15T20:53:49Z"
+  },
+  {
+    "id": "https://github.com/Lyall/MetaphorFix/issues/6",
+    "source": {
+      "issue_number": 6
+    },
+    "initial_question": {
+      "title": "Breaks alt+f4 handler entirely",
+      "body": "With `CatchAltF4 = true`, you can't alt+f4 (or end game via menu) at all with this mod"
+    },
+    "satisfaction_conditions": [
+      "Alt+F4 key combination functions as expected",
+      "Configuration setting allows control over exit behavior",
+      "Exit behavior matches current game version expectations"
+    ],
+    "created_at": "2024-09-30T18:09:43Z"
+  }
+]

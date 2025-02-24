@@ -1,0 +1,82 @@
+[
+  {
+    "number": 636,
+    "title": "Import own fbx file to generate road?",
+    "created_at": "2018-07-28T22:29:03Z",
+    "closed_at": "2018-07-30T17:53:52Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/carla-simulator/carla/issues/636",
+    "body": "Hi all, I am new to Carla and want to create a environment based on my city.\r\nI imported my .fbx file into CarlaUE4 project as new roads, but then carla client didn't work.\r\nIt seems that the CarlaMapGenerator is a must to run carla client? If so, how can I \r\ncreate my own roads rather than randomly generated roads?\r\nThanks!\r\n",
+    "comments_url": "https://api.github.com/repos/carla-simulator/carla/issues/636/comments",
+    "author": "yjumpzhighy",
+    "comments": [
+      {
+        "user": "nsubiron",
+        "created_at": "2018-07-29T08:16:04Z",
+        "body": "Hi @yangzuyuanhao,\r\n\r\nIt is possible to use your own roads without the CarlaMapGenerator, but you'll get the annoying message `Controller doesn't have a road map!` (and of course the autopilot won't work). As a hack to get rid of this message you can add a CarlaMapGenerator somewhere far where is not visible, it will create the road map so the controllers are happy.\r\n\r\nNow if you want the autopilot to work (depending on how complex is your road layout), you can create way-points with our RoutePlanner."
+      },
+      {
+        "user": "yjumpzhighy",
+        "created_at": "2018-07-30T00:02:09Z",
+        "body": "HI @nsubiron ,\r\nThanks for your help! I tried your suggestions by moving the  carla generated map far away.\r\nHowever, the controller works only when the playerstart is outside of my own-created-road. There seems to be a clear boundary. Once I move the playerstart into my own city range, the controller fails\r\nimmediately. \r\n"
+      },
+      {
+        "user": "nsubiron",
+        "created_at": "2018-07-30T09:25:09Z",
+        "body": "The autopilot needs our roads to work, otherwise it thinks it's off-road."
+      },
+      {
+        "user": "yjumpzhighy",
+        "created_at": "2018-07-30T14:57:36Z",
+        "body": "@nsubiron \r\nSorry for confusion, it is not autopilot. \r\nError happens after I start the server (clicked the play button in UE4), with error message:\r\nPIE: Error: Blueprint Runtime Error: Accessed None trying to read property CallFunc_GetPlayerPawn_ReturnValue from function: 'ExecuteUbergraph_Weather' from node: AttachToComponent in graph: EventGraph in object: Weather with description: Accessed None trying to read property CallFunc_GetPlayerPawn_ReturnValue\r\n\r\n"
+      },
+      {
+        "user": "nsubiron",
+        "created_at": "2018-07-30T15:59:30Z",
+        "body": "Do you have _\"Carla Game Mode\"_ selected as game mode in the project settings? Can you check if inside it it has the default pawn set?"
+      },
+      {
+        "user": "yjumpzhighy",
+        "created_at": "2018-07-30T16:29:40Z",
+        "body": "Hi @nsubiron, yes, the project settings are good.\r\nBy the way, the error won't happen if I drop my playerstart outside my own-created-road. It makes me\r\nfell confused.\r\n "
+      },
+      {
+        "user": "nsubiron",
+        "created_at": "2018-07-30T16:39:50Z",
+        "body": "Uhm I'm confused too. Can it be that there is some collider near your player start so the vehicle fails to spawn because collision?"
+      },
+      {
+        "user": "yjumpzhighy",
+        "created_at": "2018-07-30T16:50:23Z",
+        "body": "Hi @nsubiron , pretty sure no objects near my playerstart. Actually, anywhere inside my own-created-road-range would reproduce that error..."
+      },
+      {
+        "user": "TheNihilisticRobot",
+        "created_at": "2018-07-30T17:45:13Z",
+        "body": "Hi @yangzuyuanhao \r\n\r\nPlease, open your road's model and check \"simple collision\" under \"collision drawing options\" to see the mesh collider.\r\nA common problem when trying to import big road models into Unreal is that the automatic collision generated when importing goes far up trying to cover the entire model with very few polygons. If this is true for your model you could either delete your simple collision and generate one manually yourself (Most efficient) or, in the details panel of the mesh, under collision, change collision complexity to \"Use Complex Collision as Simple\" this way it will use all the geometry of the model as collision (This option is a bit more costly but will probably work right away). "
+      }
+    ]
+  },
+  {
+    "number": 296,
+    "title": "Does the new release of carla has mapping coordinates on Town1 and Town2?",
+    "created_at": "2018-03-22T14:37:31Z",
+    "closed_at": "2018-03-22T15:11:50Z",
+    "labels": [
+      "question"
+    ],
+    "url": "https://github.com/carla-simulator/carla/issues/296",
+    "body": "I just upgraded to the new carla release to use the LiDAR sensors.\r\nHowever, In the old release, I used the \r\nx          =             measurements.player_measurements.transform.location.x\r\ny          =             measurements.player_measurements.transform.location.y\r\n\r\nThen \r\n\r\nx_pixel = (x + 1643) // 16.43 \r\ny_pixel = (y + 1643) // 16.43 \r\npixel = Town_image[int(y_pixel), int(x_pixel)]\r\n\r\nWhich will give me the mapping of the exact pixel in the Town1 from the world coordinates.\r\n\r\nSuddenly when I switched to the new Carla release this mapping factor does not work.\r\n\r\nPlease advice.\r\n\r\n",
+    "comments_url": "https://api.github.com/repos/carla-simulator/carla/issues/296/comments",
+    "author": "LoayMAmin",
+    "comments": [
+      {
+        "user": "nsubiron",
+        "created_at": "2018-03-22T15:03:19Z",
+        "body": "The measurements are now sent in meters (previously it was in centimeters) #273. That's probably it."
+      }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "number": 55,
+    "title": "Why doesn't your program show the logo?",
+    "created_at": "2024-11-11T22:31:46Z",
+    "closed_at": "2025-02-17T04:59:08Z",
+    "labels": [],
+    "url": "https://github.com/Thavarshan/comet/issues/55",
+    "body": "Why does your program not show the logo in the program removal application?",
+    "comments_url": "https://api.github.com/repos/Thavarshan/comet/issues/55/comments",
+    "author": "asdefasdf",
+    "comments": [
+      {
+        "user": "AzielCF",
+        "created_at": "2024-12-03T04:26:06Z",
+        "body": "@Thavarshan must modify the iconUrl value of the Squirrel maker for it to work. The current URL is just a GitHub URL that does not show the image. The maintainer should upload the image to Cloudinary, for example, and place the URL, and that would fix it.\r\n"
+      }
+    ]
+  }
+]

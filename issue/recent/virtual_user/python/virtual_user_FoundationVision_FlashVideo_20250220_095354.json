@@ -1,0 +1,16 @@
+[
+  {
+    "id": "https://github.com/FoundationVision/FlashVideo/issues/6",
+    "source": {
+      "issue_number": 6
+    },
+    "initial_question": {
+      "title": "missing sat.model",
+      "body": "Hello, thank you for open-sourcing such an excellent work !\n\nBut when I run `sat/demo.ipynb`, an error will be reported at the line from `sat.model.base_model import get_model`, prompting that `sat.model cannot be found`. \nI see that there is indeed no model folder in the sat, and there is no `get_model` function in the `base_model` file. Is it because a file was uploaded missing?"
+    },
+    "satisfaction_conditions": [
+      "Required dependencies are properly installed"
+    ],
+    "created_at": "2025-02-11T05:19:28Z"
+  }
+]

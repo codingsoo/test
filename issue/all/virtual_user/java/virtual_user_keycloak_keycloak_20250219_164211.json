@@ -1,0 +1,32 @@
+[
+  {
+    "id": "https://github.com/keycloak/keycloak/issues/30128",
+    "source": {
+      "issue_number": 30128
+    },
+    "initial_question": {
+      "title": "Partial Import does not work",
+      "body": "### Before reporting an issue\n\n- [X] I have read and understood the above terms for submitting issues, and I understand that my issue may be closed without action if I do not follow them.\n\n### Area\n\nadmin/ui\n\n### Describe the bug\n\nAfter using \"Partial Export\" I cannot import the file using \"Partial Import\" (the \"Import\" button stays grayed out).\n\n### Version\n\n24.0.5\n\n### Regression\n\n- [ ] The issue is a regression\n\n### Expected behavior\n\nfile can be imported (by browse, d'n'd, paste)\n\n### Actual behavior\n\n\"Import\" button stays grayed out.\n\n### How to Reproduce?\n\n1. create new realm\r\n2. go to realm settings\r\n3. actions --> partial export: keep defaults, save file.\r\n4. actions --> partial import: browser for file\r\n\r\nobserve the import button stays grayed out.\n\n### Anything else?\n\ntested in Firefox 126 and Edge 125\r\n\r\ntested via container: `podman run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:24.0.5 start-dev`, both 24.0.5 (shown) and nightly (not shown, I made sure to pull latest nightly)."
+    },
+    "satisfaction_conditions": [
+      "The partial import functionality must correctly identify when valid importable content is present",
+      "The system must accurately communicate which entity types are supported for partial import"
+    ],
+    "created_at": "2024-06-04T09:09:43Z"
+  },
+  {
+    "id": "https://github.com/keycloak/keycloak/issues/27984",
+    "source": {
+      "issue_number": 27984
+    },
+    "initial_question": {
+      "title": "Username LDAP attribute other than uid is difficult",
+      "body": "### Before reporting an issue\r\n\r\n- [X] I have read and understood the above terms for submitting issues, and I understand that my issue may be closed without action if I do not follow them.\r\n\r\n### Area\r\n\r\nldap\r\n\r\n### Describe the bug\r\n\r\nI am trying to  create a new User Federation LDAP provider, using firstname.lastname as the user login scheme. So, on my OpenLDAP server, I tried several usually empty LDAP fields where to enter firtsname.lastname for my test user, for example title, employeeNumber, and postOfficeBox. But none of these works as Username LDAP attribute in Keycloak and syncing users fails. The log shows:\r\n\r\nERROR [org.keycloak.storage.ldap.LDAPStorageProviderFactory] (executor-thread-95) Failed during import user from LDAP: org.keycloak.models.ModelException: User returned from LDAP has null username! Check configuration of your LDAP mappings.\r\n\r\n### Version\r\n\r\nlatest\r\n\r\n### Regression\r\n\r\n- [ ] The issue is a regression\r\n\r\n### Expected behavior\r\n\r\nKeycloak syncs users according to the newly set Username LDAP attribute\r\n\r\n### Actual behavior\r\n\r\nAn error message is shown which says that no user could be imported\r\n\r\n### How to Reproduce?\r\n\r\nOn the OpenLDAP server, set firstname.lastname as employeeNumber, title and postOfficeBox for some test user. Set one of these as User LDAP attribute in Keycloak and then sync all users.\r\n\r\n### Anything else?\r\n\r\n_No response_"
+    },
+    "satisfaction_conditions": [
+      "LDAP user synchronization must complete successfully when using non-standard username attributes",
+      "Username values must be consistently retrieved from the configured LDAP attribute"
+    ],
+    "created_at": "2024-03-18T10:45:24Z"
+  }
+]
